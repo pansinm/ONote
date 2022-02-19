@@ -1,0 +1,24 @@
+.wemark-block {
+  position: relative;
+  .wemark-toolbar {
+    display: flex;
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: rgba(255, 255, 255, 0.6);
+    height: 0;
+    z-index: 100;
+    // width: 100%;
+    padding: 0 20px;
+    transition: all 0.3s;
+    align-items: center;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+
+  &:hover {
+    .wemark-toolbar {
+      height: 40px;
+    }
+  }
+}

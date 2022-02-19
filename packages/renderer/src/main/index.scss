@@ -1,0 +1,43 @@
+* {
+  border: 0;
+  margin: 0;
+  outline: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: #392f41;
+}
+
+p {
+  font-size: 14px;
+  padding-bottom: 10px;
+}
+
+html {
+  overflow: hidden;
+}
+
+.bi {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+:root {
+  --editor-width: 50%;
+}
+
+.ReactCollapse--collapse {
+  transition: height 300ms;
+}
+
+.chrome-tabs {
+  background: #e9f1f6 !important;
+}
+
+[data-tab-id$=".md"] .chrome-tab-favicon {
+  // filter: invert(66%) sepia(94%) saturate(4201%) hue-rotate(159deg) brightness(92%) contrast(101%);
+}
+
+.chrome-tabs .chrome-tab[active] .chrome-tab-background > svg .chrome-tab-geometry {
+  // fill: #fffbf0;
+}

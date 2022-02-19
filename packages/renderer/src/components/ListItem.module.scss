@@ -1,0 +1,33 @@
+.ListItem {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  cursor: pointer;
+  & > span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-break: break-all;
+    flex: 1;
+  }
+    i:last-child {
+    visibility: hidden;
+    color: #ddd !important;
+  }
+  &:hover {
+    background: var(--list-item-hover-background);
+    i {
+      visibility: initial;
+      &:hover {
+        color: rgba($color: #000000, $alpha: 0.9) !important;
+      }
+    }
+  }
+
+  &:global.active {
+    color: #fff;
+    background: var(--list-item-active-background);
+  }
+}

@@ -1,0 +1,45 @@
+.fill-height {
+  height: 100%;
+  max-height: 100%;
+  min-height: 100%;
+}
+
+.fill-width {
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+}
+
+.fullfill {
+  @extend .fill-height;
+  @extend .fill-width;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.text-ellipsis {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}

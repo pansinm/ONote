@@ -1,0 +1,17 @@
+.Button {
+  padding: 5px 20px;
+  border-width: 0px;
+  border-radius: 6px;
+  background: #1e90ff;
+  cursor: pointer;
+  outline: none;
+  color: white;
+  font-size: 16px;
+  & + & {
+    margin-left: 10px;
+  }
+}
+
+.secondary {
+  background: #999;
+}

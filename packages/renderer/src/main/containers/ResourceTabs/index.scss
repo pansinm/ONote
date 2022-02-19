@@ -1,0 +1,36 @@
+.react-tabs-container {
+  background: transparent !important;
+  border-color: #e0e0e0 !important;
+}
+
+.react-tabs-tab {
+  color: #333 !important;
+}
+
+.react-tabs-tab-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.react-tabs-active {
+  border-color: transparent !important;
+  background-color: transparent !important;
+  border-left: 0 i !important;
+  border-bottom: 2px solid #6cc7f6 !important;
+}
+
+.react-tabs-tab-close {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.react-tabs-tab-close:hover {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.chrome-tabs {
+  height: 40px;
+  padding: 6px 0px 0px 0px;
+}

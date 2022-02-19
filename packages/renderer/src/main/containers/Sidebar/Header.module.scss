@@ -1,0 +1,20 @@
+.Header {
+  display: flex;
+  flex-direction: row;
+  // color: white;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.Title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  // color: white;
+  text-decoration: none;
+  .bi {
+    padding-top: 4px;
+    margin-right: 5px;
+  }
+}

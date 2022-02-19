@@ -1,0 +1,12 @@
+.file-tree__tree-item {
+  display: flex;
+  align-items: center;
+}
+
+.file-tree__tree-item.active {
+  background-color: #1e90ff;
+
+  & * {
+    color: #fff;
+  }
+}

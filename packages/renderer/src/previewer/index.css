@@ -1,0 +1,72 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+}
+* {
+  border: 0;
+  margin: 0;
+  outline: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bbb;
+  /* -webkit-border-radius: 1ex; */
+  /* -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75); */
+}
+
+::-webkit-scrollbar-corner {
+  background: #bbb;
+}
+.bi {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+:root {
+  --sidebar-width: 250px;
+  --editor-width: calc(50% - var(--sidebar-width) / 2);
+}
+
+.codex-editor__redactor {
+  padding-bottom: 0!important;
+}
+.ce-toolbar--opened {
+  display: none !important;
+}
+.ce-block__content {
+  max-width: 100% !important;
+}
+
+blockquote {
+  white-space: pre-wrap;
+}
+
+.container {
+  padding: 10px;
+  position: relative;
+}
+
+#app {
+  padding-bottom: 100vh;
+}
+
+@media only screen and (min-width: 1200px) {
+  #app {
+    display: flex;
+    justify-content: center;
+  }
+  .container {
+    flex: 1;
+    max-width: 1200px;
+  }
+}
