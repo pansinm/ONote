@@ -1,0 +1,11 @@
+.NotepadSection {
+  ul {
+    list-style: none;
+  }
+
+  padding: 10px 0;
+
+  :global .prefix {
+    margin-right: 5px;
+  }
+}

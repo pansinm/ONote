@@ -1,0 +1,6 @@
+[submodule "packages/renderer/src/simmer-markdown"]
+	path = packages/renderer/src/simmer-markdown
+	url = https://github.com/pansinm/simmer-markdown.git
+[submodule "js-sequence-diagrams"]
+	path = js-sequence-diagrams
+	url = https://github.com/bramp/js-sequence-diagrams.git
