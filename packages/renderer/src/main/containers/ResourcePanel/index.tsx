@@ -9,7 +9,7 @@ const ResourcePanel = observer(() => {
   return (
     <>
       <MarkdownResourcePanel
-        visible={/\.md$/.test(activatedUri)}
+        visible={/\.mdx?$/i.test(activatedUri)}
         uri={activatedUri}
       />
       {/todo/.test(activatedUri) ? (

@@ -19,7 +19,8 @@ const Modal: React.FC<ModalProps> = (props) => {
           width: '600px',
           maxWidth: '80%',
           display: 'flex',
-          position: 'initial',
+          // position: 'initial',
+          position: 'relative',
           ...props.style,
         },
         overlay: {

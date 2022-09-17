@@ -1,29 +1,10 @@
-import { makeAutoObservable, reaction, runInAction } from 'mobx';
-import { fsPath2Uri, uri2fsPath } from '../../utils/uri';
-import type { AvailableNote } from './NoteStore';
-import type NoteStore from './NoteStore';
-import YAML from 'yaml';
+import { makeAutoObservable, runInAction } from 'mobx';
 import _ from 'lodash';
 
-export type NoteResource = AvailableNote & {
-  category: 'note';
-  uri: string;
-  changed: boolean;
-};
-
-export type AssetResource = {
-  category: 'asset';
-  uri: string;
-  changed: boolean;
-};
-
-export type AvailableResource = NoteResource | AssetResource;
-
-class ResourceStore {
-  openedResources: AvailableResource[] = [];
-
+class ActivationStore {
   openedFiles: string[] = [];
 
+  rootUri = '';
   activeDirUri = '';
 
   activeFileUri = '';
@@ -33,25 +14,16 @@ class ResourceStore {
   /**
    * 是否正在编辑中
    */
-  editedState: { [uri: string]: boolean } = {};
+  editState: { [uri: string]: 'editing' | 'saved' } = {};
 
-  noteStore: NoteStore;
-
-  activeNotepad = '';
-  activeTag = '';
-  activeNote = '';
-
-  private rootDir = '';
-
-  constructor(noteStore: NoteStore) {
-    this.noteStore = noteStore;
+  constructor() {
     makeAutoObservable(this);
   }
 
-  get activatedResource() {
-    return this.openedResources.find(
-      (resource) => resource.uri === this.activeFileUri,
-    );
+  setRootUri(uri: string) {
+    this.openedFiles = [];
+    this.activeDirUri = '';
+    this.rootUri = uri;
   }
 
   activeDir(uri: string) {
@@ -78,103 +50,6 @@ class ResourceStore {
     this.hideSidebar = !this.hideSidebar;
   }
 
-  async load(rootDir: string) {
-    this.rootDir = rootDir;
-    const stateFile = [rootDir, 'state.yml'].join('/');
-    const text = await window.simmer.readFile(stateFile, 'utf-8');
-    const {
-      activeNotepad = '',
-      activeNote = '',
-      activeTag = '',
-      activeResourceUri = '',
-      openedResources = [],
-    } = YAML.parse(text);
-    this.activeNote = activeNote;
-    this.activeNotepad = activeNotepad;
-    this.activeTag = activeTag;
-    this.activeFileUri = activeResourceUri;
-    this.openedResources = openedResources;
-  }
-
-  async saveYaml() {
-    const stateFile = [this.rootDir, 'state.yml'].join('/');
-    const yaml = YAML.stringify({
-      activeNotepad: this.activeNotepad,
-      activeNote: this.activeNote,
-      activeTag: this.activeTag,
-      activeResourceUri: this.activeFileUri,
-      openedResources: this.openedResources,
-    });
-    await window.simmer.writeFile(stateFile, yaml, 'utf-8');
-  }
-
-  openResource(resource: AvailableResource) {
-    const uri = resource.uri;
-    if (!this.openedResources.find((resource) => resource.uri === uri)) {
-      this.openedResources = [...this.openedResources, resource];
-    }
-    this.activeFileUri = uri;
-  }
-
-  /**
-   * 打开资源文件
-   * @param uri
-   */
-  openNote(note: AvailableNote, fsPath: string) {
-    this.openResource({
-      ...note,
-      uri: fsPath2Uri(fsPath),
-      category: 'note',
-      changed: false,
-    });
-  }
-
-  async openAsset(filePath: string) {
-    this.openResource({
-      uri: fsPath2Uri(filePath),
-      category: 'asset',
-      changed: false,
-    });
-  }
-
-  markResourceUnsaved(uri: string, changed: boolean) {
-    const resource = this.openedResources.find(
-      (resource) => resource.uri === uri,
-    );
-    if (resource) {
-      resource.changed = changed;
-    }
-  }
-
-  /**
-   * 关闭资源文件
-   * @param uri
-   */
-  closeResource(uri: string) {
-    const index = this.openedResources.findIndex(
-      (resource) => resource.uri === uri,
-    );
-    if (index > -1) {
-      this.openedResources = this.openedResources.filter(
-        (resource) => resource.uri !== uri,
-      );
-      if (uri === this.activeFileUri) {
-        this.activeFileUri =
-          (this.openedResources[index - 1] || this.openedResources[index])
-            ?.uri || '';
-      }
-    }
-  }
-
-  saveResource(uri: string, content: string) {
-    if (/^inmemory/.test(uri)) {
-      return;
-    }
-    const path = uri2fsPath(uri);
-    window.simmer.writeFile(path, content);
-    this.markResourceUnsaved(uri, false);
-  }
-
   reorderOpenedFiles(fromIndex: number, toIndex: number) {
     const openedUris = [...this.openedFiles];
     const [fromUri] = openedUris.splice(fromIndex, 1);
@@ -188,10 +63,10 @@ class ResourceStore {
    * @param content
    */
   async save(uri: string, content: string) {
-    await window.simmer.writeFile(uri2fsPath(uri), content);
+    await window.fileService.writeText(uri, content);
     runInAction(() => {
-      this.editedState[uri] = false;
-      delete this.editedState[uri];
+      this.editState[uri] = 'saved';
+      delete this.editState[uri];
     });
   }
 
@@ -199,15 +74,18 @@ class ResourceStore {
    * 将文件设置为编辑状态
    * @param uri
    */
-  setEditedState(uri: string) {
-    this.editedState[uri] = true;
+  setEditState(uri: string, state: 'editing' | 'saved') {
+    this.editState = {
+      ...this.editState,
+      [uri]: state,
+    };
   }
 
   /**
    * 关闭右侧文件
    * @param uri
    */
-  closeRightResources(uri: string) {
+  closeRightFiles(uri: string) {
     const index = this.openedFiles.findIndex((fileUri) => fileUri === uri);
     if (index > -1) {
       this.openedFiles = this.openedFiles.slice(0, index + 1);
@@ -249,23 +127,15 @@ class ResourceStore {
   }
 
   /** 关闭所有 */
-  closeAllResources() {
+  closeAllFiles() {
     this.activeFileUri = '';
     this.openedFiles = [];
   }
 
   /** 关闭已保存标签 */
-  closeSavedResources() {
-    const savedResources = this.openedResources.filter(
-      (resource) => !resource.changed,
-    );
-    this.openedResources = savedResources;
-    if (
-      !savedResources.find((resource) => resource.uri === this.activeFileUri)
-    ) {
-      this.activeFileUri = savedResources[savedResources.length - 1]?.uri || '';
-    }
+  closeSavedFiles() {
+    // TODO
   }
 }
 
-export default ResourceStore;
+export default ActivationStore;

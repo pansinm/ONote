@@ -62,16 +62,16 @@ export default observer(function EditorTabs() {
         activationStore.closeOtherFiles(uri);
         break;
       case 'CLOSE_RIGHT':
-        activationStore.closeRightResources(uri);
+        activationStore.closeRightFiles(uri);
         break;
       case 'CLOSE_LEFT':
         activationStore.closeLeftFiles(uri);
         break;
       case 'CLOSE_SAVED':
-        activationStore.closeSavedResources();
+        activationStore.closeSavedFiles();
         break;
       case 'CLOSE_ALL':
-        activationStore.closeAllResources();
+        activationStore.closeAllFiles();
         break;
       default:
         break;

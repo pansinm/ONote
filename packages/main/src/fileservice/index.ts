@@ -1,9 +1,13 @@
 import { ipcMain } from 'electron';
-import localFileService from './localFileService';
+import FileService from './FileService';
+
+const fileService = new FileService();
 
 ipcMain.handle(
   'fileservice',
-  (event, command: keyof typeof localFileService, ...args) => {
-    return (localFileService[command] as any)(...args);
+  (event, command: keyof typeof fileService, ...args) => {
+    return (fileService[command] as any)(...args);
   },
 );
+
+export default fileService;

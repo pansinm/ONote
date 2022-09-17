@@ -1,3 +1,5 @@
-import Root from './Root';
+import ActivationStore from './ActivationStore';
 
-export default new Root();
+export default {
+  activationStore: new ActivationStore(),
+};

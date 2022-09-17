@@ -19,12 +19,7 @@ import FileTreeItem from '/@/components/FileTreeItem';
 const MENU_ID = 'NOTE_MENU';
 
 const NoteList: FC = observer(() => {
-  const {
-    noteStore,
-    configStore,
-    activationStore: resourceStore,
-    notepadStore,
-  } = stores;
+  const { activationStore: resourceStore } = stores;
 
   const [files, setFiles] = useState<TreeNode[]>([]);
 
@@ -67,22 +62,6 @@ const NoteList: FC = observer(() => {
     },
   ];
 
-  const moveToMenu = notepadStore.notepads
-    .filter((pad) => pad.id !== configStore.active?.id)
-    .map((pad) => ({
-      id: 'MOVE_TO_' + pad.id,
-      title: pad.name,
-      data: pad.id,
-    }));
-
-  if (moveToMenu.length) {
-    menus.splice(2, 0, {
-      id: 'MOVE_NOTE',
-      title: '移动笔记到',
-      children: moveToMenu,
-    });
-  }
-
   const createNote = async () => {
     let name = await openPrompt({
       title: '创建笔记',
@@ -106,7 +85,9 @@ const NoteList: FC = observer(() => {
     const tips = (
       <>
         是否删除笔记
-        <span style={{ color: 'red' }}>{noteStore.notes[uri]?.title}</span>
+        <span style={{ color: 'red' }}>
+          {decodeURIComponent(uri.split('/').pop()!)}
+        </span>
       </>
     );
     if (
@@ -122,29 +103,21 @@ const NoteList: FC = observer(() => {
     }
   };
 
-  const renameNote = async (id: string) => {
-    const title = noteStore.notes[id]?.title;
+  const renameNote = async (uri: string) => {
+    const title = decodeURIComponent(uri.split('/').pop()!);
     const newName = await openPrompt({
       title: '重命名',
       defaultValue: title,
       description: '请输入笔记标题',
     });
     if (newName) {
-      stores.renameNote(id, newName);
+      await window.fileService.rename(uri, newName);
+      refreshFiles();
     }
-  };
-
-  const moveNoteTo = async (noteId: string, notepadId: string) => {
-    stores.moveNoteTo(noteId, notepadId);
   };
 
   const handleMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
     const noteId = (menuProps as any).noteId;
-    if (menu.id.startsWith('MOVE_TO')) {
-      const notepadId = menu.data;
-      moveNoteTo(noteId, notepadId);
-      return;
-    }
     switch (menu.id) {
       case 'CREATE_NOTE':
         return createNote();
@@ -162,7 +135,7 @@ const NoteList: FC = observer(() => {
       <ListHeader
         onTextChange={setText}
         onNoteCreate={() => {
-          if (configStore.active?.type === 'notepad') {
+          if (stores.activationStore.activeDirUri) {
             createNote();
           } else {
             alert('请选中笔记本');
