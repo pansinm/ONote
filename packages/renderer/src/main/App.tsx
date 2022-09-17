@@ -35,7 +35,7 @@ const App: FC = observer(() => {
             color="white"
             type="chevron-double-left"
             onClick={() => {
-              stores.toggleSidebar();
+              stores.activationStore.toggleSidebar();
             }}
           ></Icon>
         ) : null}

@@ -3,6 +3,6 @@ export const resolveUri = (path: string, ctx: any) => {
   if (/^(.*?):\/\//.test(path)) {
     return path;
   }
-  
-  return new URL(path, ctx.fileUri).toString();
+
+  return new URL(path, ctx.fileUri).toString().replace('file:', 'asset:');
 };

@@ -10,10 +10,7 @@ import Previewer from './Previewer';
 import type { EditorRef } from '/@/components/MonacoEditor';
 import MonacoEditor from '/@/components/MonacoEditor';
 import stores from '../../../stores';
-import { uri2fsPath } from '/@/utils/uri';
-import type { NoteResource } from '../../../stores/ActivationStore';
 import TitleEditor from './TitleInput';
-import type { AvailableNote } from '../../../stores/NoteStore';
 import useEditorScrollSync from '/@/hooks/useEditorScrollSync';
 import useForceUpdate from '/@/hooks/useForceUpdate';
 import Flex from '/@/components/Flex';
@@ -59,7 +56,7 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
         if (!opened) {
           // 关闭后自动保存
           if (model.getVersionId()) {
-            stores.activationStore.saveResource(
+            window.fileService.writeText(
               model.uri.toString(),
               model.getValue(),
             );
@@ -70,32 +67,30 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
     }, [openedFiles]);
 
     useEffect(() => {
+      if (!props.visible) {
+        return;
+      }
       const editor = editorRef.current?.getInstance();
       if (!editor || !activatedUri) {
         return;
       }
-      if (activatedUri.endsWith('.md')) {
-        const uri = monaco.Uri.parse(activatedUri);
-        const model = monaco.editor.getModel(uri);
-        if (model) {
-          editor.setModel(model);
-          return;
-        }
-        const fsPath = uri2fsPath(activatedUri);
-        window.simmer
-          .readFile(fsPath)
-          .then((content) => {
-            editor.setModel(
-              monaco.editor.createModel(content, 'markdown', uri),
-            );
-          })
-          .catch((err) => {
-            if (/ENOENT/.test(err.message)) {
-              editor.setModel(monaco.editor.createModel('', 'markdown', uri));
-            }
-          });
+      const uri = monaco.Uri.parse(activatedUri);
+      const model = monaco.editor.getModel(uri);
+      if (model) {
+        editor.setModel(model);
+        return;
       }
-    }, [activatedUri]);
+      window.fileService
+        .readText(activatedUri)
+        .then((content) => {
+          editor.setModel(monaco.editor.createModel(content, 'markdown', uri));
+        })
+        .catch((err) => {
+          if (/ENOENT/.test(err.message)) {
+            editor.setModel(monaco.editor.createModel('', 'markdown', uri));
+          }
+        });
+    }, [activatedUri, props.visible]);
 
     useEditorScrollSync(
       editorRef.current?.getInstance(),
@@ -129,10 +124,7 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
         const model = editor.getModel();
         if (model) {
           renderMarkdown(model);
-          stores.activationStore.markResourceUnsaved(
-            model.uri.toString(),
-            true,
-          );
+          stores.activationStore.setEditState(model.uri.toString(), 'editing');
         }
       });
       editor.addCommand(
@@ -140,7 +132,7 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
         function () {
           const model = editor.getModel();
           if (model) {
-            stores.activationStore.saveResource(
+            window.fileService.writeText(
               model.uri.toString(),
               model.getValue(),
             );
@@ -152,13 +144,7 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
         modelChangeDisposer?.dispose();
       };
     }, []);
-    const isNote =
-      stores.activationStore.activatedResource?.category === 'note';
-    const noteResource = stores.activationStore
-      .activatedResource as NoteResource;
-    const note = stores.noteStore.notes[
-      noteResource?.id
-    ] as AvailableNote | null;
+
     const [dragging, setDragging] = useState(false);
     return (
       <div
@@ -168,14 +154,6 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
           flexDirection: 'column',
         }}
       >
-        {isNote && (
-          <TitleEditor
-            title={note?.title || ''}
-            onChange={(title) =>
-              stores.noteStore.setTitle(noteResource.id, title)
-            }
-          />
-        )}
         <Flex position="relative" flex={1}>
           <div
             className="fill-height editor-container"

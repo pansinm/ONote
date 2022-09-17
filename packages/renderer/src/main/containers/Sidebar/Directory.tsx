@@ -8,8 +8,7 @@ import { Uri } from 'monaco-editor';
 import FileTreeItem from '/@/components/FileTreeItem';
 
 const Directory = observer(() => {
-  const rootPath = stores.configStore.config.root;
-  const rootUri = rootPath && Uri.file(rootPath).toString();
+  const rootUri = stores.activationStore.rootUri;
   const treeItemRenderer: FileTreeProps['treeItemRenderer'] = useCallback(
     (treeNode: TreeNode) => (
       <FileTreeItem
@@ -30,12 +29,9 @@ const Directory = observer(() => {
         onTreeItemClick={(treeNode) => {
           const activeDir = stores.activationStore.activeDirUri;
           stores.activationStore.activeDir(treeNode.uri);
-          if (activeDir === treeNode.uri) {
-            treeRef.current?.expand(treeNode.uri, !treeNode.expanded);
-          } else {
-            // forceUpdate
-            treeRef.current?.updateNode(treeNode.uri, {});
-          }
+          const isSelected = activeDir === treeNode.uri;
+          const expanded = isSelected ? !treeNode.expanded : true;
+          treeRef.current?.expand(treeNode.uri, expanded);
         }}
         doFilter={(treeNode) => treeNode.type === 'directory'}
         onError={(err) => alert(err.message)}

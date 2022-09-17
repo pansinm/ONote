@@ -7,6 +7,7 @@ interface ButtonProps {
   style?: CSSProperties;
   color?: 'primary' | 'secondary';
   shape?: 'normal' | 'rectangle' | 'round';
+  disabled?: boolean;
   className?: string;
   onClick?: () => void;
 }
@@ -17,6 +18,7 @@ const Button: FunctionComponent<ButtonProps> = ({
   color,
   children,
   shape,
+  disabled,
   onClick,
 }) => {
   const borderRadiusMap = {
@@ -26,6 +28,7 @@ const Button: FunctionComponent<ButtonProps> = ({
   };
   return (
     <button
+      disabled={disabled}
       style={{ borderRadius: borderRadiusMap[shape!], ...style }}
       className={classNames(
         styles.Button,

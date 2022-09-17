@@ -1,7 +1,7 @@
-import { app, dialog, ipcMain } from 'electron';
+import { app, dialog, ipcMain, protocol } from 'electron';
 import './security-restrictions';
 import { restoreOrCreateWindow } from '/@/mainWindow';
-import './fileservice';
+import fileService from './fileservice';
 /**
  * Prevent multiple instances
  */
@@ -74,8 +74,10 @@ if (import.meta.env.PROD) {
 }
 
 app.whenReady().then(() => {
-  // protocol.interceptFileProtocol('file', (request, callback) => {
-  //   const url = request.url.substring(0, 7);
-  //   callback({ path: path.normalize(`${__dirname}/${url}`) });
-  // });
+  protocol.interceptFileProtocol('asset', (request, callback) => {
+    const url = request.url.split('?')[0];
+    fileService.resolveUri(url.replace(/^asset:/, 'file:')).then((path) => {
+      callback({ path });
+    });
+  });
 });
