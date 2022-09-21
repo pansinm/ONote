@@ -10,7 +10,6 @@ import Previewer from './Previewer';
 import type { EditorRef } from '/@/components/MonacoEditor';
 import MonacoEditor from '/@/components/MonacoEditor';
 import stores from '../../../stores';
-import TitleEditor from './TitleInput';
 import useEditorScrollSync from '/@/hooks/useEditorScrollSync';
 import useForceUpdate from '/@/hooks/useForceUpdate';
 import Flex from '/@/components/Flex';
@@ -74,22 +73,6 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
       if (!editor || !activatedUri) {
         return;
       }
-      const uri = monaco.Uri.parse(activatedUri);
-      const model = monaco.editor.getModel(uri);
-      if (model) {
-        editor.setModel(model);
-        return;
-      }
-      window.fileService
-        .readText(activatedUri)
-        .then((content) => {
-          editor.setModel(monaco.editor.createModel(content, 'markdown', uri));
-        })
-        .catch((err) => {
-          if (/ENOENT/.test(err.message)) {
-            editor.setModel(monaco.editor.createModel('', 'markdown', uri));
-          }
-        });
     }, [activatedUri, props.visible]);
 
     useEditorScrollSync(
@@ -127,18 +110,7 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
           stores.activationStore.setEditState(model.uri.toString(), 'editing');
         }
       });
-      editor.addCommand(
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
-        function () {
-          const model = editor.getModel();
-          if (model) {
-            window.fileService.writeText(
-              model.uri.toString(),
-              model.getValue(),
-            );
-          }
-        },
-      );
+
       return () => {
         modelContentDisposer?.dispose();
         modelChangeDisposer?.dispose();
@@ -159,7 +131,7 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
             className="fill-height editor-container"
             style={{ width: 'var(--editor-width)', position: 'relative' }}
           >
-            <MonacoEditor ref={editorRef} />
+            <MonacoEditor uri={props.uri} ref={editorRef} />
             <DragBar
               onStart={() => setDragging(true)}
               onStop={(delta) => {

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import ResourcePanel from '../ResourcePanel';
+import ResourcePanel from '../FileBrowser';
 import ResourceTabs from '../ResourceTabs';
 import stores from '../../stores';
 
