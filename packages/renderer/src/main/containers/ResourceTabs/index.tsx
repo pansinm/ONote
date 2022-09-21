@@ -19,16 +19,11 @@ export default observer(function EditorTabs() {
   // const [menuVisible, setMenuVisible] = useState(false);
   const { activationStore: activationStore } = stores;
   const tabs: TabProperties[] = activationStore.openedFiles.map((fileUri) => {
-    let title = basename(fileUri);
-    const isTodo = /todo/.test(fileUri);
-    if (isTodo) {
-      title = '任务清单';
-    }
     return {
-      title: title,
+      title: basename(fileUri),
       active: fileUri === activationStore.activeFileUri,
       id: fileUri,
-      favicon: isTodo ? taskIcon : (markdownIcon as any),
+      favicon: markdownIcon as any,
     };
   });
 

@@ -1,34 +1,43 @@
 import * as monaco from 'monaco-editor';
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import { useEffect } from 'react';
+import { useEvent, useLatest } from 'react-use';
 import useDimensions from '../hooks/useDimensions';
 import { MonacoMarkdownExtension } from '../simmer-markdown/src/ts';
 
 export type EditorRef = {
   getInstance: () => monaco.editor.IStandaloneCodeEditor | undefined;
 };
-export default forwardRef<EditorRef>(function Editor(props, ref) {
+
+interface MonacoEditorProps {
+  uri: string;
+  onScroll?(): void;
+  onModelChange?(fromUri: string, toUri: string): void;
+  onContentChange?(uri: string): void;
+}
+
+export default forwardRef<EditorRef, MonacoEditorProps>(function Editor(
+  props,
+  ref,
+) {
   const domRef = useRef<HTMLDivElement>(null);
-
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
-
-  const [setNode, rect] = useDimensions();
-
-  useEffect(() => {
-    editorRef.current?.layout();
-  }, [rect]);
 
   useEffect(() => {
     const editorInstance = monaco.editor.create(domRef.current!, {
       value: '',
       language: 'markdown',
       fixedOverflowWidgets: true,
-      wordWrap: 'on',
+      // wordWrap: 'on',
       theme: 'vimark',
       padding: {
         top: 10,
       },
-
       scrollbar: {
         verticalScrollbarSize: 8,
       },
@@ -39,6 +48,16 @@ export default forwardRef<EditorRef>(function Editor(props, ref) {
     editorRef.current = editorInstance;
 
     setNode(domRef.current?.parentElement || null);
+
+    editorInstance.addCommand(
+      monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
+      function () {
+        const model = editorInstance.getModel();
+        if (model) {
+          window.fileService.writeText(model.uri.toString(), model.getValue());
+        }
+      },
+    );
 
     return () => {
       editorInstance.dispose();
@@ -52,6 +71,32 @@ export default forwardRef<EditorRef>(function Editor(props, ref) {
     }),
     [],
   );
+
+  const latestUri = useLatest(props.uri);
+  const loadModel = useCallback(async (uri: string) => {
+    const aUri = monaco.Uri.parse(uri);
+    let model = monaco.editor.getModel(aUri);
+    if (!model) {
+      const content = await window.fileService.readText(uri).catch((err) => '');
+      if (uri !== latestUri.current) {
+        return;
+      }
+      model = monaco.editor.createModel(content, 'markdown', aUri);
+    }
+    editorRef.current?.setModel(model);
+  }, []);
+
+  useEffect(() => {
+    if (props.uri) {
+      loadModel(props.uri);
+    }
+  }, [props.uri]);
+
+  const [setNode, rect] = useDimensions();
+
+  useEffect(() => {
+    editorRef.current?.layout();
+  }, [rect]);
 
   return <div className="fill-height" ref={domRef}></div>;
 });
