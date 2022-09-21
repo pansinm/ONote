@@ -97,8 +97,6 @@
     "remark-html": "^15.0.1",
     "sass": "^1.49.9",
     "simple-git-hooks": "2.7.0",
-    "ssh2": "^1.11.0",
-    "ssh2-sftp-client": "^9.0.4",
     "typescript": "4.5.5",
     "unified": "^10.1.1",
     "uuid": "^8.3.2",
@@ -108,6 +106,8 @@
   },
   "dependencies": {
     "@hpcc-js/wasm": "^1.13.0",
-    "electron-updater": "4.6.5"
+    "electron-updater": "4.6.5",
+    "ssh2": "^1.11.0",
+    "ssh2-sftp-client": "^9.0.4"
   }
 }
