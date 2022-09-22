@@ -56,7 +56,6 @@ class SSHFileService implements IFileService {
 
   async writeText(uri: string, content: string): Promise<void> {
     const remotePath = this.parsePath(uri);
-    console.log('put---', remotePath, content);
     this.sftp.put(Buffer.from(content, 'utf-8'), remotePath);
   }
 
@@ -97,7 +96,11 @@ class SSHFileService implements IFileService {
     if (childNode.type === 'directory') {
       await this.sftp.mkdir(fullPath, true);
     } else {
-      await this.sftp.put('', fullPath);
+      const node = await this.readAsTreeNode(fullPath).catch((err) => false);
+      if (node) {
+        throw new Error('当前目录存在相同文件');
+      }
+      await this.sftp.put(Buffer.from(''), fullPath);
     }
     return this.readAsTreeNode(fullPath);
   }

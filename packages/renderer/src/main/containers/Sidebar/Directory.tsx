@@ -43,9 +43,13 @@ const Directory = observer(() => {
           treeNode && treeRef.current?.addNode(dirUri, treeNode);
         });
       case 'RENAME_DIRECTORY':
-        return renameFile(dirUri, 'directory');
+        return renameFile(dirUri, 'directory').then((node) => {
+          treeRef.current?.replaceNode(dirUri, node);
+        });
       case 'DELETE_DIRECTORY':
-        return deleteFile(dirUri, 'directory');
+        return deleteFile(dirUri, 'directory').then(() => {
+          treeRef.current?.removeNode(dirUri);
+        });
       default:
         return;
     }

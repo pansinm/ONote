@@ -2,6 +2,7 @@ import useConfirm from './useConfirm';
 import usePrompt from './usePrompt';
 import React, { useCallback, useMemo } from 'react';
 import stores from '../main/stores';
+import { alertAndThrow } from '../utils/alert';
 
 function useFileOperation() {
   const { open: openPrompt, Prompt } = usePrompt();
@@ -14,15 +15,19 @@ function useFileOperation() {
       description: '请输入笔记名称:',
     });
     if (!name) {
-      return;
+      throw new Error('cancel create');
     }
     if (type === 'file' && !name.includes('.')) {
       name = name + '.md';
     }
-    return await window.fileService.create(dirUri, {
-      type: type,
-      uri: dirUri + '/' + encodeURIComponent(name),
-    });
+
+    const node = await window.fileService
+      .create(dirUri, {
+        type: type,
+        uri: dirUri + '/' + encodeURIComponent(name),
+      })
+      .catch(alertAndThrow);
+    return node;
   };
 
   const deleteFile = async (uri: string, type: 'directory' | 'file') => {
@@ -41,10 +46,12 @@ function useFileOperation() {
         shouldCloseOnEsc: true,
       })
     ) {
-      await window.fileService.remove(uri);
+      await window.fileService.remove(uri).catch(alertAndThrow);
       type === 'directory'
         ? stores.activationStore.closeFilesInDir(uri)
         : stores.activationStore.closeFile(uri);
+    } else {
+      throw new Error('not delete');
     }
   };
 
@@ -56,11 +63,15 @@ function useFileOperation() {
       description: '请输入名称',
     });
     if (newName) {
-      const newNode = await window.fileService.rename(uri, newName);
+      const newNode = await window.fileService
+        .rename(uri, newName)
+        .catch(alertAndThrow);
       type === 'directory'
         ? stores.activationStore.renameDirUri(uri, newNode.uri)
         : stores.activationStore.renameFileUri(uri, newNode.uri);
+      return newNode;
     }
+    throw new Error('not rename');
   };
 
   const Modal = useCallback(
