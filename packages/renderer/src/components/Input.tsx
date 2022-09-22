@@ -13,6 +13,7 @@ type InputProps = {
   autoFocus?: boolean;
   placeholder?: string;
   onChange?: (val: string) => void;
+  onEnter?(): void;
 };
 
 const Input: FC<InputProps> = (props) => {
@@ -25,6 +26,11 @@ const Input: FC<InputProps> = (props) => {
       value={props.value}
       className={classNames(styles.Input, props.className)}
       autoFocus={props.autoFocus}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') {
+          props.onEnter?.();
+        }
+      }}
       onChange={(e) => props.onChange?.(e.target.value)}
     ></input>
   );

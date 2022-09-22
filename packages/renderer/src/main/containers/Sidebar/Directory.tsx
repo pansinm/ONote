@@ -38,7 +38,7 @@ const Directory = observer(() => {
   const handleMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
     const dirUri = (menuProps as unknown as TreeNode).uri;
     switch (menu.id) {
-      case 'CREATE_NOTE':
+      case 'CREATE_DIRECTORY':
         return createFile(dirUri, 'directory').then((treeNode) => {
           treeNode && treeRef.current?.addNode(dirUri, treeNode);
         });
