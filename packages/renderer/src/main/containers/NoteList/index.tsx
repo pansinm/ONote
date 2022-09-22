@@ -63,13 +63,21 @@ const NoteList: FC = observer(() => {
 
   const { Modal, createFile, deleteFile, renameFile } = useFileOperation();
 
+  const createNote = () => {
+    if (stores.activationStore.activeDirUri) {
+      createFile(stores.activationStore.activeDirUri, 'file').then((node) => {
+        stores.activationStore.openFile(node.uri);
+        refreshFiles();
+      });
+    } else {
+      alert('请选中笔记本');
+    }
+  };
   const handleMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
     const uri = (menuProps as any).uri;
     switch (menu.id) {
       case 'CREATE_NOTE':
-        return createFile(dirUri, 'file').then(() => {
-          refreshFiles();
-        });
+        return createNote();
       case 'RENAME_NOTE':
         return renameFile(uri, 'file').then(() => refreshFiles());
       case 'DELETE_NOTE':
@@ -81,18 +89,7 @@ const NoteList: FC = observer(() => {
 
   return (
     <div className={styles.NoteList}>
-      <ListHeader
-        onTextChange={setText}
-        onNoteCreate={() => {
-          if (stores.activationStore.activeDirUri) {
-            createFile(stores.activationStore.activeDirUri, 'file').then(() =>
-              refreshFiles(),
-            );
-          } else {
-            alert('请选中笔记本');
-          }
-        }}
-      />
+      <ListHeader onTextChange={setText} onNoteCreate={createNote} />
 
       {files.map((file) => (
         <ListItem
