@@ -19,6 +19,7 @@ const FileTreeItem: FC<FileTreeItemProps> = ({ treeNode, active }) => {
   return (
     <div
       ref={ref}
+      title={decodeURIComponent(treeNode.uri)}
       style={{
         display: 'flex',
         paddingLeft: 10,
