@@ -31,6 +31,7 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
         paddingLeft: 10,
         alignItems: 'center',
         height: 30,
+        width: '100%',
       }}
     >
       <FileIcon
