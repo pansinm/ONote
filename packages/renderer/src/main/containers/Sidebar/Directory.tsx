@@ -6,19 +6,62 @@ import stores from '../../stores';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { Uri } from 'monaco-editor';
 import FileTreeItem from '/@/components/FileTreeItem';
+import Menu from '/@/components/Menu';
+import type { MenuItem, MenuProps } from '/@/components/Menu';
+import { useContextMenu } from 'react-contexify';
+import useFileOperation from '/@/hooks/useFileOperation';
+
+const MENU_ID = 'DIRECTORY_MENU';
+const menus: MenuItem[] = [
+  {
+    id: 'CREATE_DIRECTORY',
+    title: '创建目录',
+  },
+  {
+    id: 'RENAME_DIRECTORY',
+    title: '修改名称',
+  },
+  {
+    id: 'DELETE_DIRECTORY',
+    title: '删除目录',
+  },
+];
 
 const Directory = observer(() => {
   const rootUri = stores.activationStore.rootUri;
+  const { show: showMenu } = useContextMenu({
+    id: MENU_ID,
+  });
+  const treeRef = useRef<React.ElementRef<typeof FileTree>>(null);
+  const { Modal, createFile, deleteFile, renameFile } = useFileOperation();
+
+  const handleMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
+    const dirUri = (menuProps as unknown as TreeNode).uri;
+    switch (menu.id) {
+      case 'CREATE_NOTE':
+        return createFile(dirUri, 'directory').then((treeNode) => {
+          treeNode && treeRef.current?.addNode(dirUri, treeNode);
+        });
+      case 'RENAME_DIRECTORY':
+        return renameFile(dirUri, 'directory');
+      case 'DELETE_DIRECTORY':
+        return deleteFile(dirUri, 'directory');
+      default:
+        return;
+    }
+  };
+
   const treeItemRenderer: FileTreeProps['treeItemRenderer'] = useCallback(
     (treeNode: TreeNode) => (
       <FileTreeItem
+        onContextMenu={(event) => showMenu(event, { props: treeNode })}
         active={treeNode.uri === stores.activationStore.activeDirUri}
         treeNode={treeNode}
       />
     ),
     [],
   );
-  const treeRef = useRef<React.ElementRef<typeof FileTree>>(null);
+
   return (
     <div style={{ flex: 1, width: '100%' }}>
       <FileTree
@@ -40,6 +83,8 @@ const Directory = observer(() => {
         fileService={window.fileService}
         rowHeight={34}
       />
+      <Menu menuId={MENU_ID} menus={menus} onClick={handleMenuClick} />
+      <Modal />
     </div>
   );
 });

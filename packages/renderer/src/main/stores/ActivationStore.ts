@@ -46,6 +46,19 @@ class ActivationStore {
     }
   }
 
+  closeFilesInDir(dirUri: string) {
+    this.openedFiles = this.openedFiles.filter(
+      (file) => !file.startsWith(dirUri + '/'),
+    );
+    if (this.activeDirUri === dirUri) {
+      this.activeDirUri = '';
+    }
+    this.activeFileUri =
+      this.openedFiles.find((uri) => uri === this.activeFileUri) ||
+      _.last(this.openedFiles) ||
+      '';
+  }
+
   toggleSidebar() {
     this.hideSidebar = !this.hideSidebar;
   }
@@ -55,6 +68,30 @@ class ActivationStore {
     const [fromUri] = openedUris.splice(fromIndex, 1);
     openedUris.splice(toIndex, 0, fromUri);
     this.openedFiles = openedUris;
+  }
+
+  renameFileUri(uri: string, newUri: string) {
+    this.openedFiles = this.openedFiles.map((file) => {
+      if (uri === file) {
+        return newUri;
+      }
+      return file;
+    });
+    if (this.activeFileUri === newUri) {
+      this.activeFileUri = newUri;
+    }
+  }
+
+  renameDirUri(dirUri: string, newDirUri: string) {
+    this.openedFiles = this.openedFiles.map((file) =>
+      file.startsWith(dirUri + '/') ? file.replace(dirUri, newDirUri) : file,
+    );
+    if (this.activeDirUri === dirUri) {
+      this.activeDirUri = newDirUri;
+    }
+    if (this.activeFileUri.startsWith(dirUri + '/')) {
+      this.activeFileUri = newDirUri;
+    }
   }
 
   /**

@@ -8,7 +8,7 @@ import './FileTreeItem.scss';
 interface FileTreeItemProps {
   treeNode: TreeNode;
   active: boolean;
-  onContextMenu?(): void;
+  onContextMenu?(event: React.MouseEvent<HTMLDivElement>): void;
 }
 
 const FileTreeItem: FC<FileTreeItemProps> = ({

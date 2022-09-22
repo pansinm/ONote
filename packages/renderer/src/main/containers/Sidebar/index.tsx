@@ -6,7 +6,6 @@ import Button from '/@/components/Button';
 import stores from '../../stores';
 import Flex from '/@/components/Flex';
 import Icon from '/@/components/Icon';
-import ListItem from '/@/components/ListItem';
 import Directory from './Directory';
 import Modal from '/@/components/Modal';
 import ProjectSelect from '../../components/ProjectSelect';
