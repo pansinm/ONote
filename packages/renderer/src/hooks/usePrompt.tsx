@@ -47,6 +47,7 @@ function usePrompt() {
       let value = defaultValue || '';
       const isConfirm = await open({
         title: title,
+        shouldCloseOnEsc: true,
         content: (
           <PromptContent
             defaultValue={value}
