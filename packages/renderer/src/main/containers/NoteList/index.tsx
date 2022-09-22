@@ -117,7 +117,7 @@ const NoteList: FC = observer(() => {
   };
 
   const handleMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
-    const noteId = (menuProps as any).noteId;
+    const noteId = (menuProps as any).uri;
     switch (menu.id) {
       case 'CREATE_NOTE':
         return createNote();
@@ -147,11 +147,10 @@ const NoteList: FC = observer(() => {
           key={file.uri}
           active={resourceStore.activeFileUri === file.uri}
           onContextMenu={(e) => {
-            showMenu(e, { props: { noteId: file.uri } });
+            showMenu(e, { props: { uri: file.uri } });
           }}
           onClick={() => {
             stores.activationStore.openFile(file.uri);
-            // resourceStore.openNote(note, noteStore.getNotePath(note));
           }}
           onClose={() => {
             deleteNote(file.uri);
