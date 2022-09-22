@@ -8,9 +8,14 @@ import './FileTreeItem.scss';
 interface FileTreeItemProps {
   treeNode: TreeNode;
   active: boolean;
+  onContextMenu?(): void;
 }
 
-const FileTreeItem: FC<FileTreeItemProps> = ({ treeNode, active }) => {
+const FileTreeItem: FC<FileTreeItemProps> = ({
+  treeNode,
+  active,
+  onContextMenu,
+}) => {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const ele = ref.current?.parentElement;
@@ -20,6 +25,7 @@ const FileTreeItem: FC<FileTreeItemProps> = ({ treeNode, active }) => {
     <div
       ref={ref}
       title={decodeURIComponent(treeNode.uri)}
+      onContextMenu={onContextMenu}
       style={{
         display: 'flex',
         paddingLeft: 10,
