@@ -1,21 +1,28 @@
 import type { FC } from 'react';
 import React, { useState } from 'react';
 import LocalDirSelect from './LocalDirSelect';
-import SSHForm from './SSHForm';
 import SSHProjectSelect from './SSHProjectSelect';
 import Button from '/@/components/Button';
 import View from '/@/components/View';
 
+export type Project = {
+  type: 'local' | 'ssh';
+  config: any;
+  rootUri: string;
+};
 interface ProjectSelectProps {
-  onSelect(uri: string): void;
+  onSelect(project: Project): void;
 }
 
 const ProjectSelect: FC<ProjectSelectProps> = (props) => {
-  const [tab, setTab] = useState<'local' | 'ssh'>('local');
+  const [tab, setTab] = useState<Project['type']>('local');
 
   const handleSelect = async (type: typeof tab, uri: string, config: any) => {
-    await window.fileService.connect(type, config);
-    props.onSelect(uri);
+    props.onSelect({
+      type,
+      config,
+      rootUri: uri,
+    });
   };
 
   return (

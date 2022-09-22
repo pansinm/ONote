@@ -2,6 +2,7 @@ import type {
   FileService as _FileService,
   TreeNode,
 } from '@sinm/react-file-tree/lib/type';
+import setting from '../setting';
 import LocalFileService from './LocalFileService';
 import SSHFileService from './SSHFileService';
 import type { IFileService } from './types';
