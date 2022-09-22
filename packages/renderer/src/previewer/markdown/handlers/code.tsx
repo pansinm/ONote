@@ -7,7 +7,7 @@ import Prism from './util/Prism';
 import cz from 'classnames';
 import Icon from '/@/components/Icon';
 import lineBreak from '@sinm/prism-line-break';
-import { copyElementAsImage } from '../../shared/utils/clipboard';
+import { copyElementAsImage } from '../../utils/clipboard';
 
 interface CodeProps {
   lang?: string;
