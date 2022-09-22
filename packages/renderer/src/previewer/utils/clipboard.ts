@@ -1,6 +1,6 @@
 import html2canvas from 'html2canvas';
 import { base64Unicode } from './crypto';
-import mainClient from '../../rpc/mainRpcClient';
+import mainClient from '../rpc/mainRpcClient';
 
 export function copyElementAsImage(ele: HTMLElement) {
   const newPre = ele.cloneNode(true) as HTMLPreElement;

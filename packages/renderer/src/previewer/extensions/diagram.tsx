@@ -7,7 +7,7 @@ import { useDebounce } from 'react-use';
 import diagramEngine from '../diagram/engine';
 import Block from '../markdown/handlers/components/Block';
 import Icon from '/@/components/Icon';
-import { copyElementAsImage } from '../shared/utils/clipboard';
+import { copyElementAsImage } from '../utils/clipboard';
 
 function Diagram(props: {
   value: string;

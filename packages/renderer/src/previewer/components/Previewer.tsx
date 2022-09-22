@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import 'github-markdown-css/github-markdown-light.css';
-// import usePreview from '../hooks/useMarkdown';
 import Render from '../markdown/Render';
-import EditorClient from '/@/rpc/EditorClient';
-import usePreviewerScrollSync from '../hooks/usePreviewerScrollSync';
 
 export default function Previewer({ className }: { className: string }) {
   const [resource, setResource] = useState({ uri: '', content: '' });
