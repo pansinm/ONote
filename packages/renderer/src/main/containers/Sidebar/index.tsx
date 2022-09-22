@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './index.module.scss';
 import useDimensions from '../../../hooks/useDimensions';
 import Button from '/@/components/Button';
@@ -8,12 +8,40 @@ import Flex from '/@/components/Flex';
 import Icon from '/@/components/Icon';
 import Directory from './Directory';
 import Modal from '/@/components/Modal';
+import type { Project } from '../../components/ProjectSelect';
 import ProjectSelect from '../../components/ProjectSelect';
 import View from '/@/components/View';
+import { useLocalStorage } from 'react-use';
 
 export default observer(function ActivityBar() {
   const [ref] = useDimensions();
   const [open, setOpen] = useState(false);
+  const [project, setProject] = useLocalStorage<
+    | {
+        type: 'local' | 'ssh';
+        config: any;
+        rootUri: string;
+      }
+    | undefined
+  >('project');
+
+  const handleSelect = async (project: Project) => {
+    try {
+      await window.fileService.connect(project.type, project.config);
+      stores.activationStore.setRootUri(project.rootUri);
+      setProject(project);
+      setOpen(false);
+    } catch (err) {
+      //ignore {
+    }
+  };
+
+  useEffect(() => {
+    if (project) {
+      handleSelect(project);
+    }
+  }, []);
+
   return (
     <div className={styles.Sidebar} ref={ref}>
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
@@ -50,12 +78,7 @@ export default observer(function ActivityBar() {
         >
           <Icon onClick={() => setOpen(false)} type="x" />
         </View>
-        <ProjectSelect
-          onSelect={(uri) => {
-            setOpen(false);
-            stores.activationStore.setRootUri(uri);
-          }}
-        />
+        <ProjectSelect onSelect={handleSelect} />
       </Modal>
     </div>
   );
