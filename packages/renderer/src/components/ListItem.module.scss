@@ -26,7 +26,7 @@
     }
   }
 
-  &:global.active {
+    &:global.active span {
     color: #fff;
     background: var(--list-item-active-background);
   }

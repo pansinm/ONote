@@ -131,7 +131,9 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
             className="fill-height editor-container"
             style={{ width: 'var(--editor-width)', position: 'relative' }}
           >
-            <MonacoEditor uri={props.uri} ref={editorRef} />
+            {/\.mdx?$/.test(props.uri) && (
+              <MonacoEditor uri={props.uri} ref={editorRef} />
+            )}
             <DragBar
               onStart={() => setDragging(true)}
               onStop={(delta) => {
