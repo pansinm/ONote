@@ -1,7 +1,8 @@
 .file-tree__tree-item {
   display: flex;
   align-items: center;
-&:hover {
+&:hover,
+  &.file-tree__tree-item--dragover {
     background-color: rgba($color: (
         #000),
       $alpha: 0.05

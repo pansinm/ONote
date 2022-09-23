@@ -27,6 +27,9 @@ function useFileOperation() {
         uri: dirUri + '/' + encodeURIComponent(name),
       })
       .catch(alertAndThrow);
+    if (type === 'file') {
+      await stores.fileListStore.refreshFiles();
+    }
     return node;
   };
 
@@ -47,9 +50,12 @@ function useFileOperation() {
       })
     ) {
       await window.fileService.remove(uri).catch(alertAndThrow);
-      type === 'directory'
-        ? stores.activationStore.closeFilesInDir(uri)
-        : stores.activationStore.closeFile(uri);
+      if (type === 'directory') {
+        stores.activationStore.closeFilesInDir(uri);
+      } else {
+        stores.activationStore.closeFile(uri);
+        await stores.fileListStore.refreshFiles();
+      }
     } else {
       throw new Error('not delete');
     }
@@ -66,9 +72,12 @@ function useFileOperation() {
       const newNode = await window.fileService
         .rename(uri, newName)
         .catch(alertAndThrow);
-      type === 'directory'
-        ? stores.activationStore.renameDirUri(uri, newNode.uri)
-        : stores.activationStore.renameFileUri(uri, newNode.uri);
+      if (type === 'directory') {
+        stores.activationStore.renameDirUri(uri, newNode.uri);
+      } else {
+        stores.activationStore.renameFileUri(uri, newNode.uri);
+        await stores.fileListStore.refreshFiles();
+      }
       return newNode;
     }
     throw new Error('not rename');

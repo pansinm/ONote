@@ -3,7 +3,7 @@ import React from 'react';
 
 import Sidebar from './containers/Sidebar';
 import styles from './App.module.scss';
-import NoteList from './containers/NoteList';
+import NoteList from './containers/FileList';
 import ContentPanel from './containers/ContentPanel';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';

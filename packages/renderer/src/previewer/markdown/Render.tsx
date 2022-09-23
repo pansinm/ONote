@@ -53,6 +53,7 @@ const Render: FC<RenderProps> = (props) => {
     }
     prevRef.current = { content: props.content, uri: props.uri };
   });
+  console.log(ast);
   usePreviewerScrollSync(props.uri, ast);
   return <>{render(props.uri, ast)}</>;
 };
