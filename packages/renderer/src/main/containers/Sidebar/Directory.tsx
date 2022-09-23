@@ -69,6 +69,7 @@ const Directory = observer(() => {
   return (
     <div style={{ flex: 1, width: '100%' }}>
       <FileTree
+        draggable
         ref={treeRef}
         onRootTreeChange={(root) =>
           root && treeRef.current?.expand(root.uri, true)
@@ -81,6 +82,12 @@ const Directory = observer(() => {
           treeRef.current?.expand(treeNode.uri, expanded);
         }}
         doFilter={(treeNode) => treeNode.type === 'directory'}
+        onDrop={async (fromUri, toDirUri) => {
+          stores.activationStore.closeFile(fromUri);
+          stores.activationStore.closeFilesInDir(fromUri);
+          await treeRef.current?.move(fromUri, toDirUri);
+          stores.fileListStore.refreshFiles();
+        }}
         onError={(err) => alert(err.message)}
         treeItemRenderer={treeItemRenderer}
         rootUri={rootUri}

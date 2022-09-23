@@ -16,6 +16,7 @@ export type EditorRef = {
 
 interface MonacoEditorProps {
   uri: string;
+  needLoad?: boolean;
   onScroll?(): void;
   onModelChange?(fromUri: string, toUri: string): void;
   onContentChange?(uri: string): void;
@@ -87,7 +88,7 @@ export default forwardRef<EditorRef, MonacoEditorProps>(function Editor(
   }, []);
 
   useEffect(() => {
-    if (props.uri) {
+    if (props.uri && props.needLoad) {
       loadModel(props.uri);
     }
   }, [props.uri]);

@@ -1,6 +1,11 @@
 import classNames from 'classnames';
 import { memo } from 'react';
-import type { CSSProperties, FC , MouseEventHandler } from 'react';
+import type {
+  CSSProperties,
+  FC,
+  MouseEventHandler,
+  DragEventHandler,
+} from 'react';
 import React from 'react';
 import Icon from './Icon';
 import styles from './ListItem.module.scss';
@@ -15,6 +20,7 @@ export interface ListItemProps {
   onClose?: () => void;
   onClick?: () => void;
   onContextMenu?: MouseEventHandler<HTMLDivElement>;
+  onDragStart?: DragEventHandler<HTMLDivElement>;
 }
 const Listitem: FC<ListItemProps> = ({
   className,
@@ -25,6 +31,7 @@ const Listitem: FC<ListItemProps> = ({
   hoverBackground = 'rgba(0,0,0,0.05)',
   onClose,
   onClick,
+  onDragStart,
   onContextMenu,
 }) => {
   return (
@@ -37,6 +44,8 @@ const Listitem: FC<ListItemProps> = ({
           ...style,
         } as CSSProperties
       }
+      draggable={!!onDragStart}
+      onDragStart={onDragStart}
       onContextMenu={onContextMenu}
       onClick={() => onClick?.()}
     >

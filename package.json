@@ -33,7 +33,7 @@
     "@editorjs/table": "^2.0.1",
     "@sinm/prism-line-break": "^1.1.0",
     "@sinm/react-chrome-tabs": "^1.2.16",
-    "@sinm/react-file-tree": "^0.6.0",
+    "@sinm/react-file-tree": "^0.7.0",
     "@types/diff": "^5.0.2",
     "@types/file-saver": "^2.0.5",
     "@types/html2canvas": "^1.0.0",

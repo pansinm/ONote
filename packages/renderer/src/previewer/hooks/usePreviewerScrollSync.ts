@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import type { Root } from 'mdast';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import editorClient from '../rpc/editorClient';
@@ -35,24 +36,44 @@ const handleScroll = (e: Event) => {
   });
 };
 
-function findAst(asts: Root[], lineNumber: number) {
+function findAst(asts: Root[], lineNumber: number): Root | undefined {
   const matched = asts.find((ast) => {
     return (
       (ast.position?.start.line as number) <= lineNumber &&
       (ast.position?.end.line as number) >= lineNumber
     );
   });
-
-  const next = asts.find((ast, index) => {
-    const prev = asts[index - 1];
-    if ((ast.position?.start.line as number) >= lineNumber) {
-      return !prev || (prev.position?.end.line as number) <= lineNumber;
-    }
-    return false;
-  });
-
-  return [matched, next];
+  if (matched?.children) {
+    return findAst(matched.children as any[], lineNumber) || matched;
+  }
+  return matched;
 }
+
+const scrollToLine = (ast: Root, lineNumber: number) => {
+  let found;
+  let line = lineNumber;
+  while (!found && line <= (ast.position?.end.line || lineNumber)) {
+    found = findAst(ast.children as any[], line);
+    line++;
+  }
+  if (found) {
+    const startLine = found.position?.start.line as number;
+    const endLine = found.position?.end.line as number;
+    const dom = document.querySelector(
+      `.line-start-${startLine}.line-end-${endLine}`,
+    );
+    if (dom) {
+      const rect = dom.getBoundingClientRect();
+      let rate = 0;
+      if (endLine > startLine) {
+        rate = (lineNumber - startLine) / (endLine - startLine);
+      }
+      const scrollTop = window.scrollY + rect.y + rect.height * rate;
+      window.scrollTo(window.scrollX, scrollTop);
+      return;
+    }
+  }
+};
 
 export default function usePreviewerScrollSync(uri: string, ast: Root) {
   const astRef = useRef(ast);
@@ -62,38 +83,8 @@ export default function usePreviewerScrollSync(uri: string, ast: Root) {
 
   const scrollTo = useCallback((lineNumber: number) => {
     if (astRef.current) {
-      const [found, next] = findAst(
-        astRef.current.children as any[],
-        lineNumber,
-      );
-      if (found) {
-        const startLine = found.position?.start.line as number;
-        const endLine = found.position?.end.line as number;
-        const dom = document.querySelector(
-          `.markdown-body > .line-start-${startLine}`,
-        );
-        if (dom) {
-          const rect = dom.getBoundingClientRect();
-          let rate = 0;
-          if (endLine > startLine) {
-            rate = (lineNumber - startLine) / (endLine - startLine);
-          }
-          const scrollTop = window.scrollY + rect.y + rect.height * rate;
-          window.scrollTo(window.scrollX, scrollTop);
-          return;
-        }
-      } else if (next) {
-        const startLine = next.position?.start.line as number;
-        // const endLine = next.position?.end.line as number;
-        const dom = document.querySelector(
-          `.markdown-body > .line-start-${startLine}`,
-        );
-        if (dom) {
-          const rect = dom.getBoundingClientRect();
-          const scrollTop = window.scrollY + rect.y;
-          window.scrollTo(window.scrollX, scrollTop);
-        }
-      }
+      console.log(lineNumber);
+      scrollToLine(astRef.current, lineNumber);
     }
   }, []);
 

@@ -43,7 +43,6 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
     const editorRef = useRef<EditorRef>(null);
     const previewerRef = useRef<PreviewerRef>(null);
     const forceUpdate = useForceUpdate();
-    const activatedUri = props.uri;
 
     const openedFiles = stores.activationStore.openedFiles;
     useEffect(() => {
@@ -64,16 +63,6 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
         }
       });
     }, [openedFiles]);
-
-    useEffect(() => {
-      if (!props.visible) {
-        return;
-      }
-      const editor = editorRef.current?.getInstance();
-      if (!editor || !activatedUri) {
-        return;
-      }
-    }, [activatedUri, props.visible]);
 
     useEditorScrollSync(
       editorRef.current?.getInstance(),
@@ -131,9 +120,11 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
             className="fill-height editor-container"
             style={{ width: 'var(--editor-width)', position: 'relative' }}
           >
-            {/\.mdx?$/.test(props.uri) && (
-              <MonacoEditor uri={props.uri} ref={editorRef} />
-            )}
+            <MonacoEditor
+              needLoad={/\.mdx?$/.test(props.uri)}
+              uri={props.uri}
+              ref={editorRef}
+            />
             <DragBar
               onStart={() => setDragging(true)}
               onStop={(delta) => {

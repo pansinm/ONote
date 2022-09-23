@@ -37,25 +37,6 @@ const menus: MenuItem[] = [
 const NoteList: FC = observer(() => {
   const { activationStore: resourceStore } = stores;
 
-  const [files, setFiles] = useState<TreeNode[]>([]);
-
-  const dirUri = stores.activationStore.activeDirUri;
-  const refreshFiles = useCallback(() => {
-    if (dirUri) {
-      window.fileService.readdir(dirUri).then((nodes) => {
-        if (dirUri === stores.activationStore.activeDirUri) {
-          setFiles(nodes.filter((node) => node.type === 'file'));
-        }
-      });
-    } else {
-      setFiles([]);
-    }
-  }, [dirUri]);
-
-  useEffect(() => {
-    refreshFiles();
-  }, [dirUri]);
-
   const [text, setText] = useState('');
   const { show: showMenu } = useContextMenu({
     id: MENU_ID,
@@ -65,10 +46,7 @@ const NoteList: FC = observer(() => {
 
   const createNote = () => {
     if (stores.activationStore.activeDirUri) {
-      createFile(stores.activationStore.activeDirUri, 'file').then((node) => {
-        stores.activationStore.openFile(node.uri);
-        refreshFiles();
-      });
+      createFile(stores.activationStore.activeDirUri, 'file');
     } else {
       alert('请选中笔记本');
     }
@@ -79,9 +57,9 @@ const NoteList: FC = observer(() => {
       case 'CREATE_NOTE':
         return createNote();
       case 'RENAME_NOTE':
-        return renameFile(uri, 'file').then(() => refreshFiles());
+        return renameFile(uri, 'file');
       case 'DELETE_NOTE':
-        return deleteFile(uri, 'file').then(() => refreshFiles());
+        return deleteFile(uri, 'file');
       default:
         return;
     }
@@ -91,7 +69,7 @@ const NoteList: FC = observer(() => {
     <div className={styles.NoteList}>
       <ListHeader onTextChange={setText} onNoteCreate={createNote} />
 
-      {files.map((file) => (
+      {stores.fileListStore.files.map((file) => (
         <ListItem
           key={file.uri}
           active={resourceStore.activeFileUri === file.uri}
@@ -102,7 +80,10 @@ const NoteList: FC = observer(() => {
             stores.activationStore.openFile(file.uri);
           }}
           onClose={() => {
-            deleteFile(file.uri, 'file').then(() => refreshFiles());
+            deleteFile(file.uri, 'file');
+          }}
+          onDragStart={(e) => {
+            e.dataTransfer.setData('text/plain', file.uri);
           }}
         >
           <FileTreeItem treeNode={file} active={false} />
