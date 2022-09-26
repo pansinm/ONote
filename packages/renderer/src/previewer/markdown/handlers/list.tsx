@@ -1,5 +1,5 @@
 import React from 'react';
-import type { List, ListItem } from 'mdast';
+import type { List } from 'mdast';
 import { renderChildren } from './render';
 import Block from './components/Block';
 import Icon from '/@/components/Icon';
@@ -24,7 +24,7 @@ export default function list(node: List, ctx: any) {
   );
 
   const ele = (
-    <List>
+    <List className={className}>
       {children?.map((child, index) =>
         React.cloneElement(child, { key: index }),
       )}

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import type { Root } from 'mdast';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import editorClient from '../rpc/editorClient';
 import previewerServer from '../rpc/previewerServer';
 import PreviewerRPC from '/@/rpc/PreviewerRPC';
@@ -36,29 +36,28 @@ const handleScroll = (e: Event) => {
   });
 };
 
-function findAst(asts: Root[], lineNumber: number): Root | undefined {
+function findAst(asts: Root[], lineNumber: number): Root[] {
+  const paths: Root[] = [];
   const matched = asts.find((ast) => {
     return (
       (ast.position?.start.line as number) <= lineNumber &&
       (ast.position?.end.line as number) >= lineNumber
     );
   });
-  if (matched?.children) {
-    return findAst(matched.children as any[], lineNumber) || matched;
+  if (matched) {
+    paths.push(matched);
   }
-  return matched;
+  if (matched?.children) {
+    paths.push(...findAst(matched.children as any[], lineNumber));
+  }
+  return paths;
 }
 
 const scrollToLine = (ast: Root, lineNumber: number) => {
-  let found;
-  let line = lineNumber;
-  while (!found && line <= (ast.position?.end.line || lineNumber)) {
-    found = findAst(ast.children as any[], line);
-    line++;
-  }
-  if (found) {
-    const startLine = found.position?.start.line as number;
-    const endLine = found.position?.end.line as number;
+  const paths = findAst(ast.children as any[], lineNumber).reverse();
+  for (const node of paths) {
+    const startLine = node.position?.start.line as number;
+    const endLine = node.position?.end.line as number;
     const dom = document.querySelector(
       `.line-start-${startLine}.line-end-${endLine}`,
     );

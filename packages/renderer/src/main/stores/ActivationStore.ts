@@ -1,5 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import _ from 'lodash';
+import type FileStateStore from './FileStore';
 
 class ActivationStore {
   openedFiles: string[] = [];
@@ -11,12 +12,9 @@ class ActivationStore {
 
   hideSidebar = false;
 
-  /**
-   * 是否正在编辑中
-   */
-  editState: { [uri: string]: 'editing' | 'saved' } = {};
-
-  constructor() {
+  fileStore: FileStateStore;
+  constructor(fileStore: FileStateStore) {
+    this.fileStore = fileStore;
     makeAutoObservable(this);
   }
 
@@ -30,7 +28,7 @@ class ActivationStore {
     this.activeDirUri = uri;
   }
 
-  openFile(uri: string) {
+  activeFile(uri: string) {
     this.openedFiles = _.uniq([...this.openedFiles, uri]);
     this.activeFileUri = uri;
   }
@@ -100,22 +98,7 @@ class ActivationStore {
    * @param content
    */
   async save(uri: string, content: string) {
-    await window.fileService.writeText(uri, content);
-    runInAction(() => {
-      this.editState[uri] = 'saved';
-      delete this.editState[uri];
-    });
-  }
-
-  /**
-   * 将文件设置为编辑状态
-   * @param uri
-   */
-  setEditState(uri: string, state: 'editing' | 'saved') {
-    this.editState = {
-      ...this.editState,
-      [uri]: state,
-    };
+    return this.fileStore.saveFile(uri, content);
   }
 
   /**
@@ -171,7 +154,12 @@ class ActivationStore {
 
   /** 关闭已保存标签 */
   closeSavedFiles() {
-    // TODO
+    this.openedFiles = this.openedFiles.filter((file) =>
+      this.fileStore.savedFiles.includes(file),
+    );
+    if (!this.openedFiles.includes(this.activeFileUri)) {
+      this.activeFileUri = _.last(this.openedFiles) || '';
+    }
   }
 }
 

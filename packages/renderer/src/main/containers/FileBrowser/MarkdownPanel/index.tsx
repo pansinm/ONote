@@ -7,8 +7,8 @@ import { useRef } from 'react';
 import React from 'react';
 import type { PreviewerRef } from './Previewer';
 import Previewer from './Previewer';
-import type { EditorRef } from '/@/components/MonacoEditor';
-import MonacoEditor from '/@/components/MonacoEditor';
+import type { EditorRef } from '../MonacoEditor';
+import MonacoEditor from '../MonacoEditor';
 import stores from '../../../stores';
 import useEditorScrollSync from '/@/hooks/useEditorScrollSync';
 import useForceUpdate from '/@/hooks/useForceUpdate';
@@ -44,26 +44,6 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
     const previewerRef = useRef<PreviewerRef>(null);
     const forceUpdate = useForceUpdate();
 
-    const openedFiles = stores.activationStore.openedFiles;
-    useEffect(() => {
-      const models = monaco.editor.getModels();
-      models.forEach((model) => {
-        const opened = openedFiles.find(
-          (resource) => resource === model.uri.toString(),
-        );
-        if (!opened) {
-          // 关闭后自动保存
-          if (model.getVersionId()) {
-            window.fileService.writeText(
-              model.uri.toString(),
-              model.getValue(),
-            );
-          }
-          model.dispose();
-        }
-      });
-    }, [openedFiles]);
-
     useEditorScrollSync(
       editorRef.current?.getInstance(),
       previewerRef.current?.getWindow(),
@@ -96,7 +76,7 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
         const model = editor.getModel();
         if (model) {
           renderMarkdown(model);
-          stores.activationStore.setEditState(model.uri.toString(), 'editing');
+          stores.fileStore.markFileState(model.uri.toString(), 'changed');
         }
       });
 

@@ -77,7 +77,7 @@ const NoteList: FC = observer(() => {
             showMenu(e, { props: { uri: file.uri } });
           }}
           onClick={() => {
-            stores.activationStore.openFile(file.uri);
+            stores.activationStore.activeFile(file.uri);
           }}
           onClose={() => {
             deleteFile(file.uri, 'file');

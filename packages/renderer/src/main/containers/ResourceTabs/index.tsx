@@ -11,28 +11,46 @@ import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
 import 'react-contexify/dist/ReactContexify.css';
 import markdownIcon from 'bootstrap-icons/icons/markdown.svg';
 import taskIcon from 'bootstrap-icons/icons/list-task.svg';
+import * as monaco from 'monaco-editor';
+import { useEffect } from 'react';
 import './index.scss';
 // import diagramIcon from 'bootstrap-icons/icons/diagram-2.svg';
 
 const MENU_ID = 'TABS_MENU';
 export default observer(function EditorTabs() {
   // const [menuVisible, setMenuVisible] = useState(false);
-  const { activationStore: activationStore } = stores;
-  const tabs: TabProperties[] = activationStore.openedFiles.map((fileUri) => {
+  const { fileStore, activationStore } = stores;
+  const openedFiles = activationStore.openedFiles;
+  const tabs: TabProperties[] = openedFiles.map((fileUri) => {
     return {
-      title: basename(fileUri),
+      title:
+        (fileStore.states[fileUri] === 'changed' ? '*' : '') +
+        basename(fileUri),
       active: fileUri === activationStore.activeFileUri,
       id: fileUri,
       favicon: markdownIcon as any,
     };
   });
 
+  useEffect(() => {
+    const models = monaco.editor.getModels();
+    models.forEach((model) => {
+      const uri = model.uri.toString();
+      const opened = openedFiles.find((fileUri) => fileUri === uri);
+      if (!opened && fileStore.states[uri] === 'changed') {
+        // 关闭后自动保存
+        fileStore.saveFile(model.uri.toString(), model.getValue());
+        model.dispose();
+      }
+    });
+  }, [openedFiles]);
+
   const { show } = useContextMenu({
     id: MENU_ID,
   });
 
   const active = (tabId: string) => {
-    activationStore.openFile(tabId);
+    activationStore.activeFile(tabId);
   };
 
   const reorder = (tabId: string, from: number, to: number) => {
