@@ -5,6 +5,7 @@ import { URL } from 'url';
 async function createWindow() {
   const browserWindow = new BrowserWindow({
     show: false, // Use 'ready-to-show' event to show window
+    autoHideMenuBar: true,
     icon: import.meta.env.DEV
       ? 'buildResources/icon.png'
       : nativeImage.createFromPath(
