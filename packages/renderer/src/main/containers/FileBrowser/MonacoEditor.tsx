@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react-lite';
 import * as monaco from 'monaco-editor';
 import React, {
   forwardRef,
@@ -7,8 +8,9 @@ import React, {
 } from 'react';
 import { useEffect } from 'react';
 import { useEvent, useLatest } from 'react-use';
-import useDimensions from '../hooks/useDimensions';
-import { MonacoMarkdownExtension } from '../simmer-markdown/src/ts';
+import useDimensions from '../../../hooks/useDimensions';
+import { MonacoMarkdownExtension } from '../../../simmer-markdown/src/ts';
+import stores from '../../stores';
 
 export type EditorRef = {
   getInstance: () => monaco.editor.IStandaloneCodeEditor | undefined;
@@ -22,7 +24,7 @@ interface MonacoEditorProps {
   onContentChange?(uri: string): void;
 }
 
-export default forwardRef<EditorRef, MonacoEditorProps>(function Editor(
+const MonacoEditor = forwardRef<EditorRef, MonacoEditorProps>(function Editor(
   props,
   ref,
 ) {
@@ -55,7 +57,7 @@ export default forwardRef<EditorRef, MonacoEditorProps>(function Editor(
       function () {
         const model = editorInstance.getModel();
         if (model) {
-          window.fileService.writeText(model.uri.toString(), model.getValue());
+          stores.fileStore.saveFile(model.uri.toString(), model.getValue());
         }
       },
     );
@@ -78,7 +80,7 @@ export default forwardRef<EditorRef, MonacoEditorProps>(function Editor(
     const aUri = monaco.Uri.parse(uri);
     let model = monaco.editor.getModel(aUri);
     if (!model) {
-      const content = await window.fileService.readText(uri).catch((err) => '');
+      const content = await stores.fileStore.readFile(uri).catch((err) => '');
       if (uri !== latestUri.current) {
         return;
       }
@@ -101,3 +103,5 @@ export default forwardRef<EditorRef, MonacoEditorProps>(function Editor(
 
   return <div className="fill-height" ref={domRef}></div>;
 });
+
+export default observer(MonacoEditor);

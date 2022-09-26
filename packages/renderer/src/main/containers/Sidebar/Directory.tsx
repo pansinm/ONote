@@ -10,6 +10,7 @@ import Menu from '/@/components/Menu';
 import type { MenuItem, MenuProps } from '/@/components/Menu';
 import { useContextMenu } from 'react-contexify';
 import useFileOperation from '/@/hooks/useFileOperation';
+import { when } from 'mobx';
 
 const MENU_ID = 'DIRECTORY_MENU';
 const menus: MenuItem[] = [
@@ -66,6 +67,16 @@ const Directory = observer(() => {
     [],
   );
 
+  const handleDrop = async (fromUri: string, toDirUri: string) => {
+    stores.activationStore.closeFile(fromUri);
+    stores.activationStore.closeFilesInDir(fromUri);
+    if (stores.fileStore.states[fromUri] === 'changed') {
+      await when(() => stores.fileStore.states[fromUri] !== 'changed');
+    }
+    await treeRef.current?.move(fromUri, toDirUri);
+    stores.fileListStore.refreshFiles();
+  };
+
   return (
     <div style={{ flex: 1, width: '100%' }}>
       <FileTree
@@ -82,12 +93,7 @@ const Directory = observer(() => {
           treeRef.current?.expand(treeNode.uri, expanded);
         }}
         doFilter={(treeNode) => treeNode.type === 'directory'}
-        onDrop={async (fromUri, toDirUri) => {
-          stores.activationStore.closeFile(fromUri);
-          stores.activationStore.closeFilesInDir(fromUri);
-          await treeRef.current?.move(fromUri, toDirUri);
-          stores.fileListStore.refreshFiles();
-        }}
+        onDrop={handleDrop}
         onError={(err) => alert(err.message)}
         treeItemRenderer={treeItemRenderer}
         rootUri={rootUri}

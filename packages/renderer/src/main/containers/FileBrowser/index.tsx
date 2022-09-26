@@ -15,6 +15,7 @@ const fileType = (uri: string) => {
 
 const ResourcePanel = observer(() => {
   const activatedUri = stores.activationStore.activeFileUri;
+
   return (
     <>
       <MarkdownPanel
