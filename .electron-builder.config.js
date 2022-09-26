@@ -11,7 +11,7 @@ if (process.env.VITE_APP_VERSION === undefined) {
  */
 const config = {
   appId: 'com.pansinm.onote',
-  productName: 'ONote 笔记',
+  productName: 'ONote',
   directories: {
     output: 'dist',
     buildResources: 'buildResources',

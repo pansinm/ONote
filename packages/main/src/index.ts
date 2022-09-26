@@ -2,14 +2,16 @@ import { app, dialog, ipcMain, protocol } from 'electron';
 import './security-restrictions';
 import { restoreOrCreateWindow } from '/@/mainWindow';
 import fileService from './fileservice';
+
 /**
  * Prevent multiple instances
  */
-const isSingleInstance = app.requestSingleInstanceLock();
-if (!isSingleInstance) {
-  app.quit();
-  process.exit(0);
-}
+// const isSingleInstance = app.requestSingleInstanceLock();
+// if (!isSingleInstance) {
+//   app.quit();
+//   process.exit(0);
+// }
+
 app.on('second-instance', restoreOrCreateWindow);
 
 /**
