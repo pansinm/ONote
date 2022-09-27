@@ -29,6 +29,7 @@ function useFileOperation() {
       .catch(alertAndThrow);
     if (type === 'file') {
       await stores.fileListStore.refreshFiles();
+      stores.activationStore.activeFile(node.uri);
     }
     return node;
   };
