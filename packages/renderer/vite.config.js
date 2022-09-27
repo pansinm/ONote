@@ -26,6 +26,9 @@ const config = {
       '/@/': join(PACKAGE_ROOT, 'src') + '/',
     },
   },
+  optimizeDeps: {
+    include: ['lodash/lodash.js'],
+  },
   plugins: [react()],
   base: '',
   server: {
