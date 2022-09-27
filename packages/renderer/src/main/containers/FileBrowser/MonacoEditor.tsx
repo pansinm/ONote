@@ -37,12 +37,15 @@ const MonacoEditor = forwardRef<EditorRef, MonacoEditorProps>(function Editor(
       language: 'markdown',
       fixedOverflowWidgets: true,
       // wordWrap: 'on',
-      theme: 'vimark',
+      // theme: '',
       padding: {
         top: 10,
       },
       scrollbar: {
         verticalScrollbarSize: 8,
+      },
+      unicodeHighlight: {
+        ambiguousCharacters: false,
       },
     });
 
