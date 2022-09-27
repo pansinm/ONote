@@ -7,7 +7,7 @@ export function render(node: Node, ctx: any) {
   return handler(node, ctx);
 }
 
-export function renderChildren(node: Node, ctx: any) {
+export function renderChildren(node: Node & { children?: any[] }, ctx: any) {
   if (!node.children) {
     return null;
   }

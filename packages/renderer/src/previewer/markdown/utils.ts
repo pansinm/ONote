@@ -2,6 +2,7 @@ import type { Root, Content, Parent } from 'mdast';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import gfm from 'remark-gfm';
+import remarkFrontmatter from 'remark-frontmatter';
 import footnotes from 'remark-footnotes';
 import type { ReactNode } from 'react';
 import { definitions } from 'mdast-util-definitions';
@@ -11,6 +12,7 @@ import handlersManager from './handlers/manager';
 
 const parser = unified()
   .use(remarkParse)
+  .use(remarkFrontmatter, ['yaml', 'toml'])
   .use(footnotes, { inlineNotes: true })
   .use(gfm);
 

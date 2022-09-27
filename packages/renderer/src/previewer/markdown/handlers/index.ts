@@ -22,8 +22,12 @@ import strong from './strong';
 import table from './table';
 import text from './text';
 import thematicBreak from './thematic-break';
+import toml from './toml';
+import yaml from './yaml';
 
 const handlers = {
+  toml,
+  yaml,
   blockquote,
   break: Break,
   code,
