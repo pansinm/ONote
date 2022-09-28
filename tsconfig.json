@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "esnext",
+    "sourceMap": false,
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "strict": true,
+    "jsx": "react",
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["node"],
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "/@/*": ["./src/*"]
+    },
+    "lib": ["ESNext", "dom", "dom.iterable"]
+  }
+}

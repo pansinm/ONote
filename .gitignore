@@ -4,6 +4,7 @@ dist
 *.local
 thumbs.db
 *.log
+reports
 
 .eslintcache
 

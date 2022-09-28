@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { useEvent, useLatest } from 'react-use';
 import useDimensions from '../../../hooks/useDimensions';
 import { MonacoMarkdownExtension } from '../../../simmer-markdown/src/ts';
+import { registerActions } from '../../monaco/actions';
 import stores from '../../stores';
 
 export type EditorRef = {
@@ -50,6 +51,7 @@ const MonacoEditor = forwardRef<EditorRef, MonacoEditorProps>(function Editor(
     });
 
     new MonacoMarkdownExtension().activate(editorInstance);
+    registerActions(editorInstance);
 
     editorRef.current = editorInstance;
 
