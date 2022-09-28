@@ -1,0 +1,12 @@
+{
+  "default": {
+    "requireModule": ["ts-node/register"],
+    "require": ["features/**/*.ts"],
+    "format": [
+      "progress-bar",
+      "usage:reports/usage.txt",
+      "message:reports/messages.ndjson",
+      "html:reports/html-formatter.html"
+    ]
+  }
+}
