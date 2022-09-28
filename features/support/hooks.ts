@@ -1,6 +1,7 @@
-import { BeforeAll, AfterAll } from '@cucumber/cucumber';
+import { BeforeAll, AfterAll, Before } from '@cucumber/cucumber';
 import { _electron as electron } from 'playwright';
 import type { ElectronApplication } from 'playwright';
+import { getElectronApp } from './utils';
 
 export type World = {
   electronApp: ElectronApplication;
@@ -28,6 +29,11 @@ BeforeAll(async function (this: World) {
         );
     });
   });
+});
+
+Before(async function () {
+  const electronApp = getElectronApp();
+  this.page = await electronApp.firstWindow();
 });
 
 AfterAll(async function (this: World) {
