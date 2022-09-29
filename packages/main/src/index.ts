@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'url';
 import { app, dialog, ipcMain, protocol } from 'electron';
 import './security-restrictions';
 import { restoreOrCreateWindow } from '/@/mainWindow';
@@ -76,10 +77,16 @@ if (import.meta.env.PROD) {
 }
 
 app.whenReady().then(() => {
-  protocol.interceptFileProtocol('asset', (request, callback) => {
+  protocol.interceptFileProtocol('asset', async (request, callback) => {
     const url = request.url.split('?')[0];
-    fileService.getLocalUri(url.replace(/^asset:/, 'file:')).then((path) => {
-      callback({ path });
-    });
+    try {
+      const localUri = await fileService.getLocalUri(
+        url.replace(/^asset:/, 'file:'),
+      );
+      const filePath = fileURLToPath(localUri);
+      callback({ path: filePath });
+    } catch (err) {
+      callback({ statusCode: 500, data: JSON.stringify(err) });
+    }
   });
 });
