@@ -19,7 +19,7 @@
 10. 支持@快捷插入（只支持日期）
 
 
-## Release
+## 下载
 [Release](https://github.com/pansinm/ONote/releases)
 
 
