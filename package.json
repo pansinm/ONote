@@ -5,6 +5,7 @@
     "node": ">=v16.13",
     "npm": ">=8.1"
   },
+  "version": "0.1.0",
   "main": "packages/main/dist/index.cjs",
   "scripts": {
     "postinstall": "patch-package",
