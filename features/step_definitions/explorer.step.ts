@@ -27,8 +27,15 @@ Given('打开目录', async function (this: World) {
 
 When('打开文件{string}', async function (this: World, filename: string) {
   await this.page.click(`text=${filename}`);
-  await this.page.waitForSelector('.monaco-mouse-cursor-text');
-  await this.page.focus('.monaco-editor >> textarea');
+  await this.page.waitForSelector('.chrome-tabs');
+  if (
+    await this.page.evaluate(
+      'document.querySelector(".editor-container").getBoundingClientRect().height > 0',
+    )
+  ) {
+    await this.page.waitForSelector('.monaco-editor >> textarea');
+    await this.page.focus('.monaco-editor >> textarea');
+  }
 });
 
 Then('打开的页面是编辑页面', async function (this: World) {
