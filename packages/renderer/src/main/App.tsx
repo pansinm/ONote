@@ -9,6 +9,7 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 import stores from './stores';
 import Icon from '/@/components/Icon';
+import View from '../components/View';
 
 const App: FC = observer(() => {
   return (
@@ -40,9 +41,12 @@ const App: FC = observer(() => {
           ></Icon>
         ) : null}
       </div>
-      <div className={classNames('fill-height', styles.ContentPanelWrapper)}>
+      <View
+        flexDirection="column"
+        className={classNames('fill-height', styles.ContentPanelWrapper)}
+      >
         <ContentPanel />
-      </div>
+      </View>
     </div>
   );
 });

@@ -115,12 +115,12 @@ class SSHFileService implements IFileService {
     }
   }
 
-  async resolveUri(uri: string): Promise<string> {
+  async getLocalUri(uri: string): Promise<string> {
     const remotePath = this.parsePath(uri);
     const tmpDir = os.tmpdir();
     const localPath = path.resolve(tmpDir, remotePath.replaceAll('/', '_'));
     await this.sftp.fastGet(remotePath, localPath);
-    return localPath;
+    return pathToFileURL(localPath).toString();
   }
 }
 

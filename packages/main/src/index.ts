@@ -78,7 +78,7 @@ if (import.meta.env.PROD) {
 app.whenReady().then(() => {
   protocol.interceptFileProtocol('asset', (request, callback) => {
     const url = request.url.split('?')[0];
-    fileService.resolveUri(url.replace(/^asset:/, 'file:')).then((path) => {
+    fileService.getLocalUri(url.replace(/^asset:/, 'file:')).then((path) => {
       callback({ path });
     });
   });

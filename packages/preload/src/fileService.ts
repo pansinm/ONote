@@ -34,6 +34,9 @@ export const fileService = {
   remove: function (uri: string) {
     return ipcRenderer.invoke('fileservice', 'remove', uri);
   },
+  getLocalUri: function (uri: string) {
+    return ipcRenderer.invoke('fileservice', 'getLocalUri', uri);
+  },
 } as FileService;
 
 exposeInMainWorld('fileService', fileService);

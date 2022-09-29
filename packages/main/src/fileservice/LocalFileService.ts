@@ -20,8 +20,8 @@ class _LocalFileService extends LocalFileService implements IFileService {
     const localPath = this.parsePath(uri);
     await fs.writeFile(localPath, content, 'utf-8');
   }
-  async resolveUri(uri: string): Promise<string> {
-    return this.parsePath(uri);
+  async getLocalUri(uri: string): Promise<string> {
+    return uri;
   }
 }
 

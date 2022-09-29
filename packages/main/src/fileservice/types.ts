@@ -6,5 +6,5 @@ export interface IFileService extends FileService {
   disconnect(): Promise<void>;
   readText(uri: string): Promise<string>;
   writeText(uri: string, content: string): Promise<void>;
-  resolveUri(uri: string): Promise<string>;
+  getLocalUri(uri: string): Promise<string>;
 }

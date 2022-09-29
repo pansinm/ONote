@@ -3,6 +3,10 @@ export const basename = (uri: string) => {
   return decodeURIComponent(url.pathname.split('/').pop() || '');
 };
 
+export const extname = (uri: string) => {
+  return basename(uri).split('.').pop() || '';
+};
+
 export const fileType = (uri: string) => {
   const filename = basename(uri);
   if (/\.mdx?$/.test(filename)) {
@@ -11,9 +15,13 @@ export const fileType = (uri: string) => {
   if (/^\.[^.]+$/.test(filename)) {
     return 'plaintext';
   }
-  if (/^\.(jsx?|tsx?|txt|text|css|html)$/.test(filename)) {
+  if (/\.(jsx?|tsx?|txt|text|css|html|json)$/.test(filename)) {
     return 'plaintext';
   }
+  if (/\.(png|jpe?g|gif|webp)$/.test(filename)) {
+    return 'image';
+  }
+
   return 'unknown';
 };
 
@@ -23,4 +31,8 @@ export const isMarkdown = (uri: string) => {
 
 export const isPlaintext = (uri: string) => {
   return fileType(uri) === 'plaintext';
+};
+
+export const isUnSupport = (uri: string) => {
+  return !['markdown', 'plaintext'].includes(fileType(uri));
 };
