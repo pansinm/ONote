@@ -32,8 +32,8 @@ BeforeAll(async function (this: World) {
 });
 
 Before(async function () {
-  const electronApp = getElectronApp();
-  this.page = await electronApp.firstWindow();
+  this.app = getElectronApp();
+  this.page = await this.app.firstWindow();
 });
 
 AfterAll(async function (this: World) {

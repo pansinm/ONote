@@ -10,6 +10,7 @@ import { shell } from 'electron';
 import { ipcRenderer } from 'electron';
 import { clipboard, nativeImage } from 'electron';
 import { exposeInMainWorld } from './exposeInMainWorld';
+import { fileService } from './fileService';
 
 const ensureDir = async (dir: string) => {
   const exists = await fs
@@ -96,8 +97,9 @@ export const simmer = {
     const url = new URL(`file://${urlPath}`).href + '\r\n';
     clipboard.writeBuffer('text/uri-list', Buffer.from(url, 'utf-8'));
   },
-  openExternal(url: string) {
-    shell.openExternal(url);
+  async openExternal(uri: string) {
+    const localUri = await fileService.getLocalUri(uri);
+    shell.openExternal(localUri);
   },
 };
 

@@ -65,8 +65,8 @@ class FileService implements IFileService {
   writeText(uri: string, content: string): Promise<void> {
     return this.service.writeText(uri, content);
   }
-  resolveUri(uri: string): Promise<string> {
-    return this.service.resolveUri(uri);
+  getLocalUri(uri: string): Promise<string> {
+    return this.service.getLocalUri(uri);
   }
 }
 

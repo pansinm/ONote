@@ -2,6 +2,7 @@ import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { IContext } from 'docx';
 import type { CSSProperties, FC } from 'react';
 import React from 'react';
+import { extname, fileType, isMarkdown } from '../utils/uri';
 import type { IConProps, IconType } from './Icon';
 import Icon from './Icon';
 
@@ -23,6 +24,29 @@ function getIconType(
       color: expanded ? '#ffa602' : '#ff8833',
     };
   }
+
+  if (isMarkdown(uri)) {
+    return {
+      type: 'markdown-fill',
+      color: '#00b2db',
+    };
+  }
+
+  const ext = extname(uri);
+  if (/^pptx?$/.test(ext)) {
+    return {
+      type: 'file-ppt',
+      color: '#23c2db',
+    };
+  }
+
+  if (fileType(uri) === 'image') {
+    return {
+      type: 'file-image',
+      color: '#23c2db',
+    };
+  }
+
   return { type: 'file-text', color: '#23c2db' };
 }
 
