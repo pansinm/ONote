@@ -10,6 +10,7 @@ const localFileService = new LocalFileService();
 const sshFileService = new SSHFileService();
 
 class FileService implements IFileService {
+  type?: string | undefined;
   private service: IFileService = localFileService;
 
   private config: any;
@@ -67,6 +68,9 @@ class FileService implements IFileService {
   }
   getLocalUri(uri: string): Promise<string> {
     return this.service.getLocalUri(uri);
+  }
+  searchFiles(rootUri: string, keywords: string) {
+    return this.service.searchFiles(rootUri, keywords);
   }
 }
 

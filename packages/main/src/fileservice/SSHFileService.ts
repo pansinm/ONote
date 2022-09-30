@@ -122,6 +122,20 @@ class SSHFileService implements IFileService {
     await this.sftp.fastGet(remotePath, localPath);
     return pathToFileURL(localPath).toString();
   }
+  async searchFiles(rootUri: string, keywords: string): Promise<TreeNode[]> {
+    const matchedFiles: TreeNode[] = [];
+    const files = await this.readdir(rootUri);
+    for (const file of files) {
+      if (file.type === 'directory') {
+        matchedFiles.push(...(await this.searchFiles(file.uri, keywords)));
+      } else {
+        if (decodeURIComponent(this.parsePath(file.uri)).includes(keywords)) {
+          matchedFiles.push(file);
+        }
+      }
+    }
+    return matchedFiles;
+  }
 }
 
 export default SSHFileService;

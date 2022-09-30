@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite';
 import type { FC } from 'react';
-import { useCallback } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import React from 'react';
@@ -10,12 +9,13 @@ import ListHeader from './ListHeader';
 import ListItem from '/@/components/ListItem';
 import type { MenuItem, MenuProps } from '/@/components/Menu';
 import Menu from '/@/components/Menu';
-import usePrompt from '/@/hooks/usePrompt';
-import useConfirm from '/@/hooks/useConfirm';
 import { useContextMenu } from 'react-contexify';
-import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import FileTreeItem from '/@/components/FileTreeItem';
 import useFileOperation from '/@/hooks/useFileOperation';
+import Flex from '/@/components/Flex';
+import SearchList from './SearchList';
+import type { TreeNode } from '@sinm/react-file-tree/lib/type';
+import { useLatest, usePrevious } from 'react-use';
 
 const MENU_ID = 'NOTE_MENU';
 
@@ -35,12 +35,39 @@ const menus: MenuItem[] = [
 ];
 
 const NoteList: FC = observer(() => {
-  const { activationStore: resourceStore } = stores;
+  const { activationStore } = stores;
 
   const [text, setText] = useState('');
+  const [files, setFiles] = useState<TreeNode[]>([]);
+
   const { show: showMenu } = useContextMenu({
     id: MENU_ID,
   });
+
+  const latestText = useLatest(text);
+
+  const search = async (keywords: string) => {
+    try {
+      const filterFiles = await window.fileService.searchFiles(
+        activationStore.rootUri,
+        keywords,
+      );
+      if (keywords === latestText.current) {
+        setFiles(filterFiles);
+      }
+    } catch (err) {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    console.log(text);
+    if (!text) {
+      setFiles([]);
+    } else {
+      search(text);
+    }
+  }, [text]);
 
   const { Modal, createFile, deleteFile, renameFile } = useFileOperation();
 
@@ -51,6 +78,7 @@ const NoteList: FC = observer(() => {
       alert('请选中笔记本');
     }
   };
+
   const handleMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
     const uri = (menuProps as any).uri;
     switch (menu.id) {
@@ -66,32 +94,67 @@ const NoteList: FC = observer(() => {
   };
 
   return (
-    <div className={styles.NoteList}>
-      <ListHeader onTextChange={setText} onNoteCreate={createNote} />
+    <Flex flexDirection="column" className={styles.NoteList}>
+      <ListHeader
+        searchText={text}
+        onTextChange={setText}
+        onNoteCreate={createNote}
+      />
+      <Flex flex={1} flexDirection="column" overflow="auto">
+        {stores.fileListStore.files.map((file) => (
+          <ListItem
+            key={file.uri}
+            active={activationStore.activeFileUri === file.uri}
+            onContextMenu={(e) => {
+              showMenu(e, { props: { uri: file.uri } });
+            }}
+            onClick={() => {
+              stores.activationStore.activeFile(file.uri);
+            }}
+            onClose={() => {
+              deleteFile(file.uri, 'file');
+            }}
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', file.uri);
+            }}
+          >
+            <FileTreeItem treeNode={file} active={false} />
+          </ListItem>
+        ))}
+        {text && (
+          <Flex
+            background={'rgba(0,0,0,0.5)'}
+            position="absolute"
+            flexDirection="column"
+            left={0}
+            right={0}
+            height={'100%'}
+            className="search-container"
+            onClick={(e) => {
+              if (
+                (e.target as HTMLDivElement).classList.contains(
+                  'search-container',
+                )
+              ) {
+                setText('');
+              }
+            }}
+          >
+            <SearchList
+              style={{ maxHeight: '70%', overflow: 'auto' }}
+              files={files}
+              activeUri={stores.activationStore.activeFileUri}
+              onItemClick={(treeNode: TreeNode) => {
+                stores.activationStore.activeFile(treeNode.uri);
+              }}
+            ></SearchList>
+          </Flex>
+        )}
+      </Flex>
 
-      {stores.fileListStore.files.map((file) => (
-        <ListItem
-          key={file.uri}
-          active={resourceStore.activeFileUri === file.uri}
-          onContextMenu={(e) => {
-            showMenu(e, { props: { uri: file.uri } });
-          }}
-          onClick={() => {
-            stores.activationStore.activeFile(file.uri);
-          }}
-          onClose={() => {
-            deleteFile(file.uri, 'file');
-          }}
-          onDragStart={(e) => {
-            e.dataTransfer.setData('text/plain', file.uri);
-          }}
-        >
-          <FileTreeItem treeNode={file} active={false} />
-        </ListItem>
-      ))}
       <Menu menuId={MENU_ID} menus={menus} onClick={handleMenuClick} />
       <Modal />
-    </div>
+    </Flex>
   );
 });
 
