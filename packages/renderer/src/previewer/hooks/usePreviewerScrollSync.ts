@@ -18,7 +18,11 @@ function getLineNum(dom: HTMLElement) {
   return null;
 }
 
+let editorScrolling = false;
 const handleScroll = (e: Event) => {
+  if (editorScrolling) {
+    return;
+  }
   const list = document.querySelectorAll('.markdown-body > *');
   const listArr: HTMLElement[] = [].slice.apply(list);
   listArr.some((item) => {
@@ -82,7 +86,6 @@ export default function usePreviewerScrollSync(uri: string, ast: Root) {
 
   const scrollTo = useCallback((lineNumber: number) => {
     if (astRef.current) {
-      console.log(lineNumber);
       scrollToLine(astRef.current, lineNumber);
     }
   }, []);
@@ -98,13 +101,12 @@ export default function usePreviewerScrollSync(uri: string, ast: Root) {
     previewerServer.handle(
       PreviewerRPC.ScrollToLine,
       async (uri: string, lineNumber: number) => {
-        window.removeEventListener('scroll', handleScroll);
         scrollTo(lineNumber);
         clearTimeout(timeout);
+        editorScrolling = true;
         timeout = setTimeout(() => {
-          window.removeEventListener('scroll', handleScroll);
-          window.addEventListener('scroll', handleScroll);
-        }, 200);
+          editorScrolling = false;
+        }, 500);
       },
     );
     window.addEventListener('scroll', handleScroll);

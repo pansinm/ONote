@@ -10,6 +10,7 @@ export default function useEditorScrollSync(
   previewerWindow: Window | undefined,
 ) {
   const scrollLineRef = useRef<Record<string, number>>({});
+  const previewScrollingRef = useRef(false);
 
   useEffect(() => {
     if (!editor || !previewerWindow) {
@@ -20,7 +21,7 @@ export default function useEditorScrollSync(
     const bindScrollEvent = () => {
       return editor.onDidScrollChange((e) => {
         const [range] = editor.getVisibleRanges();
-        if (range) {
+        if (range && !previewScrollingRef.current) {
           const startLineNumber = range.startLineNumber;
           const uri = editor.getModel()?.uri.toString() || '';
           previewerClient.call(PreviewerRPC.ScrollToLine, uri, startLineNumber);
@@ -29,21 +30,22 @@ export default function useEditorScrollSync(
       });
     };
 
-    let editorScroll = bindScrollEvent();
+    const editorScroll = bindScrollEvent();
     let timeout: any;
 
     const scrollFromPreviewer = mainServer.handle(
       EditorRPC.ScrollToLine,
       async (lineNumber: number) => {
-        editorScroll.dispose();
+        // console.log('receive scroll', lineNumber);
+        // editorScroll.dispose();
         const uri = editor.getModel()?.uri.toString() || '';
         scrollLineRef.current[uri] = lineNumber;
         editor.setScrollTop(editor.getTopForLineNumber(lineNumber));
         clearTimeout(timeout);
+        previewScrollingRef.current = true;
         timeout = setTimeout(() => {
-          editorScroll && editorScroll.dispose();
-          editorScroll = bindScrollEvent();
-        }, 300);
+          previewScrollingRef.current = false;
+        }, 500);
       },
     );
 
