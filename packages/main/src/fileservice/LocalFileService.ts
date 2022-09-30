@@ -1,6 +1,7 @@
 import * as fs from 'fs/promises';
 import { LocalFileService } from '@sinm/react-file-tree/server';
 import type { IFileService } from './types';
+import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 
 class _LocalFileService extends LocalFileService implements IFileService {
   type = 'local';
@@ -22,6 +23,21 @@ class _LocalFileService extends LocalFileService implements IFileService {
   }
   async getLocalUri(uri: string): Promise<string> {
     return uri;
+  }
+  async searchFiles(rootUri: string, keywords: string): Promise<TreeNode[]> {
+    const matchedFiles: TreeNode[] = [];
+    const files = await this.readdir(rootUri);
+    for (const file of files) {
+      if (file.type === 'directory') {
+        matchedFiles.push(...(await this.searchFiles(file.uri, keywords)));
+      } else {
+        console.log(keywords);
+        if (decodeURIComponent(this.parsePath(file.uri)).includes(keywords)) {
+          matchedFiles.push(file);
+        }
+      }
+    }
+    return matchedFiles;
   }
 }
 

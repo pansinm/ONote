@@ -37,6 +37,9 @@ export const fileService = {
   getLocalUri: function (uri: string) {
     return ipcRenderer.invoke('fileservice', 'getLocalUri', uri);
   },
+  searchFiles: function (uri: string, keywords: string) {
+    return ipcRenderer.invoke('fileservice', 'searchFiles', uri, keywords);
+  },
 } as FileService;
 
 exposeInMainWorld('fileService', fileService);
