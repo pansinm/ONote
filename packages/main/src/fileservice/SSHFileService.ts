@@ -1,13 +1,12 @@
-import type { TreeNode, TreeNodeType } from '@sinm/react-file-tree/lib/type';
+import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import type { ConnectConfig } from 'ssh2';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { pathToFileURL } from 'url';
 import type { Stream } from 'stream';
 const Client = require('ssh2-sftp-client');
 import type { IFileService } from './types';
 import * as mimetypes from 'mime-types';
-import * as path from 'path/posix';
+import * as path from 'path';
 import * as os from 'os';
-import * as fs from 'fs/promises';
 
 async function stream2buffer(stream: Stream): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
@@ -26,8 +25,15 @@ class SSHFileService implements IFileService {
     return this.sftp.connect(config);
   }
   private parsePath(uri: string) {
-    return fileURLToPath(uri);
+    return decodeURIComponent(new URL(uri).pathname);
   }
+
+  private pathToUri(path: string) {
+    const uri = new URL('file:///');
+    uri.pathname = path;
+    return uri.toString();
+  }
+
   disconnect() {
     if (this.sftp.sftp) {
       return this.sftp.end();
@@ -36,7 +42,7 @@ class SSHFileService implements IFileService {
   async readAsTreeNode(aPath: string) {
     const stat = await this.sftp.stat(aPath);
     return {
-      uri: pathToFileURL(aPath).toString(),
+      uri: this.pathToUri(aPath),
       mime: stat.isFile ? mimetypes.lookup(path.basename(aPath)) : false,
       type: stat.isFile ? 'file' : 'directory',
       async: stat.isDirectory ? 'unload' : undefined,
@@ -64,7 +70,7 @@ class SSHFileService implements IFileService {
     const files: any[] = await this.sftp.list(dir);
     return files.map((file) => {
       return {
-        uri: pathToFileURL(path.resolve(dir, file.name)).toString(),
+        uri: this.pathToUri(path.posix.resolve(dir, file.name)),
         mime: file.type !== 'd' ? mimetypes.lookup(file.name) : false,
         type: file.type === 'd' ? 'directory' : 'file',
         async: file.type === 'd' ? 'unload' : undefined,
@@ -75,15 +81,15 @@ class SSHFileService implements IFileService {
   async move(fromUri: string, dirUri: string) {
     const from = this.parsePath(fromUri);
     const dirPath = this.parsePath(dirUri);
-    const toPath = path.join(dirPath, path.basename(from));
+    const toPath = path.posix.join(dirPath, path.posix.basename(from));
     await this.sftp.rename(from, toPath);
     return this.readAsTreeNode(toPath);
   }
 
   async rename(uri: string, name: string) {
     const fromPath = this.parsePath(uri);
-    const dirname = path.dirname(fromPath);
-    const toPath = path.resolve(dirname, name);
+    const dirname = path.posix.dirname(fromPath);
+    const toPath = path.posix.resolve(dirname, name);
     await this.sftp.rename(fromPath, toPath);
     return this.readAsTreeNode(toPath);
   }
@@ -91,8 +97,8 @@ class SSHFileService implements IFileService {
   async create(uri: string, childNode: TreeNode) {
     const parentPath = this.parsePath(uri);
     const childPath = this.parsePath(childNode.uri);
-    const childName = path.basename(childPath);
-    const fullPath = path.join(parentPath, childName);
+    const childName = path.posix.basename(childPath);
+    const fullPath = path.posix.join(parentPath, childName);
     if (childNode.type === 'directory') {
       await this.sftp.mkdir(fullPath, true);
     } else {
