@@ -22,6 +22,11 @@ class QuickInsertCompletionItemProvider
       position.lineNumber,
       position.column,
     );
+    if (startIndex < 0) {
+      return {
+        suggestions: [],
+      };
+    }
     return {
       suggestions: [
         {

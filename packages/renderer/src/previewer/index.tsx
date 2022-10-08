@@ -5,6 +5,7 @@ import App from './components/App';
 import { install } from './extensions/diagram';
 import engine from './diagram/engine';
 import './rpc/previewerServer';
+import '/@/emoji/emoji.scss';
 
 install();
 

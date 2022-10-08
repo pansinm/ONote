@@ -5,6 +5,7 @@ import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import QuickInsertCompletionItemProvider from './QuickInsertCompletionProvider';
+import EmojiCompletionProvider from './EmojiCompletionProvider';
 
 // 用于调试
 (window as any).monaco = monaco;
@@ -32,7 +33,12 @@ monaco.languages.getLanguages().forEach((lan) => {
     lan.id,
     new QuickInsertCompletionItemProvider(),
   );
+  monaco.languages.registerCompletionItemProvider(
+    lan.id,
+    new EmojiCompletionProvider(),
+  );
 });
+
 
 monaco.editor.registerCommand('onote.command.insertDate', function () {
   const editor = monaco.editor
