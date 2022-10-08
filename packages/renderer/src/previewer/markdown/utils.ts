@@ -1,6 +1,7 @@
 import type { Root, Content, Parent } from 'mdast';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
+import emoji from 'remark-emoji';
 import gfm from 'remark-gfm';
 import remarkFrontmatter from 'remark-frontmatter';
 import footnotes from 'remark-footnotes';
@@ -16,6 +17,10 @@ const parser = unified()
   .use(footnotes, { inlineNotes: true })
   .use(gfm);
 
+const transformToEmoji = (emoji as any)({
+  emoticon: true,
+  padSpaceAfter: true,
+});
 /**
  * 解析Markdown，定义成异步，也许以后有更好的渲染方式
  * @param markdown
@@ -23,6 +28,7 @@ const parser = unified()
  */
 export function parse(markdown: string) {
   const ast = parser.parse(markdown) as Root;
+  transformToEmoji(ast);
   return ast;
 }
 

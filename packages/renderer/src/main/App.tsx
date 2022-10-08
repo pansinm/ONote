@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import React from 'react';
-
+import '/@/emoji/emoji.scss';
 import Sidebar from './containers/Sidebar';
 import styles from './App.module.scss';
 import NoteList from './containers/FileList';

@@ -42,6 +42,7 @@ const MonacoEditor = forwardRef<EditorRef, MonacoEditorProps>(function Editor(
       padding: {
         top: 10,
       },
+      fontFamily: 'Noto Color Emoji',
       scrollbar: {
         verticalScrollbarSize: 8,
       },
