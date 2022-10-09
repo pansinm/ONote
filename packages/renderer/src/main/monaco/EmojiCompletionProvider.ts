@@ -7,9 +7,10 @@ function generateSuggestions(range: monaco.Range) {
       kind: monaco.languages.CompletionItemKind.Color,
       insertText: ':' + key + ':',
       label: Emoji.get(key) + ':' + key + ':',
-      filterText: ':' + key + ':',
+      filterText: `:${key}: ：${key}`,
+      detail: Emoji.get(key),
       range,
-    };
+    } as monaco.languages.CompletionItem;
   });
 }
 
@@ -36,6 +37,11 @@ class EmojiCompletionProvider
       position.column,
     );
 
+    if (/:[^:\s]+:$/.test(lineTextBefore)) {
+      return {
+        suggestions: [],
+      };
+    }
     if (startIndex < 0) {
       return { suggestions: [] };
     }
