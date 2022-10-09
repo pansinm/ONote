@@ -21,7 +21,10 @@ export async function parse(markdown: string) {
 
 export function stringify(mdast: Root | Content) {
   const md = toMarkdown(mdast, {
-    extensions: [gfmToMarkdown()],
+    extensions: [
+      gfmToMarkdown(),
+      { handlers: { emoji: (node) => `:${node.name}:` } },
+    ],
     listItemIndent: 'one',
     bullet: '-',
   });
