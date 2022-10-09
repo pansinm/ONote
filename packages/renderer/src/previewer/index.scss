@@ -13,7 +13,11 @@ html {
   outline: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Noto Color Emoji";
+}
+
+.emoji {
+  font-family: 'Noto Color Emoji' !important;
+  vertical-align: top !important;
 }
 
 .bi {

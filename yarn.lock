@@ -4026,11 +4026,6 @@ emoji-regex@^8.0.0:
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-8.0.0.tgz#e818fd69ce5ccfcb404594f842963bf53164cc37"
   integrity sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==
 
-emoticon@^4.0.0:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/emoticon/-/emoticon-4.0.1.tgz#2d2bbbf231ce3a5909e185bbb64a9da703a1e749"
-  integrity sha512-dqx7eA9YaqyvYtUhJwT4rC1HIp82j5ybS1/vQ42ur+jBe17dJMwZE4+gvL1XadSFfxaPFFGt3Xsw+Y8akThDlw==
-
 encodeurl@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
@@ -7866,15 +7861,6 @@ rehype-parse@^8.0.4:
     parse5 "^6.0.0"
     unified "^10.0.0"
 
-remark-emoji@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/remark-emoji/-/remark-emoji-3.0.2.tgz#786e88af1ecae682d74d7e1219989f34708205da"
-  integrity sha512-hEgxEv2sBtvhT3tNG/tQeeFY3EbslftaOoG14dDZndLo25fWJ6Fbg4ukFbIotOWWrfXyASjXjyHT+6n366k3mg==
-  dependencies:
-    emoticon "^4.0.0"
-    node-emoji "^1.11.0"
-    unist-util-visit "^4.1.0"
-
 remark-footnotes@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/remark-footnotes/-/remark-footnotes-4.0.1.tgz#17d3c87ddc240924e8b4590b34a3d79aa8ede50c"
@@ -9035,14 +9021,6 @@ unist-util-visit-parents@^5.0.0:
     "@types/unist" "^2.0.0"
     unist-util-is "^5.0.0"
 
-unist-util-visit-parents@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/unist-util-visit-parents/-/unist-util-visit-parents-5.1.1.tgz#868f353e6fce6bf8fa875b251b0f4fec3be709bb"
-  integrity sha512-gks4baapT/kNRaWxuGkl5BIhoanZo7sC/cUT/JToSRNL1dYoXRFl75d++NkjYk4TAu2uv2Px+l8guMajogeuiw==
-  dependencies:
-    "@types/unist" "^2.0.0"
-    unist-util-is "^5.0.0"
-
 unist-util-visit@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/unist-util-visit/-/unist-util-visit-3.1.0.tgz#9420d285e1aee938c7d9acbafc8e160186dbaf7b"
@@ -9060,15 +9038,6 @@ unist-util-visit@^4.0.0:
     "@types/unist" "^2.0.0"
     unist-util-is "^5.0.0"
     unist-util-visit-parents "^5.0.0"
-
-unist-util-visit@^4.1.0:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/unist-util-visit/-/unist-util-visit-4.1.1.tgz#1c4842d70bd3df6cc545276f5164f933390a9aad"
-  integrity sha512-n9KN3WV9k4h1DxYR1LoajgN93wpEi/7ZplVe02IoB4gH5ctI1AaF2670BLHQYbwj+pY83gFtyeySFiyMHJklrg==
-  dependencies:
-    "@types/unist" "^2.0.0"
-    unist-util-is "^5.0.0"
-    unist-util-visit-parents "^5.1.1"
 
 universalify@^0.1.0, universalify@^0.1.2:
   version "0.1.2"

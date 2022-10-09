@@ -99,7 +99,6 @@
     "react-use": "^17.3.2",
     "rehype-parse": "^8.0.4",
     "remark": "^14.0.2",
-    "remark-emoji": "^3.0.2",
     "remark-footnotes": "^4.0.1",
     "remark-frontmatter": "^4.0.1",
     "remark-gfm": "^3.0.1",
