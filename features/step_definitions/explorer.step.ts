@@ -1,5 +1,6 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import type { ElectronApplication, Page } from 'playwright';
+import * as expect from 'expect';
 
 type World = {
   app: ElectronApplication;
@@ -38,6 +39,7 @@ When('打开文件{string}', async function (this: World, filename: string) {
   }
 });
 
+
 Then('打开的页面是编辑页面', async function (this: World) {
   await this.page.waitForSelector('iframe', { state: 'attached' });
   await this.page.waitForSelector('.monaco-editor', { state: 'attached' });
@@ -47,4 +49,11 @@ Then('页面提示使用系统应用打开', async function (this: World) {
   await this.page.waitForSelector('text=使用系统应用打开', {
     state: 'attached',
   });
+});
+
+Then('目录按字典排序', async function (this: World) {
+  const dirs: string = await this.page.evaluate(
+    'document.querySelector(\'.file-tree\').innerText',
+  );
+  expect(dirs.split('\n')).toEqual(['fixtures', 'd1', 'd2']);
 });
