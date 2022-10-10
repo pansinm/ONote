@@ -7,6 +7,7 @@ import type { IFileService } from './types';
 import * as mimetypes from 'mime-types';
 import * as path from 'path';
 import * as os from 'os';
+import { orderBy } from 'lodash';
 
 async function stream2buffer(stream: Stream): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
@@ -67,7 +68,8 @@ class SSHFileService implements IFileService {
 
   async readdir(uri: string): Promise<TreeNode[]> {
     const dir = this.parsePath(uri);
-    const files: any[] = await this.sftp.list(dir);
+    let files: any[] = await this.sftp.list(dir);
+    files = orderBy(files, 'name', 'asc');
     return files.map((file) => {
       return {
         uri: this.pathToUri(path.posix.resolve(dir, file.name)),
