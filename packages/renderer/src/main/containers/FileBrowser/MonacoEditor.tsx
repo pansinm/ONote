@@ -90,6 +90,9 @@ const MonacoEditor = forwardRef<EditorRef, MonacoEditorProps>(function Editor(
         return;
       }
       model = monaco.editor.createModel(content, 'markdown', aUri);
+      model.onDidChangeContent((e) => {
+        stores.fileStore.saveFileLater(uri, model!.getValue());
+      });
     }
     editorRef.current?.setModel(model);
   }, []);

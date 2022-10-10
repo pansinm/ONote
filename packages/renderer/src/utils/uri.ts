@@ -1,6 +1,10 @@
 export const basename = (uri: string) => {
-  const url = new URL(uri);
-  return decodeURIComponent(url.pathname.split('/').pop() || '');
+  try {
+    const url = new URL(uri);
+    return decodeURIComponent(url.pathname.split('/').pop() || '');
+  } catch (err) {
+    return decodeURIComponent(uri.split('/').pop() || '');
+  }
 };
 
 export const extname = (uri: string) => {

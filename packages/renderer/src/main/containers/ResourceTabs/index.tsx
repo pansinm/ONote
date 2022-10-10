@@ -37,9 +37,10 @@ export default observer(function EditorTabs() {
     models.forEach((model) => {
       const uri = model.uri.toString();
       const opened = openedFiles.find((fileUri) => fileUri === uri);
-      if (!opened && fileStore.states[uri] === 'changed') {
+      if (!opened) {
         // 关闭后自动保存
-        fileStore.saveFile(model.uri.toString(), model.getValue());
+        fileStore.states[uri] === 'changed' &&
+          fileStore.saveFile(model.uri.toString(), model.getValue());
         model.dispose();
       }
     });

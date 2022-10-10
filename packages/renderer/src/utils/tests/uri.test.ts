@@ -11,4 +11,5 @@ test('isMarkdown', () => {
   expect(isMarkdown('file:///x/abc.md')).toBe(true);
   expect(isMarkdown('file:///x/abc.mdx')).toBe(true);
   expect(isMarkdown('file:///x/abc.ss')).toBe(false);
+  expect(isMarkdown('')).toBe(false);
 });

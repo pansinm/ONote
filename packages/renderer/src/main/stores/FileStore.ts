@@ -43,6 +43,14 @@ class FileStateStore {
     }
   }
 
+  timeouts: { [uri: string]: any } = {};
+  async saveFileLater(uri: string, content: string, timeMs = 5000) {
+    clearTimeout(this.timeouts[uri]);
+    this.timeouts[uri] = setTimeout(() => {
+      this.saveFile(uri, content);
+    }, timeMs);
+  }
+
   async saveFile(uri: string, content: string) {
     try {
       this.markFileState(uri, 'loading');
