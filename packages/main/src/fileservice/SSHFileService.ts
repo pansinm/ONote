@@ -55,15 +55,28 @@ class SSHFileService implements IFileService {
   }
 
   async readText(uri: string): Promise<string> {
-    const remotePath = this.parsePath(uri);
-    const stream = this.sftp.createReadStream(remotePath);
-    const buf = await stream2buffer(stream);
+    const buf = await this.readFile(uri);
     return buf.toString('utf-8');
   }
 
   async writeText(uri: string, content: string): Promise<void> {
     const remotePath = this.parsePath(uri);
-    this.sftp.put(Buffer.from(content, 'utf-8'), remotePath);
+    return this.sftp.put(Buffer.from(content, 'utf-8'), remotePath);
+  }
+
+  async readFile(uri: string): Promise<Buffer> {
+    const remotePath = this.parsePath(uri);
+    const stream = this.sftp.createReadStream(remotePath);
+    const buf = await stream2buffer(stream);
+    return buf;
+  }
+
+  async writeFile(uri: string, buffer: Buffer) {
+    const remotePath = this.parsePath(uri);
+    await this.sftp.mkdir(path.posix.dirname(remotePath), true).catch(() => {
+      // ignore
+    });
+    return this.sftp.put(buffer, remotePath);
   }
 
   async readdir(uri: string): Promise<TreeNode[]> {

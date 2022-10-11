@@ -1,7 +1,10 @@
+export const pathanme = (uri: string) => {
+  return new URL(uri).pathname;
+};
+
 export const basename = (uri: string) => {
   try {
-    const url = new URL(uri);
-    return decodeURIComponent(url.pathname.split('/').pop() || '');
+    return decodeURIComponent(pathanme(uri).split('/').pop() || '');
   } catch (err) {
     return decodeURIComponent(uri.split('/').pop() || '');
   }
@@ -39,4 +42,10 @@ export const isPlaintext = (uri: string) => {
 
 export const isUnSupport = (uri: string) => {
   return !['markdown', 'plaintext'].includes(fileType(uri));
+};
+
+export const relative = (fromUri: string, toUri: string) => {
+  const fromPath = pathanme(fromUri);
+  const toPath = pathanme(toUri);
+  throw new Error('Not implement yet!');
 };
