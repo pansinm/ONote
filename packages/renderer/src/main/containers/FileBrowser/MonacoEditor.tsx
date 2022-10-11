@@ -67,6 +67,15 @@ const MonacoEditor = forwardRef<EditorRef, MonacoEditorProps>(function Editor(
       },
     );
 
+    editorInstance.addCommand(
+      monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyV,
+      function () {
+        (editorInstance as any)._commandService.executeCommand(
+          'editor.action.clipboardPasteAction',
+        );
+      },
+    );
+
     return () => {
       editorInstance.dispose();
     };

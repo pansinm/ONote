@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import { LocalFileService } from '@sinm/react-file-tree/server';
 import type { IFileService } from './types';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
@@ -10,11 +11,6 @@ class _LocalFileService extends LocalFileService implements IFileService {
   }
   async disconnect() {
     return;
-  }
-
-  readText(uri: string): Promise<string> {
-    const localPath = this.parsePath(uri);
-    return fs.readFile(localPath, 'utf-8');
   }
 
   getFileName(uri: string) {
@@ -33,10 +29,29 @@ class _LocalFileService extends LocalFileService implements IFileService {
     );
   }
 
+  readText(uri: string): Promise<string> {
+    const localPath = this.parsePath(uri);
+    return fs.readFile(localPath, 'utf-8');
+  }
+
   async writeText(uri: string, content: string): Promise<void> {
     const localPath = this.parsePath(uri);
     await fs.writeFile(localPath, content, 'utf-8');
   }
+
+  async readFile(uri: string): Promise<Buffer> {
+    const filePath = this.parsePath(uri);
+    return fs.readFile(filePath);
+  }
+
+  async writeFile(uri: string, buffer: Buffer) {
+    const filePath = this.parsePath(uri);
+    await fs.mkdir(path.dirname(filePath), { recursive: true }).catch((err) => {
+      // ignore
+    });
+    return fs.writeFile(filePath, buffer);
+  }
+
   async getLocalUri(uri: string): Promise<string> {
     return uri;
   }

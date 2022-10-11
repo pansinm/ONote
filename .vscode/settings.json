@@ -1,5 +1,5 @@
 {
   "editor.formatOnSave": true,
-  "editor.formatOnSaveMode": "modificationsIfAvailable",
+  "editor.formatOnSaveMode": "file",
   "favorites.sortDirection": "DESC"
 }

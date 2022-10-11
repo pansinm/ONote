@@ -8,4 +8,6 @@ export interface IFileService extends FileService {
   writeText(uri: string, content: string): Promise<void>;
   getLocalUri(uri: string): Promise<string>;
   searchFiles(rootUri: string, keywords: string): Promise<TreeNode[]>;
+  readFile(uri: string): Promise<Buffer>;
+  writeFile(uri: string, buffer: Buffer): Promise<void>;
 }

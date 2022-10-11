@@ -40,6 +40,12 @@ export const fileService = {
   searchFiles: function (uri: string, keywords: string) {
     return ipcRenderer.invoke('fileservice', 'searchFiles', uri, keywords);
   },
+  readFile: (uri: string) => {
+    return ipcRenderer.invoke('fileservice', 'readFile', uri);
+  },
+  writeFile: (uri: string, buf: Buffer) => {
+    return ipcRenderer.invoke('fileservice', 'writeFile', uri, buf);
+  },
 } as FileService;
 
 exposeInMainWorld('fileService', fileService);
