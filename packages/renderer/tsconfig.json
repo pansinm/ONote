@@ -9,13 +9,11 @@
     "jsx": "react",
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
-    "types" : ["node"],
+    "types": ["node"],
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "/@/*": [
-        "./src/*"
-      ]
+      "/@/*": ["./src/*"]
     },
     "lib": ["ESNext", "dom", "dom.iterable"]
   },
@@ -28,8 +26,5 @@
     "../../types/**/*.d.ts",
     "../preload/contracts.d.ts"
   ],
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts",
-  ]
+  "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

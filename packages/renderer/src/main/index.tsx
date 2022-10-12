@@ -1,4 +1,4 @@
-import './monaco/loadMonaco';
+import './monaco';
 import React from 'react';
 import '../styles/utils.scss';
 import './index.scss';

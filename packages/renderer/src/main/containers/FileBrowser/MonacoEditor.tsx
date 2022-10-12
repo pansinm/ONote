@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import { useEvent, useLatest } from 'react-use';
 import useDimensions from '../../../hooks/useDimensions';
 import { MonacoMarkdownExtension } from '../../../simmer-markdown/src/ts';
-import { registerActions } from '../../monaco/actions';
+import { registerActions } from '../../monaco/editor';
 import stores from '../../stores';
 
 export type EditorRef = {
