@@ -12,6 +12,7 @@ import type { Project } from '../../components/ProjectSelect';
 import ProjectSelect from '../../components/ProjectSelect';
 import View from '/@/components/View';
 import { useLocalStorage } from 'react-use';
+import fileService from '../../services/fileService';
 
 export default observer(function ActivityBar() {
   const [ref] = useDimensions();
@@ -27,7 +28,7 @@ export default observer(function ActivityBar() {
 
   const handleSelect = async (project: Project) => {
     try {
-      await window.fileService.connect(project.type, project.config);
+      await fileService.connect(project.type, project.config);
       stores.activationStore.setRootUri(project.rootUri);
       setProject(project);
       setOpen(false);

@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import React, { useState } from 'react';
+import fileService from '../services/fileService';
 import SSHDirSelect from './SSHDirSelect';
 import type { SSHFormProps } from './SSHForm';
 import SSHForm from './SSHForm';
@@ -15,14 +16,14 @@ const SSHProjectSelect: FC<SSHProjectSelectProps> = (props) => {
   const [config, setConfig] = useState<any>({});
 
   const handleSubmit: SSHFormProps['onSubmit'] = async (data) => {
-    const { config, service } = await window.fileService.getService();
+    const { config, service } = await fileService.getService();
     try {
-      await window.fileService.connect('ssh', data);
+      await fileService.connect('ssh', data);
       setType('dir');
       setConfig(data);
     } catch (err) {
       alert((err as Error).message);
-      window.fileService.connect(service as any, config);
+      fileService.connect(service as any, config);
       console.error(err);
     }
   };
