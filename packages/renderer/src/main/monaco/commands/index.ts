@@ -1,2 +1,2 @@
-import './insertDateAction';
+import './insertDate';
 import './pasteAction';
