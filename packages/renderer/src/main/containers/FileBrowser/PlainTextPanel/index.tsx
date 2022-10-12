@@ -8,7 +8,7 @@ interface PlainTextPanelProps {
 
 const PlainTextPanel: FC<PlainTextPanelProps> = (props) => {
   const ref = useRef<React.ElementRef<typeof MonacoEditor>>(null);
-  return <MonacoEditor ref={ref} uri={props.uri} />;
+  return <MonacoEditor ref={ref} uri={props.uri} needLoad />;
 };
 
 export default PlainTextPanel;
