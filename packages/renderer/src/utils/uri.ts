@@ -49,3 +49,7 @@ export const relative = (fromUri: string, toUri: string) => {
   const toPath = pathanme(toUri);
   throw new Error('Not implement yet!');
 };
+
+export const resolveUri = (uri: string, relative: string) => {
+  return new URL(relative, uri.replace(/\/?$/, '/')).toString();
+};

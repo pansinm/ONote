@@ -16,6 +16,8 @@ import Flex from '/@/components/Flex';
 import SearchList from './SearchList';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { useLatest, usePrevious } from 'react-use';
+import { resolveUri } from '/@/utils/uri';
+import { blobToBuffer } from '/@/utils/transform';
 
 const MENU_ID = 'NOTE_MENU';
 
@@ -34,7 +36,7 @@ const menus: MenuItem[] = [
   },
 ];
 
-const NoteList: FC = observer(() => {
+const FileList: FC = observer(() => {
   const { activationStore } = stores;
 
   const [text, setText] = useState('');
@@ -93,6 +95,48 @@ const NoteList: FC = observer(() => {
     }
   };
 
+  const [background, setBackground] = useState('transparent');
+  const handleDragover = (event: React.DragEvent) => {
+    setBackground('rgba(0,0,0,0.2)');
+    event.preventDefault();
+  };
+  const handleDrop = (ev: React.DragEvent) => {
+    // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+    if (!activationStore.activeDirUri) {
+      alert('先打开目录');
+      return;
+    }
+    setBackground('transparent');
+
+    if (ev.dataTransfer.items) {
+      // Use DataTransferItemList interface to access the file(s)
+      [...ev.dataTransfer.items].forEach(async (item, i) => {
+        // If dropped items aren't files, reject them
+        if (item.kind === 'file') {
+          const file = item.getAsFile();
+          if (file) {
+            const fileUri = resolveUri(
+              activationStore.activeDirUri,
+              './' + file.name,
+            );
+            console.log(fileUri);
+            window.fileService
+              .writeFile(fileUri, await blobToBuffer(file))
+              .then(() => {
+                stores.fileListStore.refreshFiles();
+              })
+              .catch(console.log);
+          }
+        }
+      });
+    } else {
+      // Use DataTransfer interface to access the file(s)
+      [...ev.dataTransfer.files].forEach((file, i) => {
+        console.log(`… file[${i}].name = ${file.name}`);
+      });
+    }
+  };
   return (
     <Flex flexDirection="column" className={styles.NoteList}>
       <ListHeader
@@ -101,26 +145,40 @@ const NoteList: FC = observer(() => {
         onNoteCreate={createNote}
       />
       <Flex flex={1} flexDirection="column" overflow="auto">
-        {stores.fileListStore.files.map((file) => (
-          <ListItem
-            key={file.uri}
-            active={activationStore.activeFileUri === file.uri}
-            onContextMenu={(e) => {
-              showMenu(e, { props: { uri: file.uri } });
-            }}
-            onClick={() => {
-              stores.activationStore.activeFile(file.uri);
-            }}
-            onClose={() => {
-              deleteFile(file.uri, 'file');
-            }}
-            onDragStart={(e) => {
-              e.dataTransfer.setData('text/plain', file.uri);
-            }}
-          >
-            <FileTreeItem treeNode={file} active={false} />
-          </ListItem>
-        ))}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            background,
+          }}
+          draggable
+          // onDragEnter={() => setBackground('rgba(0,0,0,0.2)')}
+          onDragLeave={() => setBackground('transparent')}
+          onDragOver={handleDragover}
+          onDrop={handleDrop}
+        >
+          {stores.fileListStore.files.map((file) => (
+            <ListItem
+              key={file.uri}
+              active={activationStore.activeFileUri === file.uri}
+              onContextMenu={(e) => {
+                showMenu(e, { props: { uri: file.uri } });
+              }}
+              onClick={() => {
+                stores.activationStore.activeFile(file.uri);
+              }}
+              onClose={() => {
+                deleteFile(file.uri, 'file');
+              }}
+              onDragStart={(e) => {
+                e.dataTransfer.setData('text/plain', file.uri);
+              }}
+            >
+              <FileTreeItem treeNode={file} active={false} />
+            </ListItem>
+          ))}
+        </div>
         {text && (
           <Flex
             background={'rgba(0,0,0,0.5)'}
@@ -158,4 +216,4 @@ const NoteList: FC = observer(() => {
   );
 });
 
-export default NoteList;
+export default FileList;
