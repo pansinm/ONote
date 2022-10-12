@@ -42,7 +42,7 @@ const SSHDirSelect: FC<SSHDirSelectProps> = (props) => {
           onRootTreeChange={(root) => {
             root && treeRef.current?.expand(root?.uri, true);
           }}
-          fileService={window.fileService}
+          fileService={fileService}
         ></FileTree>
       </View>
       <View paddingTop={10} justifyContent="flex-end">

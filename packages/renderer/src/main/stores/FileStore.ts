@@ -1,4 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx';
+import fileService from '../services/fileService';
 
 // loading -> loaded -> changed -> saving -> saved --> closed
 
@@ -34,7 +35,7 @@ class FileStateStore {
   async readFile(uri: string) {
     try {
       this.markFileState(uri, 'saving');
-      const content = await window.fileService.readText(uri);
+      const content = await fileService.readText(uri);
       this.markFileState(uri, 'saved');
       return content;
     } catch (err) {
@@ -54,7 +55,7 @@ class FileStateStore {
   async saveFile(uri: string, content: string) {
     try {
       this.markFileState(uri, 'loading');
-      await window.fileService.writeText(uri, content);
+      await fileService.writeText(uri, content);
       this.markFileState(uri, 'loaded');
     } catch (err) {
       this.markFileState(uri, 'error');

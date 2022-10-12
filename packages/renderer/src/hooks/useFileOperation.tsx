@@ -1,8 +1,9 @@
 import useConfirm from './useConfirm';
 import usePrompt from './usePrompt';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import stores from '../main/stores';
 import { alertAndThrow } from '../utils/alert';
+import fileService from '/@/main/services/fileService';
 
 function useFileOperation() {
   const { open: openPrompt, Prompt } = usePrompt();
@@ -21,7 +22,7 @@ function useFileOperation() {
       name = name + '.md';
     }
 
-    const node = await window.fileService
+    const node = await fileService
       .create(dirUri, {
         type: type,
         uri: dirUri + '/' + encodeURIComponent(name),
@@ -50,7 +51,7 @@ function useFileOperation() {
         shouldCloseOnEsc: true,
       })
     ) {
-      await window.fileService.remove(uri).catch(alertAndThrow);
+      await fileService.remove(uri).catch(alertAndThrow);
       if (type === 'directory') {
         stores.activationStore.closeFilesInDir(uri);
       } else {
@@ -70,7 +71,7 @@ function useFileOperation() {
       description: '请输入名称',
     });
     if (newName) {
-      const newNode = await window.fileService
+      const newNode = await fileService
         .rename(uri, newName)
         .catch(alertAndThrow);
       if (type === 'directory') {

@@ -18,6 +18,7 @@ import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { useLatest, usePrevious } from 'react-use';
 import { resolveUri } from '/@/utils/uri';
 import { blobToBuffer } from '/@/utils/transform';
+import fileService from '../../services/fileService';
 
 const MENU_ID = 'NOTE_MENU';
 
@@ -50,7 +51,7 @@ const FileList: FC = observer(() => {
 
   const search = async (keywords: string) => {
     try {
-      const filterFiles = await window.fileService.searchFiles(
+      const filterFiles = await fileService.searchFiles(
         activationStore.rootUri,
         keywords,
       );
@@ -121,7 +122,7 @@ const FileList: FC = observer(() => {
               './' + file.name,
             );
             console.log(fileUri);
-            window.fileService
+            fileService
               .writeFile(fileUri, await blobToBuffer(file))
               .then(() => {
                 stores.fileListStore.refreshFiles();

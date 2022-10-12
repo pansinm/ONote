@@ -97,7 +97,7 @@ const Directory = observer(() => {
         onError={(err) => alert(err.message)}
         treeItemRenderer={treeItemRenderer}
         rootUri={rootUri}
-        fileService={window.fileService}
+        fileService={fileService}
         rowHeight={34}
       />
       <Menu menuId={MENU_ID} menus={menus} onClick={handleMenuClick} />

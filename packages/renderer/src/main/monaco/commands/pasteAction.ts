@@ -1,5 +1,6 @@
 import { first } from 'lodash';
 import * as monaco from 'monaco-editor';
+import fileService from '../../services/fileService';
 
 async function readImage() {
   const items = await navigator.clipboard.read();
@@ -26,7 +27,7 @@ async function saveAsset(editor: monaco.editor.ICodeEditor, blob: Blob) {
   const buf = await blob.arrayBuffer();
   const assetUri = url.toString();
   try {
-    await window.fileService.writeFile(
+    await fileService.writeFile(
       assetUri,
       new Int8Array(buf) as unknown as Buffer,
     );
