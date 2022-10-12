@@ -31,9 +31,8 @@ const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<
           new Set(['clipboard-read', 'clipboard-write']),
         ],
       ]
-    : [['file://', new Set(['clipboard-read', 'clipboard-write'])]],
+    : [['null', new Set(['clipboard-read', 'clipboard-write'])]],
 );
-
 
 /**
  * List of origins that you allow open IN BROWSER.
