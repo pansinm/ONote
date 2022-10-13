@@ -11,6 +11,7 @@ import { useLatest } from 'react-use';
 import useDimensions from '../../../hooks/useDimensions';
 import { MonacoMarkdownExtension } from '../../../simmer-markdown/src/ts';
 import { activate, createEditor } from '../../monaco';
+import scrollService from '../../services/scrollService';
 import stores from '../../stores';
 
 export type EditorRef = {
@@ -39,10 +40,16 @@ const MonacoEditor = forwardRef<EditorRef, MonacoEditorProps>(function Editor(
     activate(editorInstance);
 
     editorRef.current = editorInstance;
-
+    const disposer = editorInstance.onDidChangeModel((e) => {
+      const top = scrollService.getScrollTop(
+        e.newModelUrl?.toString() as string,
+      );
+      editorInstance.setScrollTop(top);
+    });
     setNode(domRef.current?.parentElement || null);
 
     return () => {
+      disposer.dispose();
       editorInstance.dispose();
     };
   }, []);
