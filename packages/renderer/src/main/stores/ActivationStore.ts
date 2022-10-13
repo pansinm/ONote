@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from 'mobx';
+import { makeAutoObservable, reaction, runInAction } from 'mobx';
 import _ from 'lodash';
 import type FileStateStore from './FileStore';
 
@@ -16,6 +16,13 @@ class ActivationStore {
   constructor(fileStore: FileStateStore) {
     this.fileStore = fileStore;
     makeAutoObservable(this);
+    reaction(
+      () => this.openedFiles,
+      (files, prevFiles) => {
+        const closedFiles = prevFiles.filter((file) => !files.includes(file));
+        closedFiles.forEach((closedFile) => fileStore.closeFile(closedFile));
+      },
+    );
   }
 
   setRootUri(uri: string) {

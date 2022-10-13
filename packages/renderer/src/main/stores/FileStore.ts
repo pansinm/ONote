@@ -1,7 +1,7 @@
-import { makeAutoObservable, runInAction } from 'mobx';
+import { makeAutoObservable } from 'mobx';
 import fileService from '../services/fileService';
-
-// loading -> loaded -> changed -> saving -> saved --> closed
+import * as monaco from 'monaco-editor';
+import { stringify } from 'yaml';
 
 type FileState =
   | 'loading'
@@ -14,8 +14,37 @@ type FileState =
 class FileStateStore {
   states: { [uri: string]: FileState } = {};
 
+  timeouts: { [uri: string]: any } = {};
+
   constructor() {
     makeAutoObservable(this);
+  }
+
+  private getModel(uri: string) {
+    const aUri = monaco.Uri.parse(uri);
+    const model = monaco.editor.getModel(aUri);
+    return model;
+  }
+
+  private async createModel(uri: string, value: string) {
+    const aUri = monaco.Uri.parse(uri);
+    const model = monaco.editor.createModel(value, undefined, aUri);
+    // 关闭时，保存文件
+    model.onWillDispose(() => {
+      if (this.states[uri] === 'changed') {
+        this.saveFile(uri, model.getValue());
+      }
+    });
+    return model;
+  }
+
+  async getOrCreateModel(uri: string) {
+    const model = this.getModel(uri);
+    if (model) {
+      return model;
+    }
+    const text = await this.readFile(uri);
+    return this.createModel(uri, text);
   }
 
   markFileState(uri: string, state: FileState) {
@@ -26,17 +55,21 @@ class FileStateStore {
     this.states = nextStates;
   }
 
+  closeFile(uri: string) {
+    return this.getModel(uri)?.dispose();
+  }
+
   get savedFiles() {
     return Object.keys(this.states).filter((file) => {
       this.states[file] !== 'changed';
     });
   }
 
-  async readFile(uri: string) {
+  private async readFile(uri: string) {
     try {
-      this.markFileState(uri, 'saving');
+      this.markFileState(uri, 'loading');
       const content = await fileService.readText(uri);
-      this.markFileState(uri, 'saved');
+      this.markFileState(uri, 'loaded');
       return content;
     } catch (err) {
       this.markFileState(uri, 'error');
@@ -44,23 +77,38 @@ class FileStateStore {
     }
   }
 
-  timeouts: { [uri: string]: any } = {};
-  async saveFileLater(uri: string, content: string, timeMs = 5000) {
-    clearTimeout(this.timeouts[uri]);
-    this.timeouts[uri] = setTimeout(() => {
-      this.saveFile(uri, content);
-    }, timeMs);
+  async save(uri: string) {
+    const model = this.getModel(uri);
+    if (model) {
+      return this.saveFile(uri, model.getValue());
+    }
+  }
+
+  async saveLater(uri: string) {
+    const model = this.getModel(uri);
+    if (model) {
+      return this.saveFileLater(uri, model.getValue());
+    }
   }
 
   async saveFile(uri: string, content: string) {
     try {
       this.markFileState(uri, 'loading');
-      await fileService.writeText(uri, content);
+      if (this.states[uri] === 'changed') {
+        await fileService.writeText(uri, content);
+      }
       this.markFileState(uri, 'loaded');
     } catch (err) {
       this.markFileState(uri, 'error');
       throw err;
     }
+  }
+
+  async saveFileLater(uri: string, content: string, timeMs = 5000) {
+    clearTimeout(this.timeouts[uri]);
+    this.timeouts[uri] = setTimeout(() => {
+      this.saveFile(uri, content);
+    }, timeMs);
   }
 }
 

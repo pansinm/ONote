@@ -10,9 +10,6 @@ import { basename } from '/@/utils/uri';
 import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
 import 'react-contexify/dist/ReactContexify.css';
 import markdownIcon from 'bootstrap-icons/icons/markdown.svg';
-import taskIcon from 'bootstrap-icons/icons/list-task.svg';
-import * as monaco from 'monaco-editor';
-import { useEffect } from 'react';
 import './index.scss';
 // import diagramIcon from 'bootstrap-icons/icons/diagram-2.svg';
 
@@ -31,20 +28,6 @@ export default observer(function EditorTabs() {
       favicon: markdownIcon as any,
     };
   });
-
-  useEffect(() => {
-    const models = monaco.editor.getModels();
-    models.forEach((model) => {
-      const uri = model.uri.toString();
-      const opened = openedFiles.find((fileUri) => fileUri === uri);
-      if (!opened) {
-        // 关闭后自动保存
-        fileStore.states[uri] === 'changed' &&
-          fileStore.saveFile(model.uri.toString(), model.getValue());
-        model.dispose();
-      }
-    });
-  }, [openedFiles]);
 
   const { show } = useContextMenu({
     id: MENU_ID,
