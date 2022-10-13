@@ -10,9 +10,10 @@ const PACKAGE_ROOT = __dirname;
 const externals = [
   'fs-extra',
   '@hpcc-js/wasm',
-  ...builtinModules.flatMap((p) => [p, `node:${p}`]),
+  ...builtinModules
+    .filter((e) => e !== 'events')
+    .flatMap((p) => [p, `node:${p}`]),
 ];
-
 
 /**
  * @type {import('vite').UserConfig}

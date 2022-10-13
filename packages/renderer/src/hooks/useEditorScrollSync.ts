@@ -22,7 +22,7 @@ export default function useEditorScrollSync(
     const bindScrollEvent = () => {
       return editor.onDidScrollChange((e) => {
         scrollService.setScrollTop(
-          editor.getModel()?.uri.toString(),
+          editor.getModel()?.uri.toString() as string,
           e.scrollTop,
         );
         const [range] = editor.getVisibleRanges();
