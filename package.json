@@ -117,6 +117,7 @@
   "dependencies": {
     "@hpcc-js/wasm": "^1.13.0",
     "electron-updater": "4.6.5",
+    "events": "^3.3.0",
     "ssh2": "^1.11.0",
     "ssh2-sftp-client": "^9.0.4"
   }

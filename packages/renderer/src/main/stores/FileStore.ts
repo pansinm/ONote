@@ -92,12 +92,14 @@ class FileStateStore {
   }
 
   async saveFile(uri: string, content: string) {
+    if (this.states[uri] !== 'changed') {
+      this.markFileState(uri, 'saved');
+      return;
+    }
     try {
       this.markFileState(uri, 'loading');
-      if (this.states[uri] === 'changed') {
-        await fileService.writeText(uri, content);
-      }
-      this.markFileState(uri, 'loaded');
+      await fileService.writeText(uri, content);
+      this.markFileState(uri, 'saved');
     } catch (err) {
       this.markFileState(uri, 'error');
       throw err;
