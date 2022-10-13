@@ -4,8 +4,17 @@ body,
 html {
   margin: 0;
   padding: 0;
-  scroll-behavior: smooth;
+  scroll-behavior: initial;
 }
+
+// body {
+//   overflow-y: hidden;
+//   padding-right: 8px;
+//   &:hover {
+//   padding-right: 0px;
+//     overflow-y: auto;
+//   }
+// }
 
 * {
   border: 0;
