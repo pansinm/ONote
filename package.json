@@ -82,7 +82,7 @@
     "mime-types": "^2.1.35",
     "mobx": "^6.4.1",
     "mobx-react-lite": "^3.3.0",
-    "monaco-editor": "^0.34.0",
+    "monaco-editor": "0.33.0",
     "nano-staged": "0.5.0",
     "node-emoji": "^1.11.0",
     "patch-package": "^6.4.7",

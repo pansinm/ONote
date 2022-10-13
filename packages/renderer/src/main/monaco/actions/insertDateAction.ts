@@ -1,4 +1,5 @@
 import type * as monaco from 'monaco-editor';
+import { getCurrentRange } from '../utils';
 
 const insertDateAction: monaco.editor.IActionDescriptor = {
   id: 'onote.action.insertDate',
@@ -9,7 +10,11 @@ const insertDateAction: monaco.editor.IActionDescriptor = {
     ...args: any[]
   ): void | Promise<void> {
     editor.focus();
-    (editor as any)._commandService.executeCommand('onote.command.insertDate');
+    (editor as any)._commandService.executeCommand(
+      'onote.command.insertDate',
+      editor.getModel(),
+      getCurrentRange(editor),
+    );
   },
 };
 

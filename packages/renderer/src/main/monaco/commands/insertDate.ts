@@ -1,24 +1,17 @@
 import * as monaco from 'monaco-editor';
 
-monaco.editor.registerCommand('onote.command.insertDate', function () {
-  const editor = monaco.editor
-    .getEditors()
-    .find((editor) => editor.hasTextFocus());
-  const selection = editor?.getSelection();
-  if (selection) {
-    const { startLineNumber, startColumn, endLineNumber, endColumn } =
-      selection;
-    editor?.executeEdits('insert-date', [
+monaco.editor.registerCommand(
+  'onote.command.insertDate',
+  function (accessor, model: monaco.editor.ITextModel, range: monaco.Range) {
+    if (!range || !model) {
+      return;
+    }
+    model?.applyEdits([
       {
-        range: new monaco.Range(
-          startLineNumber,
-          startColumn,
-          endLineNumber,
-          endColumn,
-        ),
+        range: range,
         text: new Date().toLocaleDateString(),
         forceMoveMarkers: true,
       },
     ]);
-  }
-});
+  },
+);
