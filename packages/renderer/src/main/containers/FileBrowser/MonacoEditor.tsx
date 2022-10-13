@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import * as monaco from 'monaco-editor';
+import type * as monaco from 'monaco-editor';
 import React, {
   forwardRef,
   useCallback,
@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import { useLatest } from 'react-use';
 import useDimensions from '../../../hooks/useDimensions';
 import { MonacoMarkdownExtension } from '../../../simmer-markdown/src/ts';
-import { activate } from '../../monaco';
+import { activate, createEditor } from '../../monaco';
 import stores from '../../stores';
 
 export type EditorRef = {
@@ -33,25 +33,11 @@ const MonacoEditor = forwardRef<EditorRef, MonacoEditorProps>(function Editor(
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 
   useEffect(() => {
-    const editorInstance = monaco.editor.create(domRef.current!, {
-      value: '',
-      language: 'markdown',
-      fixedOverflowWidgets: true,
-      // wordWrap: 'on',
-      // theme: '',
-      padding: {
-        top: 10,
-      },
-      scrollbar: {
-        verticalScrollbarSize: 8,
-      },
-      unicodeHighlight: {
-        ambiguousCharacters: false,
-      },
-    });
+    const editorInstance = createEditor(domRef.current!);
 
     new MonacoMarkdownExtension().activate(editorInstance);
     activate(editorInstance);
+
     editorRef.current = editorInstance;
 
     setNode(domRef.current?.parentElement || null);

@@ -1,6 +1,7 @@
 import { first } from 'lodash';
 import * as monaco from 'monaco-editor';
 import fileService from '../../services/fileService';
+import manager from '../manager';
 
 async function readImage() {
   const items = await navigator.clipboard.read();
@@ -58,11 +59,10 @@ function insertImage(editor: monaco.editor.ICodeEditor, filePath: string) {
 // 覆盖默认粘贴行为
 monaco.editor.registerCommand(
   'editor.action.clipboardPasteAction',
-  async () => {
-    const editor = monaco.editor
-      .getEditors()
-      .find((editor) => editor.hasWidgetFocus());
-    if (editor && editor.getModel()?.getLanguageId() === 'markdown') {
+  async (accessor, uri) => {
+    const editor = manager.getEditor();
+    const model = monaco.editor.getModel(uri);
+    if (editor && model?.getLanguageId() === 'markdown') {
       const blob = await readImage();
       if (blob) {
         const relativePath = await saveAsset(editor, blob);
