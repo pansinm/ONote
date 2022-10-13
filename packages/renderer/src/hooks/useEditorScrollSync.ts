@@ -1,5 +1,6 @@
 import type * as monaco from 'monaco-editor';
 import { useEffect, useRef } from 'react';
+import scrollService from '../main/services/scrollService';
 import Client from '../rpc/Client';
 import EditorRPC from '../rpc/EditorRPC';
 import mainServer from '../rpc/mainServer';
@@ -20,6 +21,10 @@ export default function useEditorScrollSync(
     const previewerClient = new Client(previewerWindow);
     const bindScrollEvent = () => {
       return editor.onDidScrollChange((e) => {
+        scrollService.setScrollTop(
+          editor.getModel()?.uri.toString(),
+          e.scrollTop,
+        );
         const [range] = editor.getVisibleRanges();
         if (range && !previewScrollingRef.current) {
           const startLineNumber = range.startLineNumber;
