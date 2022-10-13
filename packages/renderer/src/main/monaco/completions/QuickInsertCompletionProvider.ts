@@ -35,7 +35,7 @@ class QuickInsertCompletionItemProvider
           command: {
             id: 'onote.command.insertDate',
             title: '插入日期',
-            arguments: [range, model],
+            arguments: [model, range],
           },
           label: '插入日期',
           filterText: '@riqi date insert',
