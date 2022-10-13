@@ -7,10 +7,10 @@ import React, {
   useRef,
 } from 'react';
 import { useEffect } from 'react';
-import { useEvent, useLatest } from 'react-use';
+import { useLatest } from 'react-use';
 import useDimensions from '../../../hooks/useDimensions';
 import { MonacoMarkdownExtension } from '../../../simmer-markdown/src/ts';
-import { registerActions } from '../../monaco/editor';
+import { activate } from '../../monaco';
 import stores from '../../stores';
 
 export type EditorRef = {
@@ -51,30 +51,10 @@ const MonacoEditor = forwardRef<EditorRef, MonacoEditorProps>(function Editor(
     });
 
     new MonacoMarkdownExtension().activate(editorInstance);
-    registerActions(editorInstance);
-
+    activate(editorInstance);
     editorRef.current = editorInstance;
 
     setNode(domRef.current?.parentElement || null);
-
-    editorInstance.addCommand(
-      monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
-      function () {
-        const model = editorInstance.getModel();
-        if (model) {
-          stores.fileStore.saveFile(model.uri.toString(), model.getValue());
-        }
-      },
-    );
-
-    editorInstance.addCommand(
-      monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyV,
-      function () {
-        (editorInstance as any)._commandService.executeCommand(
-          'editor.action.clipboardPasteAction',
-        );
-      },
-    );
 
     return () => {
       editorInstance.dispose();

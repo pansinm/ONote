@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import stores from './stores';
 import Icon from '/@/components/Icon';
 import View from '../components/View';
+import EventBus from './containers/EventBus';
 
 const App: FC = observer(() => {
   return (
@@ -47,6 +48,7 @@ const App: FC = observer(() => {
       >
         <ContentPanel />
       </View>
+      <EventBus />
     </div>
   );
 });
