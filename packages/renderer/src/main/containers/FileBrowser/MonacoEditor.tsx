@@ -91,19 +91,10 @@ const MonacoEditor = forwardRef<EditorRef, MonacoEditorProps>(function Editor(
 
   const latestUri = useLatest(props.uri);
   const loadModel = useCallback(async (uri: string) => {
-    const aUri = monaco.Uri.parse(uri);
-    let model = monaco.editor.getModel(aUri);
-    if (!model) {
-      const content = await stores.fileStore.readFile(uri).catch((err) => '');
-      if (uri !== latestUri.current) {
-        return;
-      }
-      model = monaco.editor.createModel(content, 'markdown', aUri);
-      model.onDidChangeContent((e) => {
-        stores.fileStore.saveFileLater(uri, model!.getValue());
-      });
+    const model = await stores.fileStore.getOrCreateModel(uri);
+    if (model.uri.toString() === latestUri.current) {
+      editorRef.current?.setModel(model);
     }
-    editorRef.current?.setModel(model);
   }, []);
 
   useEffect(() => {
