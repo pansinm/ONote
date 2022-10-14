@@ -21,39 +21,6 @@ const parseTodoLines = (input: string) => {
 
 const Render: FC<RenderProps> = (props) => {
   const ast = parse(props.content);
-  const prevRef = useRef({ content: props.content, uri: props.uri });
-  useEffect(() => {
-    if (prevRef.current.uri === props.uri) {
-      const uri = props.uri;
-      const diffs = diffLines(prevRef.current.content, props.content);
-      diffs.forEach((diff) => {
-        if (!diff.removed) {
-          const todoLines = parseTodoLines(diff.value);
-          todoLines.forEach((line) => {
-            const [_, check, title] =
-              /^[-+*]\s+\[(x|\s)\]\s+(.*)/.exec(line) || [];
-            const isDone = check.trim();
-            mainRpcClient.call(
-              'ensureTodo',
-              uri,
-              title.trim(),
-              isDone ? 'done' : 'doing',
-            );
-          });
-        }
-        if (diff.removed) {
-          const todoLines = parseTodoLines(diff.value);
-          todoLines.forEach((line) => {
-            const [_, check, title] =
-              /^[-+*]\s+\[(x|\s)\]\s+(.*)/.exec(line) || [];
-            mainRpcClient.call('deleteTodo', uri, title.trim());
-          });
-        }
-      });
-    }
-    prevRef.current = { content: props.content, uri: props.uri };
-  });
-  console.log(ast);
   usePreviewerScrollSync(props.uri, ast);
   return <>{render(props.uri, ast)}</>;
 };

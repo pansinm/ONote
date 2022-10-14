@@ -40,7 +40,10 @@ const handleScroll = (e: Event) => {
   });
 };
 
-function findAst(asts: Root[], lineNumber: number): Root[] {
+function findAst(root: Root, asts: Root[], lineNumber: number): Root[] {
+  if (lineNumber > (root.position?.end.line as number)) {
+    return [];
+  }
   const paths: Root[] = [];
   const matched = asts.find((ast) => {
     return (
@@ -48,17 +51,26 @@ function findAst(asts: Root[], lineNumber: number): Root[] {
       (ast.position?.end.line as number) >= lineNumber
     );
   });
+  if (!matched) {
+    return findAst(root, asts, lineNumber + 1);
+  }
+
   if (matched) {
     paths.push(matched);
   }
-  if (matched?.children) {
-    paths.push(...findAst(matched.children as any[], lineNumber));
+  if (matched?.children?.length) {
+    paths.push(...findAst(root, matched.children as any[], lineNumber));
   }
   return paths;
 }
 
 const scrollToLine = (ast: Root, lineNumber: number) => {
-  const paths = findAst(ast.children as any[], lineNumber).reverse();
+  if (lineNumber <= 1) {
+    window.scrollTo(window.scrollX, 0);
+    return;
+  }
+  const paths = findAst(ast, ast.children as any[], lineNumber).reverse();
+  console.log('lineNumber', ast, paths, lineNumber);
   for (const node of paths) {
     const startLine = node.position?.start.line as number;
     const endLine = node.position?.end.line as number;
