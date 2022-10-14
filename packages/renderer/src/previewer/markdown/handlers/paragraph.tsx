@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
 import React from 'react';
-import type { Heading, Paragraph, Root } from 'mdast';
+import type { Heading, Paragraph, Root, Text } from 'mdast';
 import { render, renderChildren } from './render';
 import { parseDom } from './html';
 import type { Node } from 'unist';
 import { remark } from 'remark';
+import { createLineClass } from './util/position';
 
 const voidElements = [
   'area',
@@ -43,15 +44,15 @@ function parseEndTagName(value: string) {
   return value.replace(/<\/|>|\s/g, '');
 }
 
-function renderToc(root: Root) {
+function renderToc(root: Root, node: Node) {
   const headings = root.children.filter(
     (node) => node.type === 'heading',
   ) as Heading[];
   return (
-    <ul className="toc">
+    <ul className={`toc ${createLineClass(node.position)}`}>
       {headings.map((heading, index) => {
         const title = remark
-          .stringify(heading)
+          .stringify(heading as any)
           .trim()
           .slice(heading.depth + 1);
         return (
@@ -77,9 +78,9 @@ function renderToc(root: Root) {
 export default function paragraph(node: Paragraph, ctx: any) {
   if (
     node.children.length === 1 &&
-    /^\[toc\]$/i.test(node.children[0]?.value as string)
+    /^\[toc\]$/i.test((node.children[0] as Text)?.value as string)
   ) {
-    return renderToc(ctx.getRootNode());
+    return renderToc(ctx.getRootNode(), node);
   }
   const containHtml = node.children.find((n) => n.type === 'html');
 
