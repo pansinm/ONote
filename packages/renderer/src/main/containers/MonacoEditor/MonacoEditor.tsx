@@ -11,6 +11,7 @@ import stores from '../../stores';
 import useLayout from './hooks/useLayout';
 import usePreviewerRPC from './hooks/usePreviewerRPC';
 import useModel from './hooks/useModel';
+import useModelContentChange from './hooks/useModelContentChange';
 
 export type EditorRef = {
   getInstance: () => monaco.editor.IStandaloneCodeEditor | undefined;
@@ -36,6 +37,8 @@ const MonacoEditor: FC<MonacoEditorProps> = function Editor(props) {
   usePreviewerRPC(editor);
 
   useModel(editor, props.uri);
+
+  useModelContentChange(editor);
 
   return <div className="fill-height" ref={containerRef}></div>;
 };
