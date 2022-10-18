@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import type {
   MainEventPayload,
   PreviewerEventPayload,
-} from '/@/rpc/EventPayload';
+} from '/@/common/EventPayload';
 
 interface PreviewerService {
   on<T extends keyof PreviewerEventPayload>(

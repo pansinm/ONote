@@ -1,6 +1,7 @@
 import html2canvas from 'html2canvas';
 import { base64Unicode } from './crypto';
 import mainClient from '../rpc/mainRpcClient';
+import clipboardService from '/@/common/services/clipboardService';
 
 export function copyElementAsImage(ele: HTMLElement) {
   const newPre = ele.cloneNode(true) as HTMLPreElement;
@@ -19,7 +20,11 @@ export function copyElementAsImage(ele: HTMLElement) {
     scale: 2,
   })
     .then((canvas) => {
-      return mainClient.copyImage(canvas.toDataURL('image/png'), 'dataURL');
+      canvas.toBlob((blob) => {
+        if (blob) {
+          clipboardService.write(blob);
+        }
+      });
     })
     .then(() => {
       newPre.remove();
@@ -42,11 +47,10 @@ export async function copyUrlAsImage(imageUrl: string) {
     return copySvgAsImage(svg);
   }
   const blob = await res.blob();
-  const arrayBuffer = await blob.arrayBuffer();
-  return mainClient.copyImage(arrayBuffer, 'ArrayBuffer');
+  clipboardService.write(blob);
 }
 
-export function renderSvg(svg: string): Promise<string> {
+export function renderSvg(svg: string): Promise<Blob | null> {
   return new Promise((resolve, reject) => {
     const base64 = base64Unicode(svg.trim());
     const dataurl = 'data:image/svg+xml;base64,' + base64;
@@ -69,7 +73,9 @@ export function renderSvg(svg: string): Promise<string> {
         canvas.width,
         canvas.height,
       );
-      resolve(canvas.toDataURL('image/png'));
+      canvas.toBlob((blob) => {
+        resolve(blob);
+      });
     };
     img.onerror = (err) => {
       console.log(err);
@@ -85,8 +91,10 @@ export function renderSvg(svg: string): Promise<string> {
  */
 export async function copySvgAsImage(svg: string) {
   console.log(svg);
-  const img = await renderSvg(svg);
-  return mainClient.copyImage(img, 'dataURL');
+  const blob = await renderSvg(svg);
+  if (blob) {
+    clipboardService.write(blob);
+  }
 }
 
 // export async function readClipboard(type?: 'html' | 'img') {
