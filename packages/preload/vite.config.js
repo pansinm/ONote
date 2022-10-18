@@ -1,5 +1,6 @@
-import {chrome} from '../../.electron-vendors.cache.json';
-import {builtinModules} from 'module';
+import { chrome } from '../../.electron-vendors.cache.json';
+import { builtinModules } from 'module';
+import { resolve } from 'path';
 
 const PACKAGE_ROOT = __dirname;
 
@@ -18,7 +19,7 @@ const config = {
     assetsDir: '.',
     minify: process.env.MODE !== 'development',
     lib: {
-      entry: 'src/index.ts',
+      entry: ['src/main.ts', 'src/previewer.ts'],
       formats: ['cjs'],
     },
     rollupOptions: {
@@ -27,6 +28,10 @@ const config = {
         'electron/main',
         '@hpcc-js/wasm',
         ...builtinModules.flatMap((p) => [p, `node:${p}`]),
+      ],
+      input: [
+        resolve(__dirname, 'src/main.ts'),
+        resolve(__dirname, 'src/previewer.ts'),
       ],
       output: {
         entryFileNames: '[name].cjs',

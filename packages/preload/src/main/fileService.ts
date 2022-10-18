@@ -1,13 +1,13 @@
 import { ipcRenderer } from 'electron';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { exposeInMainWorld } from './exposeInMainWorld';
-import type FileService from '../../main/src/fileservice/FileService';
+import type FileService from '../../../main/src/fileservice/FileService';
 
 export const fileService = {
   getService: () => {
     return ipcRenderer.invoke('fileservice', 'getService');
   },
-  connect: (type, config) => {
+  connect: (type: string, config: any) => {
     return ipcRenderer.invoke('fileservice', 'connect', type, config);
   },
   read: function (uri: string) {

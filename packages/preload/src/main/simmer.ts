@@ -51,6 +51,14 @@ export const simmer = {
     return os.homedir();
   },
 
+  postMessageToPreviewerWindow(message: any) {
+    ipcRenderer.send('window', 'postMessageToPreviewer', message);
+  },
+
+  showPreviewerWindow() {
+    ipcRenderer.send('window', 'showPreviewerWindow');
+  },
+
   renderGraphviz(dot: string, engine: Engine) {
     return graphviz.layout(dot, 'svg', engine);
   },

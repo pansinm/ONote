@@ -1,9 +1,8 @@
 import _ from 'lodash';
 import type { Root } from 'mdast';
 import { useCallback, useEffect, useRef } from 'react';
-import editorClient from '../rpc/editorClient';
-import previewerServer from '../rpc/previewerServer';
-import PreviewerRPC from '/@/rpc/PreviewerRPC';
+import { useLatest } from 'react-use';
+import mainService from '../services/mainService';
 
 function getLineNum(dom: HTMLElement) {
   const className = dom.className;
@@ -19,26 +18,6 @@ function getLineNum(dom: HTMLElement) {
 }
 
 let editorScrolling = false;
-const handleScroll = (e: Event) => {
-  if (editorScrolling) {
-    return;
-  }
-  const list = document.querySelectorAll('.markdown-body > *');
-  const listArr: HTMLElement[] = [].slice.apply(list);
-  listArr.some((item) => {
-    const rect = item.getBoundingClientRect();
-    if (rect.top <= 0 && rect.bottom >= 0) {
-      const lines = getLineNum(item);
-      if (lines) {
-        const pos = -rect.top / rect.height;
-        const line = lines.startLine + (lines.endLine - lines.startLine) * pos;
-        editorClient.scrollToLine(line);
-      }
-      return true;
-    }
-    return false;
-  });
-};
 
 function findAst(root: Root, asts: Root[], lineNumber: number): Root[] {
   if (lineNumber > (root.position?.end.line as number)) {
@@ -90,6 +69,26 @@ const scrollToLine = (ast: Root, lineNumber: number) => {
   }
 };
 
+// scrollTop对应的lineNumber
+function getTopLineNumber() {
+  const list = document.querySelectorAll('.markdown-body > *');
+  const listArr: HTMLElement[] = [].slice.apply(list);
+  for (const item of listArr) {
+    const rect = item.getBoundingClientRect();
+    if (rect.top <= 0 && rect.bottom >= 0) {
+      const itemPosition = getLineNum(item);
+      if (itemPosition) {
+        const pos = -rect.top / rect.height;
+        const lineNumber =
+          itemPosition.startLine +
+          (itemPosition.endLine - itemPosition.startLine) * pos;
+        return +lineNumber.toFixed(0);
+      }
+    }
+  }
+  return false;
+}
+
 export default function usePreviewerScrollSync(uri: string, ast: Root) {
   const astRef = useRef(ast);
   useEffect(() => {
@@ -103,26 +102,54 @@ export default function usePreviewerScrollSync(uri: string, ast: Root) {
   }, []);
 
   useEffect(() => {
-    editorClient.getScrollLine(uri).then((number) => {
-      scrollTo(number || 0);
-    });
+    const handleReply = ({ lineNumber }: { lineNumber: number }) => {
+      scrollTo(lineNumber || 0);
+    };
+    mainService.send('previewer.getEditorScrollPosition', undefined);
+
+    mainService.on('main.getEditorScrollPosition:response', handleReply);
+    return () => {
+      mainService.off('main.getEditorScrollPosition:response', handleReply);
+    };
   }, [uri]);
+
+  const latestUri = useLatest(uri);
 
   useEffect(() => {
     let timeout: any;
-    previewerServer.handle(
-      PreviewerRPC.ScrollToLine,
-      async (uri: string, lineNumber: number) => {
-        scrollTo(lineNumber);
-        clearTimeout(timeout);
-        editorScrolling = true;
-        timeout = setTimeout(() => {
-          editorScrolling = false;
-        }, 500);
-      },
-    );
+
+    const handleScroll = (e: Event) => {
+      if (editorScrolling) {
+        return;
+      }
+      const line = getTopLineNumber();
+      if (line !== false) {
+        mainService.send('previewer.scroll.changed', {
+          uri: latestUri.current,
+          lineNumber: line,
+        });
+      }
+    };
+
+    const handleEditorScroll = ({
+      uri,
+      lineNumber,
+    }: {
+      uri: string;
+      lineNumber: number;
+    }) => {
+      scrollTo(lineNumber);
+      clearTimeout(timeout);
+      editorScrolling = true;
+      timeout = setTimeout(() => {
+        editorScrolling = false;
+      }, 500);
+    };
+    mainService.on('main.scroll.changed', handleEditorScroll);
+
     window.addEventListener('scroll', handleScroll);
     return () => {
+      mainService.off('main.scroll.changed', handleEditorScroll);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);

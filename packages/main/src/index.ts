@@ -1,9 +1,8 @@
 import { fileURLToPath } from 'url';
 import { app, dialog, ipcMain, protocol } from 'electron';
 import './security-restrictions';
-import { restoreOrCreateWindow } from '/@/mainWindow';
 import fileService from './fileservice';
-
+import { restoreOrCreateWindow } from './window';
 /**
  * Prevent multiple instances
  */
@@ -13,7 +12,7 @@ import fileService from './fileservice';
 //   process.exit(0);
 // }
 
-app.on('second-instance', restoreOrCreateWindow);
+// app.on('second-instance', restoreOrCreateWindow);
 
 /**
  * Disable Hardware Acceleration for more power-save
@@ -32,14 +31,14 @@ app.on('window-all-closed', () => {
 /**
  * @see https://www.electronjs.org/docs/v14-x-y/api/app#event-activate-macos Event: 'activate'
  */
-app.on('activate', restoreOrCreateWindow);
+app.on('activate', () => restoreOrCreateWindow('main'));
 
 /**
  * Create app window when background process will be ready
  */
 app
   .whenReady()
-  .then(restoreOrCreateWindow)
+  .then(() => restoreOrCreateWindow('main'))
   .catch((e) => console.error('Failed create window:', e));
 
 app.whenReady().then(() => {

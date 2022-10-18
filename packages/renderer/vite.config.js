@@ -44,7 +44,7 @@ const config = {
     assetsDir: '.',
     rollupOptions: {
       input: {
-        index: join(PACKAGE_ROOT, 'index.html'),
+        index: join(PACKAGE_ROOT, 'main.html'),
         previewer: join(PACKAGE_ROOT, 'previewer.html'),
       },
       external: [...externals],

@@ -46,7 +46,8 @@ class FileStateStore {
       return model;
     }
     const text = await this.readFile(uri);
-    return this.createModel(uri, text);
+    // 防止并发
+    return this.getModel(uri) || this.createModel(uri, text);
   }
 
   markFileState(uri: string, state: FileState) {

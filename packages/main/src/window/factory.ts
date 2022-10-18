@@ -1,8 +1,15 @@
-import { app, BrowserWindow, nativeImage, NativeImage, shell } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  MessageChannelMain,
+  nativeImage,
+  shell,
+} from 'electron';
 import { join } from 'path';
 import { URL } from 'url';
+import { findWindow } from './utils';
 
-async function createWindow() {
+async function createWindow(type: 'main' | 'previewer') {
   const browserWindow = new BrowserWindow({
     show: false, // Use 'ready-to-show' event to show window
     autoHideMenuBar: true,
@@ -14,7 +21,7 @@ async function createWindow() {
     webPreferences: {
       nativeWindowOpen: true,
       webviewTag: false, // The webview tag is not recommended. Consider alternatives like iframe or Electron's BrowserView. https://www.electronjs.org/docs/latest/api/webview-tag#warning
-      preload: join(__dirname, '../../preload/dist/index.cjs'),
+      preload: join(__dirname, `../../preload/dist/${type}.cjs`),
       webSecurity: true,
     },
   });
@@ -27,7 +34,6 @@ async function createWindow() {
    */
   browserWindow.on('ready-to-show', () => {
     browserWindow?.show();
-
     if (import.meta.env.DEV) {
       browserWindow?.webContents.openDevTools();
     }
@@ -40,9 +46,9 @@ async function createWindow() {
    */
   const pageUrl =
     import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL !== undefined
-      ? import.meta.env.VITE_DEV_SERVER_URL
+      ? import.meta.env.VITE_DEV_SERVER_URL + `${type}.html`
       : new URL(
-          '../renderer/dist/index.html',
+          `../renderer/dist/${type}.html`,
           'file://' + __dirname,
         ).toString();
 
@@ -57,11 +63,10 @@ async function createWindow() {
 /**
  * Restore existing BrowserWindow or Create new BrowserWindow
  */
-export async function restoreOrCreateWindow() {
-  let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
-
+export async function restoreOrCreateWindow(type: 'main' | 'previewer') {
+  let window = findWindow(type);
   if (window === undefined) {
-    window = await createWindow();
+    window = await createWindow(type);
   }
 
   if (window.isMinimized()) {
