@@ -2,17 +2,7 @@ import { first } from 'lodash';
 import * as monaco from 'monaco-editor';
 import fileService from '../../services/fileService';
 import manager from '../manager';
-
-async function readImage() {
-  const items = await navigator.clipboard.read();
-  for (const item of items) {
-    const type = item.types.find((type) => type.includes('image'));
-    if (type) {
-      return item.getType(type);
-    }
-  }
-  return false;
-}
+import clipboardService from '/@/common/services/clipboardService';
 
 async function saveAsset(editor: monaco.editor.ICodeEditor, blob: Blob) {
   const uri = editor.getModel()?.uri.toString();
@@ -63,7 +53,7 @@ monaco.editor.registerCommand(
     const editor = manager.getEditor();
     const model = monaco.editor.getModel(uri);
     if (editor && model?.getLanguageId() === 'markdown') {
-      const blob = await readImage();
+      const blob = await clipboardService.readImage();
       if (blob) {
         const relativePath = await saveAsset(editor, blob);
         if (relativePath) {
@@ -72,7 +62,7 @@ monaco.editor.registerCommand(
         }
       }
     }
-    const clipboardText = await navigator.clipboard.readText();
+    const clipboardText = await clipboardService.readText();
     if (clipboardText !== '') {
       editor?.trigger('keyboard', 'paste' /* Handler.Paste */, {
         text: clipboardText,
