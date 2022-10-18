@@ -1,10 +1,7 @@
 import type { FC } from 'react';
-import { useEffect, useRef } from 'react';
 import React from 'react';
 import { parse, render } from './utils';
 import usePreviewerScrollSync from '../hooks/usePreviewerScrollSync';
-import diffLines from '../utils/diffLines';
-import mainRpcClient from '../rpc/mainRpcClient';
 
 interface RenderProps {
   uri: string;

@@ -1,19 +1,12 @@
-import * as monaco from 'monaco-editor';
 import { observer } from 'mobx-react-lite';
 import type { FC } from 'react';
 import { useState } from 'react';
-import { useEffect } from 'react';
-import { useRef } from 'react';
 import React from 'react';
-import type { PreviewerRef } from './Previewer';
 import Previewer from './Previewer';
-import type { EditorRef } from '../MonacoEditor';
-import MonacoEditor from '../MonacoEditor';
-import stores from '../../../stores';
-import useEditorScrollSync from '/@/hooks/useEditorScrollSync';
-import useForceUpdate from '/@/hooks/useForceUpdate';
+import MonacoEditor from '../../MonacoEditor/MonacoEditor';
 import Flex from '/@/components/Flex';
 import DragBar from '/@/components/DragBar';
+import Icon from '/@/components/Icon';
 
 function handleDrag(delta: number) {
   const editorContainerEle = document.querySelector('.editor-container')!;
@@ -40,52 +33,6 @@ interface MarkdownResourcePanelProps {
 
 const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
   (props) => {
-    const editorRef = useRef<EditorRef>(null);
-    const previewerRef = useRef<PreviewerRef>(null);
-    const forceUpdate = useForceUpdate();
-
-    useEditorScrollSync(
-      editorRef.current?.getInstance(),
-      previewerRef.current?.getWindow(),
-    );
-    useEffect(() => {
-      const editor = editorRef.current?.getInstance();
-      if (!editor) {
-        return;
-      }
-      const renderMarkdown = (model: monaco.editor.IModel) => {
-        previewerRef.current
-          ?.getRPCClient()
-          .call('renderMarkdown', model?.uri.toString(), model?.getValue());
-      };
-
-      previewerRef.current?.getWindow().addEventListener('load', () => {
-        if (editor) {
-          renderMarkdown(editor!.getModel()!);
-        }
-        forceUpdate();
-      });
-
-      const modelChangeDisposer = editor.onDidChangeModel((e) => {
-        const newUrl = e.newModelUrl;
-        if (newUrl) {
-          renderMarkdown(monaco.editor.getModel(newUrl)!);
-        }
-      });
-      const modelContentDisposer = editor.onDidChangeModelContent((ev) => {
-        const model = editor.getModel();
-        if (model) {
-          renderMarkdown(model);
-          stores.fileStore.markFileState(model.uri.toString(), 'changed');
-        }
-      });
-
-      return () => {
-        modelContentDisposer?.dispose();
-        modelChangeDisposer?.dispose();
-      };
-    }, []);
-
     const [dragging, setDragging] = useState(false);
     return (
       <div
@@ -95,6 +42,20 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
           flexDirection: 'column',
         }}
       >
+        <Flex
+          justifyContent={'space-between'}
+          boxShadow="#dddddd 0 6px 6px -6px"
+          padding={'5px 10px'}
+        >
+          <div></div>
+          <Flex paddingRight={10}>
+            <Icon
+              title="布局"
+              type="layout-text-window-reverse"
+              onClick={() => window.simmer.showPreviewerWindow()}
+            />
+          </Flex>
+        </Flex>
         <Flex position="relative" flex={1}>
           <div
             className="fill-height editor-container"
@@ -103,7 +64,6 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
             <MonacoEditor
               needLoad={/\.mdx?$/.test(props.uri)}
               uri={props.uri}
-              ref={editorRef}
             />
             <DragBar
               onStart={() => setDragging(true)}
@@ -114,7 +74,7 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
             />
           </div>
           <div style={{ flex: 1, position: 'relative' }}>
-            <Previewer ref={previewerRef} />
+            <Previewer />
             {dragging ? (
               <div
                 style={{

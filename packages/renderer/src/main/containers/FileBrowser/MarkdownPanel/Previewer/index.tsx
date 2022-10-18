@@ -44,6 +44,7 @@ const Previewer = forwardRef<PreviewerRef>((props, ref) => {
   return (
     <iframe
       ref={previewerRef}
+      name="markdownPreviewer"
       className="fullfill"
       src="./previewer.html"
       //   sandbox="true"

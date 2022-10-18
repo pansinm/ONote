@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import React, { useRef } from 'react';
-import MonacoEditor from '../MonacoEditor';
+import MonacoEditor from '../../MonacoEditor/MonacoEditor';
 
 interface PlainTextPanelProps {
   uri: string;
