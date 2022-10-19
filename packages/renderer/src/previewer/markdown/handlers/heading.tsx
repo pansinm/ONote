@@ -1,15 +1,14 @@
 import React from 'react';
 import type { Heading } from 'mdast';
 import { renderChildren } from './render';
-import { remark } from 'remark';
+import { stringify } from '../../utils/md';
 
 export default function heading(node: Heading, ctx: any) {
   // eslint-disable-next-line react/no-children-prop
   return React.createElement('h' + node.depth, {
     // ### abc  => abc
     id: encodeURIComponent(
-      remark
-        .stringify(node)
+      stringify(node)
         .trim()
         .slice(node.depth + 1),
     ),
