@@ -6,6 +6,7 @@ import { parseDom } from './html';
 import type { Node } from 'unist';
 import { remark } from 'remark';
 import { createLineClass } from './util/position';
+import { stringify } from '../../utils/md';
 
 const voidElements = [
   'area',
@@ -51,8 +52,7 @@ function renderToc(root: Root, node: Node) {
   return (
     <ul className={`toc ${createLineClass(node.position)}`}>
       {headings.map((heading, index) => {
-        const title = remark
-          .stringify(heading as any)
+        const title = stringify(heading as any)
           .trim()
           .slice(heading.depth + 1);
         return (
