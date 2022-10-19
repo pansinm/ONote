@@ -1,11 +1,10 @@
 # ONote 
 
-希望打造成适合程序员，灵活好用的 Markdown 笔记应用
-
-![](docs/assets/sceenshot.png)
-
+![](docs/assets/screenshot.png)
 
 ## 特性
+
+详细特性参考[特性说明](docs/特性说明.md)
 
 ### v0.3.0
 1. 支持新窗口打开预览页面
@@ -22,7 +21,6 @@
 2. 支持在windows打开ssh资源
 3. 支持文件搜索
 4. 美化滚动条样式
-
 
 ### v0.1.0
 1. 支持打开本地目录
@@ -46,7 +44,7 @@
 1. 脚手架 [vite-electron-builder](https://github.com/cawa-93/vite-electron-builder)
 2. 编辑器 [monaco-editor](https://microsoft.github.io/monaco-editor/)
 3. [Markdown AST](https://github.com/syntax-tree/mdast)
-4. GraphViz渲染 [@hpcc-js/wasm](https://github.com/hpcc-systems/hpcc-js-wasm)
+4. Graphviz渲染 [@hpcc-js/wasm](https://github.com/hpcc-systems/hpcc-js-wasm)
 
 ## License
 
