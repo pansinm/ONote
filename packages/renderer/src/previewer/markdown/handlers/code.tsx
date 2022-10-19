@@ -15,28 +15,30 @@ interface CodeProps {
   meta?: string | null;
   ref?: React.RefObject<HTMLPreElement>;
 }
-const Code = React.forwardRef<HTMLPreElement, CodeBlockProps>((props, ref) => {
-  const codeRef = useRef<HTMLElement>(null);
-  const { lang, code } = props;
-  useEffect(() => {
-    lineBreak(codeRef.current!);
-  }, []);
-  useEffect(() => {
-    if (codeRef.current) {
-      Prism.highlightElement(codeRef.current);
-    }
-  }, [lang, code]);
-  const className = cz({
-    [`language-${lang}`]: lang,
-  });
-  return (
-    <pre className="line-numbers" ref={ref}>
-      <code className={className} ref={codeRef} lang={lang}>
-        {props.code}
-      </code>
-    </pre>
-  );
-});
+export const Code = React.forwardRef<HTMLPreElement, CodeBlockProps>(
+  (props, ref) => {
+    const codeRef = useRef<HTMLElement>(null);
+    const { lang, code } = props;
+    useEffect(() => {
+      lineBreak(codeRef.current!);
+    }, []);
+    useEffect(() => {
+      if (codeRef.current) {
+        Prism.highlightElement(codeRef.current);
+      }
+    }, [lang, code]);
+    const className = cz({
+      [`language-${lang}`]: lang,
+    });
+    return (
+      <pre className="line-numbers" ref={ref}>
+        <code className={className} ref={codeRef} lang={lang}>
+          {props.code}
+        </code>
+      </pre>
+    );
+  },
+);
 
 export interface CodeBlockProps extends CodeProps {
   className?: string;
