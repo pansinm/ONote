@@ -1,7 +1,8 @@
 import mermaid from 'mermaid';
 import Flowchart from 'flowchart.js';
-import mainClient from '../rpc/mainRpcClient';
-import _ from 'lodash';
+import _, { uniqueId } from 'lodash';
+import mainService from '../services/mainService';
+import { waitEvent } from '../utils/async';
 // import _ from 'lodash';
 
 // 使用graphviz的webassembly版本渲染，用node环境执行
@@ -80,11 +81,25 @@ class DiagramEngine {
   }
 
   async renderGraphviz(code: string, engine: string): Promise<RenderResult> {
-    const graph = await mainClient.renderGraphviz(code, engine as any);
-    return {
-      type: 'svg',
-      content: graph,
-    };
+    const taskId = uniqueId('plantuml-');
+    mainService.send('previewer.diagram.toRender', {
+      taskId,
+      code,
+      lang: 'graphviz',
+      meta: { engine },
+    });
+
+    const reply = await waitEvent(
+      mainService,
+      'main.diagram.rendered',
+      (data) => {
+        return data.taskId === taskId;
+      },
+    );
+    if (reply.err) {
+      throw reply.err;
+    }
+    return { type: 'svg', content: reply.svg };
   }
 
   async renderMermaid(code: string): Promise<RenderResult> {
@@ -124,11 +139,25 @@ class DiagramEngine {
   }
 
   async renderPlantuml(code: string): Promise<RenderResult> {
-    const graph = await mainClient.renderPlantUML(code);
-    return {
-      type: 'svg',
-      content: graph,
-    };
+    const taskId = uniqueId('plantuml-');
+    mainService.send('previewer.diagram.toRender', {
+      taskId,
+      code,
+      lang: 'plantuml',
+      meta: {},
+    });
+
+    const reply = await waitEvent(
+      mainService,
+      'main.diagram.rendered',
+      (data) => {
+        return data.taskId === taskId;
+      },
+    );
+    if (reply.err) {
+      throw reply.err;
+    }
+    return { type: 'svg', content: reply.svg };
   }
 
   async renderSequence(

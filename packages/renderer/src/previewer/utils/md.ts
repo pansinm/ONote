@@ -7,7 +7,7 @@ import type { Content, Root } from 'mdast';
 import remarkParse from 'remark-parse';
 import gfm from 'remark-gfm';
 import footnotes from 'remark-footnotes';
-import mainRpcClient from '../rpc/mainRpcClient';
+import mainService from '../services/mainService';
 // import type {  } from 'hast-util-to-mdast';
 
 export async function parse(markdown: string) {
@@ -37,16 +37,16 @@ export function replaceNode(
   after: Root | Content,
 ) {
   const { start, end } = node.position!;
-  mainRpcClient.replaceText(
-    fileUri,
-    {
+  mainService.send('previewer.replaceText', {
+    uri: fileUri,
+    range: {
       startLineNumber: start.line,
       startColumn: start.column,
       endLineNumber: end.line,
       endColumn: end.column,
     },
-    stringify(after).trim(),
-  );
+    text: stringify(after).trim(),
+  });
 }
 
 export function html2md(html: string) {

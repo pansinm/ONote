@@ -1,6 +1,5 @@
 import html2canvas from 'html2canvas';
 import { base64Unicode } from './crypto';
-import mainClient from '../rpc/mainRpcClient';
 import clipboardService from '/@/common/services/clipboardService';
 
 export function copyElementAsImage(ele: HTMLElement) {

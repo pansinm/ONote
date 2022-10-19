@@ -1,16 +1,13 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import type { Table } from 'mdast';
-// import { renderChildren } from './render';
 import { unified } from 'unified';
 import _ from 'lodash';
 import remarkHtml from 'remark-html';
 import ETable from '@editorjs/table';
 import EditorJS from '@editorjs/editorjs';
-// import { html2md } from '../../shared/utils/md';
-// import { replaceText } from '../../shared/ipc';
 import { uniqueId } from 'docx';
-import mainRpcClient from '../../rpc/mainRpcClient';
 import { html2md } from '../../utils/md';
+import mainService from '../../services/mainService';
 
 const toHtml = unified().use(remarkHtml);
 
@@ -47,16 +44,16 @@ function useReplaceText() {
     const { pos, md = '', uri } = nextRef.current || {};
     nextRef.current = undefined;
     pos &&
-      mainRpcClient.replaceText(
+      mainService.send('previewer.replaceText', {
         uri,
-        {
+        range: {
           startLineNumber: pos.start.line,
           startColumn: pos.start.column,
           endLineNumber: pos.end.line,
           endColumn: pos.end.column,
         },
-        md,
-      );
+        text: md,
+      });
     setTimeout(() => {
       updatingRef.current = false;
       executeNext();
