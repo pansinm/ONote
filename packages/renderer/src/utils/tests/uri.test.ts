@@ -1,4 +1,3 @@
-import { expect, test } from 'vitest';
 import { fileType, isMarkdown } from '../uri';
 
 test('fileType', () => {

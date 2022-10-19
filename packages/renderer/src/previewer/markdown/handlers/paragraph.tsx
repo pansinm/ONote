@@ -4,7 +4,6 @@ import type { Heading, Paragraph, Root, Text } from 'mdast';
 import { render, renderChildren } from './render';
 import { parseDom } from './html';
 import type { Node } from 'unist';
-import { remark } from 'remark';
 import { createLineClass } from './util/position';
 import { stringify } from '../../utils/md';
 
