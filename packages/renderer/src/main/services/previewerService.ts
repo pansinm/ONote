@@ -40,9 +40,8 @@ class PreviewerService extends EventEmitter {
       .markdownPreviewer as Window | null;
     if (markdownPreviewer) {
       markdownPreviewer.postMessage(message);
-    } else {
-      window.simmer.postMessageToPreviewerWindow(message);
     }
+    window.simmer.postMessageToPreviewerWindow(message);
   }
 }
 

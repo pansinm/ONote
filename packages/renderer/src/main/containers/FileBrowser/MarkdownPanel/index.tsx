@@ -50,8 +50,8 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
           <div></div>
           <Flex paddingRight={10}>
             <Icon
-              title="布局"
-              type="layout-text-window-reverse"
+              title="演示"
+              type="play-btn-fill"
               onClick={() => window.simmer.showPreviewerWindow()}
             />
           </Flex>
