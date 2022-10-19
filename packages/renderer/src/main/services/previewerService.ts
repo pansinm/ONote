@@ -30,6 +30,14 @@ class PreviewerService extends EventEmitter {
     eventName: T,
     payload: MainEventPayload[T],
   ) {
+    this.sendToIframe(eventName, payload);
+    this.sendToWindow(eventName, payload);
+  }
+
+  sendToIframe<T extends keyof MainEventPayload>(
+    eventName: T,
+    payload: MainEventPayload[T],
+  ) {
     const message = {
       source: 'main',
       target: 'previewer',
@@ -41,6 +49,18 @@ class PreviewerService extends EventEmitter {
     if (markdownPreviewer) {
       markdownPreviewer.postMessage(message);
     }
+  }
+
+  sendToWindow<T extends keyof MainEventPayload>(
+    eventName: T,
+    payload: MainEventPayload[T],
+  ) {
+    const message = {
+      source: 'main',
+      target: 'previewer',
+      eventName,
+      payload,
+    };
     window.simmer.postMessageToPreviewerWindow(message);
   }
 }
