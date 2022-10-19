@@ -7,6 +7,12 @@ html {
   scroll-behavior: initial;
 }
 
+body {
+  zoom: 1;
+  max-zoom: 5;
+  min-zoom: 0.1;
+}
+
 // body {
 //   overflow-y: hidden;
 //   padding-right: 8px;

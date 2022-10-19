@@ -1,6 +1,5 @@
 import type * as monaco from 'monaco-editor';
 import { useEffect } from 'react';
-import previewerService from '/@/main/services/previewerService';
 import stores from '/@/main/stores';
 
 export default function useModelContentChange(
@@ -10,7 +9,9 @@ export default function useModelContentChange(
     const contentChangeDisposer = editor?.onDidChangeModelContent((e) => {
       const model = editor.getModel();
       if (e.versionId && model) {
-        stores.fileStore.markFileState(model.uri.toString(), 'changed');
+        const uri = model.uri.toString();
+        stores.fileStore.markFileState(uri, 'changed');
+        stores.fileStore.saveLater(uri);
       }
     });
     return () => {
