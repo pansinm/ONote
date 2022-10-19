@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import 'github-markdown-css/github-markdown-light.css';
 import Render from '../markdown/Render';
 import useModel from '../hooks/useModel';

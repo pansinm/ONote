@@ -37,7 +37,7 @@ const MonacoEditor: FC<MonacoEditorProps> = function Editor(props) {
 
   useModelContentChange(editor);
 
-  return <div className="fill-height" ref={containerRef}></div>;
+  return <div className="fullfill" ref={containerRef}></div>;
 };
 
 export default observer(MonacoEditor);
