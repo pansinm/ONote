@@ -9,7 +9,7 @@
     "jsx": "react",
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["node"],
+    "types": ["node", "jest"],
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
