@@ -1,5 +1,9 @@
 export type PreviewerEventPayload = {
-  'previewer.scroll.changed': { uri: string; lineNumber: number };
+  'previewer.scroll.changed': {
+    uri: string;
+    lineNumber: number;
+    inIframe: boolean;
+  };
   'previewer.diagram.toRender': {
     taskId: string;
     lang: string;

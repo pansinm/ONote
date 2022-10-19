@@ -34,7 +34,9 @@ class PreviewerService extends EventEmitter {
       source: 'previewer',
       target: 'main',
       eventName,
-      payload,
+      payload: Object.assign({}, payload, {
+        inIframe: window !== window.parent,
+      }),
     };
     // iframe 内直接 post，独立窗口通过 preload 转发
     window.parent.postMessage(message);
