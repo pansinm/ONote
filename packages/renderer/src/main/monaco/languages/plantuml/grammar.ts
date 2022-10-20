@@ -28,7 +28,9 @@ const def = String.raw`
       | whitespace* whitespace* &lineEnd
       | ":" noneNewLineChar* &lineEnd
 
-    participantDeclaration = participantKind whitespace+ participantName &lineEnd
+    participantDeclaration = participantKind whitespace+ participantName participantDeclarationAsCourse? participantDeclarationColorCourse? &lineEnd
+    participantDeclarationAsCourse = whitespace+ "as" whitespace+ participantName
+    participantDeclarationColorCourse = whitespace+ colorChars
 
     participantName = stringLiteral | identifier
 
@@ -58,7 +60,8 @@ const def = String.raw`
 
     // 命名标记
      // 命名标记
-    identifier = ~("\"" | space) letter+
+    identifier = ~("\"" | ":") normalChar+
+    normalChar = letter | digit
 
     // 颜色
     colorChars= "#" alnum+

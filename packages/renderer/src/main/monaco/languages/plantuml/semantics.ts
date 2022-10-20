@@ -1,5 +1,5 @@
 import grammar from './grammar';
-import type { SequenceDiagram, UML } from './UMLAst';
+import type { ParticipantDeclaration, SequenceDiagram, UML } from './UMLAst';
 
 const semantics = grammar.createSemantics();
 semantics.addOperation('toTree', {
@@ -56,10 +56,14 @@ semantics.addOperation('toTree', {
     };
   },
 
-  participantDeclaration(_1, _2, _3, _4) {
+  participantDeclaration(kind, _2, name, as, color, _6) {
     return {
-      kind: _1.sourceString,
-    };
+      type: 'ParticipantDeclaration',
+      kind: kind.sourceString.toLowerCase(),
+      name: name.sourceString,
+      as: as.children[2]?.sourceString,
+      color: color.children[1]?.sourceString,
+    } as ParticipantDeclaration;
   },
   _iter(...children) {
     return children.map((c) => {
