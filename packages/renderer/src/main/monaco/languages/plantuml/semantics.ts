@@ -34,6 +34,12 @@ semantics.addOperation('toTree', {
       value: _3.sourceString.trim(),
     };
   },
+  multipleLineComment(_1, comment, _3) {
+    return {
+      type: 'MultipleLineComment',
+      value: comment.sourceString.trim(),
+    };
+  },
   sequenceMessage(left, _2, arrow, _4, right, _6, message) {
     return {
       type: 'SequenceMessage',
@@ -62,12 +68,11 @@ semantics.addOperation('toTree', {
       kind: kind.sourceString.toLowerCase(),
       name: name.sourceString,
       as: as.children[2]?.sourceString,
-      color: color.children[1]?.sourceString,
+      color: color.sourceString.trim() || undefined,
     } as ParticipantDeclaration;
   },
   _iter(...children) {
     return children.map((c) => {
-      console.log(c.source);
       return c.toTree();
     });
   },

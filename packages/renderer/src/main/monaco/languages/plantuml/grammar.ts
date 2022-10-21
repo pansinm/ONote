@@ -19,6 +19,7 @@ const def = String.raw`
       | participantDeclaration
       | sequenceMessage
       | singleLineComment
+      | multipleLineComment
 
     sequenceMessage =
       | participantName whitespace* sequenceArrow whitespace* participantName? whitespace* sequenceMessageTail
@@ -71,6 +72,10 @@ const def = String.raw`
     // 双引号字符串
     doubleQuoteChars = doubleQuoteChar+
     doubleQuoteChar = ~("\"" | nl)  any
+
+    // 多行注释
+    multipleLineComment = "/'" multipleLineCommentChar* "'/"
+    multipleLineCommentChar = ~"'/" any
 
     // 单行注释
     singleLineComment = space* "'" singleLineCommentChars? &lineEnd
