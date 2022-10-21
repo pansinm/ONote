@@ -25,8 +25,9 @@ export interface ParticipantDeclaration {
   type: 'ParticipantDeclaration';
   kind: string;
   name: string;
-  as: string;
-  color: string;
+  as?: string;
+  order?: number;
+  color?: string;
 }
 
 export interface Arrow {
@@ -41,4 +42,21 @@ export interface SequenceMessage {
   right?: string;
   message?: string;
   arrow: Arrow;
+}
+
+export interface SkinparamCommand {
+  type: 'SkinparamCommand';
+  param: SkinparamParam;
+  value: string | [{ param: SkinparamParam; value: string }];
+}
+
+export interface SkinparamParam {
+  type: 'SkinparamParam';
+  name: string;
+  stereotype?: Stereotype;
+}
+
+export interface Stereotype {
+  type: 'Stereotype';
+  name: string;
 }

@@ -1,5 +1,11 @@
 import grammar from './grammar';
-import type { ParticipantDeclaration, SequenceDiagram, UML } from './UMLAst';
+import type {
+  ParticipantDeclaration,
+  SequenceDiagram,
+  SkinparamCommand,
+  SkinparamParam,
+  UML,
+} from './UMLAst';
 
 const semantics = grammar.createSemantics();
 semantics.addOperation('toTree', {
@@ -62,14 +68,51 @@ semantics.addOperation('toTree', {
     };
   },
 
-  participantDeclaration(kind, _2, name, as, color, _6) {
+  participantDeclaration(arg): ParticipantDeclaration {
+    if (arg.ctorName == 'participantDeclaration_order') {
+      const [kind, name, order, orderDigit] = arg.children;
+      return {
+        type: 'ParticipantDeclaration',
+        kind: kind.sourceString.toLocaleLowerCase().trim(),
+        name: name.sourceString.trim(),
+        order: +orderDigit.sourceString.trim(),
+      };
+    }
+    const [kind, name, as, color] = arg.children;
     return {
       type: 'ParticipantDeclaration',
-      kind: kind.sourceString.toLowerCase(),
-      name: name.sourceString,
-      as: as.children[2]?.sourceString,
+      kind: kind.sourceString.toLowerCase().trim(),
+      name: name.sourceString.trim(),
+      as: as.children[2]?.sourceString.trim(),
       color: color.sourceString.trim() || undefined,
     } as ParticipantDeclaration;
+  },
+  skinparamCommand_normal(_1, pair): SkinparamCommand {
+    const [key, value] = pair.children;
+    return {
+      type: 'SkinparamCommand',
+      param: key.toTree(),
+      value: value.sourceString.trim(),
+    };
+  },
+  skinparamCommandParam(name, stereotype): SkinparamParam {
+    return {
+      type: 'SkinparamParam',
+      name: name.sourceString.trim(),
+      stereotype: stereotype.sourceString ? stereotype.toTree() : undefined,
+    };
+  },
+  stereotype(_1, name, _2) {
+    return {
+      type: 'Stereotype',
+      name: name.sourceString.trim(),
+    };
+  },
+  withRSpace(x, _) {
+    return x.toTree();
+  },
+  whitespaceAroundOrNot(_1, x, _3) {
+    return x.toTree();
   },
   _iter(...children) {
     return children.map((c) => {

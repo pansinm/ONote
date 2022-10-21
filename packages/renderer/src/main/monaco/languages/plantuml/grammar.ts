@@ -16,22 +16,30 @@ const def = String.raw`
     SequenceStatements = SequenceStatement+
 
     SequenceStatement =
-      | participantDeclaration
-      | sequenceMessage
       | singleLineComment
       | multipleLineComment
+      | skinparamCommand
+      | participantDeclaration
+      | sequenceMessage
+
 
     sequenceMessage =
       | participantName whitespace* sequenceArrow whitespace* participantName? whitespace* sequenceMessageTail
       | participantName? whitespace* sequenceArrow whitespace* participantName whitespace* sequenceMessageTail
-
     sequenceMessageTail =
       | whitespace* whitespace* &lineEnd
       | ":" noneNewLineChar* &lineEnd
 
-    participantDeclaration = participantKind whitespace+ participantName participantDeclarationAsCourse? participantDeclarationColorCourse? &lineEnd
+    // 声明参与者
+    participantDeclaration =
+      | withRSpace<participantKind> participantName participantDeclarationAsCourse? participantDeclarationColorCourse? &lineEnd -- normal
+      | withRSpace<"participant"> withRSpace<participantName> withRSpace<"order"> digit+ &lineEnd -- order
+
     participantDeclarationAsCourse = whitespace+ "as" whitespace+ participantName
     participantDeclarationColorCourse = whitespace+ colorChars
+
+    withRSpace<x> = x whitespace+
+
 
     participantName = stringLiteral | identifier
 
@@ -58,9 +66,21 @@ const def = String.raw`
     arrowPoint = ("o" | "x")
     sequenceArrowShaft = "-"+
 
+    /* -------------- common commands ------------- */
+    skinparamCommand =
+      | withRSpace<"skinparam"> skinparamCommandPair -- normal
+      | withRSpace<"skinparam"> skinparamCommandParam skinparamCommandBlock -- block
+    skinparamCommandParam = identifier stereotype?
+    skinparamCommandValue = skinparamCommandValueChar*
+    skinparamCommandValueChar = ~"}" (letter | whitespace)
+    skinparamCommandBlock = "{" lineEnd skinparamCommandPair* "}"
+    skinparamCommandPair =  withRSpace<skinparamCommandParam> skinparamCommandValue lineEnd
+
+    stereotype = "<<" whitespaceAroundOrNot<identifier> ">>"
+    // 空格环绕
+    whitespaceAroundOrNot<x> = whitespace* x whitespace*
 
     // 命名标记
-     // 命名标记
     identifier = ~("\"" | ":") normalChar+
     normalChar = letter | digit
 
