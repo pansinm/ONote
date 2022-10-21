@@ -60,3 +60,12 @@ export interface Stereotype {
   type: 'Stereotype';
   name: string;
 }
+
+export interface AutoNumberCommand {
+  type: 'AutoNumberCommand';
+  action?: 'stop' | 'resume';
+  format?: string;
+  value?: number;
+  skip?: number;
+  step?: number;
+}

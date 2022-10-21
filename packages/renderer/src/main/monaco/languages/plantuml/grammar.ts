@@ -19,6 +19,7 @@ const def = String.raw`
       | singleLineComment
       | multipleLineComment
       | skinparamCommand
+      | autonumberCommand
       | participantDeclaration
       | sequenceMessage
 
@@ -38,7 +39,6 @@ const def = String.raw`
     participantDeclarationAsCourse = whitespace+ "as" whitespace+ participantName
     participantDeclarationColorCourse = whitespace+ colorChars
 
-    withRSpace<x> = x whitespace+
 
 
     participantName = stringLiteral | identifier
@@ -72,6 +72,13 @@ const def = String.raw`
 
     arrowColor = "[" colorChars "]"
 
+    /* ------------- autonumber --------------*/
+    autonumberCommand =
+      | "autonumber" withLSpace<"stop"> lineEnd -- stop
+      | "autonumber" withLSpace<"resume"> (withLSpace<digit+>)? (withLSpace<stringLiteral>)? lineEnd -- resume
+      | "autonumber" (withLSpace<digit+>)? (withLSpace<digit+>)? (withLSpace<stringLiteral>)? lineEnd -- normal
+
+
     /* -------------- common commands ------------- */
     skinparamCommand =
       | withRSpace<"skinparam"> skinparamCommandPair -- normal
@@ -85,6 +92,8 @@ const def = String.raw`
     stereotype = "<<" whitespaceAroundOrNot<identifier> ">>"
     // 空格环绕
     whitespaceAroundOrNot<x> = whitespace* x whitespace*
+    withRSpace<x> = x whitespace+
+    withLSpace<x> = whitespace+ x
 
     // 命名标记
     identifier = ~("\"" | ":") normalChar+

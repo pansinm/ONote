@@ -397,4 +397,232 @@ Alice -[#0000FF]->Bob : ok
       },
     },
   },
+  {
+    desc: 'Message sequence numbering',
+    input: String.raw`@startuml
+autonumber
+Bob -> Alice : Authentication Request
+Bob <- Alice : Authentication Response
+autonumber 15
+Bob -> Alice : Another authentication Request
+Bob <- Alice : Another authentication Response
+autonumber 40 10
+Bob -> Alice : Yet another authentication Request
+Bob <- Alice : Yet another authentication Response
+@enduml`,
+    expect: {
+      type: 'UML',
+      diagram: {
+        type: 'SequenceDiagram',
+        statements: [
+          {
+            type: 'AutoNumberCommand',
+            value: 0,
+            step: 0,
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'Authentication Request',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '<-',
+            },
+            message: 'Authentication Response',
+          },
+          {
+            type: 'AutoNumberCommand',
+            value: 15,
+            step: 0,
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'Another authentication Request',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '<-',
+            },
+            message: 'Another authentication Response',
+          },
+          {
+            type: 'AutoNumberCommand',
+            value: 40,
+            step: 10,
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'Yet another authentication Request',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '<-',
+            },
+            message: 'Yet another authentication Response',
+          },
+        ],
+      },
+    },
+  },
+  {
+    desc: '',
+    input: String.raw`@startuml
+autonumber 10 10 "<b>[000]"
+Bob -> Alice : Authentication Request
+Bob <- Alice : Authentication Response
+autonumber stop
+Bob -> Alice : dummy
+autonumber resume "<font color=red><b>Message 0 "
+Bob -> Alice : Yet another authentication Request
+Bob <- Alice : Yet another authentication Response
+autonumber stop
+Bob -> Alice : dummy
+autonumber resume 1 "<font color=blue><b>Message 0 "
+Bob -> Alice : Yet another authentication Request
+Bob <- Alice : Yet another authentication Response
+@enduml`,
+    expect: {
+      type: 'UML',
+      diagram: {
+        type: 'SequenceDiagram',
+        statements: [
+          {
+            type: 'AutoNumberCommand',
+            value: 10,
+            step: 10,
+            format: '<b>[000]',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'Authentication Request',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '<-',
+            },
+            message: 'Authentication Response',
+          },
+          {
+            type: 'AutoNumberCommand',
+            action: 'stop',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'dummy',
+          },
+          {
+            type: 'AutoNumberCommand',
+            action: 'resume',
+            format: '<font color=red><b>Message 0 ',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'Yet another authentication Request',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '<-',
+            },
+            message: 'Yet another authentication Response',
+          },
+          {
+            type: 'AutoNumberCommand',
+            action: 'stop',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'dummy',
+          },
+          {
+            type: 'AutoNumberCommand',
+            action: 'resume',
+            skip: 1,
+            format: '<font color=blue><b>Message 0 ',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'Yet another authentication Request',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '<-',
+            },
+            message: 'Yet another authentication Response',
+          },
+        ],
+      },
+    },
+  },
 ];
