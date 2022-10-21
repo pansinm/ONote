@@ -1,5 +1,6 @@
 import grammar from './grammar';
 import type {
+  AutoNumberCommand,
   ParticipantDeclaration,
   SequenceDiagram,
   SkinparamCommand,
@@ -103,6 +104,29 @@ semantics.addOperation('toTree', {
       stereotype: stereotype.sourceString ? stereotype.toTree() : undefined,
     };
   },
+  autonumberCommand_normal(_1, value, step, format, _5): AutoNumberCommand {
+    return {
+      type: 'AutoNumberCommand',
+      value: +value.sourceString.trim(),
+      step: +step.sourceString.trim(),
+      format: format.sourceString.trim().slice(1, -1) || undefined,
+    };
+  },
+  autonumberCommand_stop(_1, _2, _3): AutoNumberCommand {
+    return {
+      type: 'AutoNumberCommand',
+      action: 'stop',
+    };
+  },
+  autonumberCommand_resume(_1, _2, skip, format, _5): AutoNumberCommand {
+    return {
+      type: 'AutoNumberCommand',
+      action: 'resume',
+      skip: +skip.sourceString.trim() || undefined,
+      format: format.sourceString.trim().slice(1, -1) || undefined,
+    };
+  },
+
   stereotype(_1, name, _2) {
     return {
       type: 'Stereotype',
@@ -110,6 +134,9 @@ semantics.addOperation('toTree', {
     };
   },
   withRSpace(x, _) {
+    return x.toTree();
+  },
+  withLSpace(_, x) {
     return x.toTree();
   },
   whitespaceAroundOrNot(_1, x, _3) {
