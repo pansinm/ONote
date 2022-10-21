@@ -20,6 +20,7 @@ const def = String.raw`
       | multipleLineComment
       | skinparamCommand
       | autonumberCommand
+      | newpageCommand
       | participantDeclaration
       | sequenceMessage
 
@@ -77,6 +78,9 @@ const def = String.raw`
       | "autonumber" withLSpace<"stop"> lineEnd -- stop
       | "autonumber" withLSpace<"resume"> (withLSpace<digit+>)? (withLSpace<stringLiteral>)? lineEnd -- resume
       | "autonumber" (withLSpace<digit+>)? (withLSpace<digit+>)? (withLSpace<stringLiteral>)? lineEnd -- normal
+
+    /* -------------- newline ----------------*/
+    newpageCommand = "newpage" (withLSpace<noneNewLineChar+>)? lineEnd
 
 
     /* -------------- common commands ------------- */

@@ -625,4 +625,92 @@ Bob <- Alice : Yet another authentication Response
       },
     },
   },
+  {
+    desc: '1.10 Splitting diagrams',
+    input: String.raw`@startuml
+Alice -> Bob : message 1
+Alice -> Bob : message 2
+newpage
+Alice -> Bob : message 3
+Alice -> Bob : message 4
+newpage A title for the\nlast page
+Alice -> Bob : message 5
+Alice -> Bob : message 6
+@enduml`,
+    expect: {
+      type: 'UML',
+      diagram: {
+        type: 'SequenceDiagram',
+        statements: [
+          {
+            type: 'SequenceMessage',
+            left: 'Alice',
+            right: 'Bob',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'message 1',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Alice',
+            right: 'Bob',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'message 2',
+          },
+          {
+            type: 'NewPageCommand',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Alice',
+            right: 'Bob',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'message 3',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Alice',
+            right: 'Bob',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'message 4',
+          },
+          {
+            type: 'NewPageCommand',
+            title: 'A title for the\\nlast page',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Alice',
+            right: 'Bob',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'message 5',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Alice',
+            right: 'Bob',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'message 6',
+          },
+        ],
+      },
+    },
+  },
 ];
