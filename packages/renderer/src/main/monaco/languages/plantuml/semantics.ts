@@ -65,6 +65,7 @@ semantics.addOperation('toTree', {
     return {
       type: 'Arrow',
       value: this.sourceString,
+      color: /\[(#[A-Za-z0-9]+?)\]/.exec(this.sourceString)?.[1],
     };
   },
 
