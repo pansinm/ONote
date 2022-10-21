@@ -24,7 +24,7 @@ export default [
     input: `
     @startuml
     Alice -> Bob: Authentication Request
-    Bob --> Alice: Authentication Response
+    Bob--> Alice: Authentication Response
     @enduml
     `,
     expect: {
@@ -192,6 +192,91 @@ export default [
               value: '->',
             },
             message: 'To queue',
+          },
+        ],
+      },
+    },
+  },
+  {
+    desc: 'change the background color of actor or participant.',
+    input: String.raw`@startuml
+actor Bob #red
+' The only difference between actor
+'and participant is the drawing
+participant Alice
+participant "I have a really\nlong name" as L #99FF99
+/' You can also declare:
+participant L as "I have a really\nlong name" #99FF99
+'/
+Alice->Bob: Authentication Request
+Bob->Alice: Authentication Response
+Bob->L: Log transaction
+@enduml
+`,
+    expect: {
+      type: 'UML',
+      diagram: {
+        type: 'SequenceDiagram',
+        statements: [
+          {
+            type: 'ParticipantDeclaration',
+            kind: 'actor',
+            name: 'Bob',
+            color: '#red',
+          },
+          {
+            type: 'SingleLineComment',
+            value: 'The only difference between actor',
+          },
+          {
+            type: 'SingleLineComment',
+            value: 'and participant is the drawing',
+          },
+          {
+            type: 'ParticipantDeclaration',
+            kind: 'participant',
+            name: 'Alice',
+          },
+          {
+            type: 'ParticipantDeclaration',
+            kind: 'participant',
+            name: '"I have a really\\nlong name"',
+            color: '#99FF99',
+          },
+          {
+            type: 'MultipleLineComment',
+            value:
+              'You can also declare:\nparticipant L as "I have a really\\nlong name" #99FF99',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Alice',
+            right: 'Bob',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'Authentication Request',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'Authentication Response',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'L',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'Log transaction',
           },
         ],
       },
