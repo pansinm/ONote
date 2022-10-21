@@ -64,7 +64,13 @@ const def = String.raw`
     rightArrowHead = (">>" | ">" | "\\\\" | "\\" | "//" | "/") arrowPoint?
     leftArrowHead = ("<<" | "<" | "\\\\" | "\\" | "//" | "/") arrowPoint?
     arrowPoint = ("o" | "x")
-    sequenceArrowShaft = "-"+
+    sequenceArrowShaft =
+      | "-"+ arrowColor "-"+ --alt0
+      | arrowColor "-"+ --alt1
+      |  "-"+ arrowColor --alt2
+      | "-"+  --alt3
+
+    arrowColor = "[" colorChars "]"
 
     /* -------------- common commands ------------- */
     skinparamCommand =

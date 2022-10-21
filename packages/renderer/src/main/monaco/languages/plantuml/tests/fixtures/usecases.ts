@@ -360,4 +360,41 @@ Alice -> Bob : ok
       },
     },
   },
+  {
+    desc: 'Change arrow color',
+    input: String.raw`@startuml
+Bob -[#red]> Alice : hello
+Alice -[#0000FF]->Bob : ok
+@enduml`,
+    expect: {
+      type: 'UML',
+      diagram: {
+        type: 'SequenceDiagram',
+        statements: [
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '-[#red]>',
+              color: '#red',
+            },
+            message: 'hello',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Alice',
+            right: 'Bob',
+            arrow: {
+              type: 'Arrow',
+              value: '-[#0000FF]->',
+              color: '#0000FF',
+            },
+            message: 'ok',
+          },
+        ],
+      },
+    },
+  },
 ];
