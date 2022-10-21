@@ -48,7 +48,7 @@ export type SupportType =
 
 export type RenderResult = {
   type: 'svg' | 'url';
-  content: string;
+  content: string | string[];
 };
 
 /**
