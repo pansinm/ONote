@@ -35,7 +35,10 @@ function Diagram(props: {
           return;
         }
         if (res.type === 'svg') {
-          ref.current.innerHTML = res.content;
+          ref.current.innerHTML =
+            typeof res.content === 'string'
+              ? res.content
+              : res.content.join('\n');
           return;
         }
         if (res.type === 'url') {

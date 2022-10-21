@@ -6,7 +6,6 @@
     "npm": ">=8.1"
   },
   "version": "0.3.0",
-  "type": "module",
   "main": "packages/main/dist/index.cjs",
   "scripts": {
     "postinstall": "patch-package",

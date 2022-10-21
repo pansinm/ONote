@@ -11,6 +11,7 @@ import { ipcRenderer } from 'electron';
 import { clipboard, nativeImage } from 'electron';
 import { exposeInMainWorld } from './exposeInMainWorld';
 import { fileService } from './fileService';
+import * as _ from 'lodash';
 
 const ensureDir = async (dir: string) => {
   const exists = await fs
@@ -69,21 +70,31 @@ export const simmer = {
   },
   async renderPlantUML(plantuml: string, endpoint: string) {
     const encodedUML = encodePlantUML(plantuml);
-    const url = endpoint + '/svg/' + encodedUML;
-    return new Promise((resolve, reject) => {
-      https
-        .get(url, (res) => {
-          let data = '';
-          res.on('data', (thunk) => {
-            data += thunk;
+    const getPage = (page: number) => {
+      const index = page - 1;
+      const url =
+        endpoint + '/svg/' + (index > 0 ? index + '/' : '') + encodedUML;
+      return new Promise((resolve, reject) => {
+        https
+          .get(url, (res) => {
+            let data = '';
+            res.on('data', (thunk) => {
+              data += thunk;
+            });
+            res.on('end', () => resolve(data));
+            res.on('error', (err) => reject(err));
+          })
+          .on('error', (err) => {
+            reject(err);
           });
-          res.on('end', () => resolve(data));
-          res.on('error', (err) => reject(err));
-        })
-        .on('error', (err) => {
-          reject(err);
-        });
-    });
+      });
+    };
+    const pagescount = plantuml.split('newpage').length;
+    const promises = new Array(pagescount)
+      .fill(0)
+      .map((_, index) => index + 1)
+      .map((page) => getPage(page));
+    return Promise.all(promises);
   },
   async copyImage(content: any, type: 'dataURL' | 'ArrayBuffer') {
     let img: NativeImage;
