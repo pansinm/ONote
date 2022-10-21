@@ -282,4 +282,82 @@ Bob->L: Log transaction
       },
     },
   },
+  {
+    desc: 'You can use the order keyword to customize the display order of participants.',
+    input: String.raw`@startuml
+participant Last order 30
+participant Middle order 20
+participant First order 10
+@enduml`,
+    expect: {
+      type: 'UML',
+      diagram: {
+        type: 'SequenceDiagram',
+        statements: [
+          {
+            type: 'ParticipantDeclaration',
+            kind: 'participant',
+            name: 'Last',
+            order: 30,
+          },
+          {
+            type: 'ParticipantDeclaration',
+            kind: 'participant',
+            name: 'Middle',
+            order: 20,
+          },
+          {
+            type: 'ParticipantDeclaration',
+            kind: 'participant',
+            name: 'First',
+            order: 10,
+          },
+        ],
+      },
+    },
+  },
+  {
+    desc: '',
+    input: String.raw`@startuml
+skinparam responseMessageBelowArrow true
+Bob -> Alice : hello
+Alice -> Bob : ok
+@enduml`,
+    expect: {
+      type: 'UML',
+      diagram: {
+        type: 'SequenceDiagram',
+        statements: [
+          {
+            type: 'SkinparamCommand',
+            param: {
+              type: 'SkinparamParam',
+              name: 'responseMessageBelowArrow',
+            },
+            value: 'true',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Bob',
+            right: 'Alice',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'hello',
+          },
+          {
+            type: 'SequenceMessage',
+            left: 'Alice',
+            right: 'Bob',
+            arrow: {
+              type: 'Arrow',
+              value: '->',
+            },
+            message: 'ok',
+          },
+        ],
+      },
+    },
+  },
 ];
