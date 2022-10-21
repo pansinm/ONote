@@ -69,3 +69,8 @@ export interface AutoNumberCommand {
   skip?: number;
   step?: number;
 }
+
+export interface NewPageCommand {
+  type: 'NewPageCommand';
+  title?: string;
+}

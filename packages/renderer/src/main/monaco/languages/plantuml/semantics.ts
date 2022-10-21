@@ -1,6 +1,7 @@
 import grammar from './grammar';
 import type {
   AutoNumberCommand,
+  NewPageCommand,
   ParticipantDeclaration,
   SequenceDiagram,
   SkinparamCommand,
@@ -126,7 +127,12 @@ semantics.addOperation('toTree', {
       format: format.sourceString.trim().slice(1, -1) || undefined,
     };
   },
-
+  newpageCommand(_1, title, _3): NewPageCommand {
+    return {
+      type: 'NewPageCommand',
+      title: title.sourceString.trim() || undefined,
+    };
+  },
   stereotype(_1, name, _2) {
     return {
       type: 'Stereotype',
