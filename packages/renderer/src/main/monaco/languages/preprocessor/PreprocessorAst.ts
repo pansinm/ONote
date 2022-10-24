@@ -51,6 +51,7 @@ export interface ReturnStatement extends Position {
 
 export interface IncludeStatement extends Position {
   type: 'IncludeStatement';
+  token: 'includeurl' | 'includesub' | 'include';
   path: string;
   std?: boolean;
   subpart?: string;

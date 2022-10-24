@@ -1,1 +1,2 @@
 import './hightlight';
+import './completion';
