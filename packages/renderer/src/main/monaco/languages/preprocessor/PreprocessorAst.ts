@@ -20,6 +20,48 @@ export interface VariableDeclaration extends Position {
   init: Expression;
 }
 
+export interface InlineFunctionDeclaration extends Position {
+  name: Identifier;
+  type: 'InlineFunctionDeclaration';
+  arguments: Argument[];
+  unquoted?: boolean;
+  return: Expression;
+}
+
+export interface FunctionDeclaration extends Position {
+  name: Identifier;
+  unquoted?: boolean;
+  type: 'FunctionDeclaration';
+  arguments: Argument[];
+  statements: Statement[];
+}
+
+export interface ProcedureDeclaration extends Position {
+  name: Identifier;
+  unquoted?: boolean;
+  type: 'ProcedureDeclaration';
+  arguments: Argument[];
+  statements: Statement[];
+}
+
+export interface ReturnStatement extends Position {
+  type: 'ReturnStatement';
+  expression: Expression;
+}
+
+export interface IncludeStatement extends Position {
+  type: 'IncludeStatement';
+  path: string;
+  std?: boolean;
+  subpart?: string;
+}
+
+export interface Argument extends Position {
+  type: 'Argument';
+  name: Identifier;
+  init?: Expression;
+}
+
 export interface UmlText extends Position {
   type: 'UmlText';
   text: string;
@@ -35,7 +77,7 @@ export interface IfStatement extends Position {
 export interface WhileStatement extends Position {
   type: 'WhileStatement';
   expression: Expression;
-  children: Statement[];
+  statements: Statement[];
 }
 
 export interface NumberLiteral extends Position {
