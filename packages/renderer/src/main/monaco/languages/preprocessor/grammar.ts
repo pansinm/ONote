@@ -6,15 +6,50 @@ const def = String.raw`
 
     Statement =
       | variableDeclaration
+      | IncludeStatement
+      | InlineFunctionDeclaration
+      | FunctionDeclaration
+      | ProcedureDeclaration
       | IfStatement
+      | WhileStatement
+      | ReturnStatement
       | umlStatement
 
     variableDeclaration = "!" identifier wsAroundOptional<"="> expression &le
+
+    /* ------------- Function & Procedure ------------ */
+    InlineFunctionDeclaration = functionStart identifier "(" Arguments? ")" "return" expression &le
+    FunctionDeclaration = functionStart identifier "(" Arguments? ")" Statement* "!endfunction"
+    ProcedureDeclaration = procedureStart identifier "(" Arguments? ")" Statement* "!endprocedure"
+    functionStart =
+      | "!function" -- normal
+      | "!unquoted function" -- unquoted
+    procedureStart =
+      | "!procedure" -- normal
+      | "!unquoted procedure" -- unquoted
+
+    Arguments = ListOf<Argument, ",">
+    Argument = identifier ("=" expression)?
+
+    IncludeStatement = "!include" includePath #includePart?
+
+    includePath =
+      | "<" pathChars ">" -- std
+      | pathChars  -- normal
+    pathChars = pathChar+
+    includePart = "!" identifier
+    pathChar = letter | "." | "/" | ":"
+
+
+
+    ReturnStatement = "!return" expression
 
     IfStatement = "!if" expression Statement*  ElseBlock? "!endif"
     ElseBlock =
       | "!elseif" expression Statement* ElseBlock* -- elseif
       | "!else" Statement+  -- else
+
+    WhileStatement = "!while" expression Statement* "!endwhile"
 
     umlStatement = ~("!" any+)  notnl+ &le
 
@@ -31,6 +66,7 @@ const def = String.raw`
     parenthesizedExpression = "(" wsAroundOptional<expression> ")"
 
     binaryOperatorToken =
+      | "!="
       | ">="
       | ">"
       | "<="

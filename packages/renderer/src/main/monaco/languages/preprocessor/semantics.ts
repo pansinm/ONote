@@ -1,14 +1,22 @@
 import type { Node } from 'ohm-js';
 import grammar from './grammar';
 import type {
+  Argument,
   BinaryExpression,
+  FunctionDeclaration,
   Identifier,
   IfStatement,
+  IncludeStatement,
+  InlineFunctionDeclaration,
+  NumberLiteral,
   ParenthesizedExpression,
+  ProcedureDeclaration,
+  ReturnStatement,
   Root,
   StringLiteral,
   UmlText,
   VariableDeclaration,
+  WhileStatement,
 } from './PreprocessorAst';
 
 const semantics = grammar.createSemantics();
@@ -43,12 +51,97 @@ semantics.addOperation('toTree', {
       pos: getPos(this),
     };
   },
+  IncludeStatement(_i, path, subpart): IncludeStatement {
+    const isStd = path.child(0).ctorName === 'includePath_std';
+    const [_1, _2] = path.child(0).children;
+    return {
+      type: 'IncludeStatement',
+      path: isStd ? _2.sourceString : _1.sourceString,
+      pos: getPos(this),
+      std: isStd,
+      subpart: subpart.child(0)?.child(1)?.sourceString,
+    };
+  },
+  InlineFunctionDeclaration(
+    _,
+    name,
+    _open,
+    args,
+    _close,
+    _return,
+    expression,
+    _le,
+  ): InlineFunctionDeclaration {
+    return {
+      name: name.toTree(),
+      unquoted: _.child(0)?.ctorName === 'functionStart_unquoted' || undefined,
+      type: 'InlineFunctionDeclaration',
+      pos: getPos(this),
+      return: expression.toTree(),
+      arguments: args.child(0)?.toTree() || [],
+    };
+  },
+  FunctionDeclaration(
+    _,
+    name,
+    _3,
+    args,
+    _5,
+    statements,
+    _7,
+  ): FunctionDeclaration {
+    return {
+      name: name.toTree(),
+      unquoted: _.child(0)?.ctorName === 'functionStart_unquoted' || undefined,
+      type: 'FunctionDeclaration',
+      pos: getPos(this),
+      statements: statements.children.map((child) => child.toTree()),
+      arguments: args.child(0)?.toTree() || [],
+    };
+  },
+  ProcedureDeclaration(
+    _,
+    name,
+    _3,
+    args,
+    _5,
+    statements,
+    _7,
+  ): ProcedureDeclaration {
+    return {
+      name: name.toTree(),
+      unquoted: _.child(0)?.ctorName === 'functionStart_unquoted' || undefined,
+      type: 'ProcedureDeclaration',
+      pos: getPos(this),
+      statements: statements.children.map((child) => child.toTree()),
+      arguments: args.toTree(),
+    };
+  },
+  Arguments(args) {
+    return args.asIteration().toTree();
+  },
+  Argument(id, _, init): Argument {
+    return {
+      type: 'Argument',
+      name: id.toTree(),
+      pos: getPos(this),
+      init: init.child(0)?.toTree(),
+    };
+  },
   IfStatement(_1, expression, then, elseif, _): IfStatement {
     return {
       type: 'IfStatement',
       expression: expression.toTree(),
       then: then.toTree(),
       else: elseif.toTree(),
+      pos: getPos(this),
+    };
+  },
+  WhileStatement(_start, expression, statements, _end): WhileStatement {
+    return {
+      type: 'WhileStatement',
+      expression: expression.toTree(),
+      statements: statements.children.map((child) => child.toTree()),
       pos: getPos(this),
     };
   },
@@ -63,6 +156,13 @@ semantics.addOperation('toTree', {
   },
   ElseBlock_else(_, statements) {
     return statements.children.map((child) => child.toTree());
+  },
+  ReturnStatement(_, expression): ReturnStatement {
+    return {
+      type: 'ReturnStatement',
+      expression: expression.toTree(),
+      pos: getPos(this),
+    };
   },
   umlStatement(uml, _): UmlText {
     return {
@@ -90,6 +190,13 @@ semantics.addOperation('toTree', {
   stringLiteral(_1, chars, _2): StringLiteral {
     return {
       type: 'StringLiteral',
+      text: chars.sourceString,
+      pos: getPos(this),
+    };
+  },
+  numberLiteral(chars): NumberLiteral {
+    return {
+      type: 'NumberLiteral',
       text: chars.sourceString,
       pos: getPos(this),
     };
