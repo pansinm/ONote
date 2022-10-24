@@ -859,6 +859,7 @@ it('include', () => {
       {
         type: 'IncludeStatement',
         path: 'aws/common',
+        token: 'include',
         pos: {
           start: 0,
           end: 21,
@@ -868,6 +869,7 @@ it('include', () => {
       {
         type: 'IncludeStatement',
         path: 'https://a.b.com/a.puml',
+        token: 'include',
         pos: {
           start: 22,
           end: 53,
@@ -877,6 +879,7 @@ it('include', () => {
       {
         type: 'IncludeStatement',
         path: '../a.puml',
+        token: 'include',
         pos: {
           start: 54,
           end: 78,

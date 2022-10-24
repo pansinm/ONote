@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import type { Node } from 'ohm-js';
 import grammar from './grammar';
 import type {
@@ -56,6 +57,7 @@ semantics.addOperation('toTree', {
     const [_1, _2] = path.child(0).children;
     return {
       type: 'IncludeStatement',
+      token: _i.sourceString.slice(1) as IncludeStatement['token'],
       path: isStd ? _2.sourceString : _1.sourceString,
       pos: getPos(this),
       std: isStd,

@@ -31,7 +31,12 @@ const def = String.raw`
     Arguments = ListOf<Argument, ",">
     Argument = identifier ("=" expression)?
 
-    IncludeStatement = "!include" includePath #includePart?
+    IncludeStatement = includeToken includePath #includePart?
+
+    includeToken =
+      | "!includeurl"
+      | "!includesub"
+      | "!include"
 
     includePath =
       | "<" pathChars ">" -- std
