@@ -3,7 +3,7 @@ import PumlFile from './PumlFile';
 import { preprocessSnippets } from './snippets';
 import stdlib from './stdlib';
 
-const file = new PumlFile('');
+stdlib.resolve();
 
 function alphabet(from: string, to: string) {
   const charF = from.charCodeAt(0);
@@ -97,10 +97,6 @@ class UMLCompletionItemProvider
       });
     }
 
-    if (/^\s*![^\s]*/.test(lineTextBefore)) {
-      return { suggestions: this.preprocessorItems(lineTextBefore, position) };
-    }
-
     const text = model.getValue();
     let fence = text.slice(start);
     fence = fence.slice(0, fence.indexOf('```\n'));
@@ -112,18 +108,38 @@ class UMLCompletionItemProvider
       position.lineNumber,
       position.column,
     );
-    return stdlib
-      .resolve()
-      .then(() =>
-        new PumlFile(fence)
-          .suggestions(r)
-          .then((sug) => ({ suggestions: sug })),
+
+    const res = /([$a-zA-Z0-9_]+?)\(/.exec(lineTextBefore);
+    if (res) {
+      let startIndex = lineTextBefore.lastIndexOf('(');
+      const cIndex = lineTextBefore.lastIndexOf(',');
+      if (cIndex > startIndex) {
+        startIndex = cIndex;
+      }
+      const r = new monaco.Range(
+        position.lineNumber,
+        startIndex + 2,
+        position.lineNumber,
+        position.column,
       );
+      return new PumlFile(fence).arguments(res[1], r).then((sug) => {
+        console.log(sug);
+        return { suggestions: sug };
+      });
+    }
+
+    if (/^\s*![^\s]*/.test(lineTextBefore)) {
+      return { suggestions: this.preprocessorItems(lineTextBefore, position) };
+    }
+
+    return new PumlFile(fence)
+      .suggestions(r)
+      .then((sug) => ({ suggestions: sug }));
   }
 
   triggerCharacters = alphabet('a', 'z')
     .concat(alphabet('A', 'Z'))
-    .concat(['$', '/', ' ', '!', '<']);
+    .concat(['$', '/', ' ', '!', '<', '(', ',']);
 }
 
 monaco.languages.registerCompletionItemProvider(
