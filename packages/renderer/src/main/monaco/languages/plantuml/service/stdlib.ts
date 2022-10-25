@@ -1,8 +1,16 @@
 class Stdlib {
-  modules: { path: string }[] = [];
+  modules: { path: string; type: string; url: string }[] = [];
   loading = false;
+
+  getModule(name: string) {
+    return this.modules.find(
+      (module) => module.path === name || module.path === name + '.puml',
+    );
+  }
+
   async resolve(): Promise<typeof this.modules> {
     if (this.modules.length || this.loading) {
+      console.log(this.modules);
       return this.modules;
     }
     this.loading = true;

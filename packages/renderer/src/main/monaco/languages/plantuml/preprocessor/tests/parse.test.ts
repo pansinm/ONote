@@ -78,7 +78,14 @@ Alice -> Bob : $ef
               end: 48,
             },
           },
-          operator: '+',
+          operator: {
+            kind: '+',
+            pos: {
+              end: 50,
+              start: 49,
+            },
+            type: 'BinaryOperatorToken',
+          },
           pos: {
             start: 45,
             end: 54,
@@ -242,7 +249,14 @@ Alice -> Bob : B
                   end: 59,
                 },
               },
-              operator: '==',
+              operator: {
+                kind: '==',
+                pos: {
+                  end: 62,
+                  start: 60,
+                },
+                type: 'BinaryOperatorToken',
+              },
               pos: {
                 start: 55,
                 end: 68,
@@ -261,7 +275,14 @@ Alice -> Bob : B
               end: 69,
             },
           },
-          operator: '&&',
+          operator: {
+            kind: '&&',
+            pos: {
+              end: 72,
+              start: 70,
+            },
+            type: 'BinaryOperatorToken',
+          },
           pos: {
             start: 54,
             end: 83,
@@ -278,7 +299,14 @@ Alice -> Bob : B
                   end: 76,
                 },
               },
-              operator: '+',
+              operator: {
+                kind: '+',
+                pos: {
+                  end: 77,
+                  start: 76,
+                },
+                type: 'BinaryOperatorToken',
+              },
               pos: {
                 start: 74,
                 end: 82,
@@ -293,7 +321,14 @@ Alice -> Bob : B
                   text: '10',
                   type: 'NumberLiteral',
                 },
-                operator: '>=',
+                operator: {
+                  kind: '>=',
+                  pos: {
+                    end: 81,
+                    start: 79,
+                  },
+                  type: 'BinaryOperatorToken',
+                },
                 pos: {
                   start: 77,
                   end: 82,
@@ -403,7 +438,14 @@ it('!function', () => {
                   end: 47,
                 },
               },
-              operator: '+',
+              operator: {
+                kind: '+',
+                pos: {
+                  end: 49,
+                  start: 48,
+                },
+                type: 'BinaryOperatorToken',
+              },
               pos: {
                 start: 45,
                 end: 52,
@@ -612,7 +654,14 @@ it('inline function', () => {
               end: 31,
             },
           },
-          operator: '+',
+          operator: {
+            kind: '+',
+            pos: {
+              end: 33,
+              start: 32,
+            },
+            type: 'BinaryOperatorToken',
+          },
           pos: {
             start: 29,
             end: 36,
@@ -684,7 +733,14 @@ it('unquoted function', () => {
               end: 57,
             },
           },
-          operator: '+',
+          operator: {
+            kind: '+',
+            pos: {
+              end: 59,
+              start: 58,
+            },
+            type: 'BinaryOperatorToken',
+          },
           pos: {
             start: 51,
             end: 66,
@@ -770,7 +826,14 @@ it('While loop', () => {
               end: 13,
             },
           },
-          operator: '!=',
+          operator: {
+            kind: '!=',
+            pos: {
+              end: 15,
+              start: 13,
+            },
+            type: 'BinaryOperatorToken',
+          },
           pos: {
             start: 9,
             end: 16,
@@ -805,7 +868,14 @@ it('While loop', () => {
                   end: 62,
                 },
               },
-              operator: '-',
+              operator: {
+                kind: '-',
+                pos: {
+                  end: 64,
+                  start: 63,
+                },
+                type: 'BinaryOperatorToken',
+              },
               pos: {
                 start: 58,
                 end: 66,
@@ -893,6 +963,188 @@ it('include', () => {
     pos: {
       start: 0,
       end: 78,
+    },
+  };
+  expect(parse(input)).toEqual(output);
+});
+
+it('scope var', () => {
+  const input = String.raw`
+!local $ELEMENT_FONT_COLOR = "#FFFFFF"
+!global $ARROW_COLOR = "#666666"
+`;
+  const output = {
+    type: 'Root',
+    children: [
+      {
+        type: 'VariableDeclaration',
+        init: {
+          type: 'StringLiteral',
+          text: '#FFFFFF',
+          pos: {
+            start: 30,
+            end: 39,
+          },
+        },
+        name: {
+          type: 'Identifier',
+          name: '$ELEMENT_FONT_COLOR',
+          pos: {
+            start: 8,
+            end: 27,
+          },
+        },
+        pos: {
+          start: 1,
+          end: 39,
+        },
+        scope: 'global',
+      },
+      {
+        type: 'VariableDeclaration',
+        init: {
+          type: 'StringLiteral',
+          text: '#666666',
+          pos: {
+            start: 63,
+            end: 72,
+          },
+        },
+        name: {
+          type: 'Identifier',
+          name: '$ARROW_COLOR',
+          pos: {
+            start: 48,
+            end: 60,
+          },
+        },
+        pos: {
+          start: 40,
+          end: 72,
+        },
+        scope: 'global',
+      },
+    ],
+    sourceString:
+      '!local $ELEMENT_FONT_COLOR = "#FFFFFF"\n!global $ARROW_COLOR = "#666666"\n',
+    pos: {
+      start: 1,
+      end: 73,
+    },
+  };
+  expect(parse(input)).toEqual(output);
+});
+
+it('callExpression', () => {
+  const input = String.raw`
+    %strlen($tags)
+    $xx(3, "x")
+    $yy()
+  `;
+  const output = {
+    type: 'Root',
+    children: [
+      {
+        type: 'ExpressionStatement',
+        expression: {
+          type: 'CallExpression',
+          name: {
+            type: 'Identifier',
+            name: 'strlen',
+            pos: {
+              start: 6,
+              end: 12,
+            },
+          },
+          buildIn: true,
+          args: [
+            {
+              type: 'Identifier',
+              name: '$tags',
+              pos: {
+                start: 13,
+                end: 18,
+              },
+            },
+          ],
+          pos: {
+            start: 5,
+            end: 19,
+          },
+        },
+        pos: {
+          start: 5,
+          end: 19,
+        },
+      },
+      {
+        type: 'ExpressionStatement',
+        expression: {
+          type: 'CallExpression',
+          name: {
+            type: 'Identifier',
+            name: '$xx',
+            pos: {
+              start: 24,
+              end: 27,
+            },
+          },
+          args: [
+            {
+              type: 'NumberLiteral',
+              text: '3',
+              pos: {
+                start: 28,
+                end: 29,
+              },
+            },
+            {
+              type: 'StringLiteral',
+              text: 'x',
+              pos: {
+                start: 31,
+                end: 34,
+              },
+            },
+          ],
+          pos: {
+            start: 24,
+            end: 35,
+          },
+        },
+        pos: {
+          start: 24,
+          end: 35,
+        },
+      },
+      {
+        type: 'ExpressionStatement',
+        expression: {
+          type: 'CallExpression',
+          name: {
+            type: 'Identifier',
+            name: '$yy',
+            pos: {
+              start: 40,
+              end: 43,
+            },
+          },
+          args: [],
+          pos: {
+            start: 40,
+            end: 45,
+          },
+        },
+        pos: {
+          start: 40,
+          end: 45,
+        },
+      },
+    ],
+    sourceString: '%strlen($tags)\n    $xx(3, "x")\n    $yy()\n  ',
+    pos: {
+      start: 5,
+      end: 48,
     },
   };
   expect(parse(input)).toEqual(output);
