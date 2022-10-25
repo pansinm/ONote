@@ -43,6 +43,20 @@ export interface InlineFunctionDeclaration extends Position {
   return: Expression;
 }
 
+export interface DefineStatement extends Position {
+  type: 'DefineStatement';
+  arguments?: Argument[];
+  name: Identifier;
+  content: string;
+}
+
+export interface DefineLongStatement extends Position {
+  type: 'DefineLongStatement';
+  arguments?: Argument[];
+  name: Identifier;
+  statements: Statement[];
+}
+
 export interface UnknownStatement extends Position {
   type: 'UnknownStatement';
   text: string;

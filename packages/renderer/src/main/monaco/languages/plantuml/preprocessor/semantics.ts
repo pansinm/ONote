@@ -6,6 +6,8 @@ import type {
   BinaryExpression,
   BinaryOperatorToken,
   CallExpression,
+  DefineLongStatement,
+  DefineStatement,
   ExpressionStatement,
   FunctionDeclaration,
   Identifier,
@@ -117,7 +119,25 @@ semantics.addOperation('toTree', {
       type: 'ProcedureDeclaration',
       pos: getPos(this),
       statements: statements.children.map((child) => child.toTree()),
-      arguments: args.toTree(),
+      arguments: args.child(0)?.toTree() || [],
+    };
+  },
+  DefineStatement(_1, name, args, content): DefineStatement {
+    return {
+      type: 'DefineStatement',
+      name: name.toTree(),
+      arguments: args.child(0)?.toTree(),
+      content: content.child(1).sourceString,
+      pos: getPos(this),
+    };
+  },
+  DefineLongStatement(_1, name, args, statements, _3): DefineLongStatement {
+    return {
+      type: 'DefineLongStatement',
+      name: name.toTree(),
+      arguments: args.child(0)?.toTree(),
+      statements: statements.children.map((child) => child.toTree()),
+      pos: getPos(this),
     };
   },
   Arguments(_, args, _3) {

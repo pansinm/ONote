@@ -1,6 +1,8 @@
 import * as monaco from 'monaco-editor';
 import { parse, traverse } from '../preprocessor/parser';
 import type {
+  DefineLongStatement,
+  DefineStatement,
   FunctionDeclaration,
   IncludeStatement,
   InlineFunctionDeclaration,
@@ -53,6 +55,38 @@ class PumlFile {
     this.ast = parse(content);
   }
 
+  queryCallable(name: string): typeof this.callableNodes[0] | undefined {
+    let node = this.callableNodes.find((n) => n.name.name === name);
+    if (node) {
+      return node;
+    }
+    for (const include of Object.values(this.includes)) {
+      node = include.queryCallable(name);
+      if (node) {
+        return node;
+      }
+    }
+    return node;
+  }
+
+  async arguments(
+    name: string,
+    range: monaco.Range,
+  ): Promise<monaco.languages.CompletionItem[]> {
+    await this.parseVars();
+    const callable = this.queryCallable(name);
+    return (
+      callable?.arguments.map((arg) => {
+        return {
+          kind: monaco.languages.CompletionItemKind.Field,
+          insertText: arg.name.name + '=',
+          label: arg.name.name,
+          range,
+        };
+      }) || []
+    );
+  }
+
   async suggestions(
     range: monaco.Range,
   ): Promise<monaco.languages.CompletionItem[]> {
@@ -76,15 +110,27 @@ class PumlFile {
     });
 
     for (const include of Object.values(this.includes)) {
-      items.push(...(await include.suggestions(range)));
+      const parentVar = await include.suggestions(range);
+      items.push(
+        ...parentVar.filter(
+          (a) =>
+            (a as any).type !== 'VariableDeclaration' ||
+            (a as any).scope === 'global',
+        ),
+      );
     }
-    console.log('----items', this, items);
     return items;
   }
 
   private async parseVars() {
+    if (this.callableNodes.length || this.declarations.length) {
+      return;
+    }
     const includes: IncludeStatement[] = [];
     traverse(this.ast, {
+      VariableDeclaration: (node: VariableDeclaration) => {
+        this.declarations.push(node);
+      },
       FunctionDeclaration: (node: FunctionDeclaration) => {
         this.callableNodes.push(node);
       },
@@ -96,6 +142,20 @@ class PumlFile {
       },
       IncludeStatement: (node: IncludeStatement) => {
         includes.push(node);
+      },
+      DefineStatement: (node: DefineStatement) => {
+        if (node.arguments) {
+          this.callableNodes.push(node as any);
+        } else {
+          this.declarations.push(node as any);
+        }
+      },
+      DefineLongStatement: (node: DefineLongStatement) => {
+        if (node.arguments) {
+          this.callableNodes.push(node as any);
+        } else {
+          this.declarations.push(node as any);
+        }
       },
     });
     for (const inc of includes) {

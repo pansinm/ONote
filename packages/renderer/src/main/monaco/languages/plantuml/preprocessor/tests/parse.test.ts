@@ -580,38 +580,36 @@ $source --> $destination
           },
         ],
         arguments: [
-          [
-            {
-              type: 'Argument',
-              name: {
-                type: 'Identifier',
-                name: '$source',
-                pos: {
-                  start: 15,
-                  end: 22,
-                },
-              },
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: '$source',
               pos: {
                 start: 15,
                 end: 22,
               },
             },
-            {
-              type: 'Argument',
-              name: {
-                type: 'Identifier',
-                name: '$destination',
-                pos: {
-                  start: 24,
-                  end: 36,
-                },
-              },
+            pos: {
+              start: 15,
+              end: 22,
+            },
+          },
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: '$destination',
               pos: {
                 start: 24,
                 end: 36,
               },
             },
-          ],
+            pos: {
+              start: 24,
+              end: 36,
+            },
+          },
         ],
       },
     ],
@@ -1145,6 +1143,255 @@ it('callExpression', () => {
     pos: {
       start: 5,
       end: 48,
+    },
+  };
+  expect(parse(input)).toEqual(output);
+});
+
+it('!define', () => {
+  const input = String.raw`!define LAYOUT_TOP_DOWN top to bottom direction
+  !define AWSCLI(e_alias, e_label, e_techn, e_descr) AWSEntity(e_alias, e_label, e_techn, e_descr, #CC2264, AWSCLI, AWSCLI)
+  `;
+  const output = {
+    type: 'Root',
+    children: [
+      {
+        type: 'DefineStatement',
+        name: {
+          type: 'Identifier',
+          name: 'LAYOUT_TOP_DOWN',
+          pos: {
+            start: 8,
+            end: 23,
+          },
+        },
+        content: 'top to bottom direction',
+        pos: {
+          start: 0,
+          end: 47,
+        },
+      },
+      {
+        type: 'DefineStatement',
+        name: {
+          type: 'Identifier',
+          name: 'AWSCLI',
+          pos: {
+            start: 58,
+            end: 64,
+          },
+        },
+        arguments: [
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: 'e_alias',
+              pos: {
+                start: 65,
+                end: 72,
+              },
+            },
+            pos: {
+              start: 65,
+              end: 72,
+            },
+          },
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: 'e_label',
+              pos: {
+                start: 74,
+                end: 81,
+              },
+            },
+            pos: {
+              start: 74,
+              end: 81,
+            },
+          },
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: 'e_techn',
+              pos: {
+                start: 83,
+                end: 90,
+              },
+            },
+            pos: {
+              start: 83,
+              end: 90,
+            },
+          },
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: 'e_descr',
+              pos: {
+                start: 92,
+                end: 99,
+              },
+            },
+            pos: {
+              start: 92,
+              end: 99,
+            },
+          },
+        ],
+        content:
+          'AWSEntity(e_alias, e_label, e_techn, e_descr, #CC2264, AWSCLI, AWSCLI)',
+        pos: {
+          start: 50,
+          end: 171,
+        },
+      },
+    ],
+    sourceString:
+      '!define LAYOUT_TOP_DOWN top to bottom direction\n  !define AWSCLI(e_alias, e_label, e_techn, e_descr) AWSEntity(e_alias, e_label, e_techn, e_descr, #CC2264, AWSCLI, AWSCLI)\n  ',
+    pos: {
+      start: 0,
+      end: 174,
+    },
+  };
+  expect(parse(input)).toEqual(output);
+});
+
+it('!definelong', () => {
+  const input = String.raw`!definelong AzureEntity(e_alias, e_label, e_techn, e_color, e_sprite, e_stereo)
+rectangle "==e_label\n<color:e_color><$e_sprite></color>\n//<size:TECHN_FONT_SIZE>[e_techn]</size>//" <<e_stereo>> as e_alias
+!enddefinelong
+`;
+  const output = {
+    type: 'Root',
+    children: [
+      {
+        type: 'DefineLongStatement',
+        name: {
+          type: 'Identifier',
+          name: 'AzureEntity',
+          pos: {
+            start: 12,
+            end: 23,
+          },
+        },
+        arguments: [
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: 'e_alias',
+              pos: {
+                start: 24,
+                end: 31,
+              },
+            },
+            pos: {
+              start: 24,
+              end: 31,
+            },
+          },
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: 'e_label',
+              pos: {
+                start: 33,
+                end: 40,
+              },
+            },
+            pos: {
+              start: 33,
+              end: 40,
+            },
+          },
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: 'e_techn',
+              pos: {
+                start: 42,
+                end: 49,
+              },
+            },
+            pos: {
+              start: 42,
+              end: 49,
+            },
+          },
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: 'e_color',
+              pos: {
+                start: 51,
+                end: 58,
+              },
+            },
+            pos: {
+              start: 51,
+              end: 58,
+            },
+          },
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: 'e_sprite',
+              pos: {
+                start: 60,
+                end: 68,
+              },
+            },
+            pos: {
+              start: 60,
+              end: 68,
+            },
+          },
+          {
+            type: 'Argument',
+            name: {
+              type: 'Identifier',
+              name: 'e_stereo',
+              pos: {
+                start: 70,
+                end: 78,
+              },
+            },
+            pos: {
+              start: 70,
+              end: 78,
+            },
+          },
+        ],
+        statements: [
+          {
+            type: 'UmlText',
+            text: 'rectangle "==e_label\\n<color:e_color><$e_sprite></color>\\n//<size:TECHN_FONT_SIZE>[e_techn]</size>//" <<e_stereo>> as e_alias',
+            pos: {
+              start: 80,
+              end: 205,
+            },
+          },
+        ],
+        pos: {
+          start: 0,
+          end: 220,
+        },
+      },
+    ],
+    sourceString:
+      '!definelong AzureEntity(e_alias, e_label, e_techn, e_color, e_sprite, e_stereo)\nrectangle "==e_label\\n<color:e_color><$e_sprite></color>\\n//<size:TECHN_FONT_SIZE>[e_techn]</size>//" <<e_stereo>> as e_alias\n!enddefinelong\n',
+    pos: {
+      start: 0,
+      end: 221,
     },
   };
   expect(parse(input)).toEqual(output);

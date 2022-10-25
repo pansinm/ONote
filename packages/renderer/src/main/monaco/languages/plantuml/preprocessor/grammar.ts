@@ -6,6 +6,8 @@ const def = String.raw`
 
     Statement =
       | variableDeclaration
+      | DefineStatement
+      | DefineLongStatement
       | IncludeStatement
       | InlineFunctionDeclaration
       | FunctionDeclaration
@@ -39,7 +41,6 @@ const def = String.raw`
     Argument = identifier ("=" expression)?
 
     IncludeStatement = includeToken includePath #includePart?
-
     includeToken =
       | "!includeurl"
       | "!includesub"
@@ -51,6 +52,11 @@ const def = String.raw`
     pathChars = pathChar+
     includePart = "!" identifier
     pathChar = letter | digit | "." | "/" | ":" | "_"
+
+    DefineStatement = #"!define " identifier Arguments? #defineContent
+    defineContent = ws+ notnl+
+
+    DefineLongStatement = "!definelong" identifier Arguments? Statement* "!enddefinelong"
 
     ReturnStatement = "!return" expression
 
