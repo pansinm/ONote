@@ -2,6 +2,7 @@
 
 import { chrome } from '../../.electron-vendors.cache.json';
 import { join } from 'path';
+import { viteCommonjs, esbuildCommonjs } from '@originjs/vite-plugin-commonjs';
 import { builtinModules } from 'module';
 import react from '@vitejs/plugin-react';
 
@@ -29,8 +30,11 @@ const config = {
   },
   optimizeDeps: {
     include: ['lodash/lodash.js'],
+    esbuildOptions: {
+      plugins: [esbuildCommonjs(['ohm-js'])],
+    },
   },
-  plugins: [react()],
+  plugins: [react(), viteCommonjs()],
   base: '',
   server: {
     fs: {

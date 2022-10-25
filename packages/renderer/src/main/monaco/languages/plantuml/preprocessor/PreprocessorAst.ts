@@ -12,12 +12,27 @@ export interface Root extends Position {
   sourceString: string;
 }
 
-type Statement = VariableDeclaration;
+type Statement =
+  | VariableDeclaration
+  | WhileStatement
+  | IfStatement
+  | InlineFunctionDeclaration
+  | FunctionDeclaration
+  | ProcedureDeclaration
+  | IncludeStatement
+  | ReturnStatement
+  | UmlText;
 
 export interface VariableDeclaration extends Position {
   type: 'VariableDeclaration';
   name: Identifier;
   init: Expression;
+  scope?: 'global' | 'local';
+}
+
+export interface ExpressionStatement extends Position {
+  type: 'ExpressionStatement';
+  expression: Expression;
 }
 
 export interface InlineFunctionDeclaration extends Position {
@@ -99,8 +114,8 @@ export interface BinaryExpression extends Position {
 }
 
 export interface BinaryOperatorToken extends Position {
-  type: 'OperatorToken';
-  kind: '+' | '-' | '*' | '/' | '&&' | '||';
+  type: 'BinaryOperatorToken';
+  kind: '+' | '-' | '*' | '/' | '&&' | '||' | '!=';
 }
 
 export interface ParenthesizedExpression extends Position {
@@ -113,9 +128,17 @@ export interface Identifier extends Position {
   name: string;
 }
 
+export interface CallExpression extends Position {
+  type: 'CallExpression';
+  name: Identifier;
+  buildIn?: boolean;
+  args: Expression[];
+}
+
 export type Expression =
   | BinaryExpression
   | ParenthesizedExpression
+  | CallExpression
   | StringLiteral
   | NumberLiteral
   | Identifier;

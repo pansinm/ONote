@@ -4,6 +4,9 @@ import grammar from './grammar';
 import type {
   Argument,
   BinaryExpression,
+  BinaryOperatorToken,
+  CallExpression,
+  ExpressionStatement,
   FunctionDeclaration,
   Identifier,
   IfStatement,
@@ -44,12 +47,27 @@ semantics.addOperation('toTree', {
   expression(expression) {
     return expression.toTree();
   },
-  variableDeclaration(_1, identifier, _3, expression, _5): VariableDeclaration {
+  variableDeclaration(
+    _1,
+    _g,
+    identifier,
+    _3,
+    expression,
+    _5,
+  ): VariableDeclaration {
+    const ctorName = _g.child(0)?.ctorName;
+    const scope =
+      ctorName === 'globalVar'
+        ? 'global'
+        : ctorName === 'localVar'
+        ? 'local'
+        : undefined;
     return {
       type: 'VariableDeclaration',
       init: expression.toTree(),
       name: identifier.toTree(),
       pos: getPos(this),
+      scope: scope,
     };
   },
   IncludeStatement(_i, path, subpart): IncludeStatement {
@@ -67,9 +85,7 @@ semantics.addOperation('toTree', {
   InlineFunctionDeclaration(
     _,
     name,
-    _open,
     args,
-    _close,
     _return,
     expression,
     _le,
@@ -83,15 +99,7 @@ semantics.addOperation('toTree', {
       arguments: args.child(0)?.toTree() || [],
     };
   },
-  FunctionDeclaration(
-    _,
-    name,
-    _3,
-    args,
-    _5,
-    statements,
-    _7,
-  ): FunctionDeclaration {
+  FunctionDeclaration(_, name, args, statements, _7): FunctionDeclaration {
     return {
       name: name.toTree(),
       unquoted: _.child(0)?.ctorName === 'functionStart_unquoted' || undefined,
@@ -101,15 +109,7 @@ semantics.addOperation('toTree', {
       arguments: args.child(0)?.toTree() || [],
     };
   },
-  ProcedureDeclaration(
-    _,
-    name,
-    _3,
-    args,
-    _5,
-    statements,
-    _7,
-  ): ProcedureDeclaration {
+  ProcedureDeclaration(_, name, args, statements, _7): ProcedureDeclaration {
     return {
       name: name.toTree(),
       unquoted: _.child(0)?.ctorName === 'functionStart_unquoted' || undefined,
@@ -119,8 +119,8 @@ semantics.addOperation('toTree', {
       arguments: args.toTree(),
     };
   },
-  Arguments(args) {
-    return args.asIteration().toTree();
+  Arguments(_, args, _3) {
+    return args.child(0)?.asIteration().toTree() || [];
   },
   Argument(id, _, init): Argument {
     return {
@@ -166,6 +166,13 @@ semantics.addOperation('toTree', {
       pos: getPos(this),
     };
   },
+  ExpressionStatement(expression): ExpressionStatement {
+    return {
+      type: 'ExpressionStatement',
+      expression: expression.toTree(),
+      pos: getPos(expression),
+    };
+  },
   umlStatement(uml, _): UmlText {
     return {
       type: 'UmlText',
@@ -180,6 +187,22 @@ semantics.addOperation('toTree', {
       operator: token.toTree(),
       pos: getPos(this),
       right: right.toTree(),
+    };
+  },
+  binaryOperatorToken(token): BinaryOperatorToken {
+    return {
+      type: 'BinaryOperatorToken',
+      kind: token.sourceString.trim() as BinaryOperatorToken['kind'],
+      pos: getPos(token),
+    };
+  },
+  callExpression(buildin, name, _open, args, _close): CallExpression {
+    return {
+      type: 'CallExpression',
+      name: name.toTree(),
+      buildIn: !!buildin.sourceString || undefined,
+      args: args.asIteration().toTree(),
+      pos: getPos(this),
     };
   },
   parenthesizedExpression(_1, expression, _3): ParenthesizedExpression {

@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import PumlFile from './PumlFile';
 import { preprocessSnippets } from './snippets';
 import stdlib from './stdlib';
 
@@ -66,7 +67,7 @@ class UMLCompletionItemProvider
             kind: monaco.languages.CompletionItemKind.Module,
             insertText: snippet.path,
             range,
-            label: snippet.path,
+            label: '' + snippet.path,
           };
         });
     });
@@ -77,7 +78,7 @@ class UMLCompletionItemProvider
     context: monaco.languages.CompletionContext,
     token: monaco.CancellationToken,
   ): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
-    const range = new monaco.Range(1, 0, position.lineNumber, position.column);
+    const range = new monaco.Range(1, 1, position.lineNumber, position.column);
     const textBefore = model.getValueInRange(range);
     const start = textBefore.lastIndexOf('```plantuml');
     const end = textBefore.lastIndexOf('```\n');
@@ -93,9 +94,19 @@ class UMLCompletionItemProvider
         return { suggestions: items };
       });
     }
+
     if (/^\s*![^\s]*/.test(lineTextBefore)) {
       return { suggestions: this.preprocessorItems(lineTextBefore, position) };
     }
+
+    const text = model.getValue();
+    let fence = text.slice(start);
+    fence = fence.slice(0, fence.indexOf('```\n'));
+    fence = fence.replace(/```plantuml.*?\n/, '');
+    return stdlib.resolve().then(() => {
+      const sug = new PumlFile(fence).suggestions(range);
+      return { suggestions: sug };
+    });
   }
 
   triggerCharacters = alphabet('a', 'z')

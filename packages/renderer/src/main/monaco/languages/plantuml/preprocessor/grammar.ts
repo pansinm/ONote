@@ -1,4 +1,4 @@
-import * as ohm from 'ohm-js';
+import ohm from 'ohm-js';
 
 const def = String.raw`
   PlantUMLPreprocessor {
@@ -13,14 +13,18 @@ const def = String.raw`
       | IfStatement
       | WhileStatement
       | ReturnStatement
+      | ExpressionStatement
       | umlStatement
 
-    variableDeclaration = "!" identifier wsAroundOptional<"="> expression &le
+    variableDeclaration = "!" globalVar? identifier wsAroundOptional<"="> expression &le
+    globalVar =
+      | "global" ws+ -- global
+      | "local" ws+ -- local
 
     /* ------------- Function & Procedure ------------ */
-    InlineFunctionDeclaration = functionStart identifier "(" Arguments? ")" "return" expression &le
-    FunctionDeclaration = functionStart identifier "(" Arguments? ")" Statement* "!endfunction"
-    ProcedureDeclaration = procedureStart identifier "(" Arguments? ")" Statement* "!endprocedure"
+    InlineFunctionDeclaration = functionStart identifier  Arguments? "return" expression &le
+    FunctionDeclaration = functionStart identifier Arguments? Statement* endToken<"function">
+    ProcedureDeclaration = procedureStart identifier Arguments? Statement* endToken<"procedure">
     functionStart =
       | "!function" -- normal
       | "!unquoted function" -- unquoted
@@ -28,7 +32,9 @@ const def = String.raw`
       | "!procedure" -- normal
       | "!unquoted procedure" -- unquoted
 
-    Arguments = ListOf<Argument, ",">
+    endToken<x> = "!end" ws* x
+
+    Arguments = "(" ListOf<Argument, ","> ")"
     Argument = identifier ("=" expression)?
 
     IncludeStatement = includeToken includePath #includePart?
@@ -43,27 +49,33 @@ const def = String.raw`
       | pathChars  -- normal
     pathChars = pathChar+
     includePart = "!" identifier
-    pathChar = letter | "." | "/" | ":"
+    pathChar = letter | digit | "." | "/" | ":"
 
 
 
     ReturnStatement = "!return" expression
 
-    IfStatement = "!if" expression Statement*  ElseBlock? "!endif"
+    IfStatement = "!if" expression Statement*  ElseBlock? endToken<"if">
     ElseBlock =
       | "!elseif" expression Statement* ElseBlock* -- elseif
       | "!else" Statement+  -- else
 
-    WhileStatement = "!while" expression Statement* "!endwhile"
+    WhileStatement = "!while" expression Statement* endToken<"while">
 
     umlStatement = ~("!" any+)  notnl+ &le
 
+    ExpressionStatement =
+     | #callExpression
+
     expression =
+      | callExpression
       | binaryExpression
       | parenthesizedExpression
       | numberLiteral
       | stringLiteral
       | identifier
+
+    callExpression = "%"? identifier "(" applySyntactic<ListOf<expression,",">> ")"
 
     binaryExpression =
       | expression wsAroundOptional<binaryOperatorToken> expression
@@ -93,8 +105,8 @@ const def = String.raw`
     stringLiteralSgChar = ~(nl | "\'") any
 
     identifier =
-      | "$" letter  (letter | digit)* -- dolor
-      | letter (letter | digit)*  -- letter
+      | "$" letter  (letter | digit | "_")* -- dolor
+      | letter (letter | digit | "_")*  -- letter
 
     wsAroundOptional<x> = ws* x ws*
 
