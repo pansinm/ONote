@@ -51,7 +51,7 @@ const def = String.raw`
       | pathChars  -- normal
     pathChars = pathChar+
     includePart = "!" identifier
-    pathChar = letter | digit | "." | "/" | ":" | "_"
+    pathChar = letter | digit | "." | "/" | ":" | "_" | "-"
 
     DefineStatement = #"!define " identifier Arguments? #defineContent
     defineContent = ws+ notnl+
@@ -67,7 +67,7 @@ const def = String.raw`
 
     WhileStatement = "!while" expression Statement* endToken<"while">
 
-    UnknownStatement = "!" ("log") #notnl+
+    UnknownStatement = "!" ("log" | "assert") #notnl+
 
     umlStatement = ~("!" any+)  notnl+ &le
 
@@ -82,7 +82,7 @@ const def = String.raw`
       | stringLiteral
       | identifier
 
-    callExpression = "%"? identifier "(" applySyntactic<ListOf<expression,",">> ")"
+    callExpression = ("%" | "!")? identifier "(" applySyntactic<ListOf<expression,",">> ")"
 
     binaryExpression =
       | expression wsAroundOptional<binaryOperatorToken> expression
@@ -112,7 +112,7 @@ const def = String.raw`
     stringLiteralSgChar = ~(nl | "\'") any
 
     identifier =
-      | "$" letter  (letter | digit | "_")* -- dolor
+      | "$" (letter | digit | "_")* -- dolor
       | letter (letter | digit | "_")*  -- letter
 
     wsAroundOptional<x> = ws* x ws*
