@@ -33,7 +33,7 @@ class PumlFile {
     return PumlFile.create(atob(content), url);
   }
 
-  includes: PumlFile[] = [];
+  includes: Record<string, PumlFile> = {};
 
   declarations: VariableDeclaration[] = [];
   callableNodes: (
@@ -45,13 +45,18 @@ class PumlFile {
   ast: Root;
   url: string;
   constructor(content: string, url?: string) {
-    console.log('----content\n', content);
     this.ast = parse(content);
     this.url = url || '';
-    this.parseVars();
   }
 
-  suggestions(range: monaco.Range): monaco.languages.CompletionItem[] {
+  async replaceContent(content: string) {
+    this.ast = parse(content);
+  }
+
+  async suggestions(
+    range: monaco.Range,
+  ): Promise<monaco.languages.CompletionItem[]> {
+    await this.parseVars();
     const items: monaco.languages.CompletionItem[] = [];
     this.declarations.forEach((dec) => {
       items.push({
@@ -69,9 +74,11 @@ class PumlFile {
         range,
       });
     });
-    this.includes.forEach((include) => {
-      items.push(...include.suggestions(range));
-    });
+
+    for (const include of Object.values(this.includes)) {
+      items.push(...(await include.suggestions(range)));
+    }
+    console.log('----items', this, items);
     return items;
   }
 
@@ -101,8 +108,9 @@ class PumlFile {
       } else if (!/https?:/.test(fullurl)) {
         fullurl = new URL(inc.path, this.url).toString();
       }
-      const include = await PumlFile.fetchOrCreate(fullurl);
-      this.includes.push(include);
+      if (!this.includes[fullurl]) {
+        this.includes[fullurl] = await PumlFile.fetchOrCreate(fullurl);
+      }
     }
   }
 }

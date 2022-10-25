@@ -43,6 +43,11 @@ export interface InlineFunctionDeclaration extends Position {
   return: Expression;
 }
 
+export interface UnknownStatement extends Position {
+  type: 'UnknownStatement';
+  text: string;
+}
+
 export interface FunctionDeclaration extends Position {
   name: Identifier;
   unquoted?: boolean;
