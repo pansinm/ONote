@@ -19,6 +19,7 @@ import type {
   Root,
   StringLiteral,
   UmlText,
+  UnknownStatement,
   VariableDeclaration,
   WhileStatement,
 } from './PreprocessorAst';
@@ -171,6 +172,13 @@ semantics.addOperation('toTree', {
       type: 'ExpressionStatement',
       expression: expression.toTree(),
       pos: getPos(expression),
+    };
+  },
+  UnknownStatement(_1, _2, _3): UnknownStatement {
+    return {
+      type: 'UnknownStatement',
+      text: this.sourceString,
+      pos: getPos(this),
     };
   },
   umlStatement(uml, _): UmlText {

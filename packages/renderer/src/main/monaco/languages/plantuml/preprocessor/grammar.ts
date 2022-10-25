@@ -14,6 +14,7 @@ const def = String.raw`
       | WhileStatement
       | ReturnStatement
       | ExpressionStatement
+      | UnknownStatement
       | umlStatement
 
     variableDeclaration = "!" globalVar? identifier wsAroundOptional<"="> expression &le
@@ -49,18 +50,18 @@ const def = String.raw`
       | pathChars  -- normal
     pathChars = pathChar+
     includePart = "!" identifier
-    pathChar = letter | digit | "." | "/" | ":"
-
-
+    pathChar = letter | digit | "." | "/" | ":" | "_"
 
     ReturnStatement = "!return" expression
 
     IfStatement = "!if" expression Statement*  ElseBlock? endToken<"if">
     ElseBlock =
       | "!elseif" expression Statement* ElseBlock* -- elseif
-      | "!else" Statement+  -- else
+      | "!else" Statement*  -- else
 
     WhileStatement = "!while" expression Statement* endToken<"while">
+
+    UnknownStatement = "!" ("log") #notnl+
 
     umlStatement = ~("!" any+)  notnl+ &le
 
@@ -68,8 +69,8 @@ const def = String.raw`
      | #callExpression
 
     expression =
-      | callExpression
       | binaryExpression
+      | callExpression
       | parenthesizedExpression
       | numberLiteral
       | stringLiteral

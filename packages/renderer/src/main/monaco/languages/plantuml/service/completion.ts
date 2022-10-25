@@ -3,6 +3,8 @@ import PumlFile from './PumlFile';
 import { preprocessSnippets } from './snippets';
 import stdlib from './stdlib';
 
+const file = new PumlFile('');
+
 function alphabet(from: string, to: string) {
   const charF = from.charCodeAt(0);
   const charT = from.charCodeAt(0);
@@ -103,10 +105,20 @@ class UMLCompletionItemProvider
     let fence = text.slice(start);
     fence = fence.slice(0, fence.indexOf('```\n'));
     fence = fence.replace(/```plantuml.*?\n/, '');
-    return stdlib.resolve().then(() => {
-      const sug = new PumlFile(fence).suggestions(range);
-      return { suggestions: sug };
-    });
+    const startIndex = lineTextBefore.lastIndexOf('<');
+    const r = new monaco.Range(
+      position.lineNumber,
+      startIndex + 2,
+      position.lineNumber,
+      position.column,
+    );
+    return stdlib
+      .resolve()
+      .then(() =>
+        new PumlFile(fence)
+          .suggestions(r)
+          .then((sug) => ({ suggestions: sug })),
+      );
   }
 
   triggerCharacters = alphabet('a', 'z')
