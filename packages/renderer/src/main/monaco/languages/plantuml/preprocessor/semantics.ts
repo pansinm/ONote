@@ -224,11 +224,11 @@ semantics.addOperation('toTree', {
       pos: getPos(token),
     };
   },
-  callExpression(buildin, name, _open, args, _close): CallExpression {
+  callExpression(lead, name, _open, args, _close): CallExpression {
     return {
       type: 'CallExpression',
       name: name.toTree(),
-      buildIn: !!buildin.sourceString || undefined,
+      buildIn: lead.sourceString === '%' || undefined,
       args: args.asIteration().toTree(),
       pos: getPos(this),
     };

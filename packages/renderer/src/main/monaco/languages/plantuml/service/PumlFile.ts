@@ -47,8 +47,13 @@ class PumlFile {
   ast: Root;
   url: string;
   constructor(content: string, url?: string) {
-    this.ast = parse(content);
-    this.url = url || '';
+    try {
+      this.ast = parse(content);
+      this.url = url || '';
+    } catch (err) {
+      console.error(err, content);
+      throw err;
+    }
   }
 
   async replaceContent(content: string) {
