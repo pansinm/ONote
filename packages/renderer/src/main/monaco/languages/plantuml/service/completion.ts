@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import { allkeywords, preprocessor } from './hightlight';
 import PumlFile from './PumlFile';
 import { preprocessSnippets } from './snippets';
 import stdlib from './stdlib';
@@ -91,6 +92,26 @@ class UMLCompletionItemProvider
       .getLineContent(position.lineNumber)
       .slice(0, position.column - 1);
 
+    if (context.triggerCharacter === '!') {
+      const startIndex = lineTextBefore.lastIndexOf('!');
+      const r = new monaco.Range(
+        position.lineNumber,
+        startIndex + 1,
+        position.lineNumber,
+        position.column,
+      );
+      return {
+        suggestions: preprocessor.map((pre) => {
+          return {
+            kind: monaco.languages.CompletionItemKind.Keyword,
+            insertText: pre + ' ',
+            range: r,
+            label: pre,
+          };
+        }),
+      };
+    }
+
     if (/!include\s*</.test(lineTextBefore)) {
       return this.includeItems(lineTextBefore, position).then((items) => {
         return { suggestions: items };
@@ -131,15 +152,20 @@ class UMLCompletionItemProvider
       position.lineNumber,
       position.column,
     );
-
+    const keywords = allkeywords.map((kw) => ({
+      kind: monaco.languages.CompletionItemKind.Keyword,
+      insertText: kw,
+      range: r,
+      label: kw,
+    }));
     return new PumlFile(fence)
       .suggestions(r)
-      .then((sug) => ({ suggestions: sug }));
+      .then((sug) => ({ suggestions: sug.concat(keywords) }));
   }
 
   triggerCharacters = alphabet('a', 'z')
     .concat(alphabet('A', 'Z'))
-    .concat(['$', '/', ' ', '!', '<', '(', ',']);
+    .concat(['$', '/', '!', '<', '(', ',', '@']);
 }
 
 monaco.languages.registerCompletionItemProvider(
