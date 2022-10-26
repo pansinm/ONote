@@ -12,6 +12,7 @@ class Manager {
       padding: {
         top: 10,
       },
+
       scrollbar: {
         verticalScrollbarSize: 8,
       },

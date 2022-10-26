@@ -101,13 +101,6 @@ class UMLCompletionItemProvider
     let fence = text.slice(start);
     fence = fence.slice(0, fence.indexOf('```\n'));
     fence = fence.replace(/```plantuml.*?\n/, '');
-    const startIndex = lineTextBefore.lastIndexOf('<');
-    const r = new monaco.Range(
-      position.lineNumber,
-      startIndex + 2,
-      position.lineNumber,
-      position.column,
-    );
 
     const res = /([$a-zA-Z0-9_]+?)\(/.exec(lineTextBefore);
     if (res) {
@@ -131,6 +124,13 @@ class UMLCompletionItemProvider
     if (/^\s*![^\s]*/.test(lineTextBefore)) {
       return { suggestions: this.preprocessorItems(lineTextBefore, position) };
     }
+
+    const r = new monaco.Range(
+      position.lineNumber,
+      position.column - 1,
+      position.lineNumber,
+      position.column,
+    );
 
     return new PumlFile(fence)
       .suggestions(r)
