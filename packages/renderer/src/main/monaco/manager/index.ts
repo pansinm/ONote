@@ -19,6 +19,8 @@ class Manager {
       unicodeHighlight: {
         ambiguousCharacters: false,
       },
+      autoClosingBrackets: 'always',
+      autoClosingQuotes: 'always',
     });
     editor.onDidDispose(() => {
       if (editor === this.editor) {

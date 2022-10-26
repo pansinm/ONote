@@ -20,6 +20,8 @@ type Statement =
   | FunctionDeclaration
   | ProcedureDeclaration
   | IncludeStatement
+  | DefineLongStatement
+  | DefineLongStatement
   | ReturnStatement
   | UmlText;
 

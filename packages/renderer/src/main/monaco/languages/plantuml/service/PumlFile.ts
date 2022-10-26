@@ -63,13 +63,16 @@ class PumlFile {
     this.ast = parse(content);
   }
 
-  queryCallable(name: string): typeof this.callableNodes[0] | undefined {
+  async queryCallable(
+    name: string,
+  ): Promise<typeof this.callableNodes[0] | undefined> {
+    await this.parseVars();
     let node = this.callableNodes.find((n) => n.name.name === name);
     if (node) {
       return node;
     }
     for (const include of Object.values(this.includes)) {
-      node = include.queryCallable(name);
+      node = await include.queryCallable(name);
       if (node) {
         return node;
       }
@@ -82,7 +85,10 @@ class PumlFile {
     range: monaco.Range,
   ): Promise<monaco.languages.CompletionItem[]> {
     await this.parseVars();
-    const callable = this.queryCallable(name);
+    const callable = await this.queryCallable(name);
+    if (/Define/.test(callable?.type || '')) {
+      return [];
+    }
     return (
       callable?.arguments.map((arg) => {
         return {

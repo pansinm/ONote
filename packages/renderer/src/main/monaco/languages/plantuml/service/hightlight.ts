@@ -141,6 +141,7 @@ export const allkeywords = typewords.concat(keywords);
 monaco.languages.register({
   id: 'plantuml',
   filenamePatterns: ['\\.(puml|plantuml)(\\.svg)?$'],
+  aliases: ['puml'],
 });
 
 monaco.languages.setMonarchTokensProvider('plantuml', {
