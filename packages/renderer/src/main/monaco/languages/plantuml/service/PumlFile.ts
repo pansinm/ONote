@@ -4,6 +4,7 @@ import type {
   DefineLongStatement,
   DefineStatement,
   FunctionDeclaration,
+  Identifier,
   IncludeStatement,
   InlineFunctionDeclaration,
   ProcedureDeclaration,
@@ -36,6 +37,8 @@ class PumlFile {
   }
 
   includes: Record<string, PumlFile> = {};
+
+  identifiers: Identifier[] = [];
 
   declarations: VariableDeclaration[] = [];
   callableNodes: (
@@ -94,10 +97,12 @@ class PumlFile {
 
   async suggestions(
     range: monaco.Range,
+    filter?: (node: any) => boolean,
   ): Promise<monaco.languages.CompletionItem[]> {
     await this.parseVars();
     const items: monaco.languages.CompletionItem[] = [];
-    this.declarations.forEach((dec) => {
+    const nodeFilter = (node: any) => (filter ? filter(node) : true);
+    this.declarations.filter(nodeFilter).forEach((dec) => {
       items.push({
         kind: monaco.languages.CompletionItemKind.Variable,
         insertText: dec.name.name,
@@ -105,24 +110,34 @@ class PumlFile {
         range,
       });
     });
-    this.callableNodes.forEach((callale) => {
+    this.callableNodes.filter(nodeFilter).forEach((callale) => {
       items.push({
-        kind: monaco.languages.CompletionItemKind.Variable,
+        kind: monaco.languages.CompletionItemKind.Method,
         insertText: callale.name.name,
         label: callale.name.name,
         range,
       });
     });
 
+    this.identifiers.filter(nodeFilter).forEach((identifier) => {
+      if (!items.some((node) => node.insertText === identifier.name)) {
+        items.push({
+          kind: monaco.languages.CompletionItemKind.Variable,
+          insertText: identifier.name,
+          label: identifier.name,
+          range,
+        });
+      }
+    });
+
     for (const include of Object.values(this.includes)) {
-      const parentVar = await include.suggestions(range);
-      items.push(
-        ...parentVar.filter(
-          (a) =>
-            (a as any).type !== 'VariableDeclaration' ||
-            (a as any).scope === 'global',
-        ),
-      );
+      const parentVar = await include.suggestions(range, (node) => {
+        return (
+          node.type !== 'Identifier' &&
+          (node.type !== 'VariableDeclaration' || node.scope === 'global')
+        );
+      });
+      items.push(...parentVar);
     }
     return items;
   }
@@ -161,6 +176,9 @@ class PumlFile {
         } else {
           this.declarations.push(node as any);
         }
+      },
+      Identifier: (node: Identifier) => {
+        this.identifiers.push(node);
       },
     });
     for (const inc of includes) {
