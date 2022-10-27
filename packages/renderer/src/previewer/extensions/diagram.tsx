@@ -1,13 +1,45 @@
 import type { Handlers } from '../markdown/handlers/interface';
 import handlersManager from '../markdown/handlers/manager';
 
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Code } from 'mdast';
 import { useDebounce } from 'react-use';
 import diagramEngine from '../diagram/engine';
 import Block from '../markdown/handlers/components/Block';
 import Icon from '/@/components/Icon';
 import { copyElementAsImage } from '../utils/clipboard';
+import { debounce, throttle } from 'lodash';
+
+function debounceRenderer(
+  onRender: (res: any) => void,
+  onError: (err: Error) => void,
+) {
+  let next = null;
+  let rendering = false;
+  return debounce(
+    async (lang: string, value: string, meta: any) => {
+      if (rendering) {
+        next = [lang, value, meta];
+        return;
+      }
+      next = [lang, value, meta];
+      rendering = true;
+      while (next) {
+        const [lang, value, meta] = next;
+        next = null;
+        try {
+          const res = await diagramEngine.render(lang, value, meta);
+          onRender(res);
+        } catch (err) {
+          onError(err as Error);
+        }
+      }
+      rendering = false;
+    },
+    300,
+    { leading: true, trailing: true },
+  );
+}
 
 function Diagram(props: {
   value: string;
@@ -16,43 +48,33 @@ function Diagram(props: {
   lang: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const renderingRef = useRef(false);
-  useDebounce(
-    async () => {
-      if (!ref.current || renderingRef.current) return;
-      renderingRef.current = true;
-      try {
-        if (!props.value) {
-          ref.current.innerHTML = '';
-          return;
-        }
-        const res = await diagramEngine.render(
-          props.lang as any,
-          props.value,
-          props.meta,
-        );
-        if (!ref.current) {
-          return;
-        }
-        if (res.type === 'svg') {
-          ref.current.innerHTML =
-            typeof res.content === 'string'
-              ? res.content
-              : res.content.join('<br>');
-          return;
-        }
-        if (res.type === 'url') {
-          ref.current.innerHTML = `<img src="${res.content}">`;
-        }
-      } catch (err) {
-        ref.current && (ref.current.innerHTML = (err as Error).message);
-      } finally {
-        renderingRef.current = false;
-      }
-    },
-    200,
-    [props.value, JSON.stringify(props.meta)],
+  const render = useMemo(
+    () =>
+      debounceRenderer(
+        (res) => {
+          if (!ref.current) {
+            return;
+          }
+          if (res.type === 'svg') {
+            ref.current.innerHTML =
+              typeof res.content === 'string'
+                ? res.content
+                : res.content.join('<br>');
+            return;
+          }
+          if (res.type === 'url') {
+            ref.current.innerHTML = `<img src="${res.content}">`;
+          }
+        },
+        (err) => {
+          ref.current && (ref.current.innerHTML = (err as Error).message);
+        },
+      ),
+    [],
   );
+  useEffect(() => {
+    render(props.lang as any, props.value, props.meta);
+  }, [props.value, JSON.stringify(props.meta)]);
 
   const handleCopyImg = useCallback(() => {
     copyElementAsImage(ref.current!);
