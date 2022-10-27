@@ -1,6 +1,6 @@
 # ONote 
 
-![](docs/assets/screenshot.png)
+![](docs/assets/screenshot.gif)
 
 ## 特性
 

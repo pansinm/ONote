@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import { findPreviousMatch, getFenceContent, isInFence } from '../../../utils';
 import { allkeywords, preprocessor } from './hightlight';
 import PumlFile from './PumlFile';
 import { preprocessSnippets } from './snippets';
@@ -15,6 +16,50 @@ function alphabet(from: string, to: string) {
   }
   return arr;
 }
+
+const ALL_THEMES = [
+  '_none_',
+  'amiga',
+  'aws-orange',
+  'black-knight',
+  'bluegray',
+  'blueprint',
+  'carbon-gray',
+  'cerulean',
+  'cerulean-outline',
+  'crt-amber',
+  'crt-green',
+  'cyborg',
+  'cyborg-outline',
+  'hacker',
+  'lightgray',
+  'mars',
+  'materia',
+  'materia-outline',
+  'metal',
+  'mimeograph',
+  'minty',
+  'plain',
+  'reddress-darkblue',
+  'reddress-darkgreen',
+  'reddress-darkorange',
+  'reddress-darkred',
+  'reddress-lightblue',
+  'reddress-lightgreen',
+  'reddress-lightorange',
+  'reddress-lightred',
+  'sandstone',
+  'silver',
+  'sketchy',
+  'sketchy-outline',
+  'spacelab',
+  'spacelab-white',
+  'superhero',
+  'superhero-outline',
+  'toy',
+  'united',
+  'vibrant',
+];
 
 class UMLCompletionItemProvider
   implements monaco.languages.CompletionItemProvider
@@ -75,19 +120,41 @@ class UMLCompletionItemProvider
         });
     });
   }
+
+  completeTheme(
+    model: monaco.editor.ITextModel,
+    position: monaco.Position,
+  ): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
+    const prevSpace = findPreviousMatch(model, position, /\s+/);
+    if (!prevSpace) {
+      return;
+    }
+    const range = new monaco.Range(
+      position.lineNumber,
+      prevSpace.range.endColumn,
+      position.lineNumber,
+      position.column,
+    );
+    return {
+      suggestions: ALL_THEMES.map((theme) => ({
+        kind: monaco.languages.CompletionItemKind.Color,
+        insertText: theme,
+        range,
+        label: '' + theme,
+      })),
+    };
+  }
+
   provideCompletionItems(
     model: monaco.editor.ITextModel,
     position: monaco.Position,
     context: monaco.languages.CompletionContext,
     token: monaco.CancellationToken,
   ): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
-    const range = new monaco.Range(1, 1, position.lineNumber, position.column);
-    const textBefore = model.getValueInRange(range);
-    const start = textBefore.lastIndexOf('```plantuml');
-    const end = textBefore.lastIndexOf('```\n');
-    if (start < 0 || start <= end) {
+    if (!isInFence(model, position, 'plantuml')) {
       return;
     }
+
     const lineTextBefore = model
       .getLineContent(position.lineNumber)
       .slice(0, position.column - 1);
@@ -118,10 +185,11 @@ class UMLCompletionItemProvider
       });
     }
 
-    const text = model.getValue();
-    let fence = text.slice(start);
-    fence = fence.slice(0, fence.indexOf('```\n'));
-    fence = fence.replace(/```plantuml.*?\n/, '');
+    if (/!theme\s+/.test(lineTextBefore)) {
+      return this.completeTheme(model, position);
+    }
+
+    const fence = getFenceContent(model, position);
 
     const res = /([$a-zA-Z0-9_]+?)\(/.exec(lineTextBefore);
     if (res) {
