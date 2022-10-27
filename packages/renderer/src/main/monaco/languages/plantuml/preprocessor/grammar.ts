@@ -67,7 +67,8 @@ const def = String.raw`
 
     WhileStatement = "!while" expression Statement* endToken<"while">
 
-    UnknownStatement = "!" ("log" | "assert") #notnl+
+    // TODO
+    UnknownStatement = "!" ("log" | "assert" | "themes" | "dump_memory" | "import") #notnl*
 
     umlStatement = ~("!" any+)  notnl+ &le
 

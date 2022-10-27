@@ -5,8 +5,9 @@
     "node": ">=v16.13",
     "npm": ">=8.1"
   },
-  "version": "0.3.0",
+  "version": "0.4.0",
   "main": "packages/main/dist/index.cjs",
+  "type": "module",
   "scripts": {
     "postinstall": "patch-package",
     "build": "npm run build:main && npm run build:preload && npm run build:renderer",
@@ -15,7 +16,7 @@
     "build:renderer": "cd ./packages/renderer && vite build",
     "compile": "cross-env MODE=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js",
     "bdd": "yarn build && chokidar \"features/**\" -c \"yarn  cucumber-js\"",
-    "test:watch": "jest --watch",
+    "test:watch": "yarn node --experimental-vm-modules $(yarn bin jest) --watch",
     "test": "jest",
     "test:e2e": "yarn bdd",
     "watch": "node scripts/watch.js",

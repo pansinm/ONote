@@ -10,7 +10,7 @@ export function parse(input: string) {
   const match = grammar.match(input);
   // console.log(match.message);
   const ast = semantics(match).toTree();
-  console.log(JSON.stringify(ast, null, 2));
+  // console.log(JSON.stringify(ast, null, 2));
   return ast;
 }
 

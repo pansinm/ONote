@@ -132,6 +132,7 @@ export const preprocessor = [
   '!endwhile',
   '!foreach',
   '!endfor',
+  '!theme',
 ];
 
 export const allkeywords = typewords.concat(keywords);

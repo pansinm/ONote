@@ -3,12 +3,11 @@ import handlersManager from '../markdown/handlers/manager';
 
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Code } from 'mdast';
-import { useDebounce } from 'react-use';
 import diagramEngine from '../diagram/engine';
 import Block from '../markdown/handlers/components/Block';
 import Icon from '/@/components/Icon';
 import { copyElementAsImage } from '../utils/clipboard';
-import { debounce, throttle } from 'lodash';
+import { debounce } from 'lodash';
 
 function debounceRenderer(
   onRender: (res: any) => void,

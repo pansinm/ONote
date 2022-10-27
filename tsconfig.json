@@ -8,6 +8,7 @@
     "strict": true,
     "jsx": "react",
     "isolatedModules": true,
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "types": ["node", "jest"],
     "resolveJsonModule": true,
