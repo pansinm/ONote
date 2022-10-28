@@ -1,5 +1,8 @@
 class ClipboardService {
   async readImage() {
+    if (window.simmer) {
+      return window.simmer.readImageFromClipboard();
+    }
     const items = await navigator.clipboard.read();
     for (const item of items) {
       const type = item.types.find((type) => type.includes('image'));

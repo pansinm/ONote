@@ -42,7 +42,13 @@ function insertImage(editor: monaco.editor.ICodeEditor, filePath: string) {
     end.column,
   );
   editor.executeEdits(null, [
-    { range, text: `![](${filePath})`, forceMoveMarkers: true },
+    {
+      range,
+      text: `${
+        /\.(jpe?g|png|gif|svg|webp|bmp|ico)$/i.test(filePath) ? '!' : ''
+      }[](${filePath})`,
+      forceMoveMarkers: true,
+    },
   ]);
 }
 
@@ -53,6 +59,21 @@ monaco.editor.registerCommand(
     const editor = manager.getEditor();
     const model = monaco.editor.getModel(uri);
     if (editor && model?.getLanguageId() === 'markdown') {
+      try {
+        const files = await window.simmer.readBlobsFromClipboard();
+        for (const file of files) {
+          const relativePath = await saveAsset(editor, file);
+          if (relativePath) {
+            insertImage(editor, relativePath);
+          }
+        }
+        if (files.length) {
+          return;
+        }
+      } catch (err) {
+        // ignore
+        console.error(err);
+      }
       const blob = await clipboardService.readImage();
       if (blob) {
         const relativePath = await saveAsset(editor, blob);

@@ -1,6 +1,8 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
+import * as mimetypes from 'mime-types';
+import { fileURLToPath } from 'url';
 import type { Engine } from '@hpcc-js/wasm';
 import { graphviz } from '@hpcc-js/wasm';
 import * as https from 'https';
@@ -67,6 +69,30 @@ export const simmer = {
     return ipcRenderer.invoke('open-directory') as ReturnType<
       Dialog['showOpenDialog']
     >;
+  },
+  async readBlobsFromClipboard() {
+    const uriList = clipboard.read('text/uri-list');
+    const uris = uriList.trim().split(/\s+/);
+    console.log(uris);
+    return Promise.all(
+      uris
+        .map((uri) => fileURLToPath(uri))
+        .map((localPath) =>
+          fs.readFile(localPath).then(
+            (buffer) =>
+              new Blob([buffer], {
+                type: mimetypes.lookup(path.basename(localPath)) || undefined,
+              }),
+          ),
+        ),
+    );
+  },
+  async readImageFromClipboard() {
+    const img = clipboard.readImage();
+    if (img.isEmpty()) {
+      return false;
+    }
+    return new Blob([img.toPNG()], { type: 'image/png' });
   },
   async renderPlantUML(plantuml: string, endpoint: string) {
     const encodedUML = encodePlantUML(plantuml);
