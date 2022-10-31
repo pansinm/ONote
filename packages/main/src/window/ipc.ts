@@ -17,3 +17,7 @@ ipcMain.on('window', (event, command: string, ...args) => {
       break;
   }
 });
+
+export function sendToMain(channel: string, message: any) {
+  return findWindow('main')?.webContents.postMessage(channel, message);
+}

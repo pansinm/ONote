@@ -7,6 +7,7 @@ import {
 } from 'electron';
 import { join } from 'path';
 import { URL } from 'url';
+import { sendToMain } from './ipc';
 import { findWindow } from './utils';
 
 async function createWindow(type: 'main' | 'previewer') {
@@ -54,6 +55,12 @@ async function createWindow(type: 'main' | 'previewer') {
 
   await browserWindow.loadURL(pageUrl);
   browserWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^onote:/.test(url)) {
+      sendToMain('open-file', { url });
+      // Prevent creating new window in application
+      return { action: 'deny' };
+    }
+
     shell.openExternal(url);
     return { action: 'deny' };
   });

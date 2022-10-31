@@ -1,5 +1,6 @@
 import { app, shell } from 'electron';
 import { URL } from 'url';
+import { sendToMain } from './window/ipc';
 
 /**
  * List of origins that you allow open INSIDE the application and permissions for each of them.
@@ -58,6 +59,7 @@ app.on('web-contents-created', (_, contents) => {
    * @see https://www.electronjs.org/docs/latest/tutorial/security#13-disable-or-limit-navigation
    */
   contents.on('will-navigate', (event, url) => {
+    console.log('-0--', url);
     const { origin } = new URL(url);
     if (ALLOWED_ORIGINS_AND_PERMISSIONS.has(origin)) {
       return;
@@ -109,7 +111,9 @@ app.on('web-contents-created', (_, contents) => {
     // @ts-expect-error Type checking is performed in runtime
     if (ALLOWED_EXTERNAL_ORIGINS.has(origin)) {
       // Open default browser
-      shell.openExternal(url).catch(console.error);
+      shell.openExternal(url).catch((err) => {
+        console.error(`打开 ${url} 失败`, err);
+      });
     } else if (import.meta.env.DEV) {
       console.warn('Blocked the opening of an unallowed origin:', origin);
     }
