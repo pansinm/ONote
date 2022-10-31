@@ -8,6 +8,7 @@ import { Code } from './handlers/code';
 interface RenderProps {
   uri: string;
   content: string;
+  rootDirUri: string;
 }
 
 const Render: FC<RenderProps> = (props) => {
@@ -16,7 +17,7 @@ const Render: FC<RenderProps> = (props) => {
   if (isPlaintext(props.uri)) {
     return <Code code={props.content} lang={extname(props.uri)}></Code>;
   }
-  return <>{render(props.uri, ast)}</>;
+  return <>{render(props.uri, ast, props.rootDirUri)}</>;
 };
 
 export default Render;

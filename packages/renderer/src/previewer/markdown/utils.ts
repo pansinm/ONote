@@ -42,7 +42,11 @@ const findParentNode = (parent: Parent, node: Content): Parent | null => {
   return null;
 };
 
-export function render(fileUri: string, ast: Root): ReactNode {
+export function render(
+  fileUri: string,
+  ast: Root,
+  rootDirUri: string,
+): ReactNode {
   const footnoteById: { [id: string]: any } = {};
 
   const ctx = {
@@ -51,6 +55,7 @@ export function render(fileUri: string, ast: Root): ReactNode {
     footnoteOrder: [],
     handlers: handlersManager.getHandlers(),
     fileUri: fileUri,
+    rootDirUri: rootDirUri,
     getRootNode: () => ast,
     getParentNode: (node: Node) =>
       findParentNode(ast, node as unknown as Content),

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import mainService from '../services/mainService';
 
 export default function useModel() {
-  const [model, setModel] = useState({ uri: '', content: '' });
+  const [model, setModel] = useState({ uri: '', content: '', rootDirUri: '' });
   useEffect(() => {
     const listener = (data: typeof model) => {
       setModel(data);

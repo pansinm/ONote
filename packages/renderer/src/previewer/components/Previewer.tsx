@@ -5,6 +5,7 @@ import useModel from '../hooks/useModel';
 
 export default function Previewer({ className }: { className: string }) {
   const resource = useModel();
+  console.log(resource);
   if (!resource.uri) {
     return null;
   }

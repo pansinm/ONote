@@ -1,6 +1,7 @@
 import * as monaco from 'monaco-editor';
 import { useEffect } from 'react';
 import previewerService from '/@/main/services/previewerService';
+import stores from '/@/main/stores';
 
 export default function useOnModelChange(
   editor?: monaco.editor.IStandaloneCodeEditor,
@@ -12,6 +13,7 @@ export default function useOnModelChange(
         previewerService.send('main.editor.modelChanged', {
           uri: model?.uri.toString() || '',
           content: model?.getValue() || '',
+          rootDirUri: stores.activationStore.rootUri,
         });
       }
     });
@@ -20,6 +22,7 @@ export default function useOnModelChange(
       previewerService.send('main.editor.contentChanged', {
         uri: model?.uri.toString() || '',
         content: model?.getValue() || '',
+        rootDirUri: stores.activationStore.rootUri,
       });
     });
     return () => {
