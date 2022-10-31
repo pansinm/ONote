@@ -59,7 +59,6 @@ app.on('web-contents-created', (_, contents) => {
    * @see https://www.electronjs.org/docs/latest/tutorial/security#13-disable-or-limit-navigation
    */
   contents.on('will-navigate', (event, url) => {
-    console.log('-0--', url);
     const { origin } = new URL(url);
     if (ALLOWED_ORIGINS_AND_PERMISSIONS.has(origin)) {
       return;

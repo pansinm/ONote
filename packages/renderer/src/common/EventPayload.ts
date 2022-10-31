@@ -25,12 +25,24 @@ export type PreviewerEventPayload = {
 };
 
 export type MainEventPayload = {
-  'main.getCurrentModel:response': { uri: string; content: string };
+  'main.getCurrentModel:response': {
+    uri: string;
+    content: string;
+    rootDirUri: string;
+  };
   'main.getEditorScrollPosition:response': { uri: string; lineNumber: number };
   'main.diagram.rendered':
     | { taskId: string; svg: string }
     | { taskId: string; err: unknown };
-  'main.editor.contentChanged': { uri: string; content: string };
-  'main.editor.modelChanged': { uri: string; content: string };
+  'main.editor.contentChanged': {
+    uri: string;
+    content: string;
+    rootDirUri: string;
+  };
+  'main.editor.modelChanged': {
+    uri: string;
+    content: string;
+    rootDirUri: string;
+  };
   'main.scroll.changed': { uri: string; lineNumber: number };
 };
