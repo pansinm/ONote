@@ -2,8 +2,9 @@
 
 import { chrome } from '../../.electron-vendors.cache.json';
 import { join } from 'path';
-import { viteCommonjs, esbuildCommonjs } from '@originjs/vite-plugin-commonjs';
+// import { viteCommonjs, esbuildCommonjs } from '@originjs/vite-plugin-commonjs';
 import { builtinModules } from 'module';
+import commonjs from 'vite-plugin-commonjs';
 import react from '@vitejs/plugin-react';
 
 const PACKAGE_ROOT = __dirname;
@@ -31,15 +32,18 @@ const config = {
   optimizeDeps: {
     include: ['lodash/lodash.js'],
     esbuildOptions: {
-      plugins: [esbuildCommonjs(['ohm-js'])],
+      // plugins: [esbuildCommonjs(['ohm-js'])],
     },
   },
-  plugins: [react(), viteCommonjs()],
+  plugins: [react(), commonjs()],
   base: '',
   server: {
     fs: {
       strict: true,
     },
+    // hmr: {
+    //   overlay: false,
+    // },
   },
   build: {
     sourcemap: true,

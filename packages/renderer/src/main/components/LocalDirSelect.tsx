@@ -1,7 +1,7 @@
+import { Button } from '@fluentui/react-components';
 import { Uri } from 'monaco-editor';
 import type { FC } from 'react';
 import React from 'react';
-import Button from '/@/components/Button';
 
 interface LocalDirSelectProps {
   onOpen(uri: string): void;
@@ -19,7 +19,9 @@ const LocalDirSelect: FC<LocalDirSelectProps> = (props) => {
   };
   return (
     <div style={{ paddingTop: 10 }}>
-      <Button onClick={handleClick}>打开目录</Button>
+      <Button appearance="primary" onClick={handleClick}>
+        打开目录
+      </Button>
     </div>
   );
 };

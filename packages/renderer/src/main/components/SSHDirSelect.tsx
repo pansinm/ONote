@@ -1,8 +1,9 @@
+import { Button } from '@fluentui/react-components';
 import type { FileTreeProps } from '@sinm/react-file-tree';
 import { FileTree } from '@sinm/react-file-tree';
 import type { FC } from 'react';
 import React, { useRef, useState } from 'react';
-import Button from '/@/components/Button';
+import fileService from '../services/fileService';
 import FileTreeItem from '/@/components/FileTreeItem';
 import View from '/@/components/View';
 
@@ -46,7 +47,9 @@ const SSHDirSelect: FC<SSHDirSelectProps> = (props) => {
         ></FileTree>
       </View>
       <View paddingTop={10} justifyContent="flex-end">
-        <Button onClick={handleClick}>打开</Button>
+        <Button appearance="primary" onClick={handleClick}>
+          打开
+        </Button>
       </View>
     </View>
   );
