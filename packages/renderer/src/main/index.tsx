@@ -6,8 +6,19 @@ import './monaco';
 import React from 'react';
 import '../styles/utils.scss';
 import './index.scss';
+import {
+  FluentProvider,
+  teamsLightTheme,
+  webDarkTheme,
+  webLightTheme,
+} from '@fluentui/react-components';
 
 import { render } from 'react-dom';
 import App from './App';
 
-render(<App />, document.getElementById('app'));
+render(
+  <FluentProvider theme={webLightTheme}>
+    <App />
+  </FluentProvider>,
+  document.getElementById('app'),
+);

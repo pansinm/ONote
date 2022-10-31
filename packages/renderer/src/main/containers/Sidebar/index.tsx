@@ -2,17 +2,24 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import styles from './index.module.scss';
 import useDimensions from '../../../hooks/useDimensions';
-import Button from '/@/components/Button';
 import stores from '../../stores';
 import Flex from '/@/components/Flex';
 import Icon from '/@/components/Icon';
 import Directory from './Directory';
-import Modal from '/@/components/Modal';
 import type { Project } from '../../components/ProjectSelect';
 import ProjectSelect from '../../components/ProjectSelect';
-import View from '/@/components/View';
 import { useLocalStorage } from 'react-use';
 import fileService from '../../services/fileService';
+import {
+  Dialog,
+  DialogSurface,
+  DialogTitle,
+  DialogTrigger,
+  Button,
+  DialogBody,
+  DialogContent,
+} from '@fluentui/react-components';
+import { Dismiss24Regular } from '@fluentui/react-icons';
 
 export default observer(function ActivityBar() {
   const [ref] = useDimensions();
@@ -49,15 +56,44 @@ export default observer(function ActivityBar() {
         <Directory />
       </div>
       <Flex justifyContent={'space-between'}>
-        <Button
-          style={{ flex: 1 }}
-          shape="rectangle"
-          onClick={async () => {
-            setOpen(true);
-          }}
+        <Dialog
+          open={open}
+          onOpenChange={(e, { open: needOpen }) => setOpen(needOpen)}
         >
-          打开目录
-        </Button>
+          <DialogTrigger>
+            <Button
+              style={{ flex: 1 }}
+              appearance="primary"
+              shape="square"
+              onClick={async () => {
+                setOpen(true);
+              }}
+            >
+              打开目录
+            </Button>
+          </DialogTrigger>
+          <DialogSurface>
+            <DialogBody>
+              <DialogTitle
+                action={
+                  <DialogTrigger action="close">
+                    <Button
+                      appearance="subtle"
+                      aria-label="close"
+                      icon={<Dismiss24Regular />}
+                    />
+                  </DialogTrigger>
+                }
+              >
+                选择目录
+              </DialogTitle>
+              <DialogContent>
+                <ProjectSelect onSelect={handleSelect} />
+              </DialogContent>
+            </DialogBody>
+          </DialogSurface>
+        </Dialog>
+
         <Icon
           type="chevron-double-right"
           color="white"
@@ -67,20 +103,6 @@ export default observer(function ActivityBar() {
           }}
         />
       </Flex>
-      <Modal isOpen={open}>
-        <View
-          position="absolute"
-          width={40}
-          height={40}
-          top={0}
-          right={0}
-          justifyContent="center"
-          alignItems={'center'}
-        >
-          <Icon onClick={() => setOpen(false)} type="x" />
-        </View>
-        <ProjectSelect onSelect={handleSelect} />
-      </Modal>
     </div>
   );
 });

@@ -1,12 +1,11 @@
 import _ from 'lodash';
-import type { FC} from 'react';
+import type { FC } from 'react';
 import { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import React from 'react';
-import Button from '../../components/Button';
 import Input from '../../components/Input';
 import styles from './SSHForm.module.scss';
-import { useRaf } from 'react-use';
+import { Button } from '@fluentui/react-components';
 
 interface SSHFormData {
   host: string;
@@ -63,7 +62,11 @@ const SSHForm: FC<SSHFormProps> = (props) => {
         placeholder="Password"
         type={'password'}
       />
-      <Button disabled={disabled} style={{ float: 'right', height: 30 }}>
+      <Button
+        appearance="primary"
+        disabled={disabled}
+        style={{ float: 'right', height: 30 }}
+      >
         {disabled ? '连接中' : '连接'}
       </Button>
     </form>

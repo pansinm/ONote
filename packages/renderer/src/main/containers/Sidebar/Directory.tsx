@@ -4,13 +4,13 @@ import { FileTree } from '@sinm/react-file-tree';
 import { observer } from 'mobx-react-lite';
 import stores from '../../stores';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
-import { Uri } from 'monaco-editor';
 import FileTreeItem from '/@/components/FileTreeItem';
 import Menu from '/@/components/Menu';
 import type { MenuItem, MenuProps } from '/@/components/Menu';
 import { useContextMenu } from 'react-contexify';
 import useFileOperation from '/@/hooks/useFileOperation';
 import { when } from 'mobx';
+import fileService from '../../services/fileService';
 
 const MENU_ID = 'DIRECTORY_MENU';
 const menus: MenuItem[] = [
