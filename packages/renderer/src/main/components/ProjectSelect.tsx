@@ -1,8 +1,6 @@
 import type { FC } from 'react';
 import React, { useState } from 'react';
 import type { TabListProps } from '@fluentui/react-components';
-import { webLightTheme } from '@fluentui/react-components';
-import { FluentProvider } from '@fluentui/react-components';
 import { TabList, Tab } from '@fluentui/react-components';
 import {
   DeviceMeetingRoomRemoteRegular,

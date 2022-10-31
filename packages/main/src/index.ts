@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'url';
-import { app, dialog, ipcMain, protocol } from 'electron';
+import { app, dialog, ipcMain, Menu, protocol } from 'electron';
 import './security-restrictions';
 import fileService from './fileservice';
 import { restoreOrCreateWindow } from './window';
@@ -19,6 +19,7 @@ import { restoreOrCreateWindow } from './window';
  */
 app.disableHardwareAcceleration();
 
+Menu.setApplicationMenu(null);
 /**
  * Shout down background process if all windows was closed
  */
