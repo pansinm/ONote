@@ -11,6 +11,7 @@ import { useContextMenu } from 'react-contexify';
 import useFileOperation from '/@/hooks/useFileOperation';
 import { when } from 'mobx';
 import fileService from '../../services/fileService';
+import NoDirectory from './NoDirectory';
 
 const MENU_ID = 'DIRECTORY_MENU';
 const menus: MenuItem[] = [
@@ -85,6 +86,7 @@ const Directory = observer(() => {
         onRootTreeChange={(root) =>
           root && treeRef.current?.expand(root.uri, true)
         }
+        emptyRenderer={() => <NoDirectory>先打开目录...</NoDirectory>}
         onTreeItemClick={(treeNode) => {
           const activeDir = stores.activationStore.activeDirUri;
           stores.activationStore.activeDir(treeNode.uri);
