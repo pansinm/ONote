@@ -77,11 +77,11 @@ if (import.meta.env.PROD) {
 }
 
 app.whenReady().then(() => {
-  protocol.interceptFileProtocol('asset', async (request, callback) => {
+  protocol.interceptFileProtocol('onote', async (request, callback) => {
     const url = request.url.split('?')[0];
     try {
       const localUri = await fileService.getLocalUri(
-        url.replace(/^asset:/, 'file:'),
+        url.replace(/^onote:/, 'file:'),
       );
       const filePath = fileURLToPath(localUri);
       callback({ path: filePath });

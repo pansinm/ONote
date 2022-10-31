@@ -4,3 +4,10 @@ import { ipcRenderer } from 'electron';
 ipcRenderer.on('message', (e, message) => {
   window.postMessage(message);
 });
+
+ipcRenderer.on('open-file', (e, message) => {
+  window.postMessage({
+    type: 'open-file',
+    ...message,
+  });
+});

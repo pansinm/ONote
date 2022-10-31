@@ -15,6 +15,19 @@ const EventBus = () => {
       eventbus.off(EDITOR_FILE_SAVE, handler);
     };
   }, []);
+  useEffect(() => {
+    const openFile = (event: any) => {
+      if (event?.data?.type === 'open-file') {
+        stores.activationStore.activeFile(
+          event?.data.url.replace(/^onote:/, 'file:'),
+        );
+      }
+    };
+    window.addEventListener('message', openFile);
+    return () => {
+      window.removeEventListener('message', openFile);
+    };
+  }, []);
   return null;
 };
 

@@ -4,5 +4,9 @@ export const resolveUri = (path: string, ctx: any) => {
     return path;
   }
 
-  return new URL(path, ctx.fileUri).toString().replace('file:', 'asset:');
+  try {
+    return new URL(path, ctx.fileUri).toString().replace('file:', 'onote:');
+  } catch (err) {
+    return path;
+  }
 };
