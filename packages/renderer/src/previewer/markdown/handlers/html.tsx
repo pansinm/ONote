@@ -1,7 +1,7 @@
 import React from 'react';
 import type { HTML } from 'mdast';
 import { escape, camelCase } from 'lodash';
-import { resolveUri } from './util/uri';
+import { resolveAssetUri } from './util/uri';
 
 // @see https://gist.github.com/goldhand/70de06a3bdbdb51565878ad1ee37e92b
 function parseStyle(styles: string) {
@@ -99,7 +99,7 @@ export default function html(node: HTML, ctx: any) {
   try {
     const { tagName, innerHtml, props } = parseDom(node.value);
     if (props.src) {
-      props.src = resolveUri(props.src, ctx);
+      props.src = resolveAssetUri(props.src, ctx);
     }
     const child = React.createElement(tagName, {
       className: `line-end-${node.position?.end.line} line-start-${node.position?.start.line}`,

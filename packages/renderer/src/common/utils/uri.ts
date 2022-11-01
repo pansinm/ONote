@@ -51,5 +51,13 @@ export const relative = (fromUri: string, toUri: string) => {
 };
 
 export const resolveUri = (uri: string, relative: string) => {
-  return new URL(relative, uri.replace(/\/?$/, '/')).toString();
+  return new URL(relative, uri).toString();
+};
+
+export const toONoteUri = (uri: string) => {
+  return uri.replace(/^file:/, 'onote:');
+};
+
+export const toFileUri = (uri: string) => {
+  return uri.replace(/^onote:/, 'file:');
 };
