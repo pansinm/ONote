@@ -105,7 +105,7 @@ const FileList: FC = observer(() => {
     // Prevent default behavior (Prevent file from being opened)
     ev.preventDefault();
     if (!activationStore.activeDirUri) {
-      alert('先打开目录');
+      alert('未选中目录');
       return;
     }
     setBackground('transparent');
