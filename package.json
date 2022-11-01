@@ -9,7 +9,7 @@
   "main": "packages/main/dist/index.cjs",
   "scripts": {
     "postinstall": "patch-package",
-    "build": "npm run build:main && npm run build:preload && npm run build:renderer",
+    "build": "export NODE_OPTIONS=\"--max-old-space-size=8192\" && npm run build:main && npm run build:preload && npm run build:renderer",
     "build:main": "cd ./packages/main && vite build",
     "build:preload": "cd ./packages/preload && vite build",
     "build:renderer": "cd ./packages/renderer && vite build",
@@ -113,7 +113,6 @@
     "ts-node": "^10.9.1",
     "typescript": "4.5.5",
     "unified": "^10.1.1",
-    "uuid": "^8.3.2",
     "vite": "^3.1.8",
     "vite-plugin-commonjs": "^0.5.3",
     "yaml": "^1.10.2"

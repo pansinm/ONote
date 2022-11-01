@@ -1,6 +1,6 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import type { ElectronApplication, Page } from 'playwright';
-import * as expect from 'expect';
+import { expect } from 'expect';
 
 type World = {
   app: ElectronApplication;
@@ -38,7 +38,6 @@ When('打开文件{string}', async function (this: World, filename: string) {
     await this.page.focus('.monaco-editor >> textarea');
   }
 });
-
 
 Then('打开的页面是编辑页面', async function (this: World) {
   await this.page.waitForSelector('iframe', { state: 'attached' });
