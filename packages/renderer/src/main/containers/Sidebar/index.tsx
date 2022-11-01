@@ -18,8 +18,15 @@ import {
   Button,
   DialogBody,
   DialogContent,
+  SplitButton,
 } from '@fluentui/react-components';
-import { Dismiss24Regular } from '@fluentui/react-icons';
+import {
+  Dismiss24Regular,
+  SettingsFilled,
+  SettingsRegular,
+} from '@fluentui/react-icons';
+import ProjectSelector from './ProjectSelector';
+import SettingTrigger from '../Setting/SettingTrigger';
 
 export default observer(function ActivityBar() {
   const [ref] = useDimensions();
@@ -56,51 +63,11 @@ export default observer(function ActivityBar() {
         <Directory />
       </div>
       <Flex justifyContent={'space-between'}>
-        <Dialog
+        <SettingTrigger />
+        <ProjectSelector
           open={open}
-          onOpenChange={(e, { open: needOpen }) => setOpen(needOpen)}
-        >
-          <DialogTrigger>
-            <Button
-              style={{ flex: 1 }}
-              appearance="primary"
-              shape="square"
-              onClick={async () => {
-                setOpen(true);
-              }}
-            >
-              打开目录
-            </Button>
-          </DialogTrigger>
-          <DialogSurface>
-            <DialogBody>
-              <DialogTitle
-                action={
-                  <DialogTrigger action="close">
-                    <Button
-                      appearance="subtle"
-                      aria-label="close"
-                      icon={<Dismiss24Regular />}
-                    />
-                  </DialogTrigger>
-                }
-              >
-                选择目录
-              </DialogTitle>
-              <DialogContent>
-                <ProjectSelect onSelect={handleSelect} />
-              </DialogContent>
-            </DialogBody>
-          </DialogSurface>
-        </Dialog>
-
-        <Icon
-          type="chevron-double-right"
-          color="white"
-          style={{ background: 'orange' }}
-          onClick={() => {
-            stores.activationStore.toggleSidebar();
-          }}
+          onOpenChange={setOpen}
+          onSelected={handleSelect}
         />
       </Flex>
     </div>
