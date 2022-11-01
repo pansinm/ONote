@@ -4,27 +4,10 @@ import styles from './index.module.scss';
 import useDimensions from '../../../hooks/useDimensions';
 import stores from '../../stores';
 import Flex from '/@/components/Flex';
-import Icon from '/@/components/Icon';
 import Directory from './Directory';
 import type { Project } from '../../components/ProjectSelect';
-import ProjectSelect from '../../components/ProjectSelect';
 import { useLocalStorage } from 'react-use';
 import fileService from '../../services/fileService';
-import {
-  Dialog,
-  DialogSurface,
-  DialogTitle,
-  DialogTrigger,
-  Button,
-  DialogBody,
-  DialogContent,
-  SplitButton,
-} from '@fluentui/react-components';
-import {
-  Dismiss24Regular,
-  SettingsFilled,
-  SettingsRegular,
-} from '@fluentui/react-icons';
 import ProjectSelector from './ProjectSelector';
 import SettingTrigger from '../Setting/SettingTrigger';
 

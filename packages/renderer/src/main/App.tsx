@@ -14,11 +14,16 @@ import EventBus from './containers/EventBus';
 const App: FC = observer(() => {
   return (
     <div className={styles.App}>
-      {!stores.activationStore.hideSidebar ? (
-        <div className="fill-height" style={{ minWidth: 200, width: 200 }}>
-          <Sidebar />
-        </div>
-      ) : null}
+      <div
+        className="fill-height"
+        style={{
+          minWidth: 200,
+          width: 200,
+          display: stores.activationStore.hideSidebar ? 'none' : 'block',
+        }}
+      >
+        <Sidebar />
+      </div>
       <div
         className="fill-height"
         style={{ minWidth: 230, width: 230, position: 'relative' }}
