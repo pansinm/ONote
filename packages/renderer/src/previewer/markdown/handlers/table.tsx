@@ -8,6 +8,7 @@ import EditorJS from '@editorjs/editorjs';
 import { uniqueId } from 'docx';
 import { html2md } from '../../utils/md';
 import mainService from '../../services/mainService';
+import { createLineClass } from './util/position';
 
 const toHtml = unified().use(remarkHtml);
 
@@ -203,9 +204,7 @@ function Editable({ node, ctx }: { node: Table; ctx: any }) {
  */
 export default function table(node: Table, ctx: any) {
   return (
-    <div
-      className={`line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}
-    >
+    <div className={createLineClass(node.position)}>
       <Editable node={node} ctx={ctx} />{' '}
     </div>
   );
@@ -239,7 +238,7 @@ export default function table(node: Table, ctx: any) {
   // });
   // return (
   //   <table
-  //     className={`line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}
+  //     className={createLineClass(node.position)}
   //   >
   //     <thead>{headEle}</thead>
   //     <tbody>{bodyEle}</tbody>

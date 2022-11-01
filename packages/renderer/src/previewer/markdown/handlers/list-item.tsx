@@ -3,6 +3,7 @@ import type { ListItem } from 'mdast';
 import { render } from './render';
 import { replaceNode } from '../../utils/md';
 import classNames from 'classnames';
+import { createLineClass } from './util/position';
 
 const Wrap = (props: { children: React.ReactElement }) => {
   return props.children;
@@ -42,7 +43,7 @@ export default function listItem(node: ListItem, ctx: any) {
           {
             'task-list-item': isTask,
           },
-          `line-end-${node.position?.end.line} line-start-${node.position?.start.line}`,
+          createLineClass(node.position),
         )}
       >
         <CheckBox

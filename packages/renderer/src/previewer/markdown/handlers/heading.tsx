@@ -2,6 +2,7 @@ import React from 'react';
 import type { Heading } from 'mdast';
 import { renderChildren } from './render';
 import { stringify } from '../../utils/md';
+import { createLineClass } from './util/position';
 
 export default function heading(node: Heading, ctx: any) {
   // eslint-disable-next-line react/no-children-prop
@@ -12,7 +13,7 @@ export default function heading(node: Heading, ctx: any) {
         .trim()
         .slice(node.depth + 1),
     ),
-    className: `line-end-${node.position?.end.line} line-start-${node.position?.start.line}`,
+    className: createLineClass(node.position),
     children: renderChildren(node, ctx),
   });
 }

@@ -89,17 +89,13 @@ export default function paragraph(node: Paragraph, ctx: any) {
   if (containHtml) {
     console.log('paragraph', node);
     return (
-      <p
-        className={`line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}
-      >
+      <p className={createLineClass(node.position)}>
         {renderHtml([...node.children], '', ctx)}
       </p>
     );
   }
   return (
-    <p
-      className={`line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}
-    >
+    <p className={createLineClass(node.position)}>
       {renderChildren(node, ctx)}
     </p>
   );

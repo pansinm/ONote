@@ -8,6 +8,7 @@ import Block from '../markdown/handlers/components/Block';
 import Icon from '/@/components/Icon';
 import { copyElementAsImage } from '../utils/clipboard';
 import { debounce } from 'lodash';
+import { createLineClass } from '../markdown/handlers/util/position';
 
 function debounceRenderer(
   onRender: (res: any) => void,
@@ -108,7 +109,7 @@ const enhanceHandlers = (handlers: Handlers) => {
       return (
         <Diagram
           lang={node.lang}
-          className={`line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}
+          className={createLineClass(node.position)}
           meta={parseMeta(node.meta || '')}
           value={node.value}
         />

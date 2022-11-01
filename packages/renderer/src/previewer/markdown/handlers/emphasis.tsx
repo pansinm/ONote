@@ -1,10 +1,11 @@
 import React from 'react';
 import type { Node } from 'unist';
 import { renderChildren } from './render';
+import { createLineClass } from './util/position';
 
 export default function emphasis(node: Node, ctx: any) {
   return (
-    <em className={`line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}>
+    <em className={createLineClass(node.position)}>
       {renderChildren(node, ctx)}
     </em>
   );

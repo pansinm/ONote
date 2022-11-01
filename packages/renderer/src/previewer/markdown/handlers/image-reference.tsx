@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ImageReference } from 'mdast';
 import { resolveAssetUri } from './util/uri';
+import { createLineClass } from './util/position';
 
 export default function imageReference(node: ImageReference, ctx: any) {
   const def = ctx.definition(node.identifier);
@@ -12,9 +13,9 @@ export default function imageReference(node: ImageReference, ctx: any) {
 
   return (
     <img
-      className={`line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}
+      className={createLineClass(node.position)}
       src={resolveAssetUri(def.url, ctx)}
-      alt={node.alt}
+      alt={node.alt || undefined}
       title={def.title}
     />
   );
