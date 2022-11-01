@@ -118,8 +118,8 @@ const FileList: FC = observer(() => {
           const file = item.getAsFile();
           if (file) {
             const fileUri = resolveUri(
-              activationStore.activeDirUri,
-              './' + file.name,
+              activationStore.activeDirUri + '/',
+              file.name,
             );
             console.log(fileUri);
             fileService

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import type { Image as IImage } from 'mdast';
-import { resolveUri } from './util/uri';
+import { resolveAssetUri } from './util/uri';
 import Block from './components/Block';
 import Icon from '/@/components/Icon';
 
@@ -40,7 +40,7 @@ export default function image(node: IImage, ctx: any) {
   return (
     <Image
       className={`line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}
-      src={resolveUri(node.url, ctx)}
+      src={resolveAssetUri(node.url, ctx)}
       alt={node.alt || undefined}
       title={node.title || undefined}
     />
