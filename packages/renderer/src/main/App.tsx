@@ -8,7 +8,6 @@ import ContentPanel from './containers/ContentPanel';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 import stores from './stores';
-import Icon from '/@/components/Icon';
 import View from '../components/View';
 import EventBus from './containers/EventBus';
 
@@ -25,22 +24,6 @@ const App: FC = observer(() => {
         style={{ minWidth: 230, width: 230, position: 'relative' }}
       >
         <FileList />
-        {stores.activationStore.hideSidebar ? (
-          <Icon
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              height: 34,
-              background: 'orange',
-            }}
-            color="white"
-            type="chevron-double-left"
-            onClick={() => {
-              stores.activationStore.toggleSidebar();
-            }}
-          ></Icon>
-        ) : null}
       </div>
       <View
         flexDirection="column"

@@ -144,6 +144,7 @@ const FileList: FC = observer(() => {
         searchText={text}
         onTextChange={setText}
         onNoteCreate={createNote}
+        onPrefixIconClick={() => stores.activationStore.toggleSidebar()}
       />
       <Flex flex={1} flexDirection="column" overflow="auto">
         <div

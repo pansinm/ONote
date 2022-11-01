@@ -6,12 +6,7 @@ import './monaco';
 import React from 'react';
 import '../styles/utils.scss';
 import './index.scss';
-import {
-  FluentProvider,
-  teamsLightTheme,
-  webDarkTheme,
-  webLightTheme,
-} from '@fluentui/react-components';
+import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 
 import { render } from 'react-dom';
 import App from './App';
