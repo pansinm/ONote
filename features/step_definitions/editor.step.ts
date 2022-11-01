@@ -1,6 +1,6 @@
 import { When, Then } from '@cucumber/cucumber';
-import * as expect from 'expect';
 import type { Page } from 'playwright';
+import { expect } from 'expect';
 // import { getElectronApp, openMarkdown } from '../support/utils';
 
 type World = {
