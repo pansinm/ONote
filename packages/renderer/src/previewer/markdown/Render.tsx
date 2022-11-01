@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import React from 'react';
 import { parse, render } from './utils';
 import usePreviewerScrollSync from '../hooks/usePreviewerScrollSync';
-import { extname, isPlaintext } from '/@/utils/uri';
+import { extname, isPlaintext } from '../../common/utils/uri';
 import { Code } from './handlers/code';
 
 interface RenderProps {

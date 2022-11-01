@@ -4,7 +4,7 @@ import React from 'react';
 import Button from '/@/components/Button';
 import FileIcon from '/@/components/FileIcon';
 import View from '/@/components/View';
-import { basename } from '/@/utils/uri';
+import { basename } from '../../../../common/utils/uri';
 
 interface UnSupportProps {
   uri: string;

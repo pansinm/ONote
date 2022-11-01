@@ -5,7 +5,7 @@ import type { ItemParams } from 'react-contexify';
 import { Menu, Item, useContextMenu } from 'react-contexify';
 import type { TabProperties } from '@sinm/react-chrome-tabs/dist/chrome-tabs';
 import stores from '../../stores';
-import { basename } from '/@/utils/uri';
+import { basename } from '../../../common/utils/uri';
 
 import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
 import 'react-contexify/dist/ReactContexify.css';

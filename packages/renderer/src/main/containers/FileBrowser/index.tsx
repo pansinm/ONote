@@ -3,10 +3,12 @@ import React from 'react';
 import MarkdownPanel from './MarkdownPanel';
 import stores from '../../stores';
 import PlainTextPanel from './PlainTextPanel';
-import { isMarkdown, isPlaintext, isUnSupport } from '/@/utils/uri';
+import {
+  isMarkdown,
+  isPlaintext,
+  isUnSupport,
+} from '../../../common/utils/uri';
 import UnSupport from './UnSupport';
-
-
 
 const ResourcePanel = observer(() => {
   const activatedUri = stores.activationStore.activeFileUri;

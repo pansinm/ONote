@@ -2,7 +2,7 @@ import useConfirm from './useConfirm';
 import usePrompt from './usePrompt';
 import React, { useCallback } from 'react';
 import stores from '../main/stores';
-import { alertAndThrow } from '../utils/alert';
+import { alertAndThrow } from '../common/utils/alert';
 import fileService from '/@/main/services/fileService';
 
 function useFileOperation() {
