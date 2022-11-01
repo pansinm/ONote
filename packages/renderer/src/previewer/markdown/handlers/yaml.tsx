@@ -2,6 +2,8 @@ import React from 'react';
 import type { Node } from 'unist';
 import { parse } from 'yaml';
 import { JSONTableViewer } from '@sinm/json-table-viewer';
+import { createLineClass } from './util/position';
+
 export default function yaml(node: Node & { value: string }, ctx: any) {
   let data: any = {};
   try {
@@ -11,9 +13,7 @@ export default function yaml(node: Node & { value: string }, ctx: any) {
     data = { message, stack };
   }
   return (
-    <div
-      className={`line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}
-    >
+    <div className={createLineClass(node.position)}>
       <JSONTableViewer json={data} />
     </div>
   );

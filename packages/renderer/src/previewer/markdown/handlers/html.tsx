@@ -2,6 +2,7 @@ import React from 'react';
 import type { HTML } from 'mdast';
 import { escape, camelCase } from 'lodash';
 import { resolveAssetUri } from './util/uri';
+import { createLineClass } from './util/position';
 
 // @see https://gist.github.com/goldhand/70de06a3bdbdb51565878ad1ee37e92b
 function parseStyle(styles: string) {
@@ -102,7 +103,7 @@ export default function html(node: HTML, ctx: any) {
       props.src = resolveAssetUri(props.src, ctx);
     }
     const child = React.createElement(tagName, {
-      className: `line-end-${node.position?.end.line} line-start-${node.position?.start.line}`,
+      className: createLineClass(node.position),
       ...props,
       dangerouslySetInnerHTML: innerHtml
         ? {

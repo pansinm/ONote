@@ -6,7 +6,7 @@ import Icon from '/@/components/Icon';
 import { replaceNode } from '../../utils/md';
 import _ from 'lodash';
 import classNames from 'classnames';
-
+import { createLineClass } from './util/position';
 
 export default function list(node: List, ctx: any) {
   const List = node.ordered ? 'ol' : 'ul';
@@ -16,12 +16,9 @@ export default function list(node: List, ctx: any) {
     (node) => typeof node.checked === 'boolean',
   );
 
-  const className = classNames(
-    `line-end-${node.position?.end.line} line-start-${node.position?.start.line}`,
-    {
-      'task-list-item': isTaskList,
-    },
-  );
+  const className = classNames(createLineClass(node.position), {
+    'task-list-item': isTaskList,
+  });
 
   const ele = (
     <List className={className}>

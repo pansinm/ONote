@@ -3,6 +3,7 @@ import type { Image as IImage } from 'mdast';
 import { resolveAssetUri } from './util/uri';
 import Block from './components/Block';
 import Icon from '/@/components/Icon';
+import { createLineClass } from './util/position';
 
 function Image(props: {
   className?: string;
@@ -39,7 +40,7 @@ function Image(props: {
 export default function image(node: IImage, ctx: any) {
   return (
     <Image
-      className={`line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}
+      className={createLineClass(node.position)}
       src={resolveAssetUri(node.url, ctx)}
       alt={node.alt || undefined}
       title={node.title || undefined}
