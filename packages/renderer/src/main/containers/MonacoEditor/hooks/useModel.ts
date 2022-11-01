@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useLatest } from 'react-use';
 import type * as monaco from 'monaco-editor';
 import stores from '/@/main/stores';
-import { isMarkdown, isPlaintext } from '/@/utils/uri';
+import { isMarkdown, isPlaintext } from '../../../../common/utils/uri';
 
 export default function useModel(
   editor: monaco.editor.IStandaloneCodeEditor | undefined,

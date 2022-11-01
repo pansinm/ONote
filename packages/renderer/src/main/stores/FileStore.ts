@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import fileService from '../services/fileService';
 import * as monaco from 'monaco-editor';
 import { stringify } from 'yaml';
-import { isMarkdown } from '/@/utils/uri';
+import { isMarkdown } from '../../common/utils/uri';
 
 type FileState =
   | 'loading'
