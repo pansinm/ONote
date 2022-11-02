@@ -6,6 +6,10 @@ import { join } from 'path';
 import { builtinModules } from 'module';
 import commonjs from 'vite-plugin-commonjs';
 import react from '@vitejs/plugin-react';
+import MonacoEditorNlsPlugin, {
+  esbuildPluginMonacoEditorNls,
+  Languages,
+} from 'vite-plugin-monaco-editor-nls';
 
 const PACKAGE_ROOT = __dirname;
 
@@ -33,9 +37,14 @@ const config = {
     include: ['lodash/lodash.js'],
     esbuildOptions: {
       // plugins: [esbuildCommonjs(['ohm-js'])],
+      plugins: [esbuildPluginMonacoEditorNls({ locale: Languages.zh_hans })],
     },
   },
-  plugins: [react(), commonjs()],
+  plugins: [
+    react(),
+    commonjs(),
+    MonacoEditorNlsPlugin({ locale: Languages.zh_hans }),
+  ],
   base: '',
   server: {
     fs: {
