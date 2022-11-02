@@ -2,7 +2,7 @@
 // @ts-ignore
 import Prism from 'prismjs/components/prism-core';
 
-import 'prismjs/themes/prism-okaidia.css';
+import 'prismjs/themes/prism.css';
 import 'prismjs/plugins/line-numbers/prism-line-numbers';
 import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
 
