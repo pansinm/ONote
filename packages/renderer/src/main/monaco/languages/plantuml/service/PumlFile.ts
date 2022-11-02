@@ -1,4 +1,5 @@
-import * as monaco from 'monaco-editor';
+import type * as monaco from 'monaco-editor';
+import { CompletionItemKind } from 'monaco-editor/esm/vs/editor/common/standalone/standaloneEnums';
 import { parse, traverse } from '../preprocessor/parser';
 import type {
   DefineLongStatement,
@@ -92,7 +93,7 @@ class PumlFile {
     return (
       callable?.arguments.map((arg) => {
         return {
-          kind: monaco.languages.CompletionItemKind.Field,
+          kind: CompletionItemKind.Field,
           insertText: arg.name.name + '=',
           label: arg.name.name,
           range,
@@ -110,7 +111,7 @@ class PumlFile {
     const nodeFilter = (node: any) => (filter ? filter(node) : true);
     this.declarations.filter(nodeFilter).forEach((dec) => {
       items.push({
-        kind: monaco.languages.CompletionItemKind.Variable,
+        kind: CompletionItemKind.Variable,
         insertText: dec.name.name,
         label: dec.name.name,
         range,
@@ -118,7 +119,7 @@ class PumlFile {
     });
     this.callableNodes.filter(nodeFilter).forEach((callale) => {
       items.push({
-        kind: monaco.languages.CompletionItemKind.Method,
+        kind: CompletionItemKind.Method,
         insertText: callale.name.name,
         label: callale.name.name,
         range,
@@ -128,7 +129,7 @@ class PumlFile {
     this.identifiers.filter(nodeFilter).forEach((identifier) => {
       if (!items.some((node) => node.insertText === identifier.name)) {
         items.push({
-          kind: monaco.languages.CompletionItemKind.Variable,
+          kind: CompletionItemKind.Variable,
           insertText: identifier.name,
           label: identifier.name,
           range,

@@ -11,6 +11,8 @@ import MonacoEditorNlsPlugin, {
   Languages,
 } from 'vite-plugin-monaco-editor-nls';
 
+const zh_CN = require('vscode-loc/i18n/vscode-language-pack-zh-hans/translations/main.i18n.json');
+
 const PACKAGE_ROOT = __dirname;
 
 const externals = [
@@ -37,13 +39,21 @@ const config = {
     include: ['lodash/lodash.js'],
     esbuildOptions: {
       // plugins: [esbuildCommonjs(['ohm-js'])],
-      plugins: [esbuildPluginMonacoEditorNls({ locale: Languages.zh_hans })],
+      plugins: [
+        // esbuildPluginMonacoEditorNls({
+        //   locale: Languages.zh_hans,
+        //   localeData: zh_CN.contents,
+        // }),
+      ],
     },
   },
   plugins: [
     react(),
     commonjs(),
-    MonacoEditorNlsPlugin({ locale: Languages.zh_hans }),
+    // MonacoEditorNlsPlugin({
+    //   locale: Languages.zh_hans,
+    //   localeData: zh_CN.contents,
+    // }),
   ],
   base: '',
   server: {
