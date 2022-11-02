@@ -1,34 +1,9 @@
 import { uniqueId } from 'lodash';
 import * as monaco from 'monaco-editor';
 import { findPreviousMatch, getFenceContent, isInFence } from '../../../utils';
+import { call } from './callWorker';
 import { allkeywords, preprocessor } from './hightlight';
 import { preprocessSnippets } from './snippets';
-import pumlWorker from './worker?worker';
-
-let worker: any;
-
-function getWorker() {
-  if (!worker) {
-    worker = new pumlWorker();
-  }
-  return worker;
-}
-
-function call(type: string, ...params: any[]) {
-  getWorker();
-  const reqId = uniqueId('puml-');
-  return new Promise((resolve, reject) => {
-    const handle = (event: MessageEvent) => {
-      const { id, res, error } = event.data;
-      if (id === reqId) {
-        error ? reject(error) : resolve(res);
-        worker.removeEventListener('message', handle);
-      }
-    };
-    worker.addEventListener('message', handle);
-    worker.postMessage({ id: reqId, type, params });
-  });
-}
 
 function alphabet(from: string, to: string) {
   const charF = from.charCodeAt(0);
