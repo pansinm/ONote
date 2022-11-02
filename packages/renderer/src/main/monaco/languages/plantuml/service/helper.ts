@@ -1,5 +1,5 @@
 import * as monaco from 'monaco-editor';
-import PumlFile from './PumlFile';
+import { call } from './callWorker';
 
 class PumlSignatureHelpProvider
   implements monaco.languages.SignatureHelpProvider
@@ -25,14 +25,14 @@ class PumlSignatureHelpProvider
       .slice(0, position.column - 1);
     const res = /([$a-zA-Z0-9_]+?)\([^)]*$/.exec(lineTextBefore);
     const name = res?.[1];
-    const node = name && (await new PumlFile(fence).queryCallable(name));
+    const node = name && ((await call('callable', fence, name)) as any);
     console.log('==============', node, name, lineTextBefore);
     if (node) {
-      const parameters = node.arguments.map((arg) => ({
+      const parameters = node.arguments.map((arg: any) => ({
         label: arg.name.name,
         documentation: `${node.name.name}(${node.arguments
           .map(
-            (arg) =>
+            (arg: any) =>
               `${arg.name.name}${arg.init ? (arg.init as any).text : ''}`,
           )
           .join(', ')})`,

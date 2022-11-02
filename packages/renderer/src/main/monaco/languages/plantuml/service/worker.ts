@@ -18,6 +18,10 @@ class PumlWorker {
   suggest(content: string, range: any) {
     return new PumlFile(content).suggestions(range);
   }
+
+  callable(content: string, name: string) {
+    return new PumlFile(content).queryCallable(name);
+  }
 }
 
 const pumlWorker = new PumlWorker();
