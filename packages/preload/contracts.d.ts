@@ -13,3 +13,5 @@ interface Exposed {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface Window extends Exposed {}
+
+declare module 'monaco-editor/esm/vs/editor/common/*';

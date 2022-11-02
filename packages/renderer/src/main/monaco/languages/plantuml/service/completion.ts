@@ -1,11 +1,34 @@
+import { uniqueId } from 'lodash';
 import * as monaco from 'monaco-editor';
 import { findPreviousMatch, getFenceContent, isInFence } from '../../../utils';
 import { allkeywords, preprocessor } from './hightlight';
-import PumlFile from './PumlFile';
 import { preprocessSnippets } from './snippets';
-import stdlib from './stdlib';
+import pumlWorker from './worker?worker';
 
-stdlib.resolve();
+let worker: any;
+
+function getWorker() {
+  if (!worker) {
+    worker = new pumlWorker();
+  }
+  return worker;
+}
+
+function call(type: string, ...params: any[]) {
+  getWorker();
+  const reqId = uniqueId('puml-');
+  return new Promise((resolve, reject) => {
+    const handle = (event: MessageEvent) => {
+      const { id, res, error } = event.data;
+      if (id === reqId) {
+        error ? reject(error) : resolve(res);
+        worker.removeEventListener('message', handle);
+      }
+    };
+    worker.addEventListener('message', handle);
+    worker.postMessage({ id: reqId, type, params });
+  });
+}
 
 function alphabet(from: string, to: string) {
   const charF = from.charCodeAt(0);
@@ -105,19 +128,15 @@ class UMLCompletionItemProvider
     );
     const preText = lineTextBefore.slice(startIndex + 1);
     console.log(lineTextBefore, preText);
-    return stdlib.resolve().then((items) => {
-      return items
-        .filter((item) => {
-          return item.path.includes(preText);
-        })
-        .map((snippet) => {
-          return {
-            kind: monaco.languages.CompletionItemKind.Module,
-            insertText: snippet.path,
-            range,
-            label: '' + snippet.path,
-          };
-        });
+    return call('includes', preText).then((items: any) => {
+      return items.map((snippet: any) => {
+        return {
+          kind: monaco.languages.CompletionItemKind.Module,
+          insertText: snippet.path,
+          range,
+          label: '' + snippet.path,
+        };
+      });
     });
   }
 
@@ -204,7 +223,7 @@ class UMLCompletionItemProvider
         position.lineNumber,
         position.column,
       );
-      return new PumlFile(fence).arguments(res[1], r).then((sug) => {
+      return call('arg', fence, res[1], r).then((sug: any) => {
         console.log(sug);
         return { suggestions: sug };
       });
@@ -226,9 +245,9 @@ class UMLCompletionItemProvider
       range: r,
       label: kw,
     }));
-    return new PumlFile(fence)
-      .suggestions(r)
-      .then((sug) => ({ suggestions: sug.concat(keywords) }));
+    return call('suggest', fence, r).then((sug: any) => ({
+      suggestions: sug.concat(keywords),
+    }));
   }
 
   triggerCharacters = alphabet('a', 'z')

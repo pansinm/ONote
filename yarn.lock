@@ -7809,10 +7809,10 @@ monaco-editor-nls@^3.0.0:
   resolved "https://registry.npmmirror.com/monaco-editor-nls/-/monaco-editor-nls-3.0.0.tgz#d5868f593bd028ede97d2f08ad3b4bfb74b7a5ce"
   integrity sha512-WYYa1lqaN1wsJOZ5j+LVHvmJgx23UbCG7XnzcY8x9DT59EZNmNsCmyMU1kyhmyNDE/KZeLCAXAM7BvQ/P6/B7w==
 
-monaco-editor@0.33.0:
-  version "0.33.0"
-  resolved "https://registry.npmmirror.com/monaco-editor/-/monaco-editor-0.33.0.tgz#842e244f3750a2482f8a29c676b5684e75ff34af"
-  integrity sha512-VcRWPSLIUEgQJQIE0pVT8FcGBIgFoxz7jtqctE+IiCxWugD0DwgyQBcZBhdSrdMC84eumoqMZsGl2GTreOzwqw==
+monaco-editor@0.34.1:
+  version "0.34.1"
+  resolved "https://registry.npmmirror.com/monaco-editor/-/monaco-editor-0.34.1.tgz#1b75c4ad6bc4c1f9da656d740d98e0b850a22f87"
+  integrity sha512-FKc80TyiMaruhJKKPz5SpJPIjL+dflGvz4CpuThaPMc94AyN7SeC9HQ8hrvaxX7EyHdJcUY5i4D0gNyJj1vSZQ==
 
 mri@^1.1.0:
   version "1.2.0"
@@ -10164,6 +10164,10 @@ vite@^3.1.8:
     rollup "~2.78.0"
   optionalDependencies:
     fsevents "~2.3.2"
+
+"vscode-loc@git+https://github.com/microsoft/vscode-loc.git":
+  version "0.0.0"
+  resolved "git+https://github.com/microsoft/vscode-loc.git#4fc31bd9d875ad4c0694ae9db36b8ce021ce5ae2"
 
 w3c-xmlserializer@^3.0.0:
   version "3.0.0"
