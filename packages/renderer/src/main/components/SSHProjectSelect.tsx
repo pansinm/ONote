@@ -4,7 +4,6 @@ import fileService from '../services/fileService';
 import SSHDirSelect from './SSHDirSelect';
 import type { SSHFormProps } from './SSHForm';
 import SSHForm from './SSHForm';
-import Button from '/@/components/Button';
 import View from '/@/components/View';
 
 interface SSHProjectSelectProps {

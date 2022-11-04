@@ -45,3 +45,9 @@ export const decrypt = function (cipherText: string): Promise<string> {
     });
   });
 };
+
+export const md5 = (input: string) => {
+  const hash = crypto.createHash('md5');
+  hash.update(input);
+  return hash.digest('hex');
+};

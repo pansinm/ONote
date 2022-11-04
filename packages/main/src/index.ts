@@ -1,8 +1,10 @@
 import { fileURLToPath } from 'url';
 import { app, dialog, ipcMain, Menu, protocol } from 'electron';
 import './security-restrictions';
-import fileService from './fileservice';
+import './ipc/dataSource';
+import './intergration';
 import { restoreOrCreateWindow } from './window';
+import { manager } from './dataSource';
 /**
  * Prevent multiple instances
  */
@@ -80,11 +82,10 @@ app.whenReady().then(() => {
   protocol.interceptFileProtocol('onote', async (request, callback) => {
     const url = request.url.split('?')[0];
     try {
-      const localUri = await fileService.getLocalUri(
-        url.replace(/^onote:/, 'file:'),
-      );
-      const filePath = fileURLToPath(localUri);
-      callback({ path: filePath });
+      const localPath = await manager
+        .getDataSource('current')
+        .cache(url.replace(/^onote:/, 'file:'));
+      callback({ path: decodeURI(localPath) });
     } catch (err) {
       callback({ statusCode: 500, data: JSON.stringify(err) });
     }

@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as fsp from 'fs/promises';
-import * as crypto from 'crypto';
 import { decrypt, encrypt } from '../utils/security';
 
 const configFile = app.getPath('userData') + '/.onote-setting.json';
