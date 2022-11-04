@@ -19,12 +19,9 @@ export interface SSHFormProps {
 
 const SSHForm: FC<SSHFormProps> = (props) => {
   const [disabled, setDisabled] = useState(false);
-  const formRef = useRef(null);
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (
-    event,
-  ) => {
-    event.preventDefault();
-    const form = new FormData(event.target as HTMLFormElement);
+  const formRef = useRef<HTMLFormElement>(null);
+  const handleSubmit = async () => {
+    const form = new FormData(formRef.current as HTMLFormElement);
     try {
       setDisabled(true);
       const data = {
@@ -52,7 +49,7 @@ const SSHForm: FC<SSHFormProps> = (props) => {
     }
   }, []);
   return (
-    <form ref={formRef} className={styles.SSHForm} onSubmit={handleSubmit}>
+    <form ref={formRef} className={styles.SSHForm}>
       <Input disabled={disabled} name="host" placeholder="Host" />
       <Input disabled={disabled} name="port" placeholder="Port" />
       <Input disabled={disabled} name="username" placeholder="Username" />
@@ -66,6 +63,7 @@ const SSHForm: FC<SSHFormProps> = (props) => {
         appearance="primary"
         disabled={disabled}
         style={{ float: 'right', height: 30 }}
+        onClick={handleSubmit}
       >
         {disabled ? '连接中' : '连接'}
       </Button>

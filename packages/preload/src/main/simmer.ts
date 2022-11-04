@@ -12,8 +12,8 @@ import { shell } from 'electron';
 import { ipcRenderer } from 'electron';
 import { clipboard, nativeImage } from 'electron';
 import { exposeInMainWorld } from './exposeInMainWorld';
-import { fileService } from './fileService';
 import * as _ from 'lodash';
+import { callDataSource } from '../ipc/dataSource';
 
 const ensureDir = async (dir: string) => {
   const exists = await fs
@@ -24,6 +24,7 @@ const ensureDir = async (dir: string) => {
     await fs.mkdir(dir, { recursive: true });
   }
 };
+
 // Export for types in contracts.d.ts
 export const simmer = {
   ensureDir,
@@ -53,6 +54,8 @@ export const simmer = {
   homedir() {
     return os.homedir();
   },
+
+  callDataSource: callDataSource,
 
   postMessageToPreviewerWindow(message: any) {
     ipcRenderer.send('window', 'postMessageToPreviewer', message);
@@ -143,7 +146,7 @@ export const simmer = {
     clipboard.writeBuffer('text/uri-list', Buffer.from(url, 'utf-8'));
   },
   async openExternal(uri: string) {
-    const localUri = await fileService.getLocalUri(uri);
+    const localUri = await callDataSource('current', 'cache', uri);
     shell.openExternal(localUri);
   },
 };

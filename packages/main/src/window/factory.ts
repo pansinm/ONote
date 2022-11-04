@@ -1,12 +1,7 @@
-import {
-  app,
-  BrowserWindow,
-  MessageChannelMain,
-  nativeImage,
-  shell,
-} from 'electron';
+import { app, BrowserWindow, nativeImage, shell, webFrameMain } from 'electron';
 import { join } from 'path';
 import { URL } from 'url';
+import frames from '../frames';
 import { sendToMain } from './ipc';
 import { findWindow } from './utils';
 
@@ -27,6 +22,23 @@ async function createWindow(type: 'main' | 'previewer') {
     },
   });
 
+  browserWindow.webContents.on(
+    'did-frame-finish-load',
+    (
+      event,
+      // url,
+      // httpResponseCode,
+      // httpStatusText,
+      isMainFrame,
+      frameProcessId,
+      frameRoutingId,
+    ) => {
+      const frame = webFrameMain.fromId(frameProcessId, frameRoutingId);
+      if (frame?.url) {
+        frames.listeners.forEach((callback) => callback(frame));
+      }
+    },
+  );
   /**
    * If you install `show: true` then it can cause issues when trying to close the window.
    * Use `show: false` and listener events `ready-to-show` to fix these issues.
