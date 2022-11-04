@@ -1,10 +1,10 @@
-import { fileURLToPath } from 'url';
 import { app, dialog, ipcMain, Menu, protocol } from 'electron';
 import './security-restrictions';
 import './ipc/dataSource';
 import './intergration';
 import { restoreOrCreateWindow } from './window';
 import { manager } from './dataSource';
+import './plugin';
 /**
  * Prevent multiple instances
  */
