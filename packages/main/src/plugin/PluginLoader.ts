@@ -8,7 +8,7 @@ class PluginLoader {
       setup(onote);
       console.log(`plugin ${plugin.name} load success`, plugin.pluginDir);
     } catch (err) {
-      console.error(`plugin ${plugin.name} load failed`, plugin.pluginDir);
+      console.error(`plugin ${plugin.name} load failed`, plugin.pluginDir, err);
       // ignore
     }
   }

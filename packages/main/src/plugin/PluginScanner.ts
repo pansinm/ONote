@@ -10,16 +10,17 @@ class PluginScanner {
   async scan(): Promise<IPlugin[]> {
     try {
       const pkg = await fs.readFile(
-        path.resolve(this.pluginsDir, 'package.json'),
+        path.resolve(this.pluginsDir, 'plugins.json'),
         'utf-8',
       );
-      const { dependencies } = JSON.parse(pkg);
-      return Object.keys(dependencies).map((key) => ({
+      const { plugins: plugins } = JSON.parse(pkg);
+      return Object.keys(plugins).map((key) => ({
         name: key,
-        version: dependencies[key],
-        pluginDir: path.resolve(this.pluginsDir, 'node_modules', key),
+        version: plugins[key],
+        pluginDir: path.resolve(this.pluginsDir, key),
       }));
     } catch (err) {
+      console.error('scan error', err);
       return [];
     }
   }
