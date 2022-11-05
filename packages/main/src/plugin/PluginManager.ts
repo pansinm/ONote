@@ -14,10 +14,10 @@ const ONOTE_ROOT = path.join(os.homedir(), 'onote');
 export const PLUGIN_ROOT = path.join(ONOTE_ROOT, 'plugins');
 
 class PluginManager {
-  scanner = new PluginScanner(PLUGIN_ROOT);
-  loader = new PluginLoader();
+  private scanner = new PluginScanner(PLUGIN_ROOT);
+  private loader = new PluginLoader(PLUGIN_ROOT);
 
-  plugins: Record<string, IPlugin> = {};
+  private plugins: Record<string, IPlugin> = {};
 
   constructor() {
     fs.mkdir(PLUGIN_ROOT, { recursive: true }).catch((err) => {
@@ -107,6 +107,7 @@ class PluginManager {
       });
       return prev;
     });
+    return this.load(name);
   }
 
   private updateConfig(callback: (prev: any) => any) {
@@ -132,14 +133,19 @@ class PluginManager {
     });
   }
 
-  load(plugin: IPlugin) {
-    this.loader.load(plugin);
+  load(plaginName: string) {
+    return this.loader.load(plaginName);
   }
 
   loadAll() {
     return this.scanner
       .scan()
-      .then((plugins) => plugins.forEach((plugin) => this.loader.load(plugin)));
+      .then((plugins) =>
+        plugins.forEach((plugin) => this.loader.load(plugin.name)),
+      );
+  }
+  getPlugins() {
+    return this.plugins;
   }
 }
 

@@ -41,14 +41,4 @@ class Setting {
 
 const setting = new Setting(configFile);
 
-// 更新设置
-ipcMain.handle('setting.update', (e, key: string, value: any) => {
-  setting.update(key, value);
-});
-
-// 获取设置
-ipcMain.handle('setting.getAll', async (e) => {
-  return setting.getAll();
-});
-
 export default setting;
