@@ -119,3 +119,13 @@ export function findPreviousMatch(
   );
   return match;
 }
+
+export function toggleTask(line: string) {
+  return line.replace(/^\s*[-*+] \[(x|\s)\]/, (substr, arg) => {
+    if (arg === 'x') {
+      return substr.replace('[x]', '[ ]');
+    } else {
+      return substr.replace('[ ]', '[x]');
+    }
+  });
+}
