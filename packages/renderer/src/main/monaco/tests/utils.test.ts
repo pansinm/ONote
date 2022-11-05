@@ -7,6 +7,7 @@ import {
   isInFence,
   isPositionMatch,
   isTextMatch,
+  toggleTask,
 } from '../utils';
 
 const md = `
@@ -168,5 +169,14 @@ describe('findPreviousMatchRange', () => {
       findPreviousMatch(model, new monaco.Position(4, 12), /\s+/)?.range
         .startColumn,
     ).toBe(10);
+  });
+});
+
+describe('toggleTask', () => {
+  it('toggle task line', () => {
+    expect(toggleTask('- [ ] task')).toBe('- [x] task');
+  });
+  it('toggle normal lne', () => {
+    expect(toggleTask('- task')).toBe('- task');
   });
 });

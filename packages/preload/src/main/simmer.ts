@@ -16,6 +16,7 @@ import * as _ from 'lodash';
 import { callDataSource } from '../ipc/dataSource';
 import { callPlugin } from '../ipc/plugin';
 import { callSetting } from '../ipc/setting';
+import { callDevelop } from '../ipc/develop';
 
 const ensureDir = async (dir: string) => {
   const exists = await fs
@@ -60,6 +61,7 @@ export const simmer = {
   callDataSource: callDataSource,
   callPlugin: callPlugin,
   callSetting: callSetting,
+  callDevelop: callDevelop,
 
   postMessageToPreviewerWindow(message: any) {
     ipcRenderer.send('window', 'postMessageToPreviewer', message);

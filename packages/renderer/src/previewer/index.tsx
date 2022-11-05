@@ -15,3 +15,5 @@ window.ReactDOM = ReactDOM;
 (window as any).DiagramEngine = engine;
 
 ReactDOM.render(<App />, document.getElementById('app'));
+
+window.addEventListener('message', console.log);
