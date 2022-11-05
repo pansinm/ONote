@@ -14,6 +14,8 @@ import { clipboard, nativeImage } from 'electron';
 import { exposeInMainWorld } from './exposeInMainWorld';
 import * as _ from 'lodash';
 import { callDataSource } from '../ipc/dataSource';
+import { callPlugin } from '../ipc/plugin';
+import { callSetting } from '../ipc/setting';
 
 const ensureDir = async (dir: string) => {
   const exists = await fs
@@ -56,6 +58,8 @@ export const simmer = {
   },
 
   callDataSource: callDataSource,
+  callPlugin: callPlugin,
+  callSetting: callSetting,
 
   postMessageToPreviewerWindow(message: any) {
     ipcRenderer.send('window', 'postMessageToPreviewer', message);
