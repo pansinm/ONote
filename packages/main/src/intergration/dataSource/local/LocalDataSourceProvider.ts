@@ -48,8 +48,10 @@ class LocalDataSourceProvider implements IDataSourceProvider<null> {
     const localPath = url.fileURLToPath(uri);
     await fs.mkdir(localPath, { recursive: true });
   }
-  write(uri: string, buffer: Buffer) {
+  async write(uri: string, buffer: Buffer) {
     const localPath = url.fileURLToPath(uri);
+    const dirname = path.dirname(localPath);
+    await fs.mkdir(dirname, { recursive: true }).catch((err) => 0);
     return fs.writeFile(localPath, buffer);
   }
   delete(uri: string) {
