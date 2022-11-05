@@ -10,6 +10,7 @@ import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 import { render } from 'react-dom';
 import App from './App';
 import './hotkey';
+import './integration';
 
 render(
   <FluentProvider theme={webLightTheme}>

@@ -44,8 +44,7 @@ class PreviewerService extends EventEmitter {
       eventName,
       payload,
     };
-    const markdownPreviewer = (document as any)
-      .markdownPreviewer as Window | null;
+    const markdownPreviewer = (document as any).previewer as Window | null;
     if (markdownPreviewer) {
       markdownPreviewer.postMessage(message);
     }

@@ -1,7 +1,7 @@
 import { app, dialog, ipcMain, Menu, protocol } from 'electron';
 import './security-restrictions';
 import './ipc';
-import './intergration';
+import './integration';
 import { restoreOrCreateWindow } from './window';
 import { manager } from './dataSource';
 /**
