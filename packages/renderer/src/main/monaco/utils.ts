@@ -79,12 +79,23 @@ export function isInFence(
     position.lineNumber,
     position.column + 2,
   );
-  const content = model.getValueInRange(range);
-  if (/```/.test(content)) {
-    return false;
+  const prev = model.findPreviousMatch(
+    '```',
+    position,
+    false,
+    true,
+    null,
+    false,
+  );
+  const next = model.findNextMatch('```', position, false, true, null, false);
+  if (prev?.range.startLineNumber && next?.range.startLineNumber) {
+    const firstLine = model.getLineContent(prev.range.startLineNumber);
+    const lastLine = model.getLineContent(next.range.startLineNumber);
+    return (
+      firstLine.trim().startsWith('```' + lang) && lastLine.trim() === '```'
+    );
   }
-  const reg = new RegExp(`\`\`\`${lang}\\s*.*?(?!(\`\`\`))$`, 'm');
-  return isPositionMatch(model, position, [reg, '```']);
+  return false;
 }
 
 export function getFenceContent(
