@@ -1,6 +1,6 @@
 # ONote 
 
-![](docs/assets/screenshot.gif)
+![](docs/assets/screenshot.png)
 
 ## 特性
 ### 支持新窗口预览
