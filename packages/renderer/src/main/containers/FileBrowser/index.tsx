@@ -1,23 +1,17 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import MarkdownPanel from './MarkdownPanel';
 import stores from '../../stores';
-import PlainTextPanel from './PlainTextPanel';
-import {
-  isMarkdown,
-  isPlaintext,
-  isUnSupport,
-} from '../../../common/utils/uri';
-import UnSupport from './UnSupport';
+import FilePanel from './FilePannel';
 
 const ResourcePanel = observer(() => {
   const activatedUri = stores.activationStore.activeFileUri;
 
   return (
     <>
-      <MarkdownPanel visible={isMarkdown(activatedUri)} uri={activatedUri} />
+      {/* <MarkdownPanel visible={isMarkdown(activatedUri)} uri={activatedUri} />
       {isPlaintext(activatedUri) && <PlainTextPanel uri={activatedUri} />}
-      {isUnSupport(activatedUri) && <UnSupport uri={activatedUri} />}
+      {isUnSupport(activatedUri) && <UnSupport uri={activatedUri} />} */}
+      <FilePanel uri={activatedUri} />
     </>
   );
 });
