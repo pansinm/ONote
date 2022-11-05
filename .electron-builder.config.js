@@ -27,6 +27,16 @@ const config = {
   linux: {
     target: ['AppImage'],
     category: 'Utility',
+    target: ['deb', 'AppImage'],
+    maintainer: 'pansinm <pansinm@foxmail.com>',
+  },
+  artifactName: 'ONote-${os}-${arch}-${version}.${ext}',
+  win: {
+    target: ['zip', 'nsis'],
+    icon: './buildResources/icon.ico',
+  },
+  nsis: {
+    perMachine: false,
   },
 };
 
