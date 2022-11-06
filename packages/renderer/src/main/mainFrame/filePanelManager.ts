@@ -1,21 +1,26 @@
+import { first, orderBy } from 'lodash';
+
 interface IFilePanel {
   extensions: string[];
   doGetContent?(uri: string): Promise<string>;
   doSaveContent?(uri: string, content: string): Promise<void>;
-  editable?: boolean;
+  editable: boolean;
   languageId?: string;
   previewer?: string;
 }
 
 class FilePanelManager {
-  filePanels: IFilePanel[] = [];
+  private filePanels: { [ext: string]: IFilePanel[] } = {};
   getPanel(uri: string) {
-    return this.filePanels.find((panel) =>
-      panel.extensions.find((extension) => uri.endsWith(extension)),
-    );
+    const ext = first(orderBy(Object.keys(this.filePanels).filter(ext => uri.endsWith(ext)), 'length', 'desc'));
+    return ext ? first(this.filePanels[ext]) : undefined;
   }
   registerFilePanel(panel: IFilePanel) {
-    this.filePanels.unshift(panel);
+    panel.extensions.forEach(ext => {
+      const panels = this.filePanels[ext] = [] as IFilePanel[];
+      panels.unshift(panel);
+      this.filePanels[ext] = panels;
+    });
   }
 }
 
