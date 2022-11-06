@@ -20,3 +20,5 @@ ipcMain.handle(
 );
 
 export type DataSourceCall = typeof callDataSource;
+
+export type IPCDataSource = { [key in CallAbleKey]: Promise<Awaited<ReturnType<DataSource[key]>>> }
