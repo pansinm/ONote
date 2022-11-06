@@ -1,5 +1,6 @@
 import type { TreeNode } from '@sinm/react-file-tree';
 import type { DataSourceCall } from '../../../../main/src/ipc/dataSource';
+import { sortTreeNodes } from '/@/common/utils/treeNode';
 
 const callDataSource: DataSourceCall = (
   dataSourceId,
@@ -36,7 +37,7 @@ const fileService = {
     return callDataSource('current', 'getTreeNode', uri);
   },
   readdir: function (uri: string): Promise<TreeNode[]> {
-    return callDataSource('current', 'listDir', uri);
+    return callDataSource('current', 'listDir', uri).then(sortTreeNodes);
   },
   move: function (uri: string, targetDirUri: string): Promise<TreeNode> {
     return callDataSource('current', 'move', uri, targetDirUri);
