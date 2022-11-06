@@ -13,7 +13,7 @@ export default function useModel(
   const loadModel = useCallback(
     async (uri: string) => {
       const panel = filePanelManager.getPanel(uri);
-      if (!panel) {
+      if (!panel?.editable) {
         return;
       }
       const model = await stores.fileStore.getOrCreateModel(uri);
