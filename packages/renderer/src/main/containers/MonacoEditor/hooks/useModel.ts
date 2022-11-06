@@ -3,6 +3,7 @@ import { useLatest } from 'react-use';
 import type * as monaco from 'monaco-editor';
 import stores from '/@/main/stores';
 import { isMarkdown, isPlaintext } from '../../../../common/utils/uri';
+import { filePanelManager } from '/@/main/mainFrame';
 
 export default function useModel(
   editor: monaco.editor.IStandaloneCodeEditor | undefined,
@@ -11,6 +12,10 @@ export default function useModel(
   const latestUri = useLatest(uri);
   const loadModel = useCallback(
     async (uri: string) => {
+      const panel = filePanelManager.getPanel(uri);
+      if (!panel) {
+        return;
+      }
       const model = await stores.fileStore.getOrCreateModel(uri);
       if (model.uri.toString() === latestUri.current) {
         editor?.setModel(model);

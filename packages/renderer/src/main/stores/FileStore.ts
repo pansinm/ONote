@@ -3,6 +3,7 @@ import fileService from '../services/fileService';
 import * as monaco from 'monaco-editor';
 import { stringify } from 'yaml';
 import { isMarkdown } from '../../common/utils/uri';
+import { filePanelManager } from '../mainFrame';
 
 type FileState =
   | 'loading'
@@ -71,7 +72,8 @@ class FileStateStore {
   private async readFile(uri: string) {
     try {
       this.markFileState(uri, 'loading');
-      const content = await fileService.readText(uri);
+      const panel = filePanelManager.getPanel(uri);
+      const content = panel?.doGetContent ? await panel.doGetContent(uri) : await fileService.readText(uri);
       this.markFileState(uri, 'loaded');
       return content;
     } catch (err) {
@@ -101,7 +103,8 @@ class FileStateStore {
     }
     try {
       this.markFileState(uri, 'loading');
-      await fileService.writeText(uri, content);
+      const panel = filePanelManager.getPanel(uri);
+      panel?.doSaveContent ? await panel.doSaveContent(uri, content) : await fileService.writeText(uri, content);
       this.markFileState(uri, 'saved');
     } catch (err) {
       this.markFileState(uri, 'error');
