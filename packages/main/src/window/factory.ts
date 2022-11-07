@@ -5,6 +5,16 @@ import frames from '../frames';
 import { sendToMain } from './ipc';
 import { findWindow } from './utils';
 
+export const getPageUrl = (type: 'main' | 'previewer') => {
+  return import.meta.env.DEV &&
+    import.meta.env.VITE_DEV_SERVER_URL !== undefined
+    ? import.meta.env.VITE_DEV_SERVER_URL + `${type}.html`
+    : new URL(
+        `../renderer/dist/${type}.html`,
+        'file://' + __dirname,
+      ).toString();
+};
+
 async function createWindow(type: 'main' | 'previewer') {
   const browserWindow = new BrowserWindow({
     show: false, // Use 'ready-to-show' event to show window
@@ -57,13 +67,7 @@ async function createWindow(type: 'main' | 'previewer') {
    * Vite dev server for development.
    * `file://../renderer/index.html` for production and test
    */
-  const pageUrl =
-    import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL !== undefined
-      ? import.meta.env.VITE_DEV_SERVER_URL + `${type}.html`
-      : new URL(
-          `../renderer/dist/${type}.html`,
-          'file://' + __dirname,
-        ).toString();
+  const pageUrl = getPageUrl(type);
 
   await browserWindow.loadURL(pageUrl);
   browserWindow.webContents.setWindowOpenHandler(({ url }) => {
