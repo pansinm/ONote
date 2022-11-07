@@ -5,7 +5,7 @@ import App from './components/App';
 import { install } from './extensions/diagram';
 import engine from './diagram/engine';
 import '/@/emoji/emoji.scss';
-
+import './ipc/port';
 install();
 
 // 暴露给插件使用
@@ -16,4 +16,4 @@ window.ReactDOM = ReactDOM;
 
 ReactDOM.render(<App />, document.getElementById('app'));
 
-window.addEventListener('message', console.log);
+window.addEventListener('message', (e) => console.log(e.data));

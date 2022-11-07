@@ -11,14 +11,11 @@ ipcRenderer.on('port', (e) => {
   );
 });
 
-// 转发到window
-ipcRenderer.on('message', (e, message) => {
-  window.postMessage(message);
+window.addEventListener('message', (event) => {
+  const { type } = event.data;
+  if (type === 'request-port') {
+    ipcRenderer.invoke('request-port');
+  }
 });
 
-ipcRenderer.on('open-file', (e, message) => {
-  window.postMessage({
-    type: 'open-file',
-    ...message,
-  });
-});
+export {};

@@ -1,4 +1,10 @@
 import { developAdapter } from './adapters';
+import portsManager from './ipc/portsManager';
+
+function reload() {
+  portsManager.closeAll();
+  window.location.reload();
+}
 
 window.document.addEventListener('keydown', (event) => {
   console.log(event.key);
@@ -7,7 +13,7 @@ window.document.addEventListener('keydown', (event) => {
       event.shiftKey && event.ctrlKey && developAdapter.openDevTools();
       break;
     case 'r':
-      event.ctrlKey && window.location.reload();
+      event.ctrlKey && reload();
       break;
     default:
       break;
