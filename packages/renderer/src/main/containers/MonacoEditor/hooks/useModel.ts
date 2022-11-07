@@ -19,6 +19,7 @@ export default function useModel(
       const model = await stores.fileStore.getOrCreateModel(uri);
       if (model.uri.toString() === latestUri.current) {
         editor?.setModel(model);
+        editor?.focus();
       }
     },
     [editor],
