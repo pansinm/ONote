@@ -13,7 +13,9 @@ const useStyles = makeStyles({
     display: 'flex',
   },
   tabList: {
+    width: '120px',
     ...shorthands.padding('10px', '5px'),
+    ...shorthands.borderRight('1px', 'solid'),
   },
   panel: {
     paddingLeft: '10px',
