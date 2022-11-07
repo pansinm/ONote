@@ -12,3 +12,5 @@ interface Exposed {
 interface Window extends Exposed {}
 
 declare module 'monaco-editor/esm/vs/editor/common/*';
+
+declare module 'monaco-vim';
