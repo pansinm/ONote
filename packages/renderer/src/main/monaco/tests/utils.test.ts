@@ -115,6 +115,17 @@ describe('isInFence', () => {
   afterAll(() => {
     model?.dispose();
   });
+  it('在第一个字符出现时', () => {
+    const model = monaco.editor.createModel(
+      '```js\nconst a = 2;\n```',
+      'markdown',
+      monaco.Uri.parse('file://x/ddd.md'),
+    );
+    expect(isInFence(model, new monaco.Position(1, 4), '')).toBe(true);
+    expect(isInFence(model, new monaco.Position(1, 4), 'js')).toBe(false);
+    expect(isInFence(model, new monaco.Position(2, 4), 'js')).toBe(true);
+    model.dispose();
+  });
   it('光标在代码块内时，返回true', () => {
     expect(isInFence(model, new monaco.Position(4, 0), 'js')).toBe(true);
     expect(isInFence(model, new monaco.Position(4, 0), 'ts')).toBe(false);
