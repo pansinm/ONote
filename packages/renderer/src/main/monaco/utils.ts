@@ -73,12 +73,6 @@ export function isInFence(
   position: monaco.Position,
   lang: string,
 ) {
-  const range = new monaco.Range(
-    position.lineNumber,
-    position.column - 2,
-    position.lineNumber,
-    position.column + 2,
-  );
   const prev = model.findPreviousMatch(
     '```',
     position,
@@ -88,9 +82,15 @@ export function isInFence(
     false,
   );
   const next = model.findNextMatch('```', position, false, true, null, false);
-  if (prev?.range.startLineNumber && next?.range.startLineNumber) {
-    const firstLine = model.getLineContent(prev.range.startLineNumber);
-    const lastLine = model.getLineContent(next.range.startLineNumber);
+  const openLine = prev?.range.startLineNumber;
+  const closeLine = next?.range.startLineNumber;
+  if (openLine && closeLine) {
+    let firstLine = model.getLineContent(openLine);
+    const lastLine = model.getLineContent(closeLine);
+    if (openLine === position.lineNumber) {
+      firstLine = firstLine.slice(0, position.column);
+    }
+
     return (
       firstLine.trim().startsWith('```' + lang) && lastLine.trim() === '```'
     );
