@@ -5,12 +5,26 @@ import {
   DialogSurface,
   DialogBody,
   DialogContent,
+  makeStyles,
 } from '@fluentui/react-components';
-import { SettingsRegular } from '@fluentui/react-icons';
+import {
+  ClosedCaption16Regular,
+  DismissRegular,
+  DismissSquareFilled,
+  SettingsRegular,
+} from '@fluentui/react-icons';
 import React from 'react';
 import Setting from './Setting';
 
+const useStyles = makeStyles({
+  dismissIcon: {
+    position: 'absolute',
+    top: '5px',
+    right: '5px',
+  },
+});
 export default function SettingTrigger() {
+  const styles = useStyles();
   return (
     <Dialog
     // open={props.open}
@@ -19,7 +33,14 @@ export default function SettingTrigger() {
       <DialogTrigger>
         <Button icon={<SettingsRegular />} shape="square"></Button>
       </DialogTrigger>
-      <DialogSurface style={{ height: '70%', minWidth: '80%' }}>
+      <DialogSurface style={{ height: '70%', minWidth: '70%' }}>
+        <DialogTrigger>
+          <Button
+            className={styles.dismissIcon}
+            icon={<DismissRegular />}
+            appearance="transparent"
+          ></Button>
+        </DialogTrigger>
         <DialogBody>
           <Setting />
         </DialogBody>

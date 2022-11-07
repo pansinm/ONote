@@ -11,7 +11,7 @@ interface PluginItemProps {
   onInstall(name: string): void;
 }
 
-function PluginiItem(props: PluginItemProps) {
+function PluginItem(props: PluginItemProps) {
   return (
     <Card>
       <CardHeader
@@ -34,4 +34,4 @@ function PluginiItem(props: PluginItemProps) {
   );
 }
 
-export default PluginiItem;
+export default PluginItem;
