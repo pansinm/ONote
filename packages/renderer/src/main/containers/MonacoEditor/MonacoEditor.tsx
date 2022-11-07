@@ -1,4 +1,4 @@
-import { observer } from 'mobx-react-lite';
+import { observer, useObserver } from 'mobx-react-lite';
 import type * as monaco from 'monaco-editor';
 import type { FC } from 'react';
 import React from 'react';
@@ -9,6 +9,10 @@ import useLayout from './hooks/useLayout';
 import usePreviewerRPC from './hooks/usePreviewerRPC';
 import useModel from './hooks/useModel';
 import useModelContentChange from './hooks/useModelContentChange';
+import useVim from './hooks/useVim';
+import Flex from '/@/components/Flex';
+import stores from '../../stores';
+import { EDITOR_MODE } from '/@/common/constants/SettingKey';
 
 export type EditorRef = {
   getInstance: () => monaco.editor.IStandaloneCodeEditor | undefined;
@@ -37,7 +41,28 @@ const MonacoEditor: FC<MonacoEditorProps> = function Editor(props) {
 
   useModelContentChange(editor);
 
-  return <div className="fullfill" ref={containerRef}></div>;
+  useVim(editor);
+
+  const editorMode = stores.settingStore.settings[EDITOR_MODE];
+
+  return (
+    <Flex flexDirection="column" className="fullfill" position="relative">
+      <div
+        style={{
+          width: '100%',
+          height: editorMode === 'VIM_MODE' ? 'calc(100% - 21px)' : '100%',
+        }}
+        ref={containerRef}
+      />
+      <div
+        id="vim-status-bar"
+        style={{
+          height: '20px',
+          display: editorMode === 'VIM_MODE' ? 'block' : 'none',
+        }}
+      ></div>
+    </Flex>
+  );
 };
 
 export default observer(MonacoEditor);

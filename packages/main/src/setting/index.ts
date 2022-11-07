@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as fsp from 'fs/promises';
 import { decrypt, encrypt } from '../utils/security';
+import { findWindow } from '../window/utils';
 
 const configFile = app.getPath('userData') + '/.onote-setting.json';
 class Setting {
@@ -28,10 +29,11 @@ class Setting {
   }
   update(key: string, value: any) {
     this._setting[key] = value;
-    // 广播，同步到所有窗口
-    BrowserWindow.getAllWindows().forEach((win) =>
-      win.webContents.send('setting.updated', this._setting, key),
-    );
+    findWindow('main')?.webContents.send('setting.updated', {
+      key,
+      value,
+      all: this._setting,
+    });
     this.syncToFile();
   }
   getAll() {
