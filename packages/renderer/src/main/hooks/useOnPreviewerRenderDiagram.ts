@@ -1,5 +1,10 @@
 import { useEffect } from 'react';
 import previewerService from '../services/previewerService';
+import stores from '../stores';
+import {
+  PLANTUML_ENDPOINT,
+  PLANTUML_USECACHE,
+} from '/@/common/constants/SettingKey';
 import type { PreviewerEventPayload } from '/@/common/EventPayload';
 
 function usePreviewerRenderDiagram() {
@@ -9,10 +14,16 @@ function usePreviewerRenderDiagram() {
     lang,
     meta,
   }: PreviewerEventPayload['previewer.diagram.toRender']) => {
+    const plantumlEndpoint =
+      (stores.settingStore.settings[PLANTUML_ENDPOINT] as string) ||
+      'https://www.plantuml.com/plantuml';
+    const plantumlUseCache = stores.settingStore.settings[
+      PLANTUML_USECACHE
+    ] as boolean;
     switch (lang) {
       case 'plantuml':
         window.simmer
-          .renderPlantUML(code, 'https://www.plantuml.com/plantuml')
+          .renderPlantUML(code, plantumlEndpoint, plantumlUseCache)
           .then((res) => {
             previewerService.send('main.diagram.rendered', {
               taskId,
