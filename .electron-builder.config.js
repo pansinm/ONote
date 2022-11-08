@@ -28,6 +28,7 @@ const config = {
     target: ['AppImage'],
     category: 'Utility',
     target: ['deb', 'AppImage'],
+    icon: './buildResources/icon.png',
     maintainer: 'pansinm <pansinm@foxmail.com>',
   },
   artifactName: 'ONote-${os}-${arch}-${version}.${ext}',
