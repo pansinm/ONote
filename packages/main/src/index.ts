@@ -21,6 +21,7 @@ import { manager } from './dataSource';
 app.disableHardwareAcceleration();
 
 Menu.setApplicationMenu(null);
+
 /**
  * Shout down background process if all windows was closed
  */
