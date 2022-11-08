@@ -90,6 +90,9 @@ export async function restoreOrCreateWindow(type: 'main' | 'previewer') {
   let window = findWindow(type);
   if (window === undefined) {
     window = await createWindow(type);
+    if (type === 'main') {
+      window.on('close', () => app.quit());
+    }
   }
 
   if (window.isMinimized()) {
