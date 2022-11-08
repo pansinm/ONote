@@ -7,6 +7,7 @@ import {
 } from '@fluentui/react-components';
 import PluginManager from './PluginManager';
 import EditorPanel from './EditorPanel';
+import PlantUMLPanel from './PlantUMLPanel';
 
 const useStyles = makeStyles({
   root: {
@@ -38,8 +39,9 @@ export default function Setting() {
         <Tab value="plugin">插件管理</Tab>
       </TabList>
       <div className={styles.panel}>
-        {tab === 'plugin' && <PluginManager />}
         {tab === 'editor' && <EditorPanel />}
+        {tab === 'plantuml' && <PlantUMLPanel />}
+        {tab === 'plugin' && <PluginManager />}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import type { Engine } from '@hpcc-js/wasm';
 import { graphviz } from '@hpcc-js/wasm';
 import * as https from 'https';
+import * as http from 'http';
 import { encode as encodePlantUML } from 'plantuml-encoder';
 import type { Dialog, NativeImage } from 'electron';
 import { shell } from 'electron';
@@ -17,6 +18,7 @@ import { callDataSource } from '../ipc/dataSource';
 import { callPlugin } from '../ipc/plugin';
 import { callSetting } from '../ipc/setting';
 import { callDevelop } from '../ipc/develop';
+import { nodeCrypto } from './nodeCrypto';
 
 const ensureDir = async (dir: string) => {
   const exists = await fs
@@ -103,33 +105,20 @@ export const simmer = {
     }
     return new Blob([img.toPNG()], { type: 'image/png' });
   },
-  async renderPlantUML(plantuml: string, endpoint: string) {
-    const encodedUML = encodePlantUML(plantuml);
-    const getPage = (page: number) => {
-      const index = page - 1;
-      const url =
-        endpoint + '/svg/' + (index > 0 ? index + '/' : '') + encodedUML;
-      return new Promise((resolve, reject) => {
-        https
-          .get(url, (res) => {
-            let data = '';
-            res.on('data', (thunk) => {
-              data += thunk;
-            });
-            res.on('end', () => resolve(data));
-            res.on('error', (err) => reject(err));
-          })
-          .on('error', (err) => {
-            reject(err);
-          });
-      });
-    };
-    const pagescount = plantuml.split('newpage').length;
-    const promises = new Array(pagescount)
-      .fill(0)
-      .map((_, index) => index + 1)
-      .map((page) => getPage(page));
-    return Promise.all(promises);
+  async renderPlantUML(plantuml: string, endpoint: string, useCache = false) {
+    if (useCache) {
+      const id = nodeCrypto.sha256sum(plantuml);
+      const cacheFilePath = path.join(os.tmpdir(), 'puml-' + id);
+      try {
+        const cacheFile = await fs.readFile(cacheFilePath, 'utf-8');
+        return JSON.parse(cacheFile);
+      } catch (err) {
+        const res = await renderPlantUMLToSvg(plantuml, endpoint);
+        fs.writeFile(cacheFilePath, JSON.stringify(res));
+        return res;
+      }
+    }
+    return renderPlantUMLToSvg(plantuml, endpoint);
   },
   async copyImage(content: any, type: 'dataURL' | 'ArrayBuffer') {
     let img: NativeImage;
@@ -158,3 +147,31 @@ export const simmer = {
 };
 
 exposeInMainWorld('simmer', simmer);
+function renderPlantUMLToSvg(plantuml: string, endpoint: string) {
+  const encodedUML = encodePlantUML(plantuml);
+  const getPage = (page: number) => {
+    const index = page - 1;
+    const url =
+      endpoint + '/svg/' + (index > 0 ? index + '/' : '') + encodedUML;
+    return new Promise((resolve, reject) => {
+      (endpoint.startsWith('https') ? https : http)
+        .get(url, (res) => {
+          let data = '';
+          res.on('data', (thunk) => {
+            data += thunk;
+          });
+          res.on('end', () => resolve(data));
+          res.on('error', (err) => reject(err));
+        })
+        .on('error', (err) => {
+          reject(err);
+        });
+    });
+  };
+  const pagescount = plantuml.split('newpage').length;
+  const promises = new Array(pagescount)
+    .fill(0)
+    .map((_, index) => index + 1)
+    .map((page) => getPage(page));
+  return Promise.all(promises);
+}
