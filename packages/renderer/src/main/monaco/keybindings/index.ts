@@ -11,9 +11,13 @@ export function bindingKeys(editor: monaco.editor.IStandaloneCodeEditor) {
   });
 
   editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyV, function () {
-    (editor as any)._commandService.executeCommand(
-      'editor.action.clipboardPasteAction',
-      editor.getModel()?.uri,
-    );
+    if (editor.hasTextFocus()) {
+      (editor as any)._commandService.executeCommand(
+        'editor.action.clipboardPasteAction',
+        editor.getModel()?.uri,
+      );
+    } else {
+      document.execCommand('paste');
+    }
   });
 }
