@@ -1,5 +1,5 @@
 import { developAdapter } from './ipc';
-import portsManager from './ipc/portsManager';
+import portsManager from './ipc/portsServer';
 
 function reload() {
   portsManager.closeAll();
