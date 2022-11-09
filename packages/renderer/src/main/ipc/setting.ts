@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 
-class SettingAdapter extends EventEmitter {
+class Setting extends EventEmitter {
   constructor() {
     super();
     window.addEventListener('message', (ev) => {
@@ -18,4 +18,4 @@ class SettingAdapter extends EventEmitter {
   }
 }
 
-export default new SettingAdapter();
+export default new Setting();

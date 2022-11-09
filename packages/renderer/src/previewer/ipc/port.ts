@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 
 class Port extends EventEmitter {
-  port?: MessagePort;
+  private port?: MessagePort;
   constructor() {
     window.addEventListener('message', (ev) => {
       const { type } = ev.data || {};
@@ -16,7 +16,7 @@ class Port extends EventEmitter {
     super();
   }
 
-  initPort(port: MessagePort) {
+  private initPort(port: MessagePort) {
     port.addEventListener('message', (event) => {
       const { type, payload } = event.data;
       this.emit(type, payload);

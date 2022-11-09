@@ -1,7 +1,7 @@
-class DevelopAdapter {
+class Develop {
   openDevTools() {
     window.simmer?.callDevelop('openDevTools');
   }
 }
 
-export default new DevelopAdapter();
+export default new Develop();
