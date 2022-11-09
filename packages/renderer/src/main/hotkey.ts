@@ -1,4 +1,4 @@
-import { developAdapter } from './adapters';
+import { developAdapter } from './ipc';
 import portsManager from './ipc/portsManager';
 
 function reload() {

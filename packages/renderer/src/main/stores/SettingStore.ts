@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import { settingAdapter } from '../adapters';
+import { settingAdapter } from '../ipc';
 
 class SettingStore {
   settings: Record<string, unknown> = {};
