@@ -78,9 +78,9 @@ export default observer(function EditorTabs() {
   return (
     <>
       <Tabs
-        onTabActivated={active}
+        onTabActive={active}
         onTabReorder={reorder}
-        onTabClosed={remove}
+        onTabClose={remove}
         onContextMenu={handleContextMenu}
         tabs={tabs}
       ></Tabs>
