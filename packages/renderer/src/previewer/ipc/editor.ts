@@ -1,4 +1,6 @@
 import port from './port';
+import IPCMethod from '/@/common/ipc/IPCMethod';
+import type { IPCGetEditorModelResponse } from '/@/common/ipc/types';
 
 type Range = {
   startLineNumber: number;
@@ -18,8 +20,8 @@ class EditorAdapter {
     // todo
   }
 
-  async getCurrentModel() {
-    // todo
+  async getCurrentModel(): Promise<IPCGetEditorModelResponse['payload']> {
+    return port.sendAndWait(IPCMethod.GetEditorModel);
   }
 
   async getScrollPosition() {

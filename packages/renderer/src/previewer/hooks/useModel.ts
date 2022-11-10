@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import editor from '../ipc/editor';
 import mainService from '../services/mainService';
 
 export default function useModel() {
@@ -8,8 +9,7 @@ export default function useModel() {
       setModel(data);
     };
     // 第一次进来时，拉取一次
-    mainService.send('previewer.getCurrentModel', undefined);
-    mainService.once('main.getCurrentModel:response', listener);
+    editor.getCurrentModel().then(listener);
 
     mainService.on('main.editor.modelChanged', listener);
     mainService.on('main.editor.contentChanged', listener);

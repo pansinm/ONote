@@ -1,3 +1,5 @@
+import type { IPCMessage } from '/@/common/ipc/types';
+
 type Handler = (type: string, payload: any) => Promise<any> | any;
 
 class PortsServer {
@@ -24,44 +26,41 @@ class PortsServer {
     this.handlers[type] = handler;
   }
 
+  private async reply(port: MessagePort, request: IPCMessage) {
+    const { id, method, payload } = request;
+    try {
+      const handler = this.handlers[method];
+      if (!handler) {
+        throw new Error(`handlers[${method}] not found!`);
+      }
+      const res = await handler(method, payload);
+      port.postMessage({
+        id,
+        method: method,
+        type: 'response',
+        payload: res,
+      } as IPCMessage);
+    } catch (error) {
+      const err = error as Error;
+      port.postMessage({
+        id,
+        method: method,
+        type: 'response',
+        error: {
+          name: err.name,
+          message: err.message,
+          stack: err.stack,
+        },
+      } as IPCMessage);
+    }
+  }
+
   private registerPort(port: MessagePort) {
     port.addEventListener('message', async (ev) => {
-      const { type, payload, id, msgType } = ev.data;
-      const handler = this.handlers[type];
-      if (handler && msgType === 'request') {
-        try {
-          const res = await handler(type, payload);
-          port.postMessage({
-            type,
-            id,
-            payload: res,
-            msgType: 'response',
-          });
-        } catch (err) {
-          const error = err as Error;
-          port.postMessage({
-            type,
-            id,
-            error: {
-              name: error.name,
-              message: error.message,
-              stack: error.stack,
-            },
-            msgType: 'response',
-          });
-        }
-      } else {
-        const error = new Error('No handler found');
-        port.postMessage({
-          type,
-          id,
-          error: {
-            name: error.name,
-            message: error.message,
-            stack: error.stack,
-          },
-          msgType: 'response',
-        });
+      const ipcMessage = ev.data as IPCMessage;
+      const { type } = ipcMessage;
+      if (type === 'request') {
+        this.reply(port, ipcMessage);
       }
     });
     const onClose = () => {

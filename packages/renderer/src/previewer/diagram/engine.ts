@@ -2,7 +2,7 @@ import mermaid from 'mermaid';
 import Flowchart from 'flowchart.js';
 import _, { uniqueId } from 'lodash';
 import mainService from '../services/mainService';
-import { waitEvent } from '../utils/async';
+import { waitEvent } from '../../common/utils/async';
 // import _ from 'lodash';
 
 // 使用graphviz的webassembly版本渲染，用node环境执行
