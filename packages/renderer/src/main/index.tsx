@@ -11,6 +11,7 @@ import { render } from 'react-dom';
 import App from './App';
 import './hotkey';
 import './integration';
+import './ipc';
 
 render(
   <FluentProvider theme={webLightTheme}>
