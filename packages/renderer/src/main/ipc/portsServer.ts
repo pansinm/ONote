@@ -1,29 +1,37 @@
 import { uniqueId } from 'lodash';
 import type IPCMethod from '/@/common/ipc/IPCMethod';
-import type { IPCMessage } from '/@/common/ipc/types';
+import type { IPCEvent, IPCMessage } from '/@/common/ipc/types';
 
-type Handler = (type: string, payload: any) => Promise<any> | any;
+type RequestHandler = (payload: any) => Promise<any> | any;
+
+type EventListener = (port: MessagePort, payload: any) => void;
 
 class PortsServer {
   constructor() {
     this.handleRequestPort();
     this.handlePort();
   }
+
   private ports: MessagePort[] = [];
 
-  private handlers: {
-    [type: string]: Handler;
+  private requestHandlers: {
+    [type: string]: RequestHandler;
   } = {};
 
+  private eventListeners: {
+    [type: string]: EventListener;
+  } = {};
+  sendEvent(port: MessagePort, method: IPCMethod, payload: any) {
+    port.postMessage({
+      method,
+      payload,
+      type: 'event',
+      id: uniqueId('event-'),
+    } as IPCMessage);
+  }
+
   broadEvent(method: IPCMethod, payload: any) {
-    this.ports.forEach((port) =>
-      port.postMessage({
-        method,
-        payload,
-        type: 'event',
-        id: uniqueId('event-'),
-      } as IPCMessage),
-    );
+    this.ports.forEach((port) => this.sendEvent(port, method, payload));
   }
 
   closeAll() {
@@ -31,18 +39,25 @@ class PortsServer {
     this.ports = [];
   }
 
-  handle(type: string, handler: (payload: any) => Promise<any>) {
-    this.handlers[type] = handler;
+  handleRequest(method: IPCMethod, handler: (payload: any) => Promise<any>) {
+    this.requestHandlers[method] = handler;
+  }
+
+  listenEvent(
+    method: IPCMethod,
+    listener: (port: MessagePort, payload: any) => void,
+  ) {
+    this.eventListeners[method] = listener;
   }
 
   private async reply(port: MessagePort, request: IPCMessage) {
     const { id, method, payload } = request;
     try {
-      const handler = this.handlers[method];
+      const handler = this.requestHandlers[method];
       if (!handler) {
         throw new Error(`handlers[${method}] not found!`);
       }
-      const res = await handler(method, payload);
+      const res = await handler(payload);
       port.postMessage({
         id,
         method: method,
@@ -64,12 +79,20 @@ class PortsServer {
     }
   }
 
+  private handleEvent(port: MessagePort, msg: IPCEvent) {
+    const { method, payload } = msg;
+    this.eventListeners[method]?.(port, payload);
+  }
+
   private registerPort(port: MessagePort) {
     port.addEventListener('message', async (ev) => {
       const ipcMessage = ev.data as IPCMessage;
       const { type } = ipcMessage;
       if (type === 'request') {
         this.reply(port, ipcMessage);
+      }
+      if (type === 'event') {
+        this.handleEvent(port, ev.data);
       }
     });
     const onClose = () => {
