@@ -7,7 +7,6 @@ import Fallback from './Fallback';
 
 export default function Previewer({ className }: { className: string }) {
   const resource = useModel();
-  console.log(resource);
   if (!resource.uri) {
     return null;
   }

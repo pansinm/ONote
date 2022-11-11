@@ -64,7 +64,6 @@ const FileList: FC = observer(() => {
   };
 
   useEffect(() => {
-    console.log(text);
     if (!text) {
       setFiles([]);
     } else {
@@ -121,7 +120,6 @@ const FileList: FC = observer(() => {
               activationStore.activeDirUri + '/',
               file.name,
             );
-            console.log(fileUri);
             fileService
               .writeFile(fileUri, await blobToBuffer(file))
               .then(() => {

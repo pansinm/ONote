@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import type { Root } from 'mdast';
 import { useCallback, useEffect, useRef } from 'react';
-import { useLatest } from 'react-use';
+import { useLatest, usePrevious } from 'react-use';
 import editor from '../ipc/editor';
 import mainService from '../services/mainService';
 
@@ -50,7 +50,6 @@ const scrollToLine = (ast: Root, lineNumber: number) => {
     return;
   }
   const paths = findAst(ast, ast.children as any[], lineNumber).reverse();
-  console.log('lineNumber', ast, paths, lineNumber);
   for (const node of paths) {
     const startLine = node.position?.start.line as number;
     const endLine = node.position?.end.line as number;
@@ -95,24 +94,23 @@ export default function usePreviewerScrollSync(
   ast: Root,
   lineNumber: number | undefined,
 ) {
-  const params = useLatest({ uri, ast, lineNumber });
+  const latestParams = useLatest({ uri, ast, lineNumber });
 
   const scrollTo = useCallback((lineNumber: number) => {
-    if (params.current.ast) {
-      scrollToLine(params.current.ast, lineNumber);
+    if (latestParams.current.ast) {
+      scrollToLine(latestParams.current.ast, lineNumber);
     }
   }, []);
 
   useEffect(() => {
     const currentUri = uri;
-    console.log('--------', lineNumber);
     if (lineNumber !== undefined) {
       scrollTo(lineNumber);
     } else {
       editor
         .getScrollPosition(currentUri)
         .then(({ lineNumber }) => {
-          currentUri === params.current.uri && scrollTo(lineNumber || 0);
+          currentUri === latestParams.current.uri && scrollTo(lineNumber || 0);
         })
         .catch((err) => {
           // ignore

@@ -9,7 +9,6 @@ function useMarkdownExtensions(editor?: monaco.editor.IStandaloneCodeEditor) {
       new MonacoMarkdownExtension().activate(editor);
       activate(editor);
       editor.onKeyDown((e) => {
-        console.log(e);
         if (e.code === 'Quote' && e.shiftKey) {
           const selection = editor.getSelection();
           if (selection) {

@@ -89,7 +89,6 @@ export function renderSvg(svg: string): Promise<Blob | null> {
  * @param svg
  */
 export async function copySvgAsImage(svg: string) {
-  console.log(svg);
   const blob = await renderSvg(svg);
   if (blob) {
     clipboardService.write(blob);

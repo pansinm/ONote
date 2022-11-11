@@ -33,7 +33,6 @@ async function rpc(data: { id: string; type: string; params: any[] }) {
       res,
     });
   } catch (err) {
-    console.log(err);
     self.postMessage({
       id: data.id,
       error: JSON.stringify(err),
@@ -48,7 +47,6 @@ const initialize = () => {
     return;
   }
   self.onmessage = function (event) {
-    console.log('event', event);
     rpc(event.data);
   };
   init = true;

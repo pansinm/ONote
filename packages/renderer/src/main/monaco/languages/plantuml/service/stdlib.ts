@@ -10,7 +10,6 @@ class Stdlib {
 
   async resolve(): Promise<typeof this.modules> {
     if (this.modules.length || this.loading) {
-      console.log(this.modules);
       return this.modules;
     }
     this.loading = true;

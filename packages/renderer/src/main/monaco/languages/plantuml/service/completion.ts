@@ -102,7 +102,6 @@ class UMLCompletionItemProvider
       position.column,
     );
     const preText = lineTextBefore.slice(startIndex + 1);
-    console.log(lineTextBefore, preText);
     return call('includes', preText).then((items: any) => {
       return items.map((snippet: any) => {
         return {
@@ -199,7 +198,6 @@ class UMLCompletionItemProvider
         position.column,
       );
       return call('arg', fence, res[1], r).then((sug: any) => {
-        console.log(sug);
         return { suggestions: sug };
       });
     }

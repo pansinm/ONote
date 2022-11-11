@@ -87,7 +87,6 @@ export default function paragraph(node: Paragraph, ctx: any) {
    * 行内的html只会解析tag，需要单独处理
    */
   if (containHtml) {
-    console.log('paragraph', node);
     return (
       <p className={createLineClass(node.position)}>
         {renderHtml([...node.children], '', ctx)}

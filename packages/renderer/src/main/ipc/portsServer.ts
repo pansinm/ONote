@@ -100,7 +100,6 @@ class PortsServer {
       console.log('main port closed');
       console.log('ports', this.ports.length);
       this.ports = this.ports.filter((p) => p !== port);
-      console.log(this.ports.length, this.ports);
     };
     port.addEventListener('close', onClose);
     port.start();

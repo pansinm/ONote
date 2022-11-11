@@ -26,7 +26,6 @@ class PumlSignatureHelpProvider
     const res = /([$a-zA-Z0-9_]+?)\([^)]*$/.exec(lineTextBefore);
     const name = res?.[1];
     const node = name && ((await call('callable', fence, name)) as any);
-    console.log('==============', node, name, lineTextBefore);
     if (node) {
       const parameters = node.arguments.map((arg: any) => ({
         label: arg.name.name,
