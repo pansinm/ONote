@@ -2,6 +2,7 @@ import _ from 'lodash';
 import type { Root } from 'mdast';
 import { useCallback, useEffect, useRef } from 'react';
 import { useLatest } from 'react-use';
+import editor from '../ipc/editor';
 import mainService from '../services/mainService';
 
 function getLineNum(dom: HTMLElement) {
@@ -89,28 +90,33 @@ function getTopLineNumber() {
   return false;
 }
 
-export default function usePreviewerScrollSync(uri: string, ast: Root) {
-  const astRef = useRef(ast);
-  useEffect(() => {
-    astRef.current = ast;
-  }, [ast]);
+export default function usePreviewerScrollSync(
+  uri: string,
+  ast: Root,
+  lineNumber: number | undefined,
+) {
+  const params = useLatest({ uri, ast, lineNumber });
 
   const scrollTo = useCallback((lineNumber: number) => {
-    if (astRef.current) {
-      scrollToLine(astRef.current, lineNumber);
+    if (params.current.ast) {
+      scrollToLine(params.current.ast, lineNumber);
     }
   }, []);
 
   useEffect(() => {
-    const handleReply = ({ lineNumber }: { lineNumber: number }) => {
-      scrollTo(lineNumber || 0);
-    };
-    mainService.send('previewer.getEditorScrollPosition', undefined);
-
-    mainService.on('main.getEditorScrollPosition:response', handleReply);
-    return () => {
-      mainService.off('main.getEditorScrollPosition:response', handleReply);
-    };
+    const currentUri = uri;
+    if (lineNumber) {
+      scrollTo(lineNumber);
+    } else {
+      editor
+        .getScrollPosition(currentUri)
+        .then(({ lineNumber }) => {
+          currentUri === params.current.uri && scrollTo(lineNumber || 0);
+        })
+        .catch((err) => {
+          // ignore
+        });
+    }
   }, [uri]);
 
   const latestUri = useLatest(uri);

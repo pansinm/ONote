@@ -1,3 +1,5 @@
+import { uniqueId } from 'lodash';
+import type IPCMethod from '/@/common/ipc/IPCMethod';
 import type { IPCMessage } from '/@/common/ipc/types';
 
 type Handler = (type: string, payload: any) => Promise<any> | any;
@@ -13,8 +15,15 @@ class PortsServer {
     [type: string]: Handler;
   } = {};
 
-  broadCast(message: any) {
-    this.ports.forEach((port) => port.postMessage(message));
+  broadEvent(method: IPCMethod, payload: any) {
+    this.ports.forEach((port) =>
+      port.postMessage({
+        method,
+        payload,
+        type: 'event',
+        id: uniqueId('event-'),
+      } as IPCMessage),
+    );
   }
 
   closeAll() {

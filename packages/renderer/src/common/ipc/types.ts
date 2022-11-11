@@ -39,11 +39,24 @@ export interface IPCEditorModelChangedEvent extends IPCEvent {
     uri: string;
     content: string;
     rootDirUri: string;
+    lineNumber?: number;
   };
 }
 
 export interface IPCEditorScrollChangedEvent extends IPCEvent {
-  method: IPCMethod.EditorScrollChanged;
+  method: IPCMethod.EditorScrollChangedEvent;
+  payload: {
+    uri: string;
+    lineNumber: number;
+  };
+}
+
+export interface IPCGetEditorScrollPositionRequest extends IPCRequest {
+  method: IPCMethod.GetEditorScrollPosition;
+}
+
+export interface IPCGetEditorScrollPositionResponse extends IPCResponse {
+  method: IPCMethod.GetEditorScrollPosition;
   payload: {
     uri: string;
     lineNumber: number;

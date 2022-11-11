@@ -13,6 +13,7 @@ import useVim from './hooks/useVim';
 import Flex from '/@/components/Flex';
 import stores from '../../stores';
 import { EDITOR_MODE } from '/@/common/constants/SettingKey';
+import { ScrollPosProvider } from './hooks/ScrollPosContext';
 
 export type EditorRef = {
   getInstance: () => monaco.editor.IStandaloneCodeEditor | undefined;
@@ -46,22 +47,24 @@ const MonacoEditor: FC<MonacoEditorProps> = function Editor(props) {
   const editorMode = stores.settingStore.settings[EDITOR_MODE];
 
   return (
-    <Flex flexDirection="column" className="fullfill" position="relative">
-      <div
-        style={{
-          width: '100%',
-          height: editorMode === 'VIM_MODE' ? 'calc(100% - 21px)' : '100%',
-        }}
-        ref={containerRef}
-      />
-      <div
-        id="vim-status-bar"
-        style={{
-          height: '20px',
-          display: editorMode === 'VIM_MODE' ? 'block' : 'none',
-        }}
-      ></div>
-    </Flex>
+    <ScrollPosProvider editor={editor}>
+      <Flex flexDirection="column" className="fullfill" position="relative">
+        <div
+          style={{
+            width: '100%',
+            height: editorMode === 'VIM_MODE' ? 'calc(100% - 21px)' : '100%',
+          }}
+          ref={containerRef}
+        />
+        <div
+          id="vim-status-bar"
+          style={{
+            height: '20px',
+            display: editorMode === 'VIM_MODE' ? 'block' : 'none',
+          }}
+        ></div>
+      </Flex>
+    </ScrollPosProvider>
   );
 };
 

@@ -1,6 +1,6 @@
 import type * as monaco from 'monaco-editor';
 import { useEffect } from 'react';
-import useEditorScrollPos from './usePreviewerRPC/useEditorScrollPos';
+import useEditorScrollPos from './useEditorScrollPosRef';
 
 /**
  * 恢复前一次滚动位置
