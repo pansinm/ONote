@@ -19,7 +19,7 @@ export default function useOnModelChange(
           uri,
           content: model?.getValue() || '',
           rootDirUri: stores.activationStore.rootUri,
-          lineNumber: scrollCtx.current?.[uri].lineNumber,
+          lineNumber: scrollCtx.current?.[uri]?.lineNumber,
         } as IPCEditorModelChangedEvent['payload']);
       }
     });

@@ -19,6 +19,7 @@ export default function useEditorScrollPos(
         scrollTop: e.scrollTop,
         lineNumber: editor?.getVisibleRanges()?.[0].startLineNumber || 0,
       };
+      console.log(scrollRef.current);
     });
     return () => {
       disposer?.dispose();
