@@ -22,7 +22,7 @@ enum IPCMethod {
   /**
    * 编辑器滚动条位置变化
    */
-  EditorScrollChanged = 'EditorScrollChanged',
+  EditorScrollChangedEvent = 'EditorScrollChanged',
 
   /**
    * 渲染 PlantUML

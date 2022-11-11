@@ -9,11 +9,12 @@ interface RenderProps {
   uri: string;
   content: string;
   rootDirUri: string;
+  lineNumber?: number;
 }
 
 const Render: FC<RenderProps> = (props) => {
   const ast = parse(props.content);
-  usePreviewerScrollSync(props.uri, ast);
+  usePreviewerScrollSync(props.uri, ast, props.lineNumber);
   if (isPlaintext(props.uri)) {
     return <Code code={props.content} lang={extname(props.uri)}></Code>;
   }

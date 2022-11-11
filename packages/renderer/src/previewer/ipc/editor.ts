@@ -1,6 +1,11 @@
 import port from './port';
 import IPCMethod from '/@/common/ipc/IPCMethod';
-import type { IPCGetEditorModelResponse } from '/@/common/ipc/types';
+import type {
+  IPCEditorModelChangedEvent,
+  IPCGetEditorModelResponse,
+  IPCGetEditorScrollPositionResponse,
+  IPCMessage,
+} from '/@/common/ipc/types';
 
 type Range = {
   startLineNumber: number;
@@ -24,8 +29,21 @@ class EditorAdapter {
     return port.sendAndWait(IPCMethod.GetEditorModel);
   }
 
-  async getScrollPosition() {
-    // todo
+  async getScrollPosition(
+    uri: string,
+  ): Promise<IPCGetEditorScrollPositionResponse['payload']> {
+    return port.sendAndWait(IPCMethod.GetEditorScrollPosition, { uri });
+  }
+
+  onModelChanged(
+    callback: (payload: IPCEditorModelChangedEvent['payload']) => void,
+  ) {
+    const listener = (data: IPCMessage) => callback(data.payload);
+    // void
+    port.on(IPCMethod.EditorModelChanged, listener);
+    return () => {
+      port.off(IPCMethod.EditorModelChanged, listener);
+    };
   }
 
   async onScrollChanged(callback: () => void) {
