@@ -105,7 +105,8 @@ export default function usePreviewerScrollSync(
 
   useEffect(() => {
     const currentUri = uri;
-    if (lineNumber) {
+    console.log('--------', lineNumber);
+    if (lineNumber !== undefined) {
       scrollTo(lineNumber);
     } else {
       editor

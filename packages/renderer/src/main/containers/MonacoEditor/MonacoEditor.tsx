@@ -14,6 +14,7 @@ import Flex from '/@/components/Flex';
 import stores from '../../stores';
 import { EDITOR_MODE } from '/@/common/constants/SettingKey';
 import { ScrollPosProvider } from './hooks/ScrollPosContext';
+import EditorConfig from './EditorConfig';
 
 export type EditorRef = {
   getInstance: () => monaco.editor.IStandaloneCodeEditor | undefined;
@@ -29,25 +30,14 @@ interface MonacoEditorProps {
 
 const MonacoEditor: FC<MonacoEditorProps> = function Editor(props) {
   const { editor, containerRef } = useEditor();
-  // 加载插件
-  useMarkdownExtensions(editor);
-  // 切换文件时，切换滚动条
-  useEditorScrollRecover(editor);
+
   // 重新调整大小
   useLayout(editor, containerRef.current);
-  // 和previewer通信
-  usePreviewerRPC(editor);
-
-  useModel(editor, props.uri);
-
-  useModelContentChange(editor);
-
-  useVim(editor);
-
   const editorMode = stores.settingStore.settings[EDITOR_MODE];
 
   return (
     <ScrollPosProvider editor={editor}>
+      <EditorConfig uri={props.uri} editor={editor} />
       <Flex flexDirection="column" className="fullfill" position="relative">
         <div
           style={{
