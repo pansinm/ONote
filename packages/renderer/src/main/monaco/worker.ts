@@ -11,7 +11,6 @@ import pumlWorker from './languages/plantuml/puml.worker?worker';
 
 (self as any).MonacoEnvironment = {
   getWorker(_: any, label: string) {
-    console.log('--------------', _, label);
     if (label === 'json') {
       return new jsonWorker();
     }

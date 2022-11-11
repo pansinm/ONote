@@ -28,7 +28,6 @@ function parseStyle(styles: string) {
 export function parseDom(text: string) {
   const dom = document.createElement('div');
   dom.innerHTML = text;
-  console.log(dom);
   const all = dom.querySelectorAll('*');
   all.forEach((node) => {
     node.getAttributeNames().forEach((name) => {

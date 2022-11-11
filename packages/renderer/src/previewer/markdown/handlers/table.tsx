@@ -135,13 +135,11 @@ function Editable({ node, ctx }: { node: Table; ctx: any }) {
           }, 500);
           const position = nodeRef.current?.position;
           const indent = position!.start.column - 1;
-          console.log(indent);
           const md = html2md(html)
             .split('\n')
             .map((row) => ''.padStart(indent) + row)
             .join('\n')
             .trim();
-          console.log(md);
           replaceText(ctx.fileUri, position!, md);
         }
       },

@@ -22,7 +22,6 @@ function renderFootDefinitions(ctx: any) {
 }
 
 export default function table(node: Root, ctx: any) {
-  console.log(ctx);
   return (
     <article
       className={`markdown-body line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}
