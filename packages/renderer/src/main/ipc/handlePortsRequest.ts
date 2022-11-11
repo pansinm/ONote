@@ -7,7 +7,7 @@ import type {
   IPCGetEditorScrollPositionResponse,
 } from '/@/common/ipc/types';
 
-portsServer.handle(IPCMethod.GetEditorModel, async () => {
+portsServer.handleRequest(IPCMethod.GetEditorModel, async () => {
   const uri = stores.activationStore.activeFileUri;
   if (!uri) {
     throw new Error('No file opened');
@@ -19,7 +19,7 @@ portsServer.handle(IPCMethod.GetEditorModel, async () => {
   } as IPCGetEditorModelResponse['payload'];
 });
 
-portsServer.handle(
+portsServer.handleRequest(
   IPCMethod.GetEditorScrollPosition,
   async ({ uri }: { uri: string }) => {
     const editor = monaco.editor.getEditors()['0'];
