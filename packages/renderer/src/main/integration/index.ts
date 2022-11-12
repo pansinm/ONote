@@ -1,1 +1,2 @@
 import './markdownFilePanel';
+import './plaintextFilePanel';
