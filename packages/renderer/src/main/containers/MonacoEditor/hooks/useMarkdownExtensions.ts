@@ -1,7 +1,7 @@
 import * as monaco from 'monaco-editor';
 import { useEffect } from 'react';
 import { activate } from '/@/main/monaco';
-import { MonacoMarkdownExtension } from '/@/simmer-markdown/src/ts';
+import { MonacoMarkdownExtension } from 'monaco-markdown';
 
 function useMarkdownExtensions(editor?: monaco.editor.IStandaloneCodeEditor) {
   useEffect(() => {
