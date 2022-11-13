@@ -1,3 +1,0 @@
-[submodule "packages/renderer/src/simmer-markdown"]
-	path = packages/renderer/src/simmer-markdown
-	url = https://github.com/pansinm/simmer-markdown.git
