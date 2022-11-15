@@ -8,6 +8,7 @@ import type {
   IPCGetEditorModelResponse,
   IPCGetEditorScrollPositionResponse,
   IPCInsertTextToEditorRequest,
+  IPCPreviewerScrollChangedEvent,
   IPCRenderGraphvizDiagramRequest,
   IPCRenderGraphvizDiagramResponse,
   IPCRenderPlantUMLDiagramRequest,
@@ -82,5 +83,12 @@ portsServer.handleRequest(
       type: 'svg',
       content,
     };
+  },
+);
+
+portsServer.listenEvent(
+  IPCMethod.PreviewerScrollChangedEvent,
+  (port, payload: IPCPreviewerScrollChangedEvent['payload']) => {
+    portsServer.broadEvent(IPCMethod.EditorScrollChangedEvent, payload, [port]);
   },
 );

@@ -16,8 +16,11 @@ type Range = {
 
 class EditorAdapter {
   // 滚动至
-  async scrollTo(lineNumber: number) {
-    // todo
+  async scrollTo(uri: string, lineNumber: number) {
+    port.sendEvent(IPCMethod.PreviewerScrollChangedEvent, {
+      uri,
+      lineNumber,
+    });
   }
 
   // 插入文本
@@ -46,11 +49,17 @@ class EditorAdapter {
     };
   }
 
-  async onScrollChanged(callback: () => void) {
+  async onScrollChanged(
+    callback: ({
+      uri,
+      lineNumber,
+    }: IPCGetEditorScrollPositionResponse['payload']) => void,
+  ) {
+    const listener = (data: IPCMessage) => callback(data.payload);
     // void
-    port.on('editor.scrolled', callback);
+    port.on(IPCMethod.EditorScrollChangedEvent, listener);
     return () => {
-      port.off('editor.scrolled', callback);
+      port.off(IPCMethod.EditorScrollChangedEvent, listener);
     };
   }
 }

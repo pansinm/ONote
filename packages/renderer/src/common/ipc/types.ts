@@ -52,6 +52,14 @@ export interface IPCEditorScrollChangedEvent extends IPCEvent {
   };
 }
 
+export interface IPCPreviewerScrollChangedEvent extends IPCEvent {
+  method: IPCMethod.PreviewerScrollChangedEvent;
+  payload: {
+    uri: string;
+    lineNumber: number;
+  };
+}
+
 export interface IPCGetEditorScrollPositionRequest extends IPCRequest {
   method: IPCMethod.GetEditorScrollPosition;
 }
