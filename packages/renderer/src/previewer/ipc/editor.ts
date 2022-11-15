@@ -21,8 +21,8 @@ class EditorAdapter {
   }
 
   // 插入文本
-  async insertText(range: Range, text: string) {
-    // todo
+  async insertText(uri: string, range: Range, text: string) {
+    return port.sendAndWait(IPCMethod.InsertTextToEditor, { uri, range, text });
   }
 
   async getCurrentModel(): Promise<IPCGetEditorModelResponse['payload']> {

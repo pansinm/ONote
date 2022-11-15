@@ -5,6 +5,7 @@ import IPCMethod from '/@/common/ipc/IPCMethod';
 import type {
   IPCGetEditorModelResponse,
   IPCGetEditorScrollPositionResponse,
+  IPCInsertTextToEditorRequest,
 } from '/@/common/ipc/types';
 
 portsServer.handleRequest(IPCMethod.GetEditorModel, async () => {
@@ -31,5 +32,16 @@ portsServer.handleRequest(
     } else {
       throw new Error('No file opened');
     }
+  },
+);
+
+portsServer.handleRequest(
+  IPCMethod.InsertTextToEditor,
+  async (payload: IPCInsertTextToEditorRequest['payload']) => {
+    const { range, text, uri } = payload;
+    const model = monaco.editor
+      .getModels()
+      .find((model) => model.uri.toString() === uri);
+    model?.applyEdits([{ range, text }]);
   },
 );

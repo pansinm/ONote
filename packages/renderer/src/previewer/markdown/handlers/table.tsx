@@ -7,8 +7,8 @@ import ETable from '@editorjs/table';
 import EditorJS from '@editorjs/editorjs';
 import { uniqueId } from 'docx';
 import { html2md } from '../../utils/md';
-import mainService from '../../services/mainService';
 import { createLineClass } from './util/position';
+import editor from '../../ipc/editor';
 
 const toHtml = unified().use(remarkHtml);
 
@@ -45,16 +45,16 @@ function useReplaceText() {
     const { pos, md = '', uri } = nextRef.current || {};
     nextRef.current = undefined;
     pos &&
-      mainService.send('previewer.replaceText', {
+      editor.insertText(
         uri,
-        range: {
+        {
           startLineNumber: pos.start.line,
           startColumn: pos.start.column,
           endLineNumber: pos.end.line,
           endColumn: pos.end.column,
         },
-        text: md,
-      });
+        md,
+      );
     setTimeout(() => {
       updatingRef.current = false;
       executeNext();
