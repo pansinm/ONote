@@ -28,6 +28,7 @@ enum IPCMethod {
    * 渲染 PlantUML
    */
   RenderPlantUmlDiagram = 'RenderPlantUmlDiagram',
+  RenderGraphvizDiagram = 'RenderGraphvizDiagram',
 }
 
 export default IPCMethod;

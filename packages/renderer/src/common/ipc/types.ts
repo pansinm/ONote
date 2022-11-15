@@ -76,3 +76,34 @@ export interface IPCInsertTextToEditorRequest extends IPCRequest {
 export interface IPCInsertTextToEditorResponse extends IPCResponse {
   method: IPCMethod.InsertTextToEditor;
 }
+
+export interface IPCRenderPlantUMLDiagramRequest extends IPCRequest {
+  method: IPCMethod.RenderPlantUmlDiagram;
+  payload: {
+    code: string;
+  };
+}
+
+export interface IPCRenderPlantUMLDiagramResponse extends IPCResponse {
+  method: IPCMethod.RenderPlantUmlDiagram;
+  payload: {
+    type: string;
+    content: string | string[];
+  };
+}
+
+export interface IPCRenderGraphvizDiagramRequest extends IPCRequest {
+  method: IPCMethod.RenderGraphvizDiagram;
+  payload: {
+    code: string;
+    engine: string;
+  };
+}
+
+export interface IPCRenderGraphvizDiagramResponse extends IPCResponse {
+  method: IPCMethod.RenderGraphvizDiagram;
+  payload: {
+    type: string;
+    content: string | string[];
+  };
+}

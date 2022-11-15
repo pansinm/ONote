@@ -2,10 +2,8 @@ import React, { useEffect } from 'react';
 import eventbus from '../../eventbus';
 import stores from '../../stores';
 import { EDITOR_FILE_SAVE } from '../../eventbus/EventName';
-import useOnPreviewerRenderDiagram from '../../hooks/useOnPreviewerRenderDiagram';
 
 const EventBus = () => {
-  useOnPreviewerRenderDiagram();
   useEffect(() => {
     const handler = (uri: string) => {
       stores.fileStore.save(uri);

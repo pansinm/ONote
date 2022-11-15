@@ -105,7 +105,11 @@ export const simmer = {
     }
     return new Blob([img.toPNG()], { type: 'image/png' });
   },
-  async renderPlantUML(plantuml: string, endpoint: string, useCache = false) {
+  async renderPlantUML(
+    plantuml: string,
+    endpoint: string,
+    useCache = false,
+  ): Promise<string[]> {
     if (useCache) {
       const id = nodeCrypto.sha256sum(plantuml);
       const cacheFilePath = path.join(os.tmpdir(), 'puml-' + id);
@@ -147,7 +151,10 @@ export const simmer = {
 };
 
 exposeInMainWorld('simmer', simmer);
-function renderPlantUMLToSvg(plantuml: string, endpoint: string) {
+function renderPlantUMLToSvg(
+  plantuml: string,
+  endpoint: string,
+): Promise<string[]> {
   const encodedUML = encodePlantUML(plantuml);
   const getPage = (page: number) => {
     const index = page - 1;
@@ -173,5 +180,5 @@ function renderPlantUMLToSvg(plantuml: string, endpoint: string) {
     .fill(0)
     .map((_, index) => index + 1)
     .map((page) => getPage(page));
-  return Promise.all(promises);
+  return Promise.all(promises as Promise<string>[]);
 }

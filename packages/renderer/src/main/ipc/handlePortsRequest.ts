@@ -1,11 +1,17 @@
 import * as monaco from 'monaco-editor';
 import stores from '../stores';
+import SettingStore from '../stores/SettingStore';
 import portsServer from './portsServer';
+import { PLANTUML_ENDPOINT } from '/@/common/constants/SettingKey';
 import IPCMethod from '/@/common/ipc/IPCMethod';
 import type {
   IPCGetEditorModelResponse,
   IPCGetEditorScrollPositionResponse,
   IPCInsertTextToEditorRequest,
+  IPCRenderGraphvizDiagramRequest,
+  IPCRenderGraphvizDiagramResponse,
+  IPCRenderPlantUMLDiagramRequest,
+  IPCRenderPlantUMLDiagramResponse,
 } from '/@/common/ipc/types';
 
 portsServer.handleRequest(IPCMethod.GetEditorModel, async () => {
@@ -43,5 +49,38 @@ portsServer.handleRequest(
       .getModels()
       .find((model) => model.uri.toString() === uri);
     model?.applyEdits([{ range, text }]);
+  },
+);
+
+portsServer.handleRequest(
+  IPCMethod.RenderGraphvizDiagram,
+  async (
+    payload: IPCRenderGraphvizDiagramRequest['payload'],
+  ): Promise<IPCRenderGraphvizDiagramResponse['payload']> => {
+    const svg = await window.simmer.renderGraphviz(
+      payload.code,
+      payload.engine as any,
+    );
+    return {
+      type: 'svg',
+      content: svg,
+    };
+  },
+);
+
+portsServer.handleRequest(
+  IPCMethod.RenderPlantUmlDiagram,
+  async (
+    payload: IPCRenderPlantUMLDiagramRequest['payload'],
+  ): Promise<IPCRenderPlantUMLDiagramResponse['payload']> => {
+    const content = await window.simmer.renderPlantUML(
+      payload.code,
+      (stores.settingStore.settings[PLANTUML_ENDPOINT] as string) ||
+        'https://www.plantuml.com/plantuml',
+    );
+    return {
+      type: 'svg',
+      content,
+    };
   },
 );
