@@ -129,10 +129,7 @@ export default function usePreviewerScrollSync(
       }
       const line = getTopLineNumber();
       if (line !== false) {
-        mainService.send('previewer.scroll.changed', {
-          uri: latestUri.current,
-          lineNumber: line,
-        });
+        editor.scrollTo(latestUri.current, line);
       }
     };
 
@@ -150,11 +147,11 @@ export default function usePreviewerScrollSync(
         editorScrolling = false;
       }, 500);
     };
-    mainService.on('main.scroll.changed', handleEditorScroll);
+    const dispose = editor.onScrollChanged(handleEditorScroll);
 
     window.addEventListener('scroll', handleScroll);
     return () => {
-      mainService.off('main.scroll.changed', handleEditorScroll);
+      dispose();
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);

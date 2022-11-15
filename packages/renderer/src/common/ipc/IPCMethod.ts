@@ -23,6 +23,10 @@ enum IPCMethod {
    * 编辑器滚动条位置变化
    */
   EditorScrollChangedEvent = 'EditorScrollChanged',
+  /**
+   * 预览页面滚动条变化
+   */
+  PreviewerScrollChangedEvent = 'PreviewerScrollChangedEvent ',
 
   /**
    * 渲染 PlantUML

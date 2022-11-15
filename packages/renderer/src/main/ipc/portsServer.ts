@@ -19,7 +19,7 @@ class PortsServer {
   } = {};
 
   private eventListeners: {
-    [type: string]: EventListener;
+    [type: string]: EventListener[] | undefined;
   } = {};
   sendEvent(port: MessagePort, method: IPCMethod, payload: any) {
     port.postMessage({
@@ -30,8 +30,10 @@ class PortsServer {
     } as IPCMessage);
   }
 
-  broadEvent(method: IPCMethod, payload: any) {
-    this.ports.forEach((port) => this.sendEvent(port, method, payload));
+  broadEvent(method: IPCMethod, payload: any, excludes: MessagePort[] = []) {
+    this.ports
+      .filter((port) => !excludes.includes(port))
+      .forEach((port) => this.sendEvent(port, method, payload));
   }
 
   closeAll() {
@@ -47,7 +49,15 @@ class PortsServer {
     method: IPCMethod,
     listener: (port: MessagePort, payload: any) => void,
   ) {
-    this.eventListeners[method] = listener;
+    const listeners = this.eventListeners[method];
+    this.eventListeners[method] = listeners
+      ? [...listeners, listener]
+      : [listener];
+    return () => {
+      this.eventListeners[method] = this.eventListeners[method]?.filter(
+        (i) => i !== listener,
+      );
+    };
   }
 
   private async reply(port: MessagePort, request: IPCMessage) {
@@ -81,7 +91,7 @@ class PortsServer {
 
   private handleEvent(port: MessagePort, msg: IPCEvent) {
     const { method, payload } = msg;
-    this.eventListeners[method]?.(port, payload);
+    this.eventListeners[method]?.forEach((listener) => listener(port, payload));
   }
 
   private registerPort(port: MessagePort) {

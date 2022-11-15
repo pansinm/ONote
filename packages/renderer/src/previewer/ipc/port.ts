@@ -27,7 +27,7 @@ class Port extends EventEmitter {
     await waitEvent(this, 'ready');
   }
 
-  sendMessage(message: Omit<IPCMessage, 'id'>) {
+  private sendMessage(message: Omit<IPCMessage, 'id'>) {
     const id = uniqueId('previewer-');
     this.port?.postMessage({ ...message, id });
     return id;
@@ -49,6 +49,14 @@ class Port extends EventEmitter {
       throw new Error(res.error.message);
     }
     return res.payload;
+  }
+
+  async sendEvent(method: IPCMethod, payload?: any) {
+    this.sendMessage({
+      method,
+      payload,
+      type: 'event',
+    });
   }
 
   private initPort(port: MessagePort) {
