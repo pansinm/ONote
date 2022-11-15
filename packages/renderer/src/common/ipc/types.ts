@@ -1,4 +1,5 @@
 import type IPCMethod from './IPCMethod';
+import type * as monaco from 'monaco-editor';
 
 export interface IPCMessage {
   method: string;
@@ -61,4 +62,17 @@ export interface IPCGetEditorScrollPositionResponse extends IPCResponse {
     uri: string;
     lineNumber: number;
   };
+}
+
+export interface IPCInsertTextToEditorRequest extends IPCRequest {
+  method: IPCMethod.InsertTextToEditor;
+  payload: {
+    uri: string;
+    range: monaco.Range;
+    text: string;
+  };
+}
+
+export interface IPCInsertTextToEditorResponse extends IPCResponse {
+  method: IPCMethod.InsertTextToEditor;
 }
