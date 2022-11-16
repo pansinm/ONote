@@ -9,6 +9,7 @@ import Icon from '/@/components/Icon';
 import { copyElementAsImage } from '../utils/clipboard';
 import { debounce } from 'lodash';
 import { createLineClass } from '../markdown/handlers/util/position';
+import frame from '../frame';
 
 function debounceRenderer(
   onRender: (res: any) => void,
@@ -102,27 +103,21 @@ export function parseMeta(meta = '') {
     }, {});
 }
 
-const enhanceHandlers = (handlers: Handlers) => {
-  const code = handlers.code;
-  function codeHandler(node: Code, ctx: any): React.ReactNode {
-    if (node.lang && diagramEngine.isDiagram(node.lang)) {
-      return (
-        <Diagram
-          lang={node.lang}
-          className={createLineClass(node.position)}
-          meta={parseMeta(node.meta || '')}
-          value={node.value}
-        />
-      );
-    }
-    return code(node, ctx);
-  }
-  return {
-    ...handlers,
-    code: codeHandler,
-  };
-};
-
 export const install = () => {
-  handlersManager.setHandlers(enhanceHandlers(handlersManager.getHandlers()));
+  frame.registerMarkdownRenderer({
+    code: (node, ctx) => {
+      if (node.lang && diagramEngine.isDiagram(node.lang)) {
+        return (
+          <Diagram
+            lang={node.lang}
+            className={createLineClass(node.position)}
+            meta={parseMeta(node.meta || '')}
+            value={node.value}
+          />
+        );
+      }
+      return ctx.skip();
+    },
+  });
+  // handlersManager.setHandlers(enhanceHandlers(handlersManager.getHandlers()));
 };
