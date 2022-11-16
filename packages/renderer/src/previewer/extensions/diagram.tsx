@@ -116,8 +116,7 @@ export const install = () => {
           />
         );
       }
-      return ctx.skip();
+      return ctx.continue();
     },
   });
-  // handlersManager.setHandlers(enhanceHandlers(handlersManager.getHandlers()));
 };

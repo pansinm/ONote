@@ -5,7 +5,7 @@ type Renderer = {
   [key: string]: (node: any, ctx: any) => React.ReactNode;
 };
 
-const SKIP = Symbol('skip');
+const CONTINUE = Symbol('continue');
 
 export function registerMarkdownRenderer(renderer: Renderer) {
   Object.keys(renderer).forEach((key) => {
@@ -13,9 +13,9 @@ export function registerMarkdownRenderer(renderer: Renderer) {
     const prev = handlers[key];
     const render = renderer[key];
     handlers[key] = (node, ctx) => {
-      ctx.skip = () => SKIP;
+      ctx.continue = () => CONTINUE;
       const res = render(node, ctx);
-      if (res === SKIP) {
+      if (res === CONTINUE) {
         return prev(node, ctx);
       }
       return res;
