@@ -1,15 +1,11 @@
-import type { Handlers } from '../markdown/handlers/interface';
-import handlersManager from '../markdown/handlers/manager';
-
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import type { Code } from 'mdast';
 import diagramEngine from '../diagram/engine';
-import Block from '../markdown/handlers/components/Block';
+import Block from '../../markdown/handlers/components/Block';
 import Icon from '/@/components/Icon';
-import { copyElementAsImage } from '../utils/clipboard';
+import { copyElementAsImage } from '../../utils/clipboard';
 import { debounce } from 'lodash';
-import { createLineClass } from '../markdown/handlers/util/position';
-import frame from '../frame';
+import { createLineClass } from '../../markdown/handlers/util/position';
+import frame from '../../frame';
 
 function debounceRenderer(
   onRender: (res: any) => void,
@@ -42,7 +38,7 @@ function debounceRenderer(
   );
 }
 
-function Diagram(props: {
+export function Diagram(props: {
   value: string;
   className?: string;
   meta: any;
@@ -103,20 +99,18 @@ export function parseMeta(meta = '') {
     }, {});
 }
 
-export const install = () => {
-  frame.registerMarkdownRenderer({
-    code: (node, ctx) => {
-      if (node.lang && diagramEngine.isDiagram(node.lang)) {
-        return (
-          <Diagram
-            lang={node.lang}
-            className={createLineClass(node.position)}
-            meta={parseMeta(node.meta || '')}
-            value={node.value}
-          />
-        );
-      }
-      return ctx.continue();
-    },
-  });
-};
+frame.registerMarkdownRenderer({
+  code: (node, ctx) => {
+    if (node.lang && diagramEngine.isDiagram(node.lang)) {
+      return (
+        <Diagram
+          lang={node.lang}
+          className={createLineClass(node.position)}
+          meta={parseMeta(node.meta || '')}
+          value={node.value}
+        />
+      );
+    }
+    return ctx.continue();
+  },
+});
