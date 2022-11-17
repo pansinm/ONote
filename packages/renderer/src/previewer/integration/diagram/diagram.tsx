@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import diagramEngine from '../diagram/engine';
+import diagramEngine from './engine';
 import Block from '../../markdown/handlers/components/Block';
 import Icon from '/@/components/Icon';
 import { copyElementAsImage } from '../../utils/clipboard';

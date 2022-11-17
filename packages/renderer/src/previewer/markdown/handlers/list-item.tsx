@@ -1,6 +1,5 @@
 import React from 'react';
 import type { ListItem } from 'mdast';
-import { render } from './render';
 import { replaceNode } from '../../utils/md';
 import classNames from 'classnames';
 import { createLineClass } from './util/position';
@@ -55,7 +54,7 @@ export default function listItem(node: ListItem, ctx: any) {
           /**
            * 如果li的子节点是paragraph，拍平
            */
-          const ele = render(n, ctx);
+          const ele = ctx.render(n, ctx);
           if (n.type === 'paragraph') {
             return <>{ele.props.children}</>;
           }
