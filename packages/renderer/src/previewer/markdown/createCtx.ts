@@ -37,6 +37,8 @@ function renderChildren(node: Node & { children?: any[] }, ctx: ICtx) {
   });
 }
 
+export const CONTINUE = Symbol('CONTINUE');
+
 function createCtx({
   fileUri,
   ast,
@@ -57,7 +59,7 @@ function createCtx({
     handlers: handlersManager.getHandlers(),
     fileUri: fileUri,
     rootDirUri: rootDirUri,
-
+    continue: () => CONTINUE,
     getRootNode: () => ast,
     getParentNode: (node: Node) =>
       findParentNode(ast, node as unknown as Content),

@@ -1,11 +1,10 @@
 import type React from 'react';
+import { CONTINUE } from '../markdown/createCtx';
 import handlersManager from '../markdown/handlers/manager';
 
 type Renderer = {
   [key: string]: (node: any, ctx: any) => React.ReactNode;
 };
-
-const CONTINUE = Symbol('continue');
 
 export function registerMarkdownRenderer(renderer: Renderer) {
   Object.keys(renderer).forEach((key) => {
@@ -13,7 +12,6 @@ export function registerMarkdownRenderer(renderer: Renderer) {
     const prev = handlers[key];
     const render = renderer[key];
     handlers[key] = (node, ctx) => {
-      ctx.continue = () => CONTINUE;
       const res = render(node, ctx);
       if (res === CONTINUE) {
         return prev(node, ctx);
