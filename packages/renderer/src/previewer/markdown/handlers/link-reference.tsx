@@ -1,6 +1,5 @@
 import React from 'react';
 import type { LinkReference } from 'mdast';
-import { renderChildren } from './render';
 import { resolveAssetUri } from './util/uri';
 import { createLineClass } from './util/position';
 
@@ -25,7 +24,7 @@ export default function linkReference(node: LinkReference, ctx: any) {
       href={resolveAssetUri(def.url, ctx)}
       title={def.title}
     >
-      {renderChildren(node, ctx)}
+      {ctx.renderChildren(node, ctx)}
     </a>
   );
 }

@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Node } from 'unist';
-import { renderChildren } from './render';
 import { createLineClass } from './util/position';
 
 export default function unknown(node: Node & { children?: any[] }, ctx: any) {
@@ -8,7 +7,7 @@ export default function unknown(node: Node & { children?: any[] }, ctx: any) {
   if (node.children) {
     return (
       <div className={createLineClass(node.position)}>
-        {renderChildren(node, ctx)}
+        {ctx.renderChildren(node, ctx)}
       </div>
     );
   }

@@ -1,16 +1,16 @@
 import React from 'react';
 import type { List } from 'mdast';
-import { renderChildren } from './render';
 import Block from './components/Block';
 import Icon from '/@/components/Icon';
 import { replaceNode } from '../../utils/md';
 import _ from 'lodash';
 import classNames from 'classnames';
 import { createLineClass } from './util/position';
+import type { ICtx } from '../types';
 
-export default function list(node: List, ctx: any) {
+export default function list(node: List, ctx: ICtx) {
   const List = node.ordered ? 'ol' : 'ul';
-  const children = renderChildren(node, ctx);
+  const children = ctx.renderChildren(node, ctx);
 
   const isTaskList = node.children.find(
     (node) => typeof node.checked === 'boolean',
@@ -22,7 +22,7 @@ export default function list(node: List, ctx: any) {
 
   const ele = (
     <List className={className}>
-      {children?.map((child, index) =>
+      {children?.map((child: React.ReactElement, index) =>
         React.cloneElement(child, { key: index }),
       )}
     </List>

@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Root } from 'mdast';
-import { renderChildren } from './render';
 import footnoteDefinition from './footnote-definition';
 
 function renderFootDefinitions(ctx: any) {
@@ -26,7 +25,7 @@ export default function table(node: Root, ctx: any) {
     <article
       className={`markdown-body line-end-${node.position?.end.line} line-start-${node.position?.start.line}`}
     >
-      {renderChildren(node, ctx)}
+      {ctx.renderChildren(node, ctx)}
       {renderFootDefinitions(ctx)}
     </article>
   );

@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Link } from 'mdast';
-import { renderChildren } from './render';
 import { resolveAssetUri } from './util/uri';
 import { createLineClass } from './util/position';
 
@@ -14,7 +13,7 @@ export default function link(node: Link, ctx: any) {
       title={node.title || ''}
       rel="noreferrer"
     >
-      {renderChildren(node, ctx)}
+      {ctx.renderChildren(node, ctx)}
     </a>
   );
 }

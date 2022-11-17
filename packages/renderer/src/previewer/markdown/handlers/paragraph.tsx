@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import React from 'react';
 import type { Heading, Paragraph, Root, Text } from 'mdast';
-import { render, renderChildren } from './render';
 import { parseDom } from './html';
 import type { Node } from 'unist';
 import { createLineClass } from './util/position';
@@ -95,7 +94,7 @@ export default function paragraph(node: Paragraph, ctx: any) {
   }
   return (
     <p className={createLineClass(node.position)}>
-      {renderChildren(node, ctx)}
+      {ctx.renderChildren(node, ctx)}
     </p>
   );
 }
@@ -105,10 +104,10 @@ function renderHtml(nodes: Node[], tagName: string, ctx: any): ReactNode[] {
   while (nodes.length) {
     const node = nodes.shift() as Node;
     if (node.type !== 'html') {
-      children.push(render(node, ctx));
+      children.push(ctx.render(node, ctx));
       continue;
     }
-    const value = node.value as string;
+    const value = (node as any).value as string;
     const type = tagType(value);
     if (type === 'start') {
       const dom = parseDom(value);
@@ -135,7 +134,7 @@ function renderHtml(nodes: Node[], tagName: string, ctx: any): ReactNode[] {
     if (type === 'end' && parseEndTagName(value) === tagName) {
       return children;
     }
-    children.push(render({ ...node, type: 'text' }, ctx));
+    children.push(ctx.render({ ...node, type: 'text' }, ctx));
   }
   return children;
 }
