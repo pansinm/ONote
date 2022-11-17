@@ -20,7 +20,8 @@ const findParentNode = (parent: Parent, node: Content): Parent | null => {
 };
 
 function render(node: Node, ctx: any) {
-  const handler = ctx.handlers[node.type] || ctx.handlers.unknown;
+  const handlers = handlersManager.getHandlers();
+  const handler = handlers[node.type] || handlers.unknown;
   return handler(node, ctx);
 }
 
@@ -30,8 +31,8 @@ function renderChildren(node: Node & { children?: any[] }, ctx: ICtx) {
   }
   return (node.children as Node[]).map((n, index) => {
     const node = ctx.render(n, ctx);
-    if (node && node.props && !node.props.key) {
-      return React.cloneElement(node, { key: index });
+    if ((node as any)?.props?.key) {
+      return React.cloneElement(node as React.ReactElement, { key: index });
     }
     return node;
   });
@@ -56,7 +57,6 @@ function createCtx({
     definition: definitions(ast),
     footnoteById,
     footnoteOrder: [],
-    handlers: handlersManager.getHandlers(),
     fileUri: fileUri,
     rootDirUri: rootDirUri,
     continue: () => CONTINUE,
