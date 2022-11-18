@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import type { FC} from 'react';
+import type { FC } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import React from 'react';
@@ -8,7 +8,7 @@ import Flex from '/@/components/Flex';
 import DragBar from '/@/components/DragBar';
 import Icon from '/@/components/Icon';
 import UnSupport from './UnSupport';
-import { filePanelManager } from '../../mainFrame';
+import { filePanelManager } from '../../frame';
 
 function handleDrag(delta: number) {
   const editorContainerEle = document.querySelector('.editor-container')!;
