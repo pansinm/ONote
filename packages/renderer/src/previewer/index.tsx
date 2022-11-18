@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
 import App from './components/App';
-import '/@/emoji/emoji.scss';
+import '/@/common/emoji/emoji.scss';
 import './ipc/port';
 import './integration';
 
