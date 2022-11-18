@@ -1,5 +1,4 @@
 import onote from '../onote';
-import path from 'path';
 import type { IPlugin } from './type';
 
 class PluginLoader {
@@ -7,14 +6,13 @@ class PluginLoader {
   constructor(pluginRoot: string) {
     this.pluginRoot = pluginRoot;
   }
-  load(pluginName: string) {
-    const pluginDir = path.join(this.pluginRoot, pluginName);
+  load(plugin: IPlugin) {
     try {
-      const { setup } = require(pluginDir);
+      const { setup } = require(plugin.pluginDir);
       setup(onote);
-      console.log(`plugin ${pluginName} load success`, pluginDir);
+      console.log(`plugin ${plugin.name} load success`, plugin.pluginDir);
     } catch (err) {
-      console.error(`plugin ${pluginName} load failed`, pluginDir, err);
+      console.error(`plugin ${plugin.name} load failed`, plugin.pluginDir, err);
       // ignore
     }
   }

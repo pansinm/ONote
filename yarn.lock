@@ -2390,6 +2390,14 @@
   dependencies:
     lodash "^4.17.21"
 
+"@sinm/onote-plugin@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@sinm/onote-plugin/-/onote-plugin-0.1.0.tgz#ebe76a918dae2863151c58d70b91c41e574d7fea"
+  integrity sha512-nl89SnGfrV1yBcve/JBnfkIbwzmC+sA4kRoEsgDVc2aitbWGadKujcr1JAgcWr0JDbHDUx8UINSPaOFycftcOA==
+  dependencies:
+    events "^3.3.0"
+    lodash "^4.17.21"
+
 "@sinm/prism-line-break@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@sinm/prism-line-break/-/prism-line-break-1.1.0.tgz#fabf2c30c629d063609f6178ebea11783a92b861"

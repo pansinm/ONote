@@ -2,6 +2,7 @@ import { app, BrowserWindow, nativeImage, shell, webFrameMain } from 'electron';
 import { join } from 'path';
 import { URL } from 'url';
 import frames from '../frames';
+import { manager as pluginManager } from '../plugin';
 import { sendToMain } from './ipc';
 import { findWindow } from './utils';
 
@@ -44,9 +45,15 @@ async function createWindow(type: 'main' | 'previewer') {
       frameRoutingId,
     ) => {
       const frame = webFrameMain.fromId(frameProcessId, frameRoutingId);
-      if (frame?.url) {
-        frames.listeners.forEach((callback) => callback(frame));
-      }
+      frame
+        ?.executeJavaScript(
+          `window.__plugins = ${JSON.stringify(pluginManager.getPlugins())}`,
+        )
+        .then(() => {
+          if (frame?.url) {
+            frames.listeners.forEach((callback) => callback(frame));
+          }
+        });
     },
   );
   /**

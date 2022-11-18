@@ -7,21 +7,17 @@ class PluginScanner {
   constructor(pluginsDir: string) {
     this.pluginsDir = pluginsDir;
   }
-  async scan(): Promise<IPlugin[]> {
+  async scan(): Promise<Record<string, IPlugin>> {
     try {
       const pkg = await fs.readFile(
         path.resolve(this.pluginsDir, 'plugins.json'),
         'utf-8',
       );
       const { plugins: plugins } = JSON.parse(pkg);
-      return Object.keys(plugins).map((key) => ({
-        name: key,
-        version: plugins[key],
-        pluginDir: path.resolve(this.pluginsDir, key),
-      }));
+      return plugins;
     } catch (err) {
       console.error('scan error', err);
-      return [];
+      return {};
     }
   }
 }

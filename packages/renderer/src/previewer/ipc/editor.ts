@@ -25,28 +25,27 @@ class EditorAdapter {
 
   // 插入文本
   async insertText(uri: string, range: Range, text: string) {
-    return port.sendAndWait(IPCMethod.InsertTextToEditor, { uri, range, text });
+    return port.sendRequestAndWait(IPCMethod.InsertTextToEditor, {
+      uri,
+      range,
+      text,
+    });
   }
 
   async getCurrentModel(): Promise<IPCGetEditorModelResponse['payload']> {
-    return port.sendAndWait(IPCMethod.GetEditorModel);
+    return port.sendRequestAndWait(IPCMethod.GetEditorModel);
   }
 
   async getScrollPosition(
     uri: string,
   ): Promise<IPCGetEditorScrollPositionResponse['payload']> {
-    return port.sendAndWait(IPCMethod.GetEditorScrollPosition, { uri });
+    return port.sendRequestAndWait(IPCMethod.GetEditorScrollPosition, { uri });
   }
 
   onModelChanged(
     callback: (payload: IPCEditorModelChangedEvent['payload']) => void,
   ) {
-    const listener = (data: IPCMessage) => callback(data.payload);
-    // void
-    port.on(IPCMethod.EditorModelChanged, listener);
-    return () => {
-      port.off(IPCMethod.EditorModelChanged, listener);
-    };
+    return port.handleEvent(IPCMethod.OpenedModelChangedEvent, callback);
   }
 
   async onScrollChanged(
@@ -55,12 +54,7 @@ class EditorAdapter {
       lineNumber,
     }: IPCGetEditorScrollPositionResponse['payload']) => void,
   ) {
-    const listener = (data: IPCMessage) => callback(data.payload);
-    // void
-    port.on(IPCMethod.EditorScrollChangedEvent, listener);
-    return () => {
-      port.off(IPCMethod.EditorScrollChangedEvent, listener);
-    };
+    return port.handleEvent(IPCMethod.EditorScrollChangedEvent, callback);
   }
 }
 

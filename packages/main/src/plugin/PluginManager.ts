@@ -92,6 +92,8 @@ class PluginManager {
       return {
         name: pkg.name,
         version: pkg.version,
+        pluginDir,
+        homepage: pkg.homepage || pkg.repository,
       };
     } finally {
       fs.rm(tmpDir, { recursive: true }).catch(() => 0);
@@ -100,14 +102,17 @@ class PluginManager {
 
   async install(urlOrPath: string) {
     const tgzPath = await this.wget(urlOrPath);
-    const { name, version } = await this.extract(tgzPath);
+    const plugin = await this.extract(tgzPath);
     this.updateConfig((prev) => {
       prev.plugins = Object.assign({}, prev.plugins, {
-        [name]: version,
+        [plugin.name]: {
+          ...plugin,
+          downloadUrl: urlOrPath,
+        },
       });
       return prev;
     });
-    return this.load(name);
+    return this.load(plugin);
   }
 
   private updateConfig(callback: (prev: any) => any) {
@@ -133,17 +138,16 @@ class PluginManager {
     });
   }
 
-  load(plaginName: string) {
-    return this.loader.load(plaginName);
+  load(plugin: IPlugin) {
+    return this.loader.load(plugin);
   }
 
-  loadAll() {
-    return this.scanner
-      .scan()
-      .then((plugins) =>
-        plugins.forEach((plugin) => this.loader.load(plugin.name)),
-      );
+  async loadAll() {
+    const plugins = await this.scanner.scan();
+    this.plugins = plugins;
+    Object.values(plugins).forEach((plugin) => this.load(plugin));
   }
+
   getPlugins() {
     return this.plugins;
   }

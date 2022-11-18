@@ -35,7 +35,7 @@ export interface IPCGetEditorModelResponse extends IPCResponse {
 }
 
 export interface IPCEditorModelChangedEvent extends IPCEvent {
-  method: IPCMethod.EditorModelChanged;
+  method: IPCMethod.OpenedModelChangedEvent;
   payload: {
     uri: string;
     content: string;

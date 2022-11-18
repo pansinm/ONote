@@ -3,7 +3,7 @@ import * as monaco from 'monaco-editor';
 const _monaco = monaco;
 
 interface IMonacoExtension {
-  activate(
+  active(
     editor: monaco.editor.IStandaloneCodeEditor,
     monaco: typeof _monaco,
   ): void;

@@ -15,7 +15,7 @@ export default function useOnModelChange(
       if (e.newModelUrl) {
         const model = monaco.editor.getModel(e.newModelUrl);
         const uri = model?.uri.toString() || '';
-        portsServer.broadEvent(IPCMethod.EditorModelChanged, {
+        portsServer.broadEvent(IPCMethod.OpenedModelChangedEvent, {
           uri,
           content: model?.getValue() || '',
           rootDirUri: stores.activationStore.rootUri,
@@ -25,7 +25,7 @@ export default function useOnModelChange(
     });
     const contentChangeDisposer = editor?.onDidChangeModelContent((e) => {
       const model = editor.getModel();
-      portsServer.broadEvent(IPCMethod.EditorModelChanged, {
+      portsServer.broadEvent(IPCMethod.OpenedModelChangedEvent, {
         uri: model?.uri.toString() || '',
         content: model?.getValue() || '',
         rootDirUri: stores.activationStore.rootUri,
