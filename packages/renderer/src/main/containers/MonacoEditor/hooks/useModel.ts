@@ -3,7 +3,7 @@ import { useLatest } from 'react-use';
 import type * as monaco from 'monaco-editor';
 import stores from '/@/main/stores';
 import { isMarkdown, isPlaintext } from '../../../../common/utils/uri';
-import { filePanelManager } from '/@/main/mainFrame';
+import { filePanelManager } from '../../../frame';
 
 export default function useModel(
   editor: monaco.editor.IStandaloneCodeEditor | undefined,
