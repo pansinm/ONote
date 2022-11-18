@@ -7,10 +7,8 @@ type CallableKey = keyof PluginManager;
 const callPlugin = async <T extends CallableKey>(
   functionName: T,
   ...args: Parameters<PluginManager[T]>
-) => {
-  return (manager[functionName] as any)(...args) as ReturnType<
-    PluginManager[T]
-  >;
+): Promise<Awaited<ReturnType<PluginManager[T]>>> => {
+  return (manager[functionName] as any)(...args);
 };
 
 export type PluginCall = typeof callPlugin;

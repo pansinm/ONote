@@ -21,7 +21,7 @@ class PortsServer {
   private eventListeners: {
     [type: string]: EventListener[] | undefined;
   } = {};
-  sendEvent(port: MessagePort, method: IPCMethod, payload: any) {
+  sendEvent(port: MessagePort, method: string, payload: any) {
     port.postMessage({
       method,
       payload,
@@ -41,12 +41,15 @@ class PortsServer {
     this.ports = [];
   }
 
-  handleRequest(method: IPCMethod, handler: (payload: any) => Promise<any>) {
+  handleRequest(method: string, handler: (payload: any) => Promise<any>) {
     this.requestHandlers[method] = handler;
+    return () => {
+      delete this.requestHandlers[method];
+    };
   }
 
   listenEvent(
-    method: IPCMethod,
+    method: string,
     listener: (port: MessagePort, payload: any) => void,
   ) {
     const listeners = this.eventListeners[method];

@@ -7,7 +7,7 @@ enum IPCMethod {
   /**
    * 编辑器内容变化
    */
-  EditorModelChanged = 'EditorModelChanged',
+  OpenedModelChangedEvent = 'OpenedModelChangedEvent',
 
   /**
    * 插入文本
@@ -22,7 +22,7 @@ enum IPCMethod {
   /**
    * 编辑器滚动条位置变化
    */
-  EditorScrollChangedEvent = 'EditorScrollChanged',
+  EditorScrollChangedEvent = 'EditorScrollChangedEvent',
   /**
    * 预览页面滚动条变化
    */

@@ -34,6 +34,7 @@
     "@fluentui/react-components": "^9.6.3",
     "@fluentui/react-icons": "^2.0.186",
     "@sinm/json-table-viewer": "^0.1.0",
+    "@sinm/onote-plugin": "^0.1.0",
     "@sinm/prism-line-break": "^1.1.0",
     "@sinm/react-chrome-tabs": "2.0.0",
     "@sinm/react-file-tree": "^0.8.0",

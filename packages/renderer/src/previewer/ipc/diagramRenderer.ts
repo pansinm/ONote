@@ -5,11 +5,10 @@ import type {
   IPCRenderGraphvizDiagramRequest,
   IPCRenderPlantUMLDiagramResponse,
 } from '/@/common/ipc/types';
-import { IPCGetEditorModelRequest } from '/@/common/ipc/types';
 
 class DiagramRenderer {
   renderGrapviz(code: string, engine: string) {
-    return port.sendAndWait(IPCMethod.RenderGraphvizDiagram, {
+    return port.sendRequestAndWait(IPCMethod.RenderGraphvizDiagram, {
       code,
       engine,
     } as IPCRenderGraphvizDiagramRequest['payload']) as Promise<
@@ -20,7 +19,7 @@ class DiagramRenderer {
   renderPlantUML(
     code: string,
   ): Promise<IPCRenderPlantUMLDiagramResponse['payload']> {
-    return port.sendAndWait(IPCMethod.RenderPlantUmlDiagram, { code });
+    return port.sendRequestAndWait(IPCMethod.RenderPlantUmlDiagram, { code });
   }
 }
 
