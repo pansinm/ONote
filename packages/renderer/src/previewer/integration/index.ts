@@ -1,1 +1,2 @@
 import './diagram';
+import './jsontable';

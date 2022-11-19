@@ -4,8 +4,6 @@ import Block from '../../markdown/handlers/components/Block';
 import Icon from '/@/components/Icon';
 import { copyElementAsImage } from '../../utils/clipboard';
 import { debounce } from 'lodash';
-import { createLineClass } from '../../markdown/handlers/util/position';
-import frame from '../../frame';
 
 function debounceRenderer(
   onRender: (res: any) => void,
@@ -88,29 +86,3 @@ export function Diagram(props: {
     </Block>
   );
 }
-
-export function parseMeta(meta = '') {
-  return meta
-    .split(',')
-    .map((item) => item.split('='))
-    .reduce((options, [key, val]) => {
-      if (!key) return options;
-      return { ...options, [key]: val };
-    }, {});
-}
-
-frame.registerMarkdownRenderer({
-  code: (node, ctx) => {
-    if (node.lang && diagramEngine.isDiagram(node.lang)) {
-      return (
-        <Diagram
-          lang={node.lang}
-          className={createLineClass(node.position)}
-          meta={parseMeta(node.meta || '')}
-          value={node.value}
-        />
-      );
-    }
-    return ctx.continue();
-  },
-});
