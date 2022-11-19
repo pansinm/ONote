@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import https from 'https';
 import fsc from 'fs';
 import tar from 'tar';
+import onote from '../onote';
 
 const ONOTE_ROOT = path.join(os.homedir(), 'onote');
 export const PLUGIN_ROOT = path.join(ONOTE_ROOT, 'plugins');
@@ -88,6 +89,9 @@ class PluginManager {
       const pkg = JSON.parse(
         await fs.readFile(path.join(tmpDir, 'package.json'), 'utf-8'),
       );
+      if (this.plugins[pkg.name]) {
+        await this.uninstall(pkg.name);
+      }
       const installDir = path.join(PLUGIN_ROOT, pkg.name);
       await this.recreateDir(installDir);
       await fs.rename(path.join(tmpDir), installDir);
@@ -134,6 +138,18 @@ class PluginManager {
 
   async uninstall(name: string) {
     const plugin = this.plugins[name];
+    try {
+      const { dispose } = require(plugin.installDir);
+      dispose();
+    } catch (err) {
+      // ignore
+    }
+    // 移除require的模块
+    Object.keys(require.cache).forEach(function (cachePath) {
+      if (cachePath.startsWith(plugin.installDir)) {
+        delete require.cache[cachePath];
+      }
+    });
     if (plugin) {
       await fs.rmdir(plugin.installDir, { maxRetries: 3 });
     }
@@ -144,7 +160,17 @@ class PluginManager {
   }
 
   load(plugin: IPlugin) {
-    return this.loader.load(plugin);
+    try {
+      const { setup } = require(plugin.installDir);
+      setup(onote);
+      console.log(`plugin ${plugin.name} load success`, plugin.installDir);
+    } catch (err) {
+      console.error(
+        `plugin ${plugin.name} load failed`,
+        plugin.installDir,
+        err,
+      );
+    }
   }
 
   async loadAll() {
