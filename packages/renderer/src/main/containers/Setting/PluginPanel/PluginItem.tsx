@@ -20,6 +20,7 @@ interface PluginItemProps {
   plugin: IPlugin;
   // logo: string;
   onInstalled?(plugin: IPlugin): void;
+  onUninstalled?(plugin: IPlugin): void;
 }
 
 const useStyles = makeStyles({
@@ -31,9 +32,10 @@ const useStyles = makeStyles({
   },
 });
 
-function PluginItem({ plugin, onInstalled: onInstall }: PluginItemProps) {
+function PluginItem({ plugin, onInstalled, onUninstalled }: PluginItemProps) {
   const [installing, setInstalling] = useState(false);
   const styles = useStyles();
+
   return (
     <Card size="large" className={styles.card}>
       <CardHeader
@@ -42,7 +44,18 @@ function PluginItem({ plugin, onInstalled: onInstall }: PluginItemProps) {
         description={<Caption1>{plugin.name}</Caption1>}
         action={
           plugin.state === 'installed' && !plugin.hasUpdate ? (
-            <Button disabled>已安装</Button>
+            <>
+              <Button disabled>已安装</Button>
+              <Button
+                onClick={() => {
+                  pluginManager
+                    .uninstall(plugin.name)
+                    .then(() => onUninstalled?.(plugin));
+                }}
+              >
+                卸载
+              </Button>
+            </>
           ) : (
             <Button
               disabled={installing}
@@ -59,7 +72,7 @@ function PluginItem({ plugin, onInstalled: onInstall }: PluginItemProps) {
                 pluginManager
                   .install(plugin.downloadUrl)
                   .then(() => {
-                    onInstall?.(plugin);
+                    onInstalled?.(plugin);
                   })
                   .finally(() => setInstalling(true));
                 // todo

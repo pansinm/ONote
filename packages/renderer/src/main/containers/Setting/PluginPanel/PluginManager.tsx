@@ -47,7 +47,7 @@ export default function PluginManager() {
     plugin.state = localPlugin.state;
     plugin.hasUpdate = compare(plugin.version, localPlugin.version) > 0;
     localPlugin.hasUpdate = plugin.hasUpdate;
-    return plugin;
+    return { ...plugin };
   });
 
   const localPlugins = Object.values(pluginState.value || {});
@@ -62,10 +62,18 @@ export default function PluginManager() {
         {/* <Tab value="setting">设置</Tab> */}
       </TabList>
       {tab === 'market' && (
-        <PluginMarket plugins={marketPlugins} onInstalled={refetch} />
+        <PluginMarket
+          plugins={marketPlugins}
+          onInstalled={refetch}
+          onUninstalled={refetch}
+        />
       )}
       {tab === 'installed' && (
-        <PluginInstalled plugins={localPlugins} onInstalled={refetch} />
+        <PluginInstalled
+          plugins={localPlugins}
+          onInstalled={refetch}
+          onUninstalled={refetch}
+        />
       )}
     </div>
   );

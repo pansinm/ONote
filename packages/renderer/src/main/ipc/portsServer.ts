@@ -131,7 +131,11 @@ class PortsServer {
           '*',
           [port1],
         );
-        event.source?.postMessage({ type: 'port' }, { transfer: [port2] });
+        console.log(event.source);
+        event.source?.postMessage(
+          { type: 'port' },
+          { transfer: [port2], targetOrigin: '*' },
+        );
       }
     });
   }
