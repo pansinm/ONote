@@ -6,6 +6,7 @@ import type { IPlugin } from '/@/main/ipc/pluginManager';
 export interface IPluginMarketProps {
   plugins: IPlugin[];
   onInstalled?(plugin: IPlugin): void;
+  onUninstalled?(plugin: IPlugin): void;
 }
 
 const useStyles = makeStyles({
@@ -23,6 +24,7 @@ export default function PluginInstalled(props: IPluginMarketProps) {
           <PluginItem
             plugin={plugin}
             onInstalled={props.onInstalled}
+            onUninstalled={props.onUninstalled}
             key={plugin.name}
           />
         ))}

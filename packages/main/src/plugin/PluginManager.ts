@@ -119,7 +119,12 @@ class PluginManager {
       });
       return prev;
     });
-    return this.load({ ...plugin, downloadUrl: urlOrPath });
+    this.plugins[plugin.name] = {
+      ...plugin,
+      downloadUrl: urlOrPath,
+      state: 'installed',
+    };
+    return this.load(this.plugins[plugin.name]);
   }
 
   private updateConfig(callback: (prev: any) => any) {
@@ -149,12 +154,13 @@ class PluginManager {
       }
     });
     if (plugin) {
-      await fs.rmdir(plugin.installDir, { maxRetries: 3 });
+      await fs.rm(plugin.installDir, { recursive: true, force: true });
     }
     this.updateConfig((prev) => {
       delete prev?.plugins[name];
       return prev;
     });
+    delete this.plugins[name];
   }
 
   load(plugin: IPlugin) {

@@ -88,7 +88,11 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
         <Flex position="relative" flex={1}>
           <div
             className="fill-height editor-container"
-            style={{ width: 'var(--editor-width)', position: 'relative' }}
+            style={{
+              width: 'var(--editor-width)',
+              position: 'relative',
+              display: panel?.editable ? 'block' : 'none',
+            }}
           >
             <MonacoEditor
               needLoad={/\.mdx?$/.test(props.uri)}
@@ -109,7 +113,6 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               display: previewerUri ? 'flex' : 'none',
             }}
           >
-            {' '}
             <Previewer previewerUri={previewerUri} />
             {dragging ? (
               <div
