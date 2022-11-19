@@ -1,6 +1,5 @@
 import * as monaco from 'monaco-editor';
 import type {
-  Dispose,
   IEditorExtension,
   IFilePanel,
   MainFrame as IMainFrame,
@@ -26,13 +25,13 @@ class MainFrame implements IMainFrame {
   registerFilePanel(panel: IFilePanel): void {
     filePanelManager.registerFilePanel(panel);
   }
-  readFile(uri: string): Promise<Uint8Array> {
+  readFile(uri: string): Promise<Buffer> {
     return fileService.readFile(uri);
   }
   readText(uri: string): Promise<string> {
     return fileService.readText(uri);
   }
-  writeFile(uri: string, content: Uint8Array): Promise<void> {
+  writeFile(uri: string, content: Buffer): Promise<void> {
     return fileService.writeFile(uri, content as Buffer);
   }
   writeText(uri: string, content: string): Promise<void> {
@@ -41,16 +40,13 @@ class MainFrame implements IMainFrame {
   listenPortEvent(
     eventName: string,
     listener: (port: MessagePort, payload: any) => void,
-  ): Dispose {
+  ) {
     return portsServer.listenEvent(eventName, listener);
   }
   sendPortEvent(port: MessagePort, eventName: string, payload: any): void {
     return portsServer.sendEvent(port, eventName, payload);
   }
-  handlePortRequest(
-    method: string,
-    handler: (payload: any) => Promise<any>,
-  ): Dispose {
+  handlePortRequest(method: string, handler: (payload: any) => Promise<any>) {
     return portsServer.handleRequest(method, handler);
   }
   getCurrentTabUrl(): string | undefined {
