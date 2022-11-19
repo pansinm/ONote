@@ -19,6 +19,17 @@ ipcMain.handle(
   },
 );
 
+type ToPromise<T extends (...args: any) => any> =
+  ReturnType<T> extends Promise<any>
+    ? T
+    : (...args: Parameters<T>) => Promise<ReturnType<T>>;
+
+type PromisifyFn<T> = {
+  [key in keyof T]: T[key] extends (...args: any) => any
+    ? ToPromise<T[key]>
+    : never;
+};
+
 export type DataSourceCall = typeof callDataSource;
 
-export type IPCDataSource = { [key in CallAbleKey]: Promise<Awaited<ReturnType<DataSource[key]>>> }
+export type IPCDataSource = PromisifyFn<DataSource>;

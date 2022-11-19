@@ -2,7 +2,7 @@
 
 interface Exposed {
   readonly nodeCrypto: Readonly<
-    typeof import('./src/main/nodeCrypto').nodeCrypto
+    typeof import('./src/common/nodeCrypto').nodeCrypto
   >;
   readonly versions: Readonly<typeof import('./src/main/versions').versions>;
   readonly simmer: Readonly<typeof import('./src/main/simmer').simmer>;

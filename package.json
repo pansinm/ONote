@@ -113,6 +113,7 @@
     "remark-gfm": "^3.0.1",
     "remark-html": "^15.0.1",
     "sass": "^1.49.9",
+    "semver": "^7.3.8",
     "simple-git-hooks": "2.7.0",
     "tar": "^6.1.12",
     "toml": "^3.0.0",

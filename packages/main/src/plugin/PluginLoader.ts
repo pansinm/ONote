@@ -8,11 +8,15 @@ class PluginLoader {
   }
   load(plugin: IPlugin) {
     try {
-      const { setup } = require(plugin.pluginDir);
+      const { setup } = require(plugin.installDir);
       setup(onote);
-      console.log(`plugin ${plugin.name} load success`, plugin.pluginDir);
+      console.log(`plugin ${plugin.name} load success`, plugin.installDir);
     } catch (err) {
-      console.error(`plugin ${plugin.name} load failed`, plugin.pluginDir, err);
+      console.error(
+        `plugin ${plugin.name} load failed`,
+        plugin.installDir,
+        err,
+      );
       // ignore
     }
   }

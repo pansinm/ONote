@@ -1,4 +1,5 @@
 import { first, orderBy } from 'lodash';
+import { getDataSource } from '../ipc';
 
 interface IFilePanel {
   extensions: string[];
@@ -12,12 +13,18 @@ interface IFilePanel {
 class FilePanelManager {
   private filePanels: { [ext: string]: IFilePanel[] } = {};
   getPanel(uri: string) {
-    const ext = first(orderBy(Object.keys(this.filePanels).filter(ext => uri.endsWith(ext)), 'length', 'desc'));
+    const ext = first(
+      orderBy(
+        Object.keys(this.filePanels).filter((ext) => uri.endsWith(ext)),
+        'length',
+        'desc',
+      ),
+    );
     return ext ? first(this.filePanels[ext]) : undefined;
   }
-  registerFilePanel(panel: IFilePanel) {
-    panel.extensions.forEach(ext => {
-      const panels = this.filePanels[ext] = [] as IFilePanel[];
+  async registerFilePanel(panel: IFilePanel) {
+    panel.extensions.forEach((ext) => {
+      const panels = (this.filePanels[ext] = [] as IFilePanel[]);
       panels.unshift(panel);
       this.filePanels[ext] = panels;
     });

@@ -71,7 +71,9 @@ class PluginManager {
     await fs.mkdir(dir, { recursive: true }).catch(() => 0);
   }
 
-  private async extract(tgzPath: string) {
+  private async extract(
+    tgzPath: string,
+  ): Promise<Omit<IPlugin, 'downloadUrl'>> {
     const tmpDir = path.join(
       ONOTE_ROOT,
       'pkg-' + Math.random().toString(36).slice(2),
@@ -86,13 +88,16 @@ class PluginManager {
       const pkg = JSON.parse(
         await fs.readFile(path.join(tmpDir, 'package.json'), 'utf-8'),
       );
-      const pluginDir = path.join(PLUGIN_ROOT, pkg.name);
-      await this.recreateDir(pluginDir);
-      await fs.rename(path.join(tmpDir), pluginDir);
+      const installDir = path.join(PLUGIN_ROOT, pkg.name);
+      await this.recreateDir(installDir);
+      await fs.rename(path.join(tmpDir), installDir);
       return {
         name: pkg.name,
+        title: pkg.title || pkg.name,
+        description: pkg.description || pkg.name || '-',
+        author: pkg.author || '-',
         version: pkg.version,
-        pluginDir,
+        installDir: installDir,
         homepage: pkg.homepage || pkg.repository,
       };
     } finally {
@@ -112,7 +117,7 @@ class PluginManager {
       });
       return prev;
     });
-    return this.load(plugin);
+    return this.load({ ...plugin, downloadUrl: urlOrPath });
   }
 
   private updateConfig(callback: (prev: any) => any) {
@@ -130,7 +135,7 @@ class PluginManager {
   async uninstall(name: string) {
     const plugin = this.plugins[name];
     if (plugin) {
-      await fs.rmdir(plugin.pluginDir, { maxRetries: 3 });
+      await fs.rmdir(plugin.installDir, { maxRetries: 3 });
     }
     this.updateConfig((prev) => {
       delete prev?.plugins[name];
@@ -144,6 +149,9 @@ class PluginManager {
 
   async loadAll() {
     const plugins = await this.scanner.scan();
+    Object.keys(plugins).forEach((key) => {
+      plugins[key].state = 'installed';
+    });
     this.plugins = plugins;
     Object.values(plugins).forEach((plugin) => this.load(plugin));
   }

@@ -1,3 +1,4 @@
+import * as monaco from 'monaco-editor';
 import type {
   Dispose,
   IEditorExtension,
@@ -48,7 +49,11 @@ class MainFrame implements IMainFrame {
     return stores.activationStore.activeFileUri;
   }
   getPluginRootUri(pluginName: string): string {
-    return (window as any)?.__plugins?.[pluginName].rootUri;
+    const installDir = (window as any)?.__plugins?.[pluginName].installDir;
+    if (installDir) {
+      return monaco.Uri.file(installDir).toString();
+    }
+    return '';
   }
 }
 
