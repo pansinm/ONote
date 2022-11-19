@@ -18,6 +18,8 @@ class PluginManager {
 
   private plugins: Record<string, IPlugin> = {};
 
+  private disposers: Record<string, () => void> = {};
+
   constructor() {
     fs.mkdir(PLUGIN_ROOT, { recursive: true }).catch((err) => {
       // ignore
@@ -142,8 +144,8 @@ class PluginManager {
   async uninstall(name: string) {
     const plugin = this.plugins[name];
     try {
-      const { dispose } = require(plugin.installDir);
-      dispose();
+      this.disposers[name]?.();
+      delete this.disposers[name];
     } catch (err) {
       // ignore
     }
@@ -166,7 +168,7 @@ class PluginManager {
   load(plugin: IPlugin) {
     try {
       const { setup } = require(plugin.installDir);
-      setup(onote);
+      this.disposers[plugin.name] = setup(onote);
       console.log(`plugin ${plugin.name} load success`, plugin.installDir);
     } catch (err) {
       console.error(

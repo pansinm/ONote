@@ -10,8 +10,16 @@ import fileService from '../services/fileService';
 import stores from '../stores';
 import filePanelManager from './filePanelManager';
 import monacoExtensionManager from './monacoExtensionManager';
+import { reaction } from 'mobx';
 
 class MainFrame implements IMainFrame {
+  onTabOpened(callback: (uri: string) => void) {
+    const disposer = reaction(
+      () => stores.activationStore.activeFileUri,
+      callback,
+    );
+    return disposer;
+  }
   registerEditorExtension(extension: IEditorExtension): void {
     monacoExtensionManager.registerMonacoExtension(extension);
   }
