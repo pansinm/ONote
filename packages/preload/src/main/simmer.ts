@@ -18,7 +18,7 @@ import { callDataSource } from '../ipc/dataSource';
 import { callPlugin } from '../ipc/plugin';
 import { callSetting } from '../ipc/setting';
 import { callDevelop } from '../ipc/develop';
-import { nodeCrypto } from './nodeCrypto';
+import { nodeCrypto } from '../common/nodeCrypto';
 
 const ensureDir = async (dir: string) => {
   const exists = await fs

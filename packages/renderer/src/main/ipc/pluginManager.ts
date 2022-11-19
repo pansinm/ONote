@@ -3,18 +3,20 @@ import type { IPlugin } from '../../../../main/src/plugin/type';
 
 type Manager = typeof manager;
 
-type PromisifyFunc<T extends (...args: any) => any> =
+export type { IPlugin };
+
+type ToPromise<T extends (...args: any) => any> =
   ReturnType<T> extends Promise<any>
     ? T
     : (...args: Parameters<T>) => Promise<ReturnType<T>>;
 
-type PromisifyObject<T> = {
+type PromisifyFn<T> = {
   [key in keyof T]: T[key] extends (...args: any) => any
-    ? PromisifyFunc<T[key]>
+    ? ToPromise<T[key]>
     : never;
 };
 
-class PluginManager implements PromisifyObject<Manager> {
+class PluginManager implements PromisifyFn<Manager> {
   install(urlOrPath: string): Promise<void> {
     return window.simmer.callPlugin('install', urlOrPath);
   }

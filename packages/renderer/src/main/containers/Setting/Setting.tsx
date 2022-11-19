@@ -5,7 +5,7 @@ import {
   makeStyles,
   shorthands,
 } from '@fluentui/react-components';
-import PluginManager from './PluginManager';
+import PluginManager from './PluginPanel/PluginManager';
 import EditorPanel from './EditorPanel';
 import PlantUMLPanel from './PlantUMLPanel';
 

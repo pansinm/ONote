@@ -1,5 +1,13 @@
 export interface IPlugin {
   name: string;
-  pluginDir: string;
-  state?: 'installed' | 'loaded' | 'unload' | 'uninstalled';
+  author: string;
+  version: string;
+  title: string;
+  description?: string;
+  installDir: string;
+  homepage?: string;
+  downloadUrl: string;
+  logo?: string;
+  hasUpdate?: boolean;
+  state?: 'installed' | 'uninstalled';
 }
