@@ -1,7 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
-import PluginLoader from './PluginLoader';
 import PluginScanner from './PluginScanner';
 import type { IPlugin } from './type';
 import http from 'http';
@@ -16,7 +15,6 @@ export const PLUGIN_ROOT = path.join(ONOTE_ROOT, 'plugins');
 
 class PluginManager {
   private scanner = new PluginScanner(PLUGIN_ROOT);
-  private loader = new PluginLoader(PLUGIN_ROOT);
 
   private plugins: Record<string, IPlugin> = {};
 
