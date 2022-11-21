@@ -50,6 +50,7 @@ function PluginItem({ plugin, onInstalled, onUninstalled }: PluginItemProps) {
                 onClick={() => {
                   pluginManager
                     .uninstall(plugin.name)
+                    .then(() => console.log('uninstalled', onUninstalled))
                     .then(() => onUninstalled?.(plugin));
                 }}
               >
