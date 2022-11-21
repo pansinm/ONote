@@ -10,6 +10,8 @@ import fsc from 'fs';
 import tar from 'tar';
 import onote from '../onote';
 import { BrowserWindow } from 'electron';
+import type { WebFrameMain } from 'electron';
+import { getMainFrame, getPreviewerFrames, injectJs } from '../window/frames';
 
 const ONOTE_ROOT = path.join(os.homedir(), 'onote');
 export const PLUGIN_ROOT = path.join(ONOTE_ROOT, 'plugins');
@@ -172,18 +174,7 @@ class PluginManager {
     delete this.plugins[name];
   }
 
-  insertPluginJs(pluginName: string) {
-    console.log('insert js', pluginName);
-    const plugin = this.plugins[pluginName];
-    if (!plugin) {
-      return;
-    }
-    BrowserWindow.getAllWindows().forEach((win) => {
-      console.log(win.webContents.mainFrame.frames);
-    });
-  }
-
-  load(plugin: IPlugin) {
+  async load(plugin: IPlugin) {
     if (plugin.backendJs) {
       try {
         const { setup } = require(plugin.backendJs);
@@ -197,7 +188,12 @@ class PluginManager {
         );
       }
     }
-    this.insertPluginJs(plugin.name);
+    const mainFrame = getMainFrame();
+    const previewerFrames = getPreviewerFrames();
+    await injectJs(mainFrame, plugin.mainJs);
+    await Promise.all(
+      previewerFrames.map((f) => injectJs(f, plugin.previewerJs)),
+    );
   }
 
   async loadAll() {
