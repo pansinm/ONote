@@ -9,6 +9,7 @@ import https from 'https';
 import fsc from 'fs';
 import tar from 'tar';
 import onote from '../onote';
+import { BrowserWindow } from 'electron';
 
 const ONOTE_ROOT = path.join(os.homedir(), 'onote');
 export const PLUGIN_ROOT = path.join(ONOTE_ROOT, 'plugins');
@@ -171,21 +172,32 @@ class PluginManager {
     delete this.plugins[name];
   }
 
-  load(plugin: IPlugin) {
-    try {
-      if (!plugin.backendJs) {
-        return;
-      }
-      const { setup } = require(plugin.backendJs);
-      this.disposers[plugin.name] = setup(onote);
-      console.log(`plugin ${plugin.name} load success`, plugin.installDir);
-    } catch (err) {
-      console.error(
-        `plugin ${plugin.name} load failed`,
-        plugin.installDir,
-        err,
-      );
+  insertPluginJs(pluginName: string) {
+    console.log('insert js', pluginName);
+    const plugin = this.plugins[pluginName];
+    if (!plugin) {
+      return;
     }
+    BrowserWindow.getAllWindows().forEach((win) => {
+      console.log(win.webContents.mainFrame.frames);
+    });
+  }
+
+  load(plugin: IPlugin) {
+    if (plugin.backendJs) {
+      try {
+        const { setup } = require(plugin.backendJs);
+        this.disposers[plugin.name] = setup(onote);
+        console.log(`plugin ${plugin.name} load success`, plugin.installDir);
+      } catch (err) {
+        console.error(
+          `plugin ${plugin.name} load failed`,
+          plugin.installDir,
+          err,
+        );
+      }
+    }
+    this.insertPluginJs(plugin.name);
   }
 
   async loadAll() {

@@ -44,10 +44,10 @@ export default function PluginManager() {
     if (!localPlugin) {
       return plugin;
     }
-    plugin.state = localPlugin.state;
-    plugin.hasUpdate = compare(plugin.version, localPlugin.version) > 0;
-    localPlugin.hasUpdate = plugin.hasUpdate;
-    return { ...plugin };
+    const state = localPlugin.state;
+    const hasUpdate = compare(plugin.version, localPlugin.version) > 0;
+    localPlugin.hasUpdate = hasUpdate;
+    return { ...plugin, state, hasUpdate };
   });
 
   const localPlugins = Object.values(pluginState.value || {});
@@ -65,14 +65,19 @@ export default function PluginManager() {
         <PluginMarket
           plugins={marketPlugins}
           onInstalled={refetch}
-          onUninstalled={refetch}
+          onUninstalled={() => {
+            console.log('uninstalle---d');
+            refetch().then(console.log);
+          }}
         />
       )}
       {tab === 'installed' && (
         <PluginInstalled
           plugins={localPlugins}
           onInstalled={refetch}
-          onUninstalled={refetch}
+          onUninstalled={() => {
+            refetch();
+          }}
         />
       )}
     </div>
