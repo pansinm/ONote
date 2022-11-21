@@ -98,6 +98,12 @@ class PluginManager {
       return {
         name: pkg.name,
         title: pkg.title || pkg.name,
+        backendJs:
+          pkg.backend && require.resolve(path.join(installDir, pkg.backend)),
+        mainJs: pkg.main && require.resolve(path.join(installDir, pkg.main)),
+        previewerJs:
+          pkg.previewer &&
+          require.resolve(path.join(installDir, pkg.previewer)),
         description: pkg.description || pkg.name || '-',
         author: pkg.author || '-',
         version: pkg.version,
@@ -167,7 +173,10 @@ class PluginManager {
 
   load(plugin: IPlugin) {
     try {
-      const { setup } = require(plugin.installDir);
+      if (!plugin.backendJs) {
+        return;
+      }
+      const { setup } = require(plugin.backendJs);
       this.disposers[plugin.name] = setup(onote);
       console.log(`plugin ${plugin.name} load success`, plugin.installDir);
     } catch (err) {

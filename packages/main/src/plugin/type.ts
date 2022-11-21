@@ -1,5 +1,8 @@
 export interface IPlugin {
   name: string;
+  mainJs?: string;
+  previewerJs?: string;
+  backendJs?: string;
   author: string;
   version: string;
   title: string;

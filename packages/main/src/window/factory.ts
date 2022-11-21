@@ -1,10 +1,11 @@
+import type { WebFrameMain } from 'electron';
 import { app, BrowserWindow, nativeImage, shell, webFrameMain } from 'electron';
 import { join } from 'path';
 import { URL } from 'url';
-import frames from '../frames';
 import { manager as pluginManager } from '../plugin';
 import { sendToMain } from './ipc';
 import { findWindow } from './utils';
+import fs from 'fs/promises';
 
 export const getPageUrl = (type: 'main' | 'previewer') => {
   return import.meta.env.DEV &&
@@ -15,6 +16,25 @@ export const getPageUrl = (type: 'main' | 'previewer') => {
         'file://' + __dirname,
       ).toString();
 };
+
+async function injectPluginJs(frame: WebFrameMain) {
+  const plugins = Object.values(pluginManager.getPlugins());
+  if (![getPageUrl('main'), getPageUrl('previewer')].includes(frame.url)) {
+    return;
+  }
+  for (const plugin of plugins) {
+    const file =
+      getPageUrl('main') === frame.url ? plugin.mainJs : plugin.previewerJs;
+    if (file) {
+      try {
+        const script = await fs.readFile(file, 'utf-8');
+        await frame.executeJavaScript(script);
+      } catch (err) {
+        console.error(`[${plugin.name}]: inject js ${file} failed`, err);
+      }
+    }
+  }
+}
 
 async function createWindow(type: 'main' | 'previewer') {
   const browserWindow = new BrowserWindow({
@@ -50,9 +70,7 @@ async function createWindow(type: 'main' | 'previewer') {
           `window.__plugins = ${JSON.stringify(pluginManager.getPlugins())}`,
         )
         .then(() => {
-          if (frame?.url) {
-            frames.listeners.forEach((callback) => callback(frame));
-          }
+          return injectPluginJs(frame);
         });
     },
   );

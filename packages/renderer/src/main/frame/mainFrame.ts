@@ -3,7 +3,7 @@ import type {
   IEditorExtension,
   IFilePanel,
   MainFrame as IMainFrame,
-} from '@sinm/onote-plugin/lib/mainFrame';
+} from '@sinm/onote-plugin/main';
 import { portsServer } from '../ipc';
 import fileService from '../services/fileService';
 import stores from '../stores';
@@ -12,9 +12,17 @@ import monacoExtensionManager from './monacoExtensionManager';
 import { reaction } from 'mobx';
 
 class MainFrame implements IMainFrame {
-  onTabOpened(callback: (uri: string) => void) {
+  getActiveTab() {
+    return { uri: stores.activationStore.activeFileUri };
+  }
+
+  openTab(uri: string): void {
+    stores.activationStore.activeFile(uri);
+  }
+
+  onTabActivated(callback: (tab: { uri: string }) => void) {
     const disposer = reaction(
-      () => stores.activationStore.activeFileUri,
+      () => ({ uri: stores.activationStore.activeFileUri }),
       callback,
     );
     return disposer;
@@ -48,9 +56,6 @@ class MainFrame implements IMainFrame {
   }
   handlePortRequest(method: string, handler: (payload: any) => Promise<any>) {
     return portsServer.handleRequest(method, handler);
-  }
-  getCurrentTabUrl(): string | undefined {
-    return stores.activationStore.activeFileUri;
   }
   getPluginRootUri(pluginName: string): string {
     const installDir = (window as any)?.__plugins?.[pluginName].installDir;

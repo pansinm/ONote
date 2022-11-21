@@ -6,9 +6,6 @@ import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import pumlWorker from './languages/plantuml/puml.worker?worker';
 
-// 用于调试
-(window as any).monaco = monaco;
-
 (self as any).MonacoEnvironment = {
   getWorker(_: any, label: string) {
     if (label === 'json') {

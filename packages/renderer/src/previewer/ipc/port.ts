@@ -1,3 +1,3 @@
-import { port } from '@sinm/onote-plugin/lib/previewerFrame';
+import { port } from '@sinm/onote-plugin/previewer';
 
 export default port;
