@@ -15,6 +15,14 @@ class MonacoExtensionManager {
   registerMonacoExtension(extension: IMonacoExtension) {
     this.extensions.push(extension);
   }
+
+  activeAll(editor: monaco.editor.IStandaloneCodeEditor) {
+    this.extensions.forEach((extension) => extension.active(editor, monaco));
+  }
+
+  disposeAll() {
+    this.extensions.forEach((extension) => extension?.dispose());
+  }
 }
 
 export default new MonacoExtensionManager();

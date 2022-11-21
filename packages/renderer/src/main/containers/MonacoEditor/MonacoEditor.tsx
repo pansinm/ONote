@@ -1,15 +1,9 @@
-import { observer, useObserver } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
 import type * as monaco from 'monaco-editor';
 import type { FC } from 'react';
 import React from 'react';
 import useEditor from './hooks/useEditor';
-import useEditorScrollRecover from './hooks/useEditorScrollRecover';
-import useMarkdownExtensions from './hooks/useMarkdownExtensions';
 import useLayout from './hooks/useLayout';
-import usePreviewerRPC from './hooks/usePreviewerRPC';
-import useModel from './hooks/useModel';
-import useModelContentChange from './hooks/useModelContentChange';
-import useVim from './hooks/useVim';
 import Flex from '/@/components/Flex';
 import stores from '../../stores';
 import { EDITOR_MODE } from '/@/common/constants/SettingKey';
