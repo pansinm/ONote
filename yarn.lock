@@ -2390,10 +2390,10 @@
   dependencies:
     lodash "^4.17.21"
 
-"@sinm/onote-plugin@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@sinm/onote-plugin/-/onote-plugin-0.2.0.tgz#105e163c5f874ae45db9a665615ccb1eb9688918"
-  integrity sha512-F9WaCPDH4e0yYVYh2U5SXsG8HUjVwlvMlaZIoffhUjor3zpHwE40Eb7RxLvEIpgYcqqRmS/Xjx2OTDzc0IJuWQ==
+"@sinm/onote-plugin@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@sinm/onote-plugin/-/onote-plugin-0.2.2.tgz#129f1bc664b5a44478849d56cbcf63d77801f04f"
+  integrity sha512-5Z85qvgUErPqeYCQRB6VRIaimjpH9c6BHCXsx5sDnmsO8bcPo9JayEQ6keNsAEhmwB2PFw6YicLwsGh/FcDlig==
   dependencies:
     events "^3.3.0"
     lodash "^4.17.21"

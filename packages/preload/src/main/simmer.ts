@@ -111,7 +111,7 @@ export const simmer = {
     useCache = false,
   ): Promise<string[]> {
     if (useCache) {
-      const id = nodeCrypto.sha256sum(plantuml);
+      const id = nodeCrypto.md5(plantuml);
       const cacheFilePath = path.join(os.tmpdir(), 'puml-' + id);
       try {
         const cacheFile = await fs.readFile(cacheFilePath, 'utf-8');
