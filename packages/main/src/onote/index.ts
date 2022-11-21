@@ -1,7 +1,9 @@
 import { manager } from '../dataSource';
+import setting from '../setting';
 
 const onote = {
-  dataSource: manager,
+  dataSourceManager: manager,
+  setting: setting,
 };
 
 export default onote;

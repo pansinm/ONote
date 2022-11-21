@@ -42,6 +42,10 @@ export const simmer = {
     await fs.rm(path, { recursive: true });
   },
 
+  async invokeIpc(channel: string, ...args: any[]): Promise<unknown> {
+    return ipcRenderer.invoke(channel, ...args);
+  },
+
   async writeFile(
     filePath: string,
     content: any,
