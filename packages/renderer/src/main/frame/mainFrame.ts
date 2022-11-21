@@ -51,6 +51,9 @@ class MainFrame implements IMainFrame {
   ) {
     return portsServer.listenEvent(eventName, listener);
   }
+  invokeIpc(channel: string, ...args: any[]) {
+    return window.simmer.invokeIpc(channel, ...args);
+  }
   sendPortEvent(port: MessagePort, eventName: string, payload: any): void {
     return portsServer.sendEvent(port, eventName, payload);
   }
