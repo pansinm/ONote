@@ -1,37 +1,26 @@
 import type { WebFrameMain } from 'electron';
 import { app, BrowserWindow, nativeImage, shell, webFrameMain } from 'electron';
 import { join } from 'path';
-import { URL } from 'url';
 import { manager as pluginManager } from '../plugin';
 import { sendToMain } from './ipc';
-import { findWindow } from './utils';
-import fs from 'fs/promises';
-
-export const getPageUrl = (type: 'main' | 'previewer') => {
-  return import.meta.env.DEV &&
-    import.meta.env.VITE_DEV_SERVER_URL !== undefined
-    ? import.meta.env.VITE_DEV_SERVER_URL + `${type}.html`
-    : new URL(
-        `../renderer/dist/${type}.html`,
-        'file://' + __dirname,
-      ).toString();
-};
+import { findWindow, getPageUrl } from './utils';
+import { getMainFrame, getPreviewerFrames, injectJs } from './frames';
 
 async function injectPluginJs(frame: WebFrameMain) {
   const plugins = Object.values(pluginManager.getPlugins());
   if (![getPageUrl('main'), getPageUrl('previewer')].includes(frame.url)) {
     return;
   }
+  const mainFrame = getMainFrame();
+  const previewerFrames = getPreviewerFrames();
   for (const plugin of plugins) {
-    const file =
-      getPageUrl('main') === frame.url ? plugin.mainJs : plugin.previewerJs;
-    if (file) {
-      try {
-        const script = await fs.readFile(file, 'utf-8');
-        await frame.executeJavaScript(script);
-      } catch (err) {
-        console.error(`[${plugin.name}]: inject js ${file} failed`, err);
-      }
+    try {
+      await injectJs(mainFrame, plugin.mainJs);
+      await Promise.all(
+        previewerFrames.map((f) => injectJs(f, plugin.previewerJs)),
+      );
+    } catch (err) {
+      console.warn('load js failed', err);
     }
   }
 }
