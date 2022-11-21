@@ -8,7 +8,7 @@ import { portsServer } from '../ipc';
 import fileService from '../services/fileService';
 import stores from '../stores';
 import filePanelManager from './filePanelManager';
-import monacoExtensionManager from './monacoExtensionManager';
+import monacoExtensionManager from '../monaco/monacoExtensionManager';
 import { reaction } from 'mobx';
 
 class MainFrame implements IMainFrame {

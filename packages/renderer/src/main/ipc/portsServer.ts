@@ -22,6 +22,10 @@ class PortsServer {
     [type: string]: EventListener[] | undefined;
   } = {};
   sendEvent(port: MessagePort, method: string, payload: any) {
+    if (!port) {
+      console.warn('sendEvent(port, ...arg) port can not be empty');
+      return;
+    }
     port.postMessage({
       method,
       payload,

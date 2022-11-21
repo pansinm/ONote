@@ -1,5 +1,6 @@
 import type * as monaco from 'monaco-editor';
 import useEditorScrollRecover from './hooks/useEditorScrollRecover';
+import useExtensions from './hooks/useExtensions';
 import useLayout from './hooks/useLayout';
 import useMarkdownExtensions from './hooks/useMarkdownExtensions';
 import useModel from './hooks/useModel';
@@ -15,8 +16,10 @@ function EditorConfig({
 }) {
   // 加载插件
   useMarkdownExtensions(editor);
+
   // 切换文件时，切换滚动条
   useEditorScrollRecover(editor);
+
   // 和previewer通信
   usePreviewerRPC(editor);
 
@@ -25,6 +28,9 @@ function EditorConfig({
   useModelContentChange(editor);
 
   useVim(editor);
+
+  useExtensions(editor);
+
   return null;
 }
 
