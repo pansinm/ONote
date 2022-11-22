@@ -35,11 +35,23 @@ async function createWindow(type: 'main' | 'previewer') {
           join(app.getAppPath(), 'buildResources/icon.png'),
         ),
     webPreferences: {
-      nativeWindowOpen: true,
-      webviewTag: false, // The webview tag is not recommended. Consider alternatives like iframe or Electron's BrowserView. https://www.electronjs.org/docs/latest/api/webview-tag#warning
-      preload: join(__dirname, `../../preload/dist/${type}.cjs`),
-      webSecurity: !import.meta.env.DEV,
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: false, // Sandbox disabled because the demo of preload script depend on the Node.js api
+      webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
+      preload: join(app.getAppPath(), `packages/preload/dist/${type}.cjs`),
+      // webviewTag: false, // The webview tag is not recommended. Consider alternatives like iframe or Electron's BrowserView. https://www.electronjs.org/docs/latest/api/webview-tag#warning
+      // preload: join(__dirname, `../../preload/dist/${type}.cjs`),
+      webSecurity: false, //!import.meta.env.DEV,
     },
+  });
+
+  browserWindow.webContents.on('render-process-gone', (e, detail) => {
+    console.log(e, detail);
+  });
+
+  browserWindow.webContents.on('destroyed', () => {
+    console.log('destroy');
   });
 
   browserWindow.webContents.on(
