@@ -1,10 +1,12 @@
-import { app, dialog, ipcMain, Menu, protocol } from 'electron';
+import { app, crashReporter, dialog, ipcMain, Menu, protocol } from 'electron';
 import './security-restrictions';
 import './ipc';
 import './integration';
 import { restoreOrCreateWindow } from './window';
 import { manager as dataSourceManager } from './dataSource';
 import { manager as pluginManager } from './plugin';
+
+crashReporter.start({ uploadToServer: false });
 /**
  * Prevent multiple instances
  */
