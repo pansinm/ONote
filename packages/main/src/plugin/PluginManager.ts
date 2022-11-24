@@ -9,8 +9,6 @@ import https from 'https';
 import fsc from 'fs';
 import tar from 'tar';
 import onote from '../onote';
-import { BrowserWindow } from 'electron';
-import type { WebFrameMain } from 'electron';
 import { getMainFrame, getPreviewerFrames, injectJs } from '../window/frames';
 
 const ONOTE_ROOT = path.join(os.homedir(), 'onote');
