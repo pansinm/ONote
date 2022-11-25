@@ -1,4 +1,4 @@
-import { Caption2, makeStyles } from '@fluentui/react-components';
+import { Caption2, makeStyles, shorthands } from '@fluentui/react-components';
 import React from 'react';
 import PluginItem from './PluginItem';
 import type { IPlugin } from '/@/main/ipc/pluginManager';
@@ -11,7 +11,8 @@ export interface IPluginMarketProps {
 
 const useStyles = makeStyles({
   root: {
-    display: 'flex',
+    display: 'grid',
+    gridGap: '10px',
   },
 });
 

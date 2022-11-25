@@ -11,7 +11,8 @@ export interface IPluginMarketProps {
 
 const useStyles = makeStyles({
   root: {
-    display: 'flex',
+    display: 'grid',
+    gridGap: '10px',
   },
 });
 
