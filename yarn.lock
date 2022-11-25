@@ -2392,6 +2392,15 @@
   dependencies:
     lodash "^4.17.21"
 
+"@sinm/monaco-plantuml@0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@sinm/monaco-plantuml/-/monaco-plantuml-0.2.1.tgz#1ad9bb878ee94215ecb6758b4b3c80872bd9f6aa"
+  integrity sha512-IoWzy+2pYmW32XPxtjmPjXXmiK0iRgFDgsItv3tqUGCNSWRHxX6vKJbPy1rJchpa8eLbIikY04RPEiKeik+DfQ==
+  dependencies:
+    lodash "^4.17.21"
+    monaco-editor "*"
+    ohm-js "^16.4.0"
+
 "@sinm/onote-plugin@^0.2.2":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@sinm/onote-plugin/-/onote-plugin-0.2.2.tgz#129f1bc664b5a44478849d56cbcf63d77801f04f"
@@ -8060,7 +8069,7 @@ monaco-editor-nls@^3.0.0:
   resolved "https://registry.npmmirror.com/monaco-editor-nls/-/monaco-editor-nls-3.0.0.tgz#d5868f593bd028ede97d2f08ad3b4bfb74b7a5ce"
   integrity sha512-WYYa1lqaN1wsJOZ5j+LVHvmJgx23UbCG7XnzcY8x9DT59EZNmNsCmyMU1kyhmyNDE/KZeLCAXAM7BvQ/P6/B7w==
 
-monaco-editor@0.30.1, monaco-editor@0.34.1:
+monaco-editor@*, monaco-editor@0.30.1, monaco-editor@0.34.1:
   version "0.34.1"
   resolved "https://registry.npmmirror.com/monaco-editor/-/monaco-editor-0.34.1.tgz#1b75c4ad6bc4c1f9da656d740d98e0b850a22f87"
   integrity sha512-FKc80TyiMaruhJKKPz5SpJPIjL+dflGvz4CpuThaPMc94AyN7SeC9HQ8hrvaxX7EyHdJcUY5i4D0gNyJj1vSZQ==
