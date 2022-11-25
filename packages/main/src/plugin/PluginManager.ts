@@ -188,6 +188,10 @@ class PluginManager {
     }
     const mainFrame = getMainFrame();
     const previewerFrames = getPreviewerFrames();
+    await injectJs(
+      mainFrame,
+      `window.__plugins = ${JSON.stringify(this.getPlugins())}`,
+    );
     await injectJs(mainFrame, plugin.mainJs);
     await Promise.all(
       previewerFrames.map((f) => injectJs(f, plugin.previewerJs)),
