@@ -19,7 +19,7 @@
 ## 下载
 [Release](https://github.com/pansinm/ONote/releases)
 
-## 其他
+## 依赖于
 
 1. 脚手架 [vite-electron-builder](https://github.com/cawa-93/vite-electron-builder)
 2. 编辑器 [monaco-editor](https://microsoft.github.io/monaco-editor/)
