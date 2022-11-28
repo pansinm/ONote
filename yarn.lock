@@ -2401,10 +2401,10 @@
     monaco-editor "*"
     ohm-js "^16.4.0"
 
-"@sinm/onote-plugin@^0.2.2":
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@sinm/onote-plugin/-/onote-plugin-0.2.2.tgz#129f1bc664b5a44478849d56cbcf63d77801f04f"
-  integrity sha512-5Z85qvgUErPqeYCQRB6VRIaimjpH9c6BHCXsx5sDnmsO8bcPo9JayEQ6keNsAEhmwB2PFw6YicLwsGh/FcDlig==
+"@sinm/onote-plugin@0.2.10":
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/@sinm/onote-plugin/-/onote-plugin-0.2.10.tgz#da7f029332accfea8b4013cb4575a6df65ef0b59"
+  integrity sha512-LSvpV1OZrJ2Ig/Lx0vwWWvSp6OFrm3SKhO+BaKtufS7pzQkyq7pws/bcIsK0vdPlziGQ/iSicev3UZYrplGnAw==
   dependencies:
     events "^3.3.0"
     lodash "^4.17.21"

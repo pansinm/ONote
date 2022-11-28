@@ -4,21 +4,17 @@ import { join } from 'path';
 import { manager as pluginManager } from '../plugin';
 import { sendToMain } from './ipc';
 import { findWindow, getPageUrl } from './utils';
-import { getMainFrame, getPreviewerFrames, injectJs } from './frames';
+import { injectJs } from './frames';
 
 async function injectPluginJs(frame: WebFrameMain) {
   const plugins = Object.values(pluginManager.getPlugins());
   if (![getPageUrl('main'), getPageUrl('previewer')].includes(frame.url)) {
     return;
   }
-  const mainFrame = getMainFrame();
-  const previewerFrames = getPreviewerFrames();
+  const isMainFrame = getPageUrl('main') === frame.url;
   for (const plugin of plugins) {
     try {
-      await injectJs(mainFrame, plugin.mainJs);
-      await Promise.all(
-        previewerFrames.map((f) => injectJs(f, plugin.previewerJs)),
-      );
+      await injectJs(frame, isMainFrame ? plugin.mainJs : plugin.previewerJs);
     } catch (err) {
       console.warn('load js failed', err);
     }
