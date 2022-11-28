@@ -4,11 +4,12 @@ import { monacoExtensionManager } from '/@/main/frame';
 
 function useExtensions(editor?: monaco.editor.IStandaloneCodeEditor) {
   useEffect(() => {
+    let disposer: monaco.IDisposable;
     if (editor) {
-      monacoExtensionManager.activeAll(editor);
+      disposer = monacoExtensionManager.activeAll(editor);
     }
     return () => {
-      monacoExtensionManager.disposeAll();
+      disposer?.dispose();
     };
   }, [editor]);
 }

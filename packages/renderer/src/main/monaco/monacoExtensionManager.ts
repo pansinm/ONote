@@ -6,8 +6,7 @@ interface IMonacoExtension {
   active(
     editor: monaco.editor.IStandaloneCodeEditor,
     monaco: typeof _monaco,
-  ): void;
-  dispose(): void;
+  ): monaco.IDisposable;
 }
 
 class MonacoExtensionManager {
@@ -17,11 +16,12 @@ class MonacoExtensionManager {
   }
 
   activeAll(editor: monaco.editor.IStandaloneCodeEditor) {
-    this.extensions.forEach((extension) => extension.active(editor, monaco));
-  }
-
-  disposeAll() {
-    this.extensions.forEach((extension) => extension?.dispose());
+    const disposers = this.extensions.map((extension) =>
+      extension.active(editor, monaco),
+    );
+    return {
+      dispose: () => disposers.forEach((disposer) => disposer.dispose()),
+    };
   }
 }
 
