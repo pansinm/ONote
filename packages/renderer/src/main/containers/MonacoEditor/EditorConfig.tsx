@@ -1,4 +1,5 @@
 import type * as monaco from 'monaco-editor';
+import useEditorOpen from './hooks/useEditorOpen';
 import useEditorScrollRecover from './hooks/useEditorScrollRecover';
 import useExtensions from './hooks/useExtensions';
 import useLayout from './hooks/useLayout';
@@ -30,6 +31,8 @@ function EditorConfig({
   useVim(editor);
 
   useExtensions(editor);
+
+  useEditorOpen(editor);
 
   return null;
 }
