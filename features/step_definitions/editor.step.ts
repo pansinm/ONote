@@ -13,13 +13,13 @@ When('编辑器输入{string}', async function (this: World, text) {
 });
 
 Then('代码提示{string}', async function (this: World, text) {
-  await this.page.waitForSelector(`.suggest-widget >> text=${text}`);
+  await this.page.waitForSelector(`.suggest-widget >> text="${text}"`);
   await this.page.click('.chrome-tab-close');
   await this.page.waitForSelector('.monaco-editor', { state: 'detached' });
 });
 
 When('点击代码提示{string}', async function (this: World, text: string) {
-  const selector = `.suggest-widget >> text=${text}`;
+  const selector = `.suggest-widget >> text="${text}"`;
   await this.page.waitForSelector(selector);
   await this.page.click(selector);
 });

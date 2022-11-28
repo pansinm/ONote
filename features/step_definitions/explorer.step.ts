@@ -8,8 +8,10 @@ type World = {
 };
 
 Given('打开目录', async function (this: World) {
-  await this.page.click('text=打开目录');
-  await this.page.waitForSelector('.ReactModal__Content');
+  await this.page.waitForSelector('text=打开目录');
+  console.log('click');
+  await this.page.click('text="打开目录"', { force: true, delay: 50 });
+  await this.page.waitForSelector('.fui-DialogBody');
 
   this.app.evaluate(
     async ({ dialog }, filePaths) => {
@@ -18,8 +20,8 @@ Given('打开目录', async function (this: World) {
     },
     [process.cwd() + '/fixtures'],
   );
-
-  await this.page.click('.ReactModal__Content >> text=打开目录');
+  console.log('open');
+  await this.page.click('.fui-DialogBody >> text=打开目录');
   const root = 'text=fixtures';
   await this.page.waitForSelector(root);
   await this.page.click(root);
@@ -39,6 +41,12 @@ When('打开文件{string}', async function (this: World, filename: string) {
   }
 });
 
+When('点击{string}', async function (this: World, name: string) {
+  await this.page.waitForSelector(`text="${name}"`);
+  await this.page.click(`text="${name}"`);
+  await new Promise((resolve) => setTimeout(resolve, 100));
+});
+
 Then('打开的页面是编辑页面', async function (this: World) {
   await this.page.waitForSelector('iframe', { state: 'attached' });
   await this.page.waitForSelector('.monaco-editor', { state: 'attached' });
@@ -48,6 +56,17 @@ Then('页面提示使用系统应用打开', async function (this: World) {
   await this.page.waitForSelector('text=使用系统应用打开', {
     state: 'attached',
   });
+});
+
+Then('使用系统应用打开', async function (this: World) {
+  const focus = await this.app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()[0].isFocused(),
+  );
+  // const focus = await this.page.evaluate(() => document.hasFocus());
+  expect(focus).toBe(false);
+  await this.app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()[0].focus(),
+  );
 });
 
 Then('目录按字典排序', async function (this: World) {
