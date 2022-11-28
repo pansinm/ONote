@@ -1,5 +1,6 @@
-import { BeforeAll, AfterAll, Before } from '@cucumber/cucumber';
+import { BeforeAll, AfterAll, Before, After } from '@cucumber/cucumber';
 import { _electron as electron } from 'playwright';
+import * as fs from 'fs';
 import type { ElectronApplication } from 'playwright';
 import { getElectronApp } from './utils';
 
@@ -34,6 +35,10 @@ BeforeAll(async function (this: World) {
 Before(async function () {
   this.app = getElectronApp();
   this.page = await this.app.firstWindow();
+});
+
+After(function () {
+  fs.writeFileSync('./fixtures/empty.md', '');
 });
 
 AfterAll(async function (this: World) {
