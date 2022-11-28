@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
 import * as mimetypes from 'mime-types';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import type { Engine } from '@hpcc-js/wasm';
 import { graphviz } from '@hpcc-js/wasm';
 import * as https from 'https';
@@ -149,8 +149,8 @@ export const simmer = {
     clipboard.writeBuffer('text/uri-list', Buffer.from(url, 'utf-8'));
   },
   async openExternal(uri: string) {
-    const localUri = await callDataSource('current', 'cache', uri);
-    shell.openExternal(localUri);
+    const localPath = await callDataSource('current', 'cache', uri);
+    shell.openExternal(pathToFileURL(localPath).toString());
   },
 };
 
