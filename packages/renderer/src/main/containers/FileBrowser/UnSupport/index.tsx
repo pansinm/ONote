@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { useState } from 'react';
 import React from 'react';
-import Button from '/@/components/Button';
+import { Button } from '@fluentui/react-components';
 import FileIcon from '/@/components/FileIcon';
 import View from '/@/components/View';
 import { basename } from '../../../../common/utils/uri';
@@ -33,7 +33,7 @@ const UnSupport: FC<UnSupportProps> = (props) => {
         <FileIcon size={40} uri={props.uri}></FileIcon>
         <p style={{ marginTop: 10 }}>{basename(props.uri)}</p>
         <p>不支持当前文件格式</p>
-        <Button disabled={opening} onClick={handleClick}>
+        <Button appearance="primary" disabled={opening} onClick={handleClick}>
           使用系统应用打开
         </Button>
       </View>
