@@ -5,7 +5,7 @@ import useDimensions from '../../../hooks/useDimensions';
 import stores from '../../stores';
 import Flex from '/@/components/Flex';
 import Directory from './Directory';
-import type { Project } from '../../components/ProjectSelect';
+import type { Project } from './components/ProjectSelect';
 import { useLocalStorage } from 'react-use';
 import fileService from '../../services/fileService';
 import ProjectSelector from './ProjectSelector';

@@ -39,39 +39,11 @@ export default function Setting() {
         <Tab value="editor">编辑器</Tab>
         <Tab value="plantuml">PlantUML</Tab>
         <Tab value="plugin">插件管理</Tab>
-        <Tab value="test">test</Tab>
       </TabList>
       <div className={styles.panel}>
         {tab === 'editor' && <EditorPanel />}
         {tab === 'plantuml' && <PlantUMLPanel />}
         {tab === 'plugin' && <PluginManager />}
-        {tab === 'test' && (
-          <Form
-            schema={{
-              title: 'A registration form',
-              description: 'A simple form example. Demonstrating ui options',
-              type: 'object',
-              required: ['firstName', 'lastName'],
-              properties: {
-                firstName: {
-                  type: 'string',
-                  title: 'First name',
-                  default: 'Chuck',
-                },
-                lastName: {
-                  type: 'string',
-                  title: 'Last name',
-                },
-                telephone: {
-                  type: 'string',
-                  title: 'Telephone',
-                  minLength: 10,
-                },
-              },
-            }}
-            validator={validator}
-          />
-        )}
       </div>
     </div>
   );

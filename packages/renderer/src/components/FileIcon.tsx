@@ -1,5 +1,3 @@
-import type { TreeNode } from '@sinm/react-file-tree/lib/type';
-import { IContext } from 'docx';
 import type { CSSProperties, FC } from 'react';
 import React from 'react';
 import { extname, fileType, isMarkdown } from '../common/utils/uri';

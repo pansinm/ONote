@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import React from 'react';
-import Input from '../../components/Input';
+import Input from '../../../../components/Input';
 import styles from './SSHForm.module.scss';
 import { Button } from '@fluentui/react-components';
 
