@@ -9,8 +9,8 @@ import {
 } from '@fluentui/react-components';
 import { Dismiss24Regular } from '@fluentui/react-icons';
 import React from 'react';
-import type { Project } from '../../components/ProjectSelect';
-import ProjectSelect from '../../components/ProjectSelect';
+import type { Project } from './components/ProjectSelect';
+import ProjectSelect from './components/ProjectSelect';
 
 export default function ProjectSelector(props: {
   open: boolean;

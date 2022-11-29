@@ -3,7 +3,7 @@ import type { FileTreeProps } from '@sinm/react-file-tree';
 import { FileTree } from '@sinm/react-file-tree';
 import type { FC } from 'react';
 import React, { useRef, useState } from 'react';
-import fileService from '../services/fileService';
+import fileService from '../../../services/fileService';
 import FileTreeItem from '/@/components/FileTreeItem';
 import View from '/@/components/View';
 
