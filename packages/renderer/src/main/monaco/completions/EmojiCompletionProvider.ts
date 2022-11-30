@@ -1,5 +1,6 @@
 import * as monaco from 'monaco-editor';
 import * as Emoji from 'node-emoji';
+import { isInFence } from '../utils';
 
 function generateSuggestions(range: monaco.Range) {
   return Object.keys(Emoji.emoji).map((key) => {
@@ -25,6 +26,9 @@ class EmojiCompletionProvider
     context: monaco.languages.CompletionContext,
     token: monaco.CancellationToken,
   ): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
+    if (isInFence(model, position, '')) {
+      return;
+    }
     const lineTextBefore = model
       .getLineContent(position.lineNumber)
       .substring(0, position.column);
