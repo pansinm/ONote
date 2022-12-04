@@ -27,7 +27,7 @@ const Listitem: FC<ListItemProps> = ({
   children,
   style,
   active,
-  activeBackground = '#1e90ff',
+  activeBackground = '#0f6cbd',
   hoverBackground = 'rgba(0,0,0,0.05)',
   onClose,
   onClick,

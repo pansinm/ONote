@@ -2,8 +2,8 @@ import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import type { FC } from 'react';
 import { useEffect, useRef } from 'react';
 import React from 'react';
-import FileIcon from './FileIcon';
 import './FileTreeItem.scss';
+import FileItemWithFileIcon from '@sinm/react-file-tree/lib/FileItemWithFileIcon';
 
 interface FileTreeItemProps {
   treeNode: TreeNode;
@@ -34,16 +34,7 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
         width: '100%',
       }}
     >
-      <FileIcon
-        isDirectory={treeNode.type === 'directory'}
-        expanded={treeNode.expanded}
-        uri={treeNode.uri}
-        style={{ marginRight: 5 }}
-        size={20}
-      />
-      <span className="text-ellipsis">
-        {decodeURIComponent(treeNode.uri.split('/').pop() || '')}
-      </span>
+      <FileItemWithFileIcon treeNode={treeNode} />
     </div>
   );
 };

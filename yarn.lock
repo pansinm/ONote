@@ -2456,10 +2456,10 @@
     webpack "^5.74.0"
     webpack-cli "^4.10.0"
 
-"@sinm/react-file-tree@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@sinm/react-file-tree/-/react-file-tree-0.8.0.tgz#647ca5086883bbd657618be195684755cb1bde4c"
-  integrity sha512-KAsIsKHyRzR8BUD/V7nIiTHE4QygnP6E/dUBVCbjNtEOeTSt6xFdRZd/5HmSlrjJuKdNPrJ0OAkyLUcL5kumoA==
+"@sinm/react-file-tree@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@sinm/react-file-tree/-/react-file-tree-1.0.0.tgz#26d59f6e72e5608409565774f2d7af04802c8b4b"
+  integrity sha512-IMgt+xbY5xR6gcUgeoZC6q82iLD+jZ/473nrVsiL+6Qgu45gHDBg6RgUAN4xdGIfj6QNKJRigSEwDtwn2ODM4w==
   dependencies:
     "@types/react-virtualized" "^9.21.15"
     react-virtualized "^9.22.3"
@@ -3285,6 +3285,7 @@ ajv-keywords@^3.4.1, ajv-keywords@^3.5.2:
   integrity sha512-5p6WTN0DdTGVQk6VjcEju19IgaHudalcfabD7yhDGeA6bcQnmL+CpveLJq/3hvfwd1aof6L386Ougkx6RfyMIQ==
 
 "ajv8@npm:ajv@^8.11.0", ajv@^8.0.0:
+  name ajv8
   version "8.11.2"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.11.2.tgz#aecb20b50607acf2569b6382167b65a96008bb78"
   integrity sha512-E4bfmKAhGiSTvMfL1Myyycaub+cUEU2/IvpylXkUu7CHBkBj1f/ikdzbD7YQ6FKUbixDxeYvB/xY4fvyroDlQg==
@@ -3811,15 +3812,10 @@ camelcase@^6.2.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.3.0.tgz#5685b95eb209ac9c0c177467778c9c84df58ba9a"
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
-caniuse-lite@^1.0.30001317:
-  version "1.0.30001319"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001319.tgz#eb4da4eb3ecdd409f7ba1907820061d56096e88f"
-  integrity sha512-xjlIAFHucBRSMUo1kb5D4LYgcN1M45qdKP++lhqowDpwJwGkpIRTt5qQqnhxjj1vHcI7nrJxWhCC1ATrCEBTcw==
-
-caniuse-lite@^1.0.30001400:
-  version "1.0.30001422"
-  resolved "https://registry.npmmirror.com/caniuse-lite/-/caniuse-lite-1.0.30001422.tgz#f2d7c6202c49a8359e6e35add894d88ef93edba1"
-  integrity sha512-hSesn02u1QacQHhaxl/kNMZwqVG35Sz/8DgvmgedxSH8z9UUpcDYSPYgsj3x5dQNRcNp6BwpSfQfVzYUTm+fog==
+caniuse-lite@^1.0.30001317, caniuse-lite@^1.0.30001400:
+  version "1.0.30001436"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001436.tgz"
+  integrity sha512-ZmWkKsnC2ifEPoWUvSAIGyOYwT+keAaaWPHiQ9DfMqS1t6tfuyFYoWR78TeZtznkEQ64+vGXH9cZrElwR2Mrxg==
 
 capital-case@^1.0.4:
   version "1.0.4"

@@ -2,7 +2,6 @@ import type { TreeNode } from '@sinm/react-file-tree';
 import * as url from 'url';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import mimetypes from 'mime-types';
 import type { IDataSourceProvider } from '/@/dataSource';
 
 function statsToTreeNode(
@@ -11,11 +10,7 @@ function statsToTreeNode(
 ): TreeNode {
   return {
     uri: url.pathToFileURL(filePath).toString(),
-    mime: stats.isFile()
-      ? mimetypes.lookup(path.basename(filePath)) || undefined
-      : undefined,
     type: stats.isFile() ? 'file' : 'directory',
-    async: stats.isDirectory() ? 'unload' : undefined,
   };
 }
 
