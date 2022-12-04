@@ -41,7 +41,7 @@
     "@sinm/onote-plugin": "0.2.10",
     "@sinm/prism-line-break": "^1.1.0",
     "@sinm/react-chrome-tabs": "2.0.0",
-    "@sinm/react-file-tree": "^0.8.0",
+    "@sinm/react-file-tree": "^1.0.0",
     "@types/diff": "^5.0.2",
     "@types/file-saver": "^2.0.5",
     "@types/html2canvas": "^1.0.0",

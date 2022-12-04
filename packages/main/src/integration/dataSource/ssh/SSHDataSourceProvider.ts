@@ -28,8 +28,6 @@ class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
     return {
       type: stats.isDirectory() ? 'directory' : 'file',
       uri: pathToUri(filePath),
-      async: 'unload',
-      mime: mimetypes.lookup(filePath),
     } as TreeNode;
   }
 
