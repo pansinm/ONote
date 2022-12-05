@@ -23,7 +23,8 @@ Given('打开目录', async function (this: World) {
   console.log('open');
   await this.page.click('.fui-DialogBody >> text=打开目录');
   const root = 'text=fixtures';
-  await this.page.waitForSelector(root);
+  await this.page.waitForSelector('text=d1');
+  await this.page.click(root);
   await this.page.click(root);
   await this.page.waitForSelector('text=empty.md');
 });
@@ -73,5 +74,6 @@ Then('目录按字典排序', async function (this: World) {
   const dirs: string = await this.page.evaluate(
     'document.querySelector(\'.file-tree\').innerText',
   );
+  console.log(dirs);
   expect(dirs.split('\n')).toEqual(['fixtures', 'd1', 'd2']);
 });
