@@ -1,6 +1,5 @@
 import type { TreeNode } from '@sinm/react-file-tree';
 import * as path from 'path/posix';
-import mimetypes from 'mime-types';
 import assert from 'assert';
 import type { IDataSourceProvider } from '/@/dataSource';
 import type { Client, ConnectConfig } from 'ssh2';
