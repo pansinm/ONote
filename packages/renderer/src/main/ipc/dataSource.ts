@@ -16,3 +16,5 @@ export function getDataSource(dataSourceId: string) {
 }
 
 export const currentDataSource = getDataSource('current');
+
+export type IDataSource = IPCDataSource;
