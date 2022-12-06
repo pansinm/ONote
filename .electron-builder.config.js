@@ -14,6 +14,7 @@ const config = {
     output: 'dist',
     buildResources: 'buildResources',
   },
+  remoteBuild: false,
   files: [
     'packages/**/dist/**',
     {

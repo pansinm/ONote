@@ -60,6 +60,7 @@ Then('页面提示使用系统应用打开', async function (this: World) {
 });
 
 Then('使用系统应用打开', async function (this: World) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   const focus = await this.app.evaluate(({ BrowserWindow }) =>
     BrowserWindow.getAllWindows()[0].isFocused(),
   );
