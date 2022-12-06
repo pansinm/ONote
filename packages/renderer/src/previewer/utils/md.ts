@@ -1,37 +1,10 @@
 import { unified } from 'unified';
 import rehypeParse from 'rehype-parse';
 import { toMdast } from 'hast-util-to-mdast';
-import { gfmToMarkdown } from 'mdast-util-gfm';
-import { toMarkdown } from 'mdast-util-to-markdown';
 import type { Content, Root } from 'mdast';
-import remarkParse from 'remark-parse';
-import gfm from 'remark-gfm';
-import footnotes from 'remark-footnotes';
 import editor from '../ipc/editor';
-import { mathFromMarkdown, mathToMarkdown } from 'mdast-util-math';
+import { stringify } from '../markdown/parser';
 // import type {  } from 'hast-util-to-mdast';
-
-export async function parse(markdown: string) {
-  const ast = unified()
-    .use(remarkParse)
-    .use(footnotes, { inlineNotes: true })
-    .use(gfm)
-    .parse(markdown) as Root;
-  return ast;
-}
-
-export function stringify(mdast: Root | Content) {
-  const md = toMarkdown(mdast, {
-    extensions: [
-      mathToMarkdown(),
-      gfmToMarkdown(),
-      { handlers: { emoji: (node) => `:${node.name}:` } },
-    ],
-    listItemIndent: 'one',
-    bullet: '-',
-  });
-  return md;
-}
 
 export function replaceNode(
   fileUri: string,
