@@ -65,9 +65,9 @@ Then('使用系统应用打开', async function (this: World) {
   );
   // const focus = await this.page.evaluate(() => document.hasFocus());
   expect(focus).toBe(false);
-  await this.app.evaluate(({ BrowserWindow }) =>
-    BrowserWindow.getAllWindows()[0].focus(),
-  );
+  // await this.app.evaluate(({ BrowserWindow }) =>
+  //   BrowserWindow.getAllWindows()[0].focus(),
+  // );
 });
 
 Then('目录按字典排序', async function (this: World) {
