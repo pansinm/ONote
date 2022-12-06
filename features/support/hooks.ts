@@ -1,6 +1,7 @@
 import { BeforeAll, AfterAll, Before, After } from '@cucumber/cucumber';
 import { _electron as electron } from 'playwright';
 import * as fs from 'fs';
+import * as os from 'os';
 import type { ElectronApplication } from 'playwright';
 import { getElectronApp } from './utils';
 
@@ -10,7 +11,7 @@ export type World = {
 
 BeforeAll(async function (this: World) {
   const app = ((global as any).electronApp = await electron.launch({
-    args: ['.'],
+    args: ['.', '--user-data-dir=' + os.tmpdir()],
   }));
   await app.evaluate(({ BrowserWindow }) => {
     const mainWindow = BrowserWindow.getAllWindows()[0];
