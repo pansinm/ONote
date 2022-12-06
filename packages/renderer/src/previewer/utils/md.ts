@@ -8,6 +8,7 @@ import remarkParse from 'remark-parse';
 import gfm from 'remark-gfm';
 import footnotes from 'remark-footnotes';
 import editor from '../ipc/editor';
+import { mathFromMarkdown, mathToMarkdown } from 'mdast-util-math';
 // import type {  } from 'hast-util-to-mdast';
 
 export async function parse(markdown: string) {
@@ -22,6 +23,7 @@ export async function parse(markdown: string) {
 export function stringify(mdast: Root | Content) {
   const md = toMarkdown(mdast, {
     extensions: [
+      mathToMarkdown(),
       gfmToMarkdown(),
       { handlers: { emoji: (node) => `:${node.name}:` } },
     ],

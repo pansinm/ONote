@@ -5,6 +5,8 @@ import Delete from './delete';
 import emphasis from './emphasis';
 import footnoteReference from './footnote-reference';
 import footnoteDefinition from './footnote-definition';
+import math from './math';
+import inlineMath from './inline-math';
 import emoji from './emoji';
 import footnote from './footnote';
 import heading from './heading';
@@ -35,6 +37,8 @@ const handlers = {
   delete: Delete,
   emphasis,
   emoji,
+  math,
+  inlineMath,
   footnoteReference,
   footnote,
   heading,
