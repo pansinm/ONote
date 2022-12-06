@@ -7,9 +7,11 @@ import footnotes from 'remark-footnotes';
 import type { ReactNode } from 'react';
 import remarkEmoji from './parser/remark-emoji';
 import createCtx from './createCtx';
+import remarkMath from 'remark-math';
 
 const parser = unified()
   .use(remarkParse)
+  .use(remarkMath)
   .use(remarkFrontmatter, ['yaml', 'toml'])
   .use(remarkEmoji)
   .use(footnotes, { inlineNotes: true })
