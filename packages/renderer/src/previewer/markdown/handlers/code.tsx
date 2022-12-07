@@ -8,6 +8,7 @@ import cz from 'classnames';
 import Icon from '/@/components/Icon';
 import lineBreak from '@sinm/prism-line-break';
 import { copyElementAsImage } from '../../utils/clipboard';
+import { useMeasure, useSize } from 'react-use';
 
 interface CodeProps {
   lang?: string;
@@ -19,14 +20,18 @@ export const Code = React.forwardRef<HTMLPreElement, CodeBlockProps>(
   (props, ref) => {
     const codeRef = useRef<HTMLElement>(null);
     const { lang, code } = props;
+    const [setEle, { width }] = useMeasure<HTMLElement>();
     useEffect(() => {
-      lineBreak(codeRef.current!);
-    }, []);
+      setEle(codeRef.current!);
+    });
+    console.log(width);
     useEffect(() => {
       if (codeRef.current) {
-        Prism.highlightElement(codeRef.current);
+        Prism.highlightElement(codeRef.current, false, () => {
+          lineBreak(codeRef.current!);
+        });
       }
-    }, [lang, code]);
+    }, [lang, code, width]);
     const className = cz({
       [`language-${lang}`]: lang,
     });
