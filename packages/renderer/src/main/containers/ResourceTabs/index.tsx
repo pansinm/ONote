@@ -9,8 +9,9 @@ import { basename } from '../../../common/utils/uri';
 
 import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
 import 'react-contexify/dist/ReactContexify.css';
-import markdownIcon from 'bootstrap-icons/icons/markdown.svg';
 import './index.scss';
+import { getFileIconClass } from '@sinm/react-file-tree/lib/FileItemWithFileIcon';
+import { getFileName } from '@sinm/react-file-tree/lib/utils';
 // import diagramIcon from 'bootstrap-icons/icons/diagram-2.svg';
 
 const MENU_ID = 'TABS_MENU';
@@ -25,7 +26,8 @@ export default observer(function EditorTabs() {
         basename(fileUri),
       active: fileUri === activationStore.activeFileUri,
       id: fileUri,
-      favicon: markdownIcon as any,
+      faviconClass: ` ${getFileIconClass(getFileName(fileUri), false)}`,
+      // favicon: markdownIcon as any,
     };
   });
 

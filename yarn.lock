@@ -2445,10 +2445,10 @@
   resolved "https://registry.yarnpkg.com/@sinm/prism-line-break/-/prism-line-break-1.1.0.tgz#fabf2c30c629d063609f6178ebea11783a92b861"
   integrity sha512-kke1KCvo1QDb9wEdpKGeN3e6dPAFxxzsDDu+ThP4b5oMyOjEIGDtvhRhtI8TB8b41ApX65+WpT+eT94W/pTBYA==
 
-"@sinm/react-chrome-tabs@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.npmmirror.com/@sinm/react-chrome-tabs/-/react-chrome-tabs-2.0.0.tgz#ddbe92e25373f23b41020d4a84b6f30ab65cc25e"
-  integrity sha512-EuUBl1Mok9QX210VhUKp0J6VP9Olw9WwME8OsYr49/z1MqKktJeEiH3k6R9oGtiXRzHX4qyh5lvIc7aRyxLGng==
+"@sinm/react-chrome-tabs@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@sinm/react-chrome-tabs/-/react-chrome-tabs-2.1.2.tgz#80991f14ee77825f1a1b4ea5497552eef914b220"
+  integrity sha512-iX/S8zxY9VT3IWdz5HQjUhd84Md9xGOETZ7FFIeuyH1sGewdETLLNnr536TP/XK2Lcwtq3Goxhxb2bYmLp9bLg==
   dependencies:
     draggabilly "2.2.0"
     lodash.isequal "^4.5.0"
@@ -2456,10 +2456,10 @@
     webpack "^5.74.0"
     webpack-cli "^4.10.0"
 
-"@sinm/react-file-tree@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@sinm/react-file-tree/-/react-file-tree-1.0.0.tgz#26d59f6e72e5608409565774f2d7af04802c8b4b"
-  integrity sha512-IMgt+xbY5xR6gcUgeoZC6q82iLD+jZ/473nrVsiL+6Qgu45gHDBg6RgUAN4xdGIfj6QNKJRigSEwDtwn2ODM4w==
+"@sinm/react-file-tree@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@sinm/react-file-tree/-/react-file-tree-1.0.2.tgz#b7f74d6d88b85e45a9cf5b6dc6a965de63b90ccf"
+  integrity sha512-nuYHNnOhaLotNx+W6+cx1BfXQ8DCX83o2glWvKXAXNk+qndccAupoy+Yx0kGsKBDvea1KBi0+v/Qhnd+2E2OOw==
   dependencies:
     "@types/react-virtualized" "^9.21.15"
     react-virtualized "^9.22.3"
