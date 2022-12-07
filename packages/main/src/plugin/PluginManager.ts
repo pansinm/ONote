@@ -95,7 +95,11 @@ class PluginManager {
       }
       const installDir = path.join(PLUGIN_ROOT, pkg.name);
       await this.recreateDir(installDir);
-      await fs.rename(path.join(tmpDir), installDir);
+      if (os.platform() === 'win32') {
+        await fs.cp(path.join(tmpDir), installDir, { recursive: true, force: true });
+      } else {
+        await fs.rename(path.join(tmpDir), installDir);
+      }
       return {
         name: pkg.name,
         title: pkg.title || pkg.name,
