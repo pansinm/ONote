@@ -23,7 +23,11 @@ const useStyles = makeStyles({
     ...shorthands.padding('10px'),
   },
   prefix: {
-    marginRight: '5px',
+    // marginRight: '5px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '32px',
     ':hover': {
       backgroundColor: 'rgba(0,0,0,0.05)',
       cursor: 'pointer',
@@ -34,6 +38,7 @@ const useStyles = makeStyles({
     ...shorthands.flex(1),
     ...shorthands.padding('5px', '10px'),
     ...shorthands.border('1px', 'solid', '#d3b17d'),
+    minWidth: '50px',
     fontFamily: 'bootstrap-icons',
   },
   suffix: {
@@ -56,11 +61,9 @@ const ListHeader: FC<ListHeaderProps> = ({
   const styles = useStyles();
   return (
     <div className={styles.root}>
-      <TextHangingRegular
-        onClick={onPrefixIconClick}
-        className={styles.prefix}
-        fontSize={30}
-      />
+      <span className={styles.prefix}>
+        <TextHangingRegular onClick={onPrefixIconClick} fontSize={22} />
+      </span>
       <input
         className={styles.input}
         value={searchText}

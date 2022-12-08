@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import React, { useRef, useState } from 'react';
 import { DraggableCore as Draggable } from 'react-draggable';
 import './DragBar.scss';
@@ -5,6 +6,7 @@ import './DragBar.scss';
 interface DragBarProps {
   onStop(delta: number): void;
   onStart?(): void;
+  style?: CSSProperties;
 }
 
 function DragBar(props: DragBarProps) {
@@ -34,7 +36,7 @@ function DragBar(props: DragBarProps) {
     >
       <div
         className={`resize-handle ${x ? 'moving' : ''}`}
-        style={{ transform: `translateX(${x}px)` }}
+        style={{ ...props.style, transform: `translateX(${x}px)` }}
       ></div>
     </Draggable>
   );
