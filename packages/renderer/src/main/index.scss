@@ -1,4 +1,4 @@
-@import "../styles/scrollbar.scss";
+@import '../styles/scrollbar.scss';
 * {
   border: 0;
   margin: 0;
@@ -26,6 +26,20 @@ html {
 
 :root {
   --editor-width: 50%;
+  --sidebar-width: 200px;
+  --file-list-width: 230px;
+}
+
+.file-list {
+  width: var(--file-list-width);
+  min-width: 150px;
+  position: relative;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: 100px;
+  position: relative;
 }
 
 .ReactCollapse--collapse {
@@ -36,10 +50,14 @@ html {
   background: #e9f1f6 !important;
 }
 
-[data-tab-id$=".md"] .chrome-tab-favicon {
+[data-tab-id$='.md'] .chrome-tab-favicon {
   // filter: invert(66%) sepia(94%) saturate(4201%) hue-rotate(159deg) brightness(92%) contrast(101%);
 }
 
-.chrome-tabs .chrome-tab[active] .chrome-tab-background > svg .chrome-tab-geometry {
+.chrome-tabs
+  .chrome-tab[active]
+  .chrome-tab-background
+  > svg
+  .chrome-tab-geometry {
   // fill: #fffbf0;
 }

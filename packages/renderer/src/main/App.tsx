@@ -10,25 +10,47 @@ import { observer } from 'mobx-react-lite';
 import stores from './stores';
 import View from '../components/View';
 import EventBus from './containers/EventBus';
+import DragBar from '../components/DragBar';
+
+function handleSidebarDrag(delta: number) {
+  const sidebarEle = document.querySelector('.sidebar')!;
+  const editorWidth = parseFloat(
+    getComputedStyle(sidebarEle).getPropertyValue('width'),
+  );
+
+  const root = document.documentElement;
+
+  const finalWidth = editorWidth + delta + 'px';
+  root.style.setProperty('--sidebar-width', finalWidth);
+}
+
+function handleFileListDrag(delta: number) {
+  const sidebarEle = document.querySelector('.file-list')!;
+  const editorWidth = parseFloat(
+    getComputedStyle(sidebarEle).getPropertyValue('width'),
+  );
+
+  const root = document.documentElement;
+
+  const finalWidth = editorWidth + delta + 'px';
+  root.style.setProperty('--file-list-width', finalWidth);
+}
 
 const App: FC = observer(() => {
   return (
     <div className={styles.App}>
       <div
-        className="fill-height"
+        className="fill-height sidebar"
         style={{
-          minWidth: 200,
-          width: 200,
           display: stores.activationStore.hideSidebar ? 'none' : 'block',
         }}
       >
         <Sidebar />
+        <DragBar onStart={console.log} onStop={handleSidebarDrag} />
       </div>
-      <div
-        className="fill-height"
-        style={{ minWidth: 230, width: 230, position: 'relative' }}
-      >
+      <div className="fill-height file-list">
         <FileList />
+        <DragBar onStart={console.log} onStop={handleFileListDrag} />
       </div>
       <View
         flexDirection="column"
