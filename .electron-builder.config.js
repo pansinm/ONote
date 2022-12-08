@@ -26,10 +26,9 @@ const config = {
     version: process.env.VITE_APP_VERSION,
   },
   linux: {
-    target: ['AppImage'],
-    category: 'Utility',
     target: ['deb', 'AppImage'],
-    icon: './buildResources/icon.png',
+    category: 'Utility',
+    icon: 'buildResources/icon.icns',
     maintainer: 'pansinm <pansinm@foxmail.com>',
   },
   artifactName: 'ONote-${os}-${arch}-${version}.${ext}',
