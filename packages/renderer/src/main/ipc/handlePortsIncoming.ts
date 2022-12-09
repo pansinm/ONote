@@ -2,7 +2,10 @@ import * as monaco from 'monaco-editor';
 import stores from '../stores';
 import SettingStore from '../stores/SettingStore';
 import portsServer from './portsServer';
-import { PLANTUML_ENDPOINT } from '/@/common/constants/SettingKey';
+import {
+  PLANTUML_ENDPOINT,
+  PLANTUML_USECACHE,
+} from '/@/common/constants/SettingKey';
 import IPCMethod from '/@/common/ipc/IPCMethod';
 import type {
   IPCGetEditorModelResponse,
@@ -78,6 +81,7 @@ portsServer.handleRequest(
       payload.code,
       (stores.settingStore.settings[PLANTUML_ENDPOINT] as string) ||
         'https://www.plantuml.com/plantuml',
+      !!stores.settingStore.settings[PLANTUML_USECACHE],
     );
     return {
       type: 'svg',

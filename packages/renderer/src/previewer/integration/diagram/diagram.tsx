@@ -24,7 +24,9 @@ function debounceRenderer(
         next = null;
         try {
           const res = await diagramEngine.render(lang, value, meta);
-          onRender(res);
+          if (!next) {
+            onRender(res);
+          }
         } catch (err) {
           onError(err as Error);
         }
@@ -43,30 +45,28 @@ export function Diagram(props: {
   lang: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const render = useMemo(
-    () =>
-      debounceRenderer(
-        (res) => {
-          if (!ref.current) {
-            return;
-          }
-          if (res.type === 'svg') {
-            ref.current.innerHTML =
-              typeof res.content === 'string'
-                ? res.content
-                : res.content.join('<br>');
-            return;
-          }
-          if (res.type === 'url') {
-            ref.current.innerHTML = `<img src="${res.content}">`;
-          }
-        },
-        (err) => {
-          ref.current && (ref.current.innerHTML = (err as Error).message);
-        },
-      ),
-    [],
-  );
+  const render = useMemo(() => {
+    return debounceRenderer(
+      (res) => {
+        if (!ref.current) {
+          return;
+        }
+        if (res.type === 'svg') {
+          ref.current.innerHTML =
+            typeof res.content === 'string'
+              ? res.content
+              : res.content.join('<br>');
+          return;
+        }
+        if (res.type === 'url') {
+          ref.current.innerHTML = `<img src="${res.content}">`;
+        }
+      },
+      (err) => {
+        ref.current && (ref.current.innerHTML = (err as Error).message);
+      },
+    );
+  }, []);
   useEffect(() => {
     render(props.lang as any, props.value, props.meta);
   }, [props.value, JSON.stringify(props.meta)]);
