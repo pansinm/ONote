@@ -86,7 +86,7 @@
     "magic-string": "^0.26.7",
     "mdast": "^3.0.0",
     "mdast-util-math": "^2.0.1",
-    "mermaid": "^8.14.0",
+    "mermaid": "^9.2.2",
     "mime-types": "^2.1.35",
     "mobx": "^6.4.1",
     "mobx-react-lite": "^3.3.0",
