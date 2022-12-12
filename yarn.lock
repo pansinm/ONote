@@ -2423,11 +2423,12 @@
   dependencies:
     lodash "^4.17.21"
 
-"@sinm/monaco-plantuml@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@sinm/monaco-plantuml/-/monaco-plantuml-0.4.0.tgz#aa6f5afdbb22098d0b2897ff0391c5c071690b5d"
-  integrity sha512-sTont19chzcNgTtDqYREmrpZpuzTLAP8kdd48VBzx1/3OQxJmqbT3crSIvyWpbX/EN6MmdyzUbsmfrep/zMcTg==
+"@sinm/monaco-plantuml@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@sinm/monaco-plantuml/-/monaco-plantuml-0.5.2.tgz#b189de3b127a4dbd741a6f3bbec1a774e3880773"
+  integrity sha512-zNffxh1LM7nW8Kn7gNv5/z8YtjM1RIKeINCG8VlNvql1wU4hbrfysyo9uKVcGbruXG/LtiE/unHbUvlrqN7Uwg==
   dependencies:
+    dexie "^3.2.2"
     lodash "^4.17.21"
     monaco-editor "*"
     ohm-js "^16.4.0"
@@ -4932,6 +4933,11 @@ detect-node@^2.0.4:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
   integrity sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==
+
+dexie@^3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.2.2.tgz#fa6f2a3c0d6ed0766f8d97a03720056f88fe0e01"
+  integrity sha512-q5dC3HPmir2DERlX+toCBbHQXW5MsyrFqPFcovkH9N2S/UW/H3H5AWAB6iEOExeraAu+j+zRDG+zg/D7YhH0qg==
 
 diff-sequences@^29.2.0:
   version "29.2.0"
