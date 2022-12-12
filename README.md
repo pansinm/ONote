@@ -12,10 +12,6 @@
 
 ![](docs/assets/1667632524525.png)
 
-### 双向编辑
-
-![](docs/assets/1667632692516.png)
-
 ### plantuml 智能提示
 
 ![](docs/assets/1667632399819.png)
