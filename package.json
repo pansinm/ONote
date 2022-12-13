@@ -17,7 +17,7 @@
     "compile:win": "cross-env MODE=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --win",
     "bdd": "chokidar \"features/**\" -c \"yarn  cucumber-js\"",
     "test:watch": "yarn node --experimental-vm-modules $(yarn bin jest) --watch",
-    "test": "jest",
+    "test": "jest && yarn build && yarn test:e2e",
     "test:e2e": "yarn cucumber-js",
     "watch": "node scripts/watch.js",
     "lint": "eslint . --ext js,ts,tsx"
