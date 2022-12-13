@@ -3,13 +3,8 @@
  * https://jestjs.io/docs/configuration
  */
 import { pathsToModuleNameMapper } from 'ts-jest';
-import { compilerOptions } from './packages/renderer/tsconfig.json';
+import { compilerOptions } from './tsconfig.json';
 
-console.log(
-  pathsToModuleNameMapper(compilerOptions.paths, {
-    prefix: '<rootDir>/packages/renderer/',
-  }),
-);
 export default {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
@@ -95,7 +90,7 @@ export default {
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
     ...pathsToModuleNameMapper(compilerOptions.paths, {
-      prefix: '<rootDir>/packages/renderer/',
+      prefix: '<rootDir>/',
     }),
     'monaco-editor':
       '<rootDir>/node_modules/monaco-editor/esm/vs/editor/editor.api',
@@ -115,7 +110,7 @@ export default {
   preset: 'ts-jest',
 
   // Run tests from one or more projects
-  projects: ['<rootDir>/packages/*'],
+  // projects: ['<rootDir>/packages/*'],
 
   // Use this configuration option to add custom reporters to Jest
   // reporters: undefined,
