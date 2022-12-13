@@ -1,8 +1,10 @@
 import React from 'react';
 import type { HTML } from 'mdast';
+import { ErrorBoundary } from 'react-error-boundary';
 import { escape, camelCase } from 'lodash';
 import { resolveAssetUri } from './util/uri';
 import { createLineClass } from './util/position';
+import type { ICtx } from '../types';
 
 // @see https://gist.github.com/goldhand/70de06a3bdbdb51565878ad1ee37e92b
 function parseStyle(styles: string) {
@@ -95,7 +97,7 @@ export function parseDom(text: string) {
  * @param node
  * @param ctx
  */
-export default function html(node: HTML, ctx: any) {
+export default function html(node: HTML, ctx: ICtx) {
   try {
     const { tagName, innerHtml, props } = parseDom(node.value);
     if (props.src) {
@@ -110,18 +112,9 @@ export default function html(node: HTML, ctx: any) {
           }
         : undefined,
     });
-    return <HtmlBound value={node.value}>{child}</HtmlBound>;
+    return <ErrorBoundary fallback={<>{node.value}</>}>{child}</ErrorBoundary>;
   } catch (err) {
+    console.error(err);
     return node.value;
-  }
-}
-
-class HtmlBound extends React.PureComponent<{ value: string }> {
-  state = { ele: this.props.children };
-  componentDidCatch() {
-    this.setState({ ele: this.props.value });
-  }
-  render() {
-    return this.state.ele;
   }
 }
