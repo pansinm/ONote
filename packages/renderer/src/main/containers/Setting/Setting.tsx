@@ -8,8 +8,6 @@ import {
 import PluginManager from './PluginPanel/PluginManager';
 import EditorPanel from './EditorPanel';
 import PlantUMLPanel from './PlantUMLPanel';
-import Form from '@rjsf/core';
-import validator from '@rjsf/validator-ajv8';
 
 const useStyles = makeStyles({
   root: {
@@ -22,6 +20,7 @@ const useStyles = makeStyles({
   },
   panel: {
     paddingLeft: '10px',
+    ...shorthands.flex(1),
   },
 });
 

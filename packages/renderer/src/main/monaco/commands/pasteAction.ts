@@ -56,7 +56,7 @@ function insertImage(editor: monaco.editor.ICodeEditor, filePath: string) {
 monaco.editor.registerCommand(
   'editor.action.clipboardPasteAction',
   async (accessor, uri) => {
-    const editor = manager.getEditor();
+    const editor = monaco.editor.getEditors()[0];
     const model = monaco.editor.getModel(uri);
     if (editor && model?.getLanguageId() === 'markdown') {
       try {

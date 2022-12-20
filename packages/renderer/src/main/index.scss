@@ -18,6 +18,12 @@ html {
   scroll-behavior: smooth;
 }
 
+body {
+  font-family: Source Han Sans, Noto, 'Droid Sans Mono', 'monospace',
+    Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei,
+    WenQuanYi Micro Hei, Arial, sans-serif;
+}
+
 .bi {
   display: flex;
   justify-content: center;
