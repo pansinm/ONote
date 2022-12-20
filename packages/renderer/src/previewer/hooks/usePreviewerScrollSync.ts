@@ -1,9 +1,8 @@
 import _ from 'lodash';
 import type { Root } from 'mdast';
-import { useCallback, useEffect, useRef } from 'react';
-import { useLatest, usePrevious } from 'react-use';
+import { useCallback, useEffect } from 'react';
+import { useLatest } from 'react-use';
 import editor from '../ipc/editor';
-import mainService from '../services/mainService';
 
 function getLineNum(dom: HTMLElement) {
   const className = dom.className;
