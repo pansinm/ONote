@@ -80,7 +80,9 @@ export default (function remarkEmoji() {
     },
   });
 
-  add('toMarkdown', { handlers: { emoji: (node: any) => `:${node.name}:` } });
+  add('toMarkdownExtensions', {
+    handlers: { emoji: (node: any) => `:${node.name}:` },
+  });
 
   function add(field: string, value: unknown) {
     const list: unknown[] = data[field]

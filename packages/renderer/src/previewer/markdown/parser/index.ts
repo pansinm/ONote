@@ -23,5 +23,5 @@ export const parse = (markdown: string) => {
 };
 
 export const stringify = (node: Node) => {
-  return parser.stringify(node as Root);
+  return parser.stringify(node as Root).trim();
 };
