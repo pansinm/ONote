@@ -39,6 +39,8 @@
     "@sinm/prism-line-break": "^1.1.0",
     "@sinm/react-chrome-tabs": "^2.1.2",
     "@sinm/react-file-tree": "^1.0.2",
+    "@swc/core": "^1.3.23",
+    "@swc/jest": "^0.2.24",
     "@testing-library/react": "^13.4.0",
     "@types/diff": "^5.0.2",
     "@types/file-saver": "^2.0.5",
