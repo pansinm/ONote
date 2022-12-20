@@ -48,7 +48,7 @@ class EditorAdapter {
     return port.handleEvent(IPCMethod.OpenedModelChangedEvent, callback);
   }
 
-  async onScrollChanged(
+  onScrollChanged(
     callback: ({
       uri,
       lineNumber,
