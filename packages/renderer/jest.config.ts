@@ -4,6 +4,7 @@
  */
 import { pathsToModuleNameMapper } from 'ts-jest';
 import { compilerOptions } from './tsconfig.json';
+import path from 'path';
 
 export default {
   // All imported modules in your tests should be mocked automatically
@@ -69,6 +70,11 @@ export default {
   // A set of global variables that need to be available in all test environments
   // globals: {},
 
+  globals: {
+    'ts-jest': {
+      isolatedModules: true,
+    },
+  },
   // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
   // maxWorkers: "50%",
 
@@ -89,12 +95,12 @@ export default {
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
+    '^.+\\.(css|less|scss)$': '<rootDir>/.eslintrc.json',
     ...pathsToModuleNameMapper(compilerOptions.paths, {
       prefix: '<rootDir>/',
     }),
     'monaco-editor':
-      '<rootDir>/node_modules/monaco-editor/esm/vs/editor/editor.api',
-    '^.+\\.(css|less)$': '<rootDir>/.electron-vendors.cache.json',
+      '<rootDir>/../../node_modules/monaco-editor/esm/vs/editor/editor.api',
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
@@ -185,7 +191,9 @@ export default {
   },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  transformIgnorePatterns: ['node_modules/(?!(monaco-editor)/)'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(monaco-editor|mdast-.*|unist-.*))/.+\\.(js|jsx|mjs|cjs|ts|tsx)$"',
+  ],
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,
 
@@ -196,5 +204,5 @@ export default {
   watchPathIgnorePatterns: ['dist', 'node_modules'],
 
   // Whether to use watchman for file crawling
-  // watchman: true,
+  watchman: true,
 };
