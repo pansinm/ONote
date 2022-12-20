@@ -7,15 +7,16 @@ import '../styles/utils.scss';
 import './index.scss';
 import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 import './hotkey';
 import './integration';
 import './ipc';
 
-render(
+const root = createRoot(document.getElementById('app') as HTMLDivElement);
+
+root.render(
   <FluentProvider theme={webLightTheme}>
     <App />
   </FluentProvider>,
-  document.getElementById('app'),
 );

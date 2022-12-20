@@ -1,4 +1,4 @@
-type Layout = 'split' | 'editor-only' | 'previewer-only' | 'separate-window';
+type Layout = 'split' | 'editor-only' | 'previewer-only';
 
 class LayoutStore {
   layout: Layout = 'split';
