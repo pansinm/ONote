@@ -2,14 +2,15 @@ import React from 'react';
 import type { LinkReference } from 'mdast';
 import { resolveAssetUri } from './util/uri';
 import { createLineClass } from './util/position';
+import type { ICtx } from '../types';
 
-export default function linkReference(node: LinkReference, ctx: any) {
+export default function linkReference(node: LinkReference, ctx: ICtx) {
   const def = ctx.definition(node.identifier);
   if (!def) {
     const head = `[${node.label || node.identifier}]`;
     let tail: React.ReactNode = '';
     if (node.children.length) {
-      tail = <>[{renderChildren(node, ctx)}]</>;
+      tail = <>[{ctx.renderChildren(node, ctx)}]</>;
     }
     return (
       <>
@@ -22,7 +23,7 @@ export default function linkReference(node: LinkReference, ctx: any) {
     <a
       className={createLineClass(node.position)}
       href={resolveAssetUri(def.url, ctx)}
-      title={def.title}
+      title={def.title || undefined}
     >
       {ctx.renderChildren(node, ctx)}
     </a>
