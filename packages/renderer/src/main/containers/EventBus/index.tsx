@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
+import * as monaco from 'monaco-editor';
 import eventbus from '../../eventbus';
 import stores from '../../stores';
 import { EDITOR_FILE_SAVE } from '../../eventbus/EventName';
+import { fileType, relative } from '/@/common/utils/uri';
+import { getFileName } from '@sinm/react-file-tree/lib/utils';
 
 const EventBus = () => {
   useEffect(() => {
@@ -14,16 +17,43 @@ const EventBus = () => {
     };
   }, []);
   useEffect(() => {
-    const openFile = (event: any) => {
-      if (event?.data?.type === 'open-file') {
+    const handleMessage = (event: any) => {
+      const data = event?.data;
+      if (data?.type === 'open-file') {
         stores.activationStore.activeFile(
           event?.data.url.replace(/^onote:/, 'file:'),
         );
+        return;
+      }
+      if (data?.type === 'insert-file') {
+        const { payload } = data;
+        const { uri, insertUri } = payload || {};
+        const editor = monaco.editor.getEditors()[0];
+        const model = editor.getModel();
+        const modelUri = model?.uri.toString();
+        const position = editor?.getPosition();
+        if (editor && modelUri && position) {
+          const relativePath = relative(modelUri, insertUri);
+          editor.executeEdits('', [
+            {
+              range: new monaco.Range(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column,
+              ),
+              text:
+                fileType(insertUri) === 'image'
+                  ? `![](${relativePath})`
+                  : `[${getFileName(insertUri)}](${relativePath})`,
+            },
+          ]);
+        }
       }
     };
-    window.addEventListener('message', openFile);
+    window.addEventListener('message', handleMessage);
     return () => {
-      window.removeEventListener('message', openFile);
+      window.removeEventListener('message', handleMessage);
     };
   }, []);
   return null;

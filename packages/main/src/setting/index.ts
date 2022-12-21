@@ -1,13 +1,16 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
+import EventEmitter from 'events';
 import * as fsp from 'fs/promises';
 import { decrypt, encrypt } from '../utils/security';
 import { findWindow } from '../window/utils';
 
 const configFile = app.getPath('userData') + '/.onote-setting.json';
-class Setting {
+
+class Setting extends EventEmitter {
   private _setting: Record<string, any> = {};
   private configFile: string;
   constructor(configFile: string) {
+    super();
     this.configFile = configFile;
     this.loadFromFile();
   }
@@ -27,20 +30,35 @@ class Setting {
       // ignore
     }
   }
+
   update(key: string, value: any) {
     this._setting[key] = value;
-    findWindow('main')?.webContents.send('setting.updated', {
-      key,
-      value,
-      all: this._setting,
-    });
+    this.emit('updated', key, value, this._setting);
     this.syncToFile();
   }
+
+  get(key: string) {
+    return this.getAll()[key];
+  }
+
   getAll() {
-    return this._setting;
+    return Object.assign(
+      {
+        'server.port': '21221',
+      },
+      this._setting,
+    );
   }
 }
 
 const setting = new Setting(configFile);
+
+setting.on('updated', (key, value, all) => {
+  findWindow('main')?.webContents.send('setting.updated', {
+    key,
+    value,
+    all,
+  });
+});
 
 export default setting;

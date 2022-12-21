@@ -31,6 +31,7 @@ const config = {
       external: [
         'electron',
         'electron-devtools-installer',
+        'express',
         'ssh2',
         ...builtinModules.flatMap((p) => [p, `node:${p}`]),
       ],

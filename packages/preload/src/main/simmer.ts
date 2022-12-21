@@ -13,27 +13,18 @@ import { shell } from 'electron';
 import { ipcRenderer } from 'electron';
 import { clipboard, nativeImage } from 'electron';
 import { exposeInMainWorld } from './exposeInMainWorld';
-import * as _ from 'lodash';
+import { internalIpV4 } from 'internal-ip';
 import { callDataSource } from '../ipc/dataSource';
 import { callPlugin } from '../ipc/plugin';
 import { callSetting } from '../ipc/setting';
 import { callDevelop } from '../ipc/develop';
 import { nodeCrypto } from '../common/nodeCrypto';
 
-const ensureDir = async (dir: string) => {
-  const exists = await fs
-    .access(dir)
-    .then(() => true)
-    .catch(() => false);
-  if (!exists) {
-    await fs.mkdir(dir, { recursive: true });
-  }
-};
-
 // Export for types in contracts.d.ts
 export const simmer = {
-  ensureDir,
-
+  localIpV4() {
+    return internalIpV4();
+  },
   /**
    * 删除目录或文件
    * @param path
@@ -44,20 +35,6 @@ export const simmer = {
 
   async invokeIpc(channel: string, ...args: any[]): Promise<unknown> {
     return ipcRenderer.invoke(channel, ...args);
-  },
-
-  async writeFile(
-    filePath: string,
-    content: any,
-    encoding: BufferEncoding = 'utf-8',
-  ) {
-    const parent = path.dirname(filePath);
-    await ensureDir(parent);
-    await fs.writeFile(filePath, content, encoding);
-  },
-
-  readFile(filePath: string, encoding: BufferEncoding = 'utf-8') {
-    return fs.readFile(filePath, encoding);
   },
 
   homedir() {

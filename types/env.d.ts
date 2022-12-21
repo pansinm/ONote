@@ -23,3 +23,5 @@ interface ImportMeta {
 declare module 'plantuml-encoder';
 
 declare module 'monaco-editor-nls/locale/zh-hans';
+
+declare module 'relative';

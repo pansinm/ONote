@@ -60,6 +60,9 @@ const config = {
     fs: {
       strict: true,
     },
+    proxy: {
+      '/upload': 'http://localhost:21221',
+    },
     // hmr: {
     //   overlay: false,
     // },
@@ -73,6 +76,7 @@ const config = {
       input: {
         index: join(PACKAGE_ROOT, 'main.html'),
         previewer: join(PACKAGE_ROOT, 'previewer.html'),
+        auxiliary: join(PACKAGE_ROOT, 'auxiliary.html'),
       },
       external: [...externals],
     },

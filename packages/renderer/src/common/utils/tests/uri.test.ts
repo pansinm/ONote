@@ -2,6 +2,7 @@ import { isEqual } from 'lodash';
 import {
   fileType,
   isMarkdown,
+  relative,
   resolveUri,
   toFileUri,
   toONoteUri,
@@ -34,4 +35,8 @@ test('toFileUri', () => {
 
 test('isEquals', () => {
   expect(isEqual('file:///测试.md', 'file:///%E6%B5%8B%E8%AF%95'));
+});
+
+test('relative', () => {
+  expect(relative('file:///a/b.txt', 'file:///b/c.txt')).toBe('../b/c.txt');
 });

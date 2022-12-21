@@ -7,6 +7,8 @@ import { manager as dataSourceManager } from './dataSource';
 import { manager as pluginManager } from './plugin';
 
 crashReporter.start({ uploadToServer: false });
+
+import './server';
 /**
  * Prevent multiple instances
  */
