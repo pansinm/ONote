@@ -9,17 +9,12 @@
     "isolatedModules": true,
     "types": ["node"],
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
       "/@/*": ["./src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "../../types/**/*.d.ts"
-  ],
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ]
+  "include": ["src/**/*.ts", "../../types/**/*.d.ts"],
+  "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

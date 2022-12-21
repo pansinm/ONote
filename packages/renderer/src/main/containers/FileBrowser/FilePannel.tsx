@@ -6,10 +6,10 @@ import React from 'react';
 import MonacoEditor from '../MonacoEditor/MonacoEditor';
 import Flex from '/@/components/Flex';
 import DragBar from '/@/components/DragBar';
-import Icon from '/@/components/Icon';
 import UnSupport from './UnSupport';
 import { filePanelManager } from '../../frame';
 import { isEquals } from '/@/common/utils/uri';
+import Toolbar from './Toolbar';
 
 function handleDrag(delta: number) {
   const editorContainerEle = document.querySelector('.editor-container')!;
@@ -72,20 +72,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
           flexDirection: 'column',
         }}
       >
-        <Flex
-          justifyContent={'space-between'}
-          boxShadow="#dddddd 0 6px 6px -6px"
-          padding={'5px 10px'}
-        >
-          <div></div>
-          <Flex paddingRight={10}>
-            <Icon
-              title="演示"
-              type="play-btn-fill"
-              onClick={() => window.simmer.showPreviewerWindow()}
-            />
-          </Flex>
-        </Flex>
+        <Toolbar />
         <Flex position="relative" flex={1}>
           <div
             className="fill-height editor-container"
