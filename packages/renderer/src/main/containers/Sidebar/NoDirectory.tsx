@@ -1,6 +1,6 @@
 import { makeStyles } from '@fluentui/react-components';
 import { AnimalCatRegular } from '@fluentui/react-icons';
-import type { FC } from 'react';
+import type { FC, ReactNode } from 'react';
 import React from 'react';
 
 const useStyles = makeStyles({
@@ -16,7 +16,7 @@ const useStyles = makeStyles({
   },
 });
 
-const NoDirectory: FC = (props) => {
+const NoDirectory: FC<{ children: string }> = (props) => {
   const styles = useStyles();
   return (
     <div className={styles.root}>

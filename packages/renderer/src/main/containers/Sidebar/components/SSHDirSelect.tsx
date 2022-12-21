@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import FileTreeItem from '/@/components/FileTreeItem';
 import View from '/@/components/View';
 import { currentDataSource } from '/@/main/ipc';
+import { isEquals } from '/@/common/utils/uri';
 
 interface SSHDirSelectProps {
   onOpen(uri: string): void;
@@ -55,7 +56,10 @@ const SSHDirSelect: FC<SSHDirSelectProps> = (props) => {
   }, []);
   const itemRenderer: FileTreeProps['itemRenderer'] = (treeNode) => {
     return (
-      <FileTreeItem active={selected === treeNode.uri} treeNode={treeNode} />
+      <FileTreeItem
+        active={isEquals(selected, treeNode.uri)}
+        treeNode={treeNode}
+      />
     );
   };
   const handleClick = () => {

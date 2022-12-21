@@ -2,6 +2,7 @@ import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { autorun, makeAutoObservable, reaction, runInAction, when } from 'mobx';
 import fileService from '../services/fileService';
 import type ActivationStore from './ActivationStore';
+import { isEquals } from '/@/common/utils/uri';
 
 class FileListStore {
   files: TreeNode[] = [];
@@ -24,7 +25,7 @@ class FileListStore {
     const dirUri = this.activationStore.activeDirUri;
     if (dirUri) {
       fileService.readdir(dirUri).then((nodes) => {
-        if (dirUri === this.activationStore.activeDirUri) {
+        if (isEquals(dirUri, this.activationStore.activeDirUri)) {
           runInAction(() => {
             this.files = nodes.filter((node) => node.type === 'file');
           });

@@ -1,6 +1,7 @@
 import { makeAutoObservable, reaction, runInAction } from 'mobx';
 import _ from 'lodash';
 import type FileStateStore from './FileStore';
+import { isEquals } from '/@/common/utils/uri';
 
 class ActivationStore {
   openedFiles: string[] = [];
@@ -41,10 +42,12 @@ class ActivationStore {
   }
 
   closeFile(uri: string) {
-    const index = this.openedFiles.findIndex((fileUri) => fileUri === uri);
+    const index = this.openedFiles.findIndex((fileUri) =>
+      isEquals(fileUri, uri),
+    );
     if (index > -1) {
       this.openedFiles = this.openedFiles.filter((fileUri) => fileUri !== uri);
-      if (uri === this.activeFileUri) {
+      if (isEquals(uri, this.activeFileUri)) {
         this.activeFileUri =
           this.openedFiles[index - 1] || this.openedFiles[index] || '';
       }
@@ -55,11 +58,11 @@ class ActivationStore {
     this.openedFiles = this.openedFiles.filter(
       (file) => !file.startsWith(dirUri + '/'),
     );
-    if (this.activeDirUri === dirUri) {
+    if (isEquals(this.activeDirUri, dirUri)) {
       this.activeDirUri = '';
     }
     this.activeFileUri =
-      this.openedFiles.find((uri) => uri === this.activeFileUri) ||
+      this.openedFiles.find((uri) => isEquals(uri, this.activeFileUri)) ||
       _.last(this.openedFiles) ||
       '';
   }
@@ -77,12 +80,12 @@ class ActivationStore {
 
   renameFileUri(uri: string, newUri: string) {
     this.openedFiles = this.openedFiles.map((file) => {
-      if (uri === file) {
+      if (isEquals(uri, file)) {
         return newUri;
       }
       return file;
     });
-    if (this.activeFileUri === newUri) {
+    if (isEquals(this.activeFileUri, newUri)) {
       this.activeFileUri = newUri;
     }
   }
@@ -91,7 +94,7 @@ class ActivationStore {
     this.openedFiles = this.openedFiles.map((file) =>
       file.startsWith(dirUri + '/') ? file.replace(dirUri, newDirUri) : file,
     );
-    if (this.activeDirUri === dirUri) {
+    if (isEquals(this.activeDirUri, dirUri)) {
       this.activeDirUri = newDirUri;
     }
     if (this.activeFileUri.startsWith(dirUri + '/')) {
@@ -113,10 +116,16 @@ class ActivationStore {
    * @param uri
    */
   closeRightFiles(uri: string) {
-    const index = this.openedFiles.findIndex((fileUri) => fileUri === uri);
+    const index = this.openedFiles.findIndex((fileUri) =>
+      isEquals(fileUri, uri),
+    );
     if (index > -1) {
       this.openedFiles = this.openedFiles.slice(0, index + 1);
-      if (this.openedFiles.find((fileUri) => fileUri === this.activeFileUri)) {
+      if (
+        this.openedFiles.find((fileUri) =>
+          isEquals(fileUri, this.activeFileUri),
+        )
+      ) {
         this.activeFileUri = uri;
       } else {
         this.activeFileUri =
@@ -130,11 +139,15 @@ class ActivationStore {
    * @param uri
    */
   closeLeftFiles(uri: string) {
-    const index = this.openedFiles.findIndex((fileUri) => fileUri === uri);
+    const index = this.openedFiles.findIndex((fileUri) =>
+      isEquals(fileUri, uri),
+    );
     if (index > -1) {
       this.openedFiles = this.openedFiles.slice(index);
       if (
-        this.openedFiles.find((resource) => resource === this.activeFileUri)
+        this.openedFiles.find((resource) =>
+          isEquals(resource, this.activeFileUri),
+        )
       ) {
         this.activeFileUri = uri;
       } else {
@@ -149,7 +162,9 @@ class ActivationStore {
    * @param uri
    */
   closeOtherFiles(uri: string) {
-    this.openedFiles = this.openedFiles.filter((fileUri) => fileUri === uri);
+    this.openedFiles = this.openedFiles.filter((fileUri) =>
+      isEquals(fileUri, uri),
+    );
     this.activeFileUri = uri;
   }
 

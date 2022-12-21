@@ -17,6 +17,7 @@ import type {
   IPCRenderPlantUMLDiagramRequest,
   IPCRenderPlantUMLDiagramResponse,
 } from '/@/common/ipc/types';
+import { isEquals } from '/@/common/utils/uri';
 
 portsServer.handleRequest(IPCMethod.GetEditorModel, async () => {
   const uri = stores.activationStore.activeFileUri;
@@ -34,7 +35,7 @@ portsServer.handleRequest(
   IPCMethod.GetEditorScrollPosition,
   async ({ uri }: { uri: string }) => {
     const editor = monaco.editor.getEditors()['0'];
-    if (editor && editor.getModel()?.uri.toString() === uri) {
+    if (editor && isEquals(editor.getModel()?.uri.toString(), uri)) {
       return {
         uri,
         lineNumber: editor.getVisibleRanges()?.[0].startLineNumber || 0,
@@ -51,7 +52,7 @@ portsServer.handleRequest(
     const { range, text, uri } = payload;
     const model = monaco.editor
       .getModels()
-      .find((model) => model.uri.toString() === uri);
+      .find((model) => isEquals(model.uri.toString(), uri));
     model?.applyEdits([{ range, text }]);
   },
 );
