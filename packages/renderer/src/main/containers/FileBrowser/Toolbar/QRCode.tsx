@@ -18,23 +18,25 @@ function QRCodeContent() {
         `http://${ip}:${stores.settingStore.settings['server.port']}/mobile?file=${stores.activationStore.activeFileUri}`,
       );
     });
-  }, []);
-  console.log('url', url);
+  }, [stores.activationStore.activeFileUri]);
+
   return (
     <div>
       <p>从手机插入文件</p>
-      {url && <_QRCode style={{ width: '100%' }} value={url} />}
+      {url ? <_QRCode style={{ width: '100%' }} value={url} /> : <p>...</p>}
     </div>
   );
 }
 
 function QRCode() {
+  const [visible, setVisible] = useState(false);
   return (
     <Tooltip
       withArrow
+      onVisibleChange={(e, data) => setVisible(data.visible)}
       positioning={'below-start'}
-      content={<QRCodeContent />}
-      relationship={'label'}
+      content={visible ? <QRCodeContent /> : ''}
+      relationship={'description'}
     >
       <span>
         <QrCode20Regular title="insert" />
