@@ -61,3 +61,14 @@ export const toONoteUri = (uri: string) => {
 export const toFileUri = (uri: string) => {
   return uri.replace(/^onote:/, 'file:');
 };
+
+export const isEquals = (uri1?: string, uri2?: string) => {
+  if (!uri1 || !uri2) {
+    return false;
+  }
+  try {
+    return decodeURIComponent(uri1) === decodeURIComponent(uri2);
+  } catch (err) {
+    return uri1 === uri2;
+  }
+};

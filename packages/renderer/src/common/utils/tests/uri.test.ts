@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash';
 import {
   fileType,
   isMarkdown,
@@ -29,4 +30,8 @@ test('toONoteUri', () => {
 
 test('toFileUri', () => {
   expect(toFileUri('onote:///a/b')).toBe('file:///a/b');
+});
+
+test('isEquals', () => {
+  expect(isEqual('file:///测试.md', 'file:///%E6%B5%8B%E8%AF%95'));
 });

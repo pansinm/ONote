@@ -9,6 +9,7 @@ import DragBar from '/@/components/DragBar';
 import Icon from '/@/components/Icon';
 import UnSupport from './UnSupport';
 import { filePanelManager } from '../../frame';
+import { isEquals } from '/@/common/utils/uri';
 
 function handleDrag(delta: number) {
   const editorContainerEle = document.querySelector('.editor-container')!;
@@ -49,7 +50,7 @@ function Previewer({ previewerUri }: { previewerUri?: string }) {
         <iframe
           key={uri}
           className="fullfill"
-          style={{ display: uri === previewerUri ? 'block' : 'none' }}
+          style={{ display: isEquals(uri, previewerUri) ? 'block' : 'none' }}
           name="previewer"
           src={uri}
         />

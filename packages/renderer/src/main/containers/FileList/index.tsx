@@ -16,7 +16,7 @@ import Flex from '/@/components/Flex';
 import SearchList from './SearchList';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { useLatest, usePrevious } from 'react-use';
-import { resolveUri } from '../../../common/utils/uri';
+import { isEquals, resolveUri } from '../../../common/utils/uri';
 import { blobToBuffer } from '../../../common/utils/transform';
 import fileService from '../../services/fileService';
 
@@ -161,7 +161,7 @@ const FileList: FC = observer(() => {
           {stores.fileListStore.files.map((file) => (
             <ListItem
               key={file.uri}
-              active={activationStore.activeFileUri === file.uri}
+              active={isEquals(activationStore.activeFileUri, file.uri)}
               onContextMenu={(e) => {
                 showMenu(e, { props: { uri: file.uri } });
               }}

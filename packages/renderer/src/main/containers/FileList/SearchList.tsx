@@ -2,6 +2,7 @@ import { TreeItem } from '@sinm/react-file-tree';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import type { CSSProperties, FC } from 'react';
 import React from 'react';
+import { isEquals } from '/@/common/utils/uri';
 import FileTreeItem from '/@/components/FileTreeItem';
 import Flex from '/@/components/Flex';
 
@@ -28,7 +29,7 @@ const SearchList: FC<SearchListProps> = (props) => {
               return (
                 <FileTreeItem
                   treeNode={treeNode}
-                  active={props.activeUri === treeNode.uri}
+                  active={isEquals(props.activeUri, treeNode.uri)}
                 ></FileTreeItem>
               );
             }}

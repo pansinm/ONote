@@ -3,6 +3,7 @@ import type { Root } from 'mdast';
 import { useCallback, useEffect } from 'react';
 import { useLatest } from 'react-use';
 import editor from '../ipc/editor';
+import { isEquals } from '/@/common/utils/uri';
 
 function getLineNum(dom: HTMLElement) {
   const className = dom.className;
@@ -109,7 +110,8 @@ export default function usePreviewerScrollSync(
       editor
         .getScrollPosition(currentUri)
         .then(({ lineNumber }) => {
-          currentUri === latestParams.current.uri && scrollTo(lineNumber || 0);
+          isEquals(currentUri, latestParams.current.uri) &&
+            scrollTo(lineNumber || 0);
         })
         .catch((err) => {
           // ignore

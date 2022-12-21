@@ -33,6 +33,7 @@ const menus: MenuItem[] = [
 
 import orderBy from 'lodash/orderBy';
 import { when } from 'mobx';
+import { isEquals } from '/@/common/utils/uri';
 
 // directory first and filename dict sort
 const sorter = (treeNodes: TreeNode[]) =>
@@ -122,7 +123,7 @@ const Directory = observer(() => {
     (treeNode: TreeNode) => (
       <FileTreeItem
         onContextMenu={(event) => showMenu(event, { props: treeNode })}
-        active={treeNode.uri === stores.activationStore.activeDirUri}
+        active={isEquals(treeNode.uri, stores.activationStore.activeDirUri)}
         treeNode={treeNode}
       />
     ),

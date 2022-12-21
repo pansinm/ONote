@@ -5,7 +5,7 @@ import type { ItemParams } from 'react-contexify';
 import { Menu, Item, useContextMenu } from 'react-contexify';
 import type { TabProperties } from '@sinm/react-chrome-tabs/dist/chrome-tabs';
 import stores from '../../stores';
-import { basename } from '../../../common/utils/uri';
+import { basename, isEquals } from '../../../common/utils/uri';
 
 import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
 import 'react-contexify/dist/ReactContexify.css';
@@ -24,7 +24,7 @@ export default observer(function EditorTabs() {
       title:
         (fileStore.states[fileUri] === 'changed' ? '*' : '') +
         basename(fileUri),
-      active: fileUri === activationStore.activeFileUri,
+      active: isEquals(fileUri, activationStore.activeFileUri),
       id: fileUri,
       faviconClass: ` ${getFileIconClass(getFileName(fileUri), false)}`,
       // favicon: markdownIcon as any,

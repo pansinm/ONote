@@ -2,7 +2,11 @@ import { useCallback, useEffect } from 'react';
 import { useLatest } from 'react-use';
 import type * as monaco from 'monaco-editor';
 import stores from '/@/main/stores';
-import { isMarkdown, isPlaintext } from '../../../../common/utils/uri';
+import {
+  isEquals,
+  isMarkdown,
+  isPlaintext,
+} from '../../../../common/utils/uri';
 import { filePanelManager } from '../../../frame';
 
 export default function useModel(
@@ -17,7 +21,7 @@ export default function useModel(
         return;
       }
       const model = await stores.fileStore.getOrCreateModel(uri);
-      if (model.uri.toString() === latestUri.current) {
+      if (isEquals(model.uri.toString(), latestUri.current)) {
         editor?.setModel(model);
         editor?.focus();
       }
