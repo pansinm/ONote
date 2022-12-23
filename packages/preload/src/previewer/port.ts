@@ -12,9 +12,9 @@ ipcRenderer.on('port', (e) => {
 });
 
 window.addEventListener('message', (event) => {
-  const { type } = event.data;
+  const { type, payload } = event.data;
   if (type === 'request-port') {
-    ipcRenderer.invoke('request-port');
+    ipcRenderer.invoke('request-port', payload);
   }
 });
 
