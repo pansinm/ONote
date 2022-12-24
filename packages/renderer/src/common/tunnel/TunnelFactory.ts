@@ -1,17 +1,18 @@
 import { uniqueId } from 'lodash';
+import Tunnel from './Tunnel';
 
 class TunnelFactory {
-  static createTunnelToMainFrame(clientId: string) {
+  static createTunnelToMainFrame(groupId: string, peerId: string) {
+    const tunnel = new Tunnel(groupId, peerId);
     window.parent.postMessage({
-      type: 'request-payload',
-      payload: {
-        client: clientId,
-        id: [
-          uniqueId('tunnel'),
-          Math.random().toString(36).toString().slice(2),
-        ].join('-'),
+      channel: 'request-port',
+      meta: {
+        groupId,
+        peerId,
+        clientId: tunnel.clientId,
       },
     });
+    return tunnel;
   }
 }
 
