@@ -26,7 +26,7 @@ export default observer(function ActivityBar() {
   const handleSelect = async (project: Project) => {
     try {
       await fileService.connect(project.type, project.config);
-      stores.activationStore.setRootUri(project.rootUri);
+      stores.activationStore.openNoteBook(project.type, project.rootUri);
       setProject(project);
       setOpen(false);
     } catch (err) {

@@ -7,6 +7,9 @@ class ActivationStore {
   openedFiles: string[] = [];
 
   rootUri = '';
+
+  dataSourceId = 'local';
+
   activeDirUri = '';
 
   activeFileUri = '';
@@ -26,10 +29,11 @@ class ActivationStore {
     );
   }
 
-  setRootUri(uri: string) {
+  openNoteBook(dataSourceId: string, rootUri: string) {
     this.openedFiles = [];
     this.activeDirUri = '';
-    this.rootUri = uri;
+    this.rootUri = rootUri;
+    this.dataSourceId = dataSourceId;
   }
 
   activeDir(uri: string) {
