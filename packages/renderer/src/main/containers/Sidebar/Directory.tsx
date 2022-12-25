@@ -16,7 +16,7 @@ import '@sinm/react-file-tree/styles.css';
 import '@sinm/react-file-tree/icons.css';
 
 const MENU_ID = 'DIRECTORY_MENU';
-const menus: MenuItem[] = [
+const MENUS: MenuItem[] = [
   {
     id: 'CREATE_DIRECTORY',
     title: '创建目录',
@@ -114,6 +114,8 @@ const Directory = observer(() => {
         return deleteFile(dirUri, 'directory').then(() => {
           removeTreeNode(dirUri);
         });
+      case 'OPEN_FOLDER':
+        return window.simmer.openPath(dirUri);
       default:
         return;
     }
@@ -143,6 +145,10 @@ const Directory = observer(() => {
     stores.fileListStore.refreshFiles();
   };
 
+  let menus = MENUS;
+  if (stores.activationStore.dataSourceId === 'local') {
+    menus = [...MENUS, { id: 'OPEN_FOLDER', title: '打开所在文件夹' }];
+  }
   return (
     <div style={{ flex: 1, width: '100%' }}>
       <FileTree

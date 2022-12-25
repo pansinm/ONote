@@ -105,6 +105,9 @@ export const simmer = {
     }
     return renderPlantUMLToSvg(plantuml, endpoint);
   },
+  openPath(uri: string) {
+    return shell.openPath(fileURLToPath(uri));
+  },
   async copyImage(content: any, type: 'dataURL' | 'ArrayBuffer') {
     let img: NativeImage;
     console.log(content, type);
