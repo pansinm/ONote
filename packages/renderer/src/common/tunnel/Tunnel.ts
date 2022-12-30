@@ -35,23 +35,25 @@ class Tunnel {
   private handlePortMessage = (ev: MessageEvent) => {
     const { channel, meta } = ev.data;
     if (
-      channel === 'port' &&
-      meta?.clientId !== this.clientId &&
+      channel === 'tunnel-port' &&
+      meta?.isSender &&
       meta?.peerId === this.peerId
     ) {
       this.port = ev.ports[0];
       this.setupPort(this.port);
-      this.emitter.emit('_ready');
-      this.ready = true;
       window.removeEventListener('message', this.handlePortMessage);
     }
   };
 
-  constructor(groupId: string, peerId: string) {
+  constructor(groupId: string, peerId: string, port?: MessagePort) {
     this.peerId = peerId;
     this.groupId = groupId;
     this.clientId = uuid();
-    window.addEventListener('message', this.handlePortMessage);
+    if (port) {
+      this.setupPort(port);
+    } else {
+      window.addEventListener('message', this.handlePortMessage);
+    }
   }
 
   async waitForReady() {
@@ -66,6 +68,8 @@ class Tunnel {
   }
 
   private setupPort(port: MessagePort) {
+    this.emitter.emit('_ready');
+    this.ready = true;
     port.addEventListener('message', (ev) => {
       const { channel, payload, meta } = ev.data;
       this.emitter.emit(channel, payload, meta);
