@@ -16,20 +16,20 @@ ipcMain.handle('create-tunnel-port', async (ev, payload, meta) => {
     (w) => w.webContents.getURL() === getPageUrl('main'),
   );
   mainWindow?.webContents.postMessage(
-    'channel-port',
+    'tunnel-port',
     {
-      channel: 'channel-port',
+      channel: 'tunnel-port',
       payload,
-      meta,
+      meta: { ...meta, isSender: false },
     },
     [port1],
   );
   ev.sender.postMessage(
-    'channel-port',
+    'tunnel-port',
     {
-      channel: 'channel-port',
+      channel: 'tunnel-port',
       payload,
-      meta,
+      meta: { ...meta, isSender: true },
     },
     [port2],
   );

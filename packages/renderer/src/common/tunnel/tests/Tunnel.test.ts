@@ -2,28 +2,6 @@ import { waitFor } from '@testing-library/react';
 import Tunnel from '../Tunnel';
 import { uuid } from '../utils';
 
-// todo: move to setup
-window.MessageChannel = require('worker_threads').MessageChannel;
-
-function postMessage(message, targetOrigin, transfer) {
-  const event = window.document.createEvent('messageevent') as MessageEvent;
-  event.initEvent('message');
-  Object.defineProperty(event, 'data', {
-    writable: true,
-  });
-  Object.defineProperty(event, 'ports', {
-    writable: true,
-  });
-  const e = event as any;
-  e._type = 'message';
-  e.data = message;
-  e.ports = transfer;
-
-  this.dispatchEvent(event);
-}
-
-window.postMessage = postMessage.bind(window);
-
 it('Tunnel disposed will be true when call dispose', () => {
   const t1 = new Tunnel('previewer', uuid());
   expect(t1.disposed).toBe(false);
@@ -55,9 +33,10 @@ it('trigger event when port receive message', async () => {
   const tunnel = new Tunnel('test', uuid());
   window.postMessage(
     {
-      channel: 'port',
+      channel: 'tunnel-port',
       meta: {
         peerId: tunnel.peerId,
+        isSender: true,
       },
     },
     '*',
@@ -85,9 +64,10 @@ it('Tunnel will be disposed when port closed', async () => {
   const tunnel = new Tunnel('test', uuid());
   window.postMessage(
     {
-      channel: 'port',
+      channel: 'tunnel-port',
       meta: {
         peerId: tunnel.peerId,
+        isSender: true,
       },
     },
     '*',
@@ -104,9 +84,10 @@ it('call handle function to register handler', async () => {
   const tunnel = new Tunnel('test', uuid());
   window.postMessage(
     {
-      channel: 'port',
+      channel: 'tunnel-port',
       meta: {
         peerId: tunnel.peerId,
+        isSender: true,
       },
     },
     '*',
@@ -131,32 +112,20 @@ it('call handle function to register handler', async () => {
 it('tunnel can invoke peer handler', async () => {
   const { port1, port2 } = new window.MessageChannel();
   const tunnel1 = new Tunnel('test1', uuid());
-  const tunnel2 = new Tunnel('test1', tunnel1.peerId);
+  const tunnel2 = new Tunnel('test1', tunnel1.peerId, port2);
 
   window.postMessage(
     {
-      channel: 'port',
+      channel: 'tunnel-port',
       meta: {
         clientId: tunnel1.clientId,
         groupId: 'test1',
         peerId: tunnel1.peerId,
+        isSender: true,
       },
     },
     '*',
     [port1],
-  );
-
-  window.postMessage(
-    {
-      channel: 'port',
-      meta: {
-        clientId: tunnel2.clientId,
-        groupId: 'test1',
-        peerId: tunnel2.peerId,
-      },
-    },
-    '*',
-    [port2],
   );
 
   const fn = jest.fn();
