@@ -4,14 +4,25 @@ import type {
   IFilePanel,
   MainFrame as IMainFrame,
 } from '@sinm/onote-plugin/main';
-import { portsServer } from '../ipc';
 import fileService from '../services/fileService';
 import stores from '../stores';
 import filePanelManager from './filePanelManager';
 import monacoExtensionManager from '../monaco/monacoExtensionManager';
 import { reaction } from 'mobx';
+import TunnelPool from '/@/common/tunnel/TunnelPool';
+import type Tunnel from '/@/common/tunnel/Tunnel';
 
-class MainFrame implements IMainFrame {
+class MainFrame {
+  private tunnelPool = new TunnelPool();
+
+  onNewTunnel(callback: (tunnel: Tunnel) => void) {
+    return this.tunnelPool.on('new', callback);
+  }
+
+  findTunnels(indicate: (tunnel: Tunnel) => boolean) {
+    return this.tunnelPool.findAll(indicate);
+  }
+
   getActiveTab() {
     return { uri: stores.activationStore.activeFileUri };
   }
@@ -45,21 +56,11 @@ class MainFrame implements IMainFrame {
   writeText(uri: string, content: string): Promise<void> {
     return fileService.writeText(uri, content);
   }
-  listenPortEvent(
-    eventName: string,
-    listener: (port: MessagePort, payload: any) => void,
-  ) {
-    return portsServer.listenEvent(eventName, listener);
-  }
+
   invokeIpc(channel: string, ...args: any[]) {
     return window.simmer.invokeIpc(channel, ...args);
   }
-  sendPortEvent(port: MessagePort, eventName: string, payload: any): void {
-    return portsServer.sendEvent(port, eventName, payload);
-  }
-  handlePortRequest(method: string, handler: (payload: any) => Promise<any>) {
-    return portsServer.handleRequest(method, handler);
-  }
+
   getPluginRootUri(pluginName: string): string {
     const installDir = (window as any)?.__plugins?.[pluginName].installDir;
     if (installDir) {

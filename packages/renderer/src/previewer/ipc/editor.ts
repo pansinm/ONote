@@ -1,10 +1,9 @@
-import port from './port';
+import tunnel from './tunnel';
 import IPCMethod from '/@/common/ipc/IPCMethod';
 import type {
   IPCEditorModelChangedEvent,
   IPCGetEditorModelResponse,
   IPCGetEditorScrollPositionResponse,
-  IPCMessage,
 } from '/@/common/ipc/types';
 
 type Range = {
@@ -17,7 +16,7 @@ type Range = {
 class EditorAdapter {
   // 滚动至
   async scrollTo(uri: string, lineNumber: number) {
-    port.sendEvent(IPCMethod.PreviewerScrollChangedEvent, {
+    tunnel.send(IPCMethod.PreviewerScrollChangedEvent, {
       uri,
       lineNumber,
     });
@@ -25,7 +24,7 @@ class EditorAdapter {
 
   // 插入文本
   async insertText(uri: string, range: Range, text: string) {
-    return port.sendRequestAndWait(IPCMethod.InsertTextToEditor, {
+    return tunnel.call(IPCMethod.InsertTextToEditor, {
       uri,
       range,
       text,
@@ -33,19 +32,22 @@ class EditorAdapter {
   }
 
   async getCurrentModel(): Promise<IPCGetEditorModelResponse['payload']> {
-    return port.sendRequestAndWait(IPCMethod.GetEditorModel);
+    await tunnel.waitForReady();
+    return tunnel.call(IPCMethod.GetEditorModel) as any;
   }
 
   async getScrollPosition(
     uri: string,
   ): Promise<IPCGetEditorScrollPositionResponse['payload']> {
-    return port.sendRequestAndWait(IPCMethod.GetEditorScrollPosition, { uri });
+    return tunnel.call(IPCMethod.GetEditorScrollPosition, {
+      uri,
+    }) as Promise<any>;
   }
 
   onModelChanged(
     callback: (payload: IPCEditorModelChangedEvent['payload']) => void,
   ) {
-    return port.handleEvent(IPCMethod.OpenedModelChangedEvent, callback);
+    return tunnel.on(IPCMethod.OpenedModelChangedEvent, callback);
   }
 
   onScrollChanged(
@@ -54,7 +56,7 @@ class EditorAdapter {
       lineNumber,
     }: IPCGetEditorScrollPositionResponse['payload']) => void,
   ) {
-    return port.handleEvent(IPCMethod.EditorScrollChangedEvent, callback);
+    return tunnel.on(IPCMethod.EditorScrollChangedEvent, callback);
   }
 }
 
