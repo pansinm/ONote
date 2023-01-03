@@ -72,11 +72,9 @@ class Tunnel {
     this.ready = true;
     port.addEventListener('message', (ev) => {
       const { channel, payload, meta } = ev.data;
-      console.log('receive', channel, payload, meta);
       this.emitter.emit(channel, payload, meta);
     });
     port.addEventListener('close', () => {
-      console.log('port close');
       this.dispose();
     });
     port.start();
@@ -107,7 +105,6 @@ class Tunnel {
 
   send(channel: string, payload: any, meta: Meta = {}) {
     const id = uuid('tunnel-msg');
-    console.log('send message', channel, payload);
     this.port?.postMessage({
       channel,
       payload,

@@ -53,7 +53,7 @@ describe('getTextBefore', () => {
     );
   });
   afterAll(() => {
-    model.dispose();
+    model?.dispose();
   });
   it('getTextBefore', () => {
     expect(getTextBefore(model, new monaco.Position(2, 6)).trim()).toBe('t');
