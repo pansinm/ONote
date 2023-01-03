@@ -1,7 +1,8 @@
+import EventEmitter from 'events';
 import type DataSourceManager from './DataSourceManager';
 import type { IDataSourceProvider } from './providers';
 
-class DataSource {
+class DataSource extends EventEmitter {
   private provider!: IDataSourceProvider<any>;
 
   private cfg: Record<string, any>;
@@ -14,6 +15,7 @@ class DataSource {
     cfg: Record<string, any>,
     manager: DataSourceManager,
   ) {
+    super();
     this.id = id;
     this.cfg = cfg;
     this.manager = manager;
@@ -54,12 +56,15 @@ class DataSource {
   mkdir(uri: string) {
     return this.provider.mkdir(uri);
   }
-  write(uri: string, data: Buffer) {
-    return this.provider.write(uri, data);
+
+  async write(uri: string, data: Buffer) {
+    await this.provider.write(uri, data);
+    this.emit('file.content.changed', uri);
   }
 
-  writeText(uri: string, text: string) {
-    return this.provider.write(uri, Buffer.from(text, 'utf-8'));
+  async writeText(uri: string, text: string) {
+    await this.provider.write(uri, Buffer.from(text, 'utf-8'));
+    this.emit('file.content.changed', uri);
   }
 
   readText(uri: string) {

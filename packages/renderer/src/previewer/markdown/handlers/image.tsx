@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type { Image as IImage } from 'mdast';
 import { resolveAssetUri } from './util/uri';
 import Block from './components/Block';
 import Icon from '/@/components/Icon';
 import { createLineClass } from './util/position';
+import tunnel from '../../ipc/tunnel';
 
 function Image(props: {
   className?: string;
@@ -11,7 +12,7 @@ function Image(props: {
   title?: string;
   alt?: string;
 }) {
-  const [version] = useState(Date.now() + '');
+  const [version, setVersion] = useState(Date.now() + '');
   const srcUrl = new URL(props.src);
   srcUrl.searchParams.set('_', version);
   const src = srcUrl.toString();
@@ -19,6 +20,17 @@ function Image(props: {
   const handleCopyImg = useCallback(() => {
     // copyUrlAsImage(src);
   }, [src]);
+
+  useEffect(() => {
+    const disposer = tunnel.on('file.content.changed', ({ uri }) => {
+      if (uri === props.src.replace(/^onote:/, 'file:')) {
+        setVersion(Date.now() + '');
+      }
+    });
+    return () => {
+      disposer.dispose();
+    };
+  }, [props.src]);
 
   return (
     <Block

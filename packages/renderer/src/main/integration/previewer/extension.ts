@@ -3,6 +3,8 @@ import * as monaco from 'monaco-editor';
 import IPCMethod from '/@/common/ipc/IPCMethod';
 import stores from '../../stores';
 import state from './state';
+import eventbus from '../../eventbus';
+import { FILE_CONTENT_CHANGED } from '../../eventbus/EventName';
 
 function broadcastToPreviewer(channel: string, payload: any) {
   mainFrame
@@ -11,6 +13,10 @@ function broadcastToPreviewer(channel: string, payload: any) {
       tunnel.send(channel, payload);
     });
 }
+
+eventbus.on(FILE_CONTENT_CHANGED, ({ uri }) => {
+  broadcastToPreviewer(FILE_CONTENT_CHANGED, { uri });
+});
 
 mainFrame.registerEditorExtension({
   active(editor: monaco.editor.IStandaloneCodeEditor) {
