@@ -10,6 +10,7 @@ export const ScrollPosContext = React.createContext(
 
 export const ScrollPosProvider: FC<{
   editor?: monaco.editor.IStandaloneCodeEditor;
+  children: React.ReactNode;
 }> = ({ children, editor }) => {
   const posRef = useEditorScrollPos(editor);
   return (

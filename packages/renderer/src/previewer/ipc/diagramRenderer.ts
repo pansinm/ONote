@@ -1,4 +1,4 @@
-import port from './port';
+import tunnel from './tunnel';
 import IPCMethod from '/@/common/ipc/IPCMethod';
 import type {
   IPCRenderGraphvizDiagramResponse,
@@ -8,7 +8,7 @@ import type {
 
 class DiagramRenderer {
   renderGrapviz(code: string, engine: string) {
-    return port.sendRequestAndWait(IPCMethod.RenderGraphvizDiagram, {
+    return tunnel.call(IPCMethod.RenderGraphvizDiagram, {
       code,
       engine,
     } as IPCRenderGraphvizDiagramRequest['payload']) as Promise<
@@ -19,7 +19,7 @@ class DiagramRenderer {
   renderPlantUML(
     code: string,
   ): Promise<IPCRenderPlantUMLDiagramResponse['payload']> {
-    return port.sendRequestAndWait(IPCMethod.RenderPlantUmlDiagram, { code });
+    return tunnel.call(IPCMethod.RenderPlantUmlDiagram, { code }) as any;
   }
 }
 

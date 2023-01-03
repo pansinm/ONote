@@ -1,7 +1,6 @@
-import { developAdapter, portsServer } from './ipc';
+import { developAdapter } from './ipc';
 
 function reload() {
-  portsServer.closeAll();
   window.location.reload();
 }
 

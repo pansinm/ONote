@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client';
 import './index.scss';
 import App from './components/App';
 import '/@/common/emoji/emoji.scss';
-import './ipc/port';
 import './integration';
 
 // 暴露给插件使用
