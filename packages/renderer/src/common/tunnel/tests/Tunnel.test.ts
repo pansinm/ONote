@@ -17,7 +17,7 @@ it('Tunnel state will be ready when received message port', () => {
   );
   window.postMessage(
     {
-      channel: 'port',
+      channel: 'tunnel-port',
       meta: {
         clientId: '',
         peerId: tunnel.peerId,

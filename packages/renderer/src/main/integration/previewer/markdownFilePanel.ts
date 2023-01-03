@@ -1,4 +1,4 @@
-import { filePanelManager } from '../frame';
+import { filePanelManager } from '../../frame';
 
 filePanelManager.registerFilePanel({
   extensions: ['.md', '.mdx'],
