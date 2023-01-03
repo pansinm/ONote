@@ -86,6 +86,9 @@ export const simmer = {
     }
     return new Blob([img.toPNG()], { type: 'image/png' });
   },
+  executeScript(script: string) {
+    return eval(script);
+  },
   async renderPlantUML(
     plantuml: string,
     endpoint: string,

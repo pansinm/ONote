@@ -1,6 +1,7 @@
+import EventEmitter from 'events';
 import DataSource from './DataSource';
 
-class DataSourceManager {
+class DataSourceManager extends EventEmitter {
   private dataSources: Record<string, DataSource> = {};
 
   private currentDataSource?: string;
@@ -20,8 +21,13 @@ class DataSourceManager {
     if (id === 'current') {
       throw new Error('current 保留字，不能作为数据源ID');
     }
-    this.dataSources[id] =
-      this.dataSources[id] || new DataSource(id, cfg, this);
+    if (!this.dataSources[id]) {
+      const datasource = new DataSource(id, cfg, this);
+      datasource.on('file.content.changed', (uri) => {
+        this.emit('file.content.changed', { uri });
+      });
+      this.dataSources[id] = datasource;
+    }
     return this.dataSources[id];
   }
 }

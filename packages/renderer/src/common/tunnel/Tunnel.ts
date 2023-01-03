@@ -98,6 +98,11 @@ class Tunnel {
   }
   on(channel: string, handler: (payload: any, meta: Meta) => void) {
     this.emitter.on(channel, handler);
+    return {
+      dispose: () => {
+        this.emitter.off(channel, handler);
+      },
+    };
   }
 
   send(channel: string, payload: any, meta: Meta = {}) {
