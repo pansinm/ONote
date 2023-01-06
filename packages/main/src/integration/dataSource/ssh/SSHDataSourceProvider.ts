@@ -136,14 +136,23 @@ class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
     assert(this.sftp);
     const proj = md5(JSON.stringify(this.sftp.config));
     const remotePath = uriToPath(uri);
-    const localPath = platformPath.join(os.tmpdir(), proj, `./${remotePath}`);
 
+    const localPath = platformPath.join(
+      os.tmpdir(),
+      proj,
+      `./${remotePath.replaceAll(':', '')}`,
+    );
     await fs
       .mkdir(platformPath.dirname(localPath), { recursive: true })
       .catch((err) => {
         // ignore
       });
-    await this.sftp.fastGet(remotePath, localPath);
+    try {
+      await this.sftp.fastGet(remotePath, localPath);
+    } catch (err) {
+      console.log(err, remotePath, localPath, uri);
+      throw err;
+    }
     return localPath;
   }
 }
