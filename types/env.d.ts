@@ -25,3 +25,5 @@ declare module 'plantuml-encoder';
 declare module 'monaco-editor-nls/locale/zh-hans';
 
 declare module 'relative';
+
+declare module 'monaco-editor/esm/vs/base/common/uri';

@@ -35,6 +35,7 @@ test('toFileUri', () => {
 
 test('isEquals', () => {
   expect(isEqual('file:///测试.md', 'file:///%E6%B5%8B%E8%AF%95'));
+  expect(isEqual('file:///E:/测试.md', 'file:///e:/测试.md'));
 });
 
 test('relative', () => {
