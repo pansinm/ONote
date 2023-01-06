@@ -1,3 +1,5 @@
+import { URI } from 'monaco-editor/esm/vs/base/common/uri';
+
 export const pathanme = (uri: string) => {
   return new URL(uri).pathname;
 };
@@ -114,7 +116,8 @@ export const isEquals = (uri1?: string, uri2?: string) => {
     return false;
   }
   try {
-    return decodeURIComponent(uri1) === decodeURIComponent(uri2);
+    // 同一使用 Monaco URI
+    return URI.parse(uri1).toString() === URI.parse(uri2).toString();
   } catch (err) {
     return uri1 === uri2;
   }
