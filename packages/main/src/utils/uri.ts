@@ -1,5 +1,5 @@
 export const uriToPath = (uri: string) => {
-  return decodeURI(new URL(uri).pathname);
+  return decodeURIComponent(new URL(uri).pathname);
 };
 
 export const pathToUri = (path: string) => {
