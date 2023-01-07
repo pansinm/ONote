@@ -26,6 +26,7 @@ const config = {
       external: [
         'electron',
         'electron/main',
+        'default-gateway',
         '@hpcc-js/wasm',
         ...builtinModules.flatMap((p) => [p, `node:${p}`]),
       ],
