@@ -4,7 +4,7 @@ import assert from 'assert';
 import type { IDataSourceProvider } from '/@/dataSource';
 import type { Client, ConnectConfig } from 'ssh2';
 import Sftp from './Sftp';
-import { pathToUri, uriToPath } from '/@/utils/uri';
+import { pathToUri, uriToPath } from './uri';
 import * as os from 'os';
 import * as fs from 'fs/promises';
 import * as platformPath from 'path';
