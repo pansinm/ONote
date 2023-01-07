@@ -13,17 +13,19 @@ import { shell } from 'electron';
 import { ipcRenderer } from 'electron';
 import { clipboard, nativeImage } from 'electron';
 import { exposeInMainWorld } from './exposeInMainWorld';
-import { internalIpV4 } from 'internal-ip';
 import { callDataSource } from '../ipc/dataSource';
 import { callPlugin } from '../ipc/plugin';
 import { callSetting } from '../ipc/setting';
 import { callDevelop } from '../ipc/develop';
 import { nodeCrypto } from '../common/nodeCrypto';
+import * as defaultGateway from 'default-gateway';
 
 // Export for types in contracts.d.ts
 export const simmer = {
-  localIpV4() {
-    return internalIpV4();
+  async localIpV4() {
+    const gateway = await defaultGateway.v4();
+    const netInterface = os.networkInterfaces()[gateway.interface];
+    return netInterface?.find((a) => a.family === 'IPv4')?.address;
   },
   /**
    * 删除目录或文件

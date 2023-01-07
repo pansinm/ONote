@@ -33,6 +33,7 @@ const config = {
         'electron-devtools-installer',
         'express',
         'ssh2',
+        'default-gateway',
         ...builtinModules.flatMap((p) => [p, `node:${p}`]),
       ],
       output: {

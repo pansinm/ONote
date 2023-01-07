@@ -6,10 +6,10 @@ import { join } from 'path';
 import { builtinModules } from 'module';
 import commonjs from 'vite-plugin-commonjs';
 import react from '@vitejs/plugin-react';
-import MonacoEditorNlsPlugin, {
-  esbuildPluginMonacoEditorNls,
-  Languages,
-} from 'vite-plugin-monaco-editor-nls';
+// import MonacoEditorNlsPlugin, {
+//   esbuildPluginMonacoEditorNls,
+//   Languages,
+// } from 'vite-plugin-monaco-editor-nls';
 
 const zh_CN = require('vscode-loc/i18n/vscode-language-pack-zh-hans/translations/main.i18n.json');
 
@@ -18,6 +18,7 @@ const PACKAGE_ROOT = __dirname;
 const externals = [
   'fs-extra',
   '@hpcc-js/wasm',
+  'default-gateway',
   ...builtinModules
     .filter((e) => e !== 'events')
     .flatMap((p) => [p, `node:${p}`]),
