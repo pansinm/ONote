@@ -99,6 +99,8 @@ export default {
     ...pathsToModuleNameMapper(compilerOptions.paths, {
       prefix: '<rootDir>/',
     }),
+    'monaco-editor/esm/vs/base/common/uri':
+      '<rootDir>/../../node_modules/monaco-editor/esm/vs/base/common/uri',
     'monaco-editor':
       '<rootDir>/../../node_modules/monaco-editor/esm/vs/editor/editor.api',
   },

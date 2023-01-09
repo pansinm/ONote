@@ -1,5 +1,6 @@
-import { URI } from 'monaco-editor/esm/vs/base/common/uri';
+import * as uri from 'monaco-editor/esm/vs/base/common/uri';
 
+const URI = uri.URI;
 export const pathanme = (uri: string) => {
   return new URL(uri).pathname;
 };
@@ -47,12 +48,13 @@ export const isUnSupport = (uri: string) => {
 };
 
 export const relative = (from: string, to: string) => {
+  console.log(from, to);
   if (from === to) {
     return '';
   }
 
-  const fromUrl = new URL(from);
-  const toUrl = new URL(to);
+  const fromUrl = new URL(URI.parse(from).toString());
+  const toUrl = new URL(URI.parse(to).toString());
 
   if (fromUrl.host !== toUrl.host) {
     return to;
