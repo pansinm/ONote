@@ -1,5 +1,8 @@
 # ONote
 
+![drawio](assets/1673256329665.drawio.svg)
+
+## 截图
 ![](docs/assets/screenshot.png)
 
 ## 特性
