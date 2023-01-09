@@ -9,6 +9,7 @@ import * as os from 'os';
 import * as fs from 'fs/promises';
 import * as platformPath from 'path';
 import { md5 } from '/@/utils/security';
+import _ from 'lodash';
 
 type AuthForm = ConnectConfig;
 
@@ -20,6 +21,14 @@ class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
   authenticateFormSchema = {
     title: '打开本地目录',
   };
+
+  rootUri?: string;
+  setRootDirUri(rootDirUri: string): void {
+    this.rootUri = rootDirUri;
+  }
+  getRootDirUri(): string {
+    return this.rootUri || '';
+  }
 
   async readFileAsTreeNode(filePath: string): Promise<TreeNode> {
     assert(this.sftp, 'sftp 未初始化');
@@ -66,6 +75,7 @@ class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
   }
   async write(uri: string, buffer: Buffer) {
     assert(this.sftp);
+    await this.mkdir(new URL('../', uri).toString()).catch(_.noop);
     const remotePath = uriToPath(uri);
     await this.sftp.writeFile(remotePath, buffer);
   }

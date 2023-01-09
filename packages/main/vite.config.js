@@ -34,6 +34,7 @@ const config = {
         'express',
         'ssh2',
         'default-gateway',
+        'webdav-server',
         ...builtinModules.flatMap((p) => [p, `node:${p}`]),
       ],
       output: {
