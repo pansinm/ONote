@@ -62,7 +62,7 @@ mainFrame.onNewTunnel((tunnel) => {
     inIframe: boolean;
   }) => {
     const editor = monaco.editor.getEditors()[0];
-    if (uri !== editor?.getModel()?.uri.toString()) {
+    if (!isEquals(uri, editor?.getModel()?.uri.toString())) {
       return;
     }
     clearTimeout(timeout);
