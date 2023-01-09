@@ -1,4 +1,3 @@
-import { isEqual } from 'lodash';
 import {
   fileType,
   isMarkdown,
@@ -6,6 +5,7 @@ import {
   resolveUri,
   toFileUri,
   toONoteUri,
+  isEquals,
 } from '../uri';
 
 test('fileType', () => {
@@ -34,10 +34,15 @@ test('toFileUri', () => {
 });
 
 test('isEquals', () => {
-  expect(isEqual('file:///测试.md', 'file:///%E6%B5%8B%E8%AF%95'));
-  expect(isEqual('file:///E:/测试.md', 'file:///e:/测试.md'));
+  expect(isEquals('file:///测试.md', 'file:///%E6%B5%8B%E8%AF%95.md')).toBe(
+    true,
+  );
+  expect(isEquals('file:///E:/测试.md', 'file:///e:/测试.md')).toBe(true);
 });
 
 test('relative', () => {
+  expect(relative('file:///e%3A/a/a.md', 'file:///e:/a/assets/b.txt')).toBe(
+    'assets/b.txt',
+  );
   expect(relative('file:///a/b.txt', 'file:///b/c.txt')).toBe('../b/c.txt');
 });
