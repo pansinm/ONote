@@ -21,6 +21,14 @@ class DataSource extends EventEmitter {
     this.manager = manager;
   }
 
+  setRootDirUri(rootDirUri: string) {
+    return this.provider.setRootDirUri(rootDirUri);
+  }
+
+  getRootDirUri() {
+    return this.provider.getRootDirUri();
+  }
+
   getId() {
     return this.id;
   }

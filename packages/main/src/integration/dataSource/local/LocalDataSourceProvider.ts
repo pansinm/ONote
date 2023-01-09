@@ -20,6 +20,14 @@ async function readFileAsTreeNode(filePath: string): Promise<TreeNode> {
 }
 
 class LocalDataSourceProvider implements IDataSourceProvider<null> {
+  rootUri?: string;
+  setRootDirUri(rootDirUri: string): void {
+    this.rootUri = rootDirUri;
+  }
+  getRootDirUri(): string {
+    return this.rootUri || '';
+  }
+
   authenticateFormSchema = {
     title: '打开本地目录',
   };
@@ -47,6 +55,7 @@ class LocalDataSourceProvider implements IDataSourceProvider<null> {
     const localPath = url.fileURLToPath(uri);
     const dirname = path.dirname(localPath);
     await fs.mkdir(dirname, { recursive: true }).catch((err) => 0);
+    console.log(localPath, buffer);
     return fs.writeFile(localPath, buffer);
   }
   delete(uri: string) {

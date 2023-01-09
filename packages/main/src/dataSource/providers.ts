@@ -7,6 +7,9 @@ export interface IDataSourceProvider<T> {
   authenticateFormSchema: JSONSchema;
   authenticate(form: T): Promise<void>;
 
+  setRootDirUri(rootDirUri: string): void;
+  getRootDirUri(): string;
+
   disconnect(): Promise<void>;
 
   // 对于内容的版本号
