@@ -5,7 +5,7 @@ import Block from './components/Block';
 import Icon from '/@/components/Icon';
 import { createLineClass } from './util/position';
 import tunnel from '../../ipc/tunnel';
-
+import { isEquals } from '/@/common/utils/uri';
 function Image(props: {
   className?: string;
   src: string;
@@ -23,7 +23,7 @@ function Image(props: {
 
   useEffect(() => {
     const disposer = tunnel.on('file.content.changed', ({ uri }) => {
-      if (uri === props.src.replace(/^onote:/, 'file:')) {
+      if (isEquals(uri, props.src.replace(/^onote:/, 'file:'))) {
         setVersion(Date.now() + '');
       }
     });
