@@ -84,6 +84,10 @@ if (import.meta.env.PROD) {
     .catch((e) => console.error('Failed check updates:', e));
 }
 
+// app.on('renderer-process-crashed', (event, webContents, kill) => {
+//   console.warn('app:renderer-process-crashed', event, webContents, kill);
+// });
+
 app.whenReady().then(() => {
   protocol.interceptFileProtocol('onote', async (request, callback) => {
     const url = request.url.split('?')[0];
