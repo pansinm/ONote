@@ -11,3 +11,8 @@ ipcRenderer.on('open-file', (e, message) => {
     ...message,
   });
 });
+
+ipcRenderer.on('tunnel-port', (e, message) => {
+  // e.ports is a list of ports sent along with this message
+  window.postMessage(message, '*', [e.ports[0]]);
+});

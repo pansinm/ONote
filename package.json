@@ -75,7 +75,7 @@
     "cross-env": "7.0.3",
     "diff": "^5.0.0",
     "docx": "^7.3.0",
-    "electron": "^21.3.0",
+    "electron": "^22.0.2",
     "electron-builder": "^23.6.0",
     "electron-devtools-installer": "^3.2.0",
     "eslint": "8.9.0",
@@ -143,13 +143,13 @@
     "yaml": "^1.10.2"
   },
   "dependencies": {
-    "webdav-server": "^2.6.2",
-    "default-gateway": "^6.0.3",
     "@hpcc-js/wasm": "^1.13.0",
+    "default-gateway": "^6.0.3",
     "electron-updater": "4.6.5",
     "events": "^3.3.0",
     "express": "^4.18.2",
-    "ssh2": "^1.11.0"
+    "ssh2": "^1.11.0",
+    "webdav-server": "^2.6.2"
   },
   "resolutions": {
     "monaco-editor": "0.34.1"

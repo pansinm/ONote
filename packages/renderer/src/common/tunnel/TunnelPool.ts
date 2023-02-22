@@ -16,6 +16,11 @@ class TunnelPool {
     return this.tunnels.filter((tunnel) => !tunnel.disposed).filter(predicate);
   }
 
+  closeAll() {
+    this.tunnels.forEach((tunnel) => tunnel.dispose());
+    this.tunnels = [];
+  }
+
   constructor() {
     window.addEventListener('message', (ev) => {
       const { channel, meta } = ev.data;

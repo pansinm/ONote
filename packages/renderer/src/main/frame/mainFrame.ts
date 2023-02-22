@@ -9,18 +9,16 @@ import stores from '../stores';
 import filePanelManager from './filePanelManager';
 import monacoExtensionManager from '../monaco/monacoExtensionManager';
 import { reaction } from 'mobx';
-import TunnelPool from '/@/common/tunnel/TunnelPool';
 import type Tunnel from '/@/common/tunnel/Tunnel';
+import tunnelPool from '../ipc/tunnelPool';
 
 class MainFrame {
-  private tunnelPool = new TunnelPool();
-
   onNewTunnel(callback: (tunnel: Tunnel) => void) {
-    return this.tunnelPool.on('new', callback);
+    return tunnelPool.on('new', callback);
   }
 
   findTunnels(indicate: (tunnel: Tunnel) => boolean) {
-    return this.tunnelPool.findAll(indicate);
+    return tunnelPool.findAll(indicate);
   }
 
   getActiveTab() {
