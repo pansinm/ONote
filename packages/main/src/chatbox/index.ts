@@ -6,7 +6,6 @@ export function isChatBox(frame: WebFrameMain) {
 
 function injectJs() {
   const messages = document.querySelector('#messages');
-  console.log('.....', messages);
 
   const findContentElement = (target: HTMLElement): HTMLElement | null => {
     if (target.classList.contains('content')) {
@@ -38,17 +37,6 @@ function injectJs() {
         );
       });
       src.appendChild(button);
-    }
-  });
-
-  messages?.addEventListener('mouseout', (e) => {
-    const src = findContentElement(e.target as HTMLDivElement);
-    if (!src) {
-      return;
-    }
-    const button = src.querySelector('button');
-    if (button) {
-      button.remove();
     }
   });
 }
