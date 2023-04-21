@@ -10,6 +10,7 @@ import UnSupport from './UnSupport';
 import { filePanelManager } from '../../frame';
 import { isEquals } from '/@/common/utils/uri';
 import Toolbar from './Toolbar';
+import stores from '../../stores';
 
 function handleDrag(delta: number) {
   const editorContainerEle = document.querySelector('.editor-container')!;
@@ -74,48 +75,70 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
       >
         <Toolbar />
         <Flex position="relative" flex={1}>
-          <div
-            className="fill-height editor-container"
-            style={{
-              width: 'var(--editor-width)',
-              position: 'relative',
-              display: panel?.editable ? 'block' : 'none',
-            }}
-          >
-            <MonacoEditor
-              needLoad={/\.mdx?$/.test(props.uri)}
-              uri={props.uri}
-            />
-            <DragBar
-              onStart={() => setDragging(true)}
-              onStop={(delta) => {
-                setDragging(false);
-                handleDrag(delta);
+          <Flex flex={1}>
+            <div
+              className="fill-height editor-container"
+              style={{
+                width: 'var(--editor-width)',
+                position: 'relative',
+                display: panel?.editable ? 'block' : 'none',
               }}
-            />
-          </div>
-          <div
-            style={{
-              flex: 1,
-              position: 'relative',
-              display: previewerUri ? 'flex' : 'none',
-            }}
-          >
-            <Previewer previewerUri={previewerUri} />
-            {dragging ? (
-              <div
+            >
+              <MonacoEditor
+                needLoad={/\.mdx?$/.test(props.uri)}
+                uri={props.uri}
+              />
+              <DragBar
+                onStart={() => setDragging(true)}
+                onStop={(delta) => {
+                  setDragging(false);
+                  handleDrag(delta);
+                }}
+              />
+            </div>
+            <div
+              style={{
+                flex: 1,
+                position: 'relative',
+                display: previewerUri ? 'flex' : 'none',
+              }}
+            >
+              <Previewer previewerUri={previewerUri} />
+              {dragging ? (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 1,
+                    background: 'transparent',
+                  }}
+                ></div>
+              ) : null}
+            </div>
+          </Flex>
+          {typeof stores.layoutStore.sidebarShown === 'boolean' && (
+            <div
+              style={{
+                width: 400,
+                position: 'relative',
+                display: stores.layoutStore.sidebarShown ? 'block' : 'none',
+              }}
+            >
+              <iframe
                 style={{
                   position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
                   bottom: 0,
-                  zIndex: 1,
-                  background: 'transparent',
+                  right: 0,
+                  height: '100%',
+                  width: '100%',
                 }}
-              ></div>
-            ) : null}
-          </div>
+                src={stores.layoutStore.sidebarUrl}
+              />
+            </div>
+          )}
         </Flex>
       </div>
       {!panel && <UnSupport uri={props.uri} />}

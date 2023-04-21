@@ -5,6 +5,7 @@ import { manager as pluginManager } from '../plugin';
 import { sendToMain } from './ipc';
 import { findWindow, getPageUrl } from './utils';
 import { injectJs } from './frames';
+import { injectScript, isChatBox } from '../chatbox';
 
 async function injectPluginJs(frame: WebFrameMain) {
   const plugins = Object.values(pluginManager.getPlugins());
@@ -62,6 +63,9 @@ async function createWindow(type: 'main' | 'previewer') {
       frameRoutingId,
     ) => {
       const frame = webFrameMain.fromId(frameProcessId, frameRoutingId);
+      if (!frame) {
+        return;
+      }
       frame
         ?.executeJavaScript(
           `window.__plugins = ${JSON.stringify(pluginManager.getPlugins())}`,
@@ -69,6 +73,9 @@ async function createWindow(type: 'main' | 'previewer') {
         .then(() => {
           return injectPluginJs(frame);
         });
+      if (isChatBox(frame)) {
+        injectScript(frame);
+      }
     },
   );
   /**
