@@ -54,6 +54,11 @@ const App: FC = observer(() => {
       </div>
       <View
         flexDirection="column"
+        maxWidth={
+          stores.activationStore.hideSidebar
+            ? 'calc(100vw - var(--file-list-width))'
+            : 'calc(100vw - var(--file-list-width) - var(--sidebar-width))'
+        }
         className={classNames('fill-height', styles.ContentPanelWrapper)}
       >
         <ContentPanel />

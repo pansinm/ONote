@@ -25,13 +25,20 @@ function Toolbar() {
       </div>
       <Flex paddingRight={10}>
         <Icon
+          title="切换布局"
+          type="layout-split"
+          size={18}
+          onClick={() => stores.layoutStore.switchLayout()}
+        />
+        <Icon
+          style={{ marginLeft: 10 }}
           title="演示"
           type="play-btn"
           size={20}
           onClick={() => window.simmer.showPreviewerWindow()}
         />
         <Icon
-          style={{ marginLeft: 10 }}
+          style={{ marginLeft: 10, marginTop: 1 }}
           title="ChatGPT"
           type="chat-dots"
           size={18}

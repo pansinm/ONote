@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite';
-import type { FC } from 'react';
+import type { FC} from 'react';
+import { useRef } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import React from 'react';
@@ -64,6 +65,10 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
   const [dragging, setDragging] = useState(false);
   const panel = filePanelManager.getPanel(props.uri);
   const previewerUri = panel?.previewer;
+  const layout = stores.layoutStore.layout;
+
+  const editorContainerRef = useRef<HTMLDivElement>(null);
+
   return (
     <>
       <div
@@ -75,32 +80,46 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
       >
         <Toolbar />
         <Flex position="relative" flex={1}>
-          <Flex flex={1}>
+          <Flex
+            width={
+              stores.layoutStore.sidebarShown ? 'calc(100% - 400px)' : '100%'
+            }
+          >
             <div
               className="fill-height editor-container"
+              ref={editorContainerRef}
               style={{
-                width: 'var(--editor-width)',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                width:
+                  layout === 'editor-only' ? '100%' : 'var(--editor-width)',
                 position: 'relative',
-                display: panel?.editable ? 'block' : 'none',
+                display:
+                  panel?.editable && layout !== 'previewer-only'
+                    ? 'block'
+                    : 'none',
               }}
             >
               <MonacoEditor
                 needLoad={/\.mdx?$/.test(props.uri)}
                 uri={props.uri}
               />
-              <DragBar
-                onStart={() => setDragging(true)}
-                onStop={(delta) => {
-                  setDragging(false);
-                  handleDrag(delta);
-                }}
-              />
+              {layout !== 'editor-only' && (
+                <DragBar
+                  onStart={() => setDragging(true)}
+                  onStop={(delta) => {
+                    setDragging(false);
+                    handleDrag(delta);
+                  }}
+                />
+              )}
             </div>
             <div
               style={{
                 flex: 1,
                 position: 'relative',
-                display: previewerUri ? 'flex' : 'none',
+                display:
+                  previewerUri && layout !== 'editor-only' ? 'flex' : 'none',
               }}
             >
               <Previewer previewerUri={previewerUri} />
