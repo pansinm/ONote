@@ -109,6 +109,7 @@ async function createWindow(type: 'main' | 'previewer') {
     shell.openExternal(url);
     return { action: 'deny' };
   });
+
   return browserWindow;
 }
 

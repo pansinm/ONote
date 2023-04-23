@@ -1,14 +1,15 @@
 import type { WebFrameMain } from 'electron';
+import setting from '../setting';
 
 export function isChatBox(frame: WebFrameMain) {
-  return frame.url.startsWith('https://chat.chatbot.sex/chat/');
+  const url = setting.get('chatgpt.url');
+  return frame.url.startsWith(url);
 }
 
-function injectJs() {
-  const messages = document.querySelector('#messages');
-
+function injectJs(cls: string) {
+  const messages = document.body;
   const findContentElement = (target: HTMLElement): HTMLElement | null => {
-    if (target.classList.contains('content')) {
+    if (target.className.startsWith(cls)) {
       return target;
     }
     if (!target.parentElement) {
@@ -37,11 +38,13 @@ function injectJs() {
         );
       });
       src.appendChild(button);
+      button.addEventListener('mouseleave', () => button?.remove());
     }
   });
 }
 
 export function injectScript(frame: WebFrameMain) {
-  const script = `(${injectJs.toString()})()`;
+  const cls = setting.get('chatgpt.class');
+  const script = `(${injectJs.toString()})("${cls}")`;
   frame.executeJavaScript(script);
 }

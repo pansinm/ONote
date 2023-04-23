@@ -4,6 +4,7 @@ import Flex from '/@/components/Flex';
 import Icon from '/@/components/Icon';
 import { observer } from 'mobx-react-lite';
 import stores from '/@/main/stores';
+import { CHATGPT_URL } from '/@/common/constants/SettingKey';
 
 function Toolbar() {
   const toggleChatBox = () => {
@@ -11,7 +12,9 @@ function Toolbar() {
     if (shown) {
       stores.layoutStore.hideSidebar();
     } else {
-      stores.layoutStore.showSidebar('https://chat.chatbot.sex/chat/');
+      stores.layoutStore.showSidebar(
+        stores.settingStore.settings[CHATGPT_URL] as string,
+      );
     }
   };
   return (
