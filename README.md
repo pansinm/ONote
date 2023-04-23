@@ -7,6 +7,10 @@
 
 ## 特性
 
+### 集成[chatbox](https://github.com/xtekky/gpt4free)
+
+![](docs/assets/chatbox.gif)
+
 ### 支持新窗口预览
 
 ![](docs/assets/1667632814747.png)
