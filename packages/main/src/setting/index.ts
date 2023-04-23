@@ -3,6 +3,7 @@ import EventEmitter from 'events';
 import * as fsp from 'fs/promises';
 import { decrypt, encrypt } from '../utils/security';
 import { findWindow } from '../window/utils';
+import { defaultSetting } from './defaultSetting';
 
 const configFile = app.getPath('userData') + '/.onote-setting.json';
 
@@ -38,13 +39,13 @@ class Setting extends EventEmitter {
   }
 
   get(key: string) {
-    return this.getAll()[key];
+    return this.getAll()[key] || defaultSetting[key];
   }
 
   getAll() {
     return Object.assign(
       {
-        'server.port': '21221',
+        ...defaultSetting,
       },
       this._setting,
     );

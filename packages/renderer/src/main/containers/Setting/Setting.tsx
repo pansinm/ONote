@@ -8,6 +8,7 @@ import {
 import PluginManager from './PluginPanel/PluginManager';
 import EditorPanel from './EditorPanel';
 import PlantUMLPanel from './PlantUMLPanel';
+import ChatGPT from './ChatGPT';
 
 const useStyles = makeStyles({
   root: {
@@ -38,11 +39,13 @@ export default function Setting() {
         <Tab value="editor">编辑器</Tab>
         <Tab value="plantuml">PlantUML</Tab>
         <Tab value="plugin">插件管理</Tab>
+        <Tab value="chatgpt">GPT配置</Tab>
       </TabList>
       <div className={styles.panel}>
         {tab === 'editor' && <EditorPanel />}
         {tab === 'plantuml' && <PlantUMLPanel />}
         {tab === 'plugin' && <PluginManager />}
+        {tab === 'chatgpt' && <ChatGPT />}
       </div>
     </div>
   );
