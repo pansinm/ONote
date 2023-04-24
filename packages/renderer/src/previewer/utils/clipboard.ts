@@ -45,14 +45,14 @@ export async function copyUrlAsImage(imageUrl: string) {
     const svg = await res.text();
     return copySvgAsImage(svg);
   }
-  const blob = await res.blob();
-  clipboardService.write(blob);
+  const blob = await renderImage(imageUrl);
+  if (blob) {
+    clipboardService.write(blob);
+  }
 }
 
-export function renderSvg(svg: string): Promise<Blob | null> {
+export function renderImage(imageUrl: string): Promise<Blob | null> {
   return new Promise((resolve, reject) => {
-    const base64 = base64Unicode(svg.trim());
-    const dataurl = 'data:image/svg+xml;base64,' + base64;
     const canvas = document.createElement('canvas');
     const img = document.createElement('img');
     img.onload = (e) => {
@@ -80,8 +80,14 @@ export function renderSvg(svg: string): Promise<Blob | null> {
       console.log(err);
       reject(err);
     };
-    img.src = dataurl;
+    img.src = imageUrl;
   });
+}
+
+export function renderSvg(svg: string): Promise<Blob | null> {
+  const base64 = base64Unicode(svg.trim());
+  const dataurl = 'data:image/svg+xml;base64,' + base64;
+  return renderImage(dataurl);
 }
 
 /**
