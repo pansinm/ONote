@@ -1,13 +1,9 @@
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverSurface,
-  Tooltip,
-} from '@fluentui/react-components';
+import { Tooltip } from '@fluentui/react-components';
 import { QrCode20Regular } from '@fluentui/react-icons';
 import React, { useEffect, useState } from 'react';
 import _QRCode from 'react-qr-code';
 import stores from '/@/main/stores';
+import { observer } from 'mobx-react-lite';
 
 function QRCodeContent() {
   const [url, setUrl] = useState('');
@@ -28,6 +24,8 @@ function QRCodeContent() {
   );
 }
 
+const ObserverQRCode = observer(QRCodeContent);
+
 function QRCode() {
   const [visible, setVisible] = useState(false);
   return (
@@ -35,7 +33,7 @@ function QRCode() {
       withArrow
       onVisibleChange={(e, data) => setVisible(data.visible)}
       positioning={'below-start'}
-      content={visible ? <QRCodeContent /> : ''}
+      content={visible ? <ObserverQRCode /> : ''}
       relationship={'description'}
     >
       <span>
