@@ -5,6 +5,7 @@ import React from 'react';
 import {
   EDITOR_FONT_FAMILY,
   EDITOR_MODE,
+  EDITOR_WORD_WRAP,
 } from '/@/common/constants/SettingKey';
 import stores from '/@/main/stores';
 
@@ -31,8 +32,24 @@ const EditorPanel = observer(function EditorPanel() {
   const setFamily = (val: string) => {
     stores.settingStore.update(EDITOR_FONT_FAMILY, val);
   };
+
+  const wordWrapConfig =
+    stores.settingStore.settings[EDITOR_WORD_WRAP] || 'off';
+  const wordWrap = wordWrapConfig as 'on' | 'off';
+
+  const toggleWordWrap = () => {
+    stores.settingStore.update(
+      EDITOR_WORD_WRAP,
+      wordWrap === 'on' ? 'off' : 'on',
+    );
+  };
   return (
     <div>
+      <Checkbox
+        label={'自动换行'}
+        checked={wordWrap === 'on'}
+        onChange={toggleWordWrap}
+      />
       <Checkbox
         label={'VIM 模式'}
         checked={mode === 'VIM_MODE'}
