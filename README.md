@@ -7,7 +7,7 @@
 
 ## 特性
 
-### 集成[chatbox](https://github.com/xtekky/gpt4free)
+### 支持配置侧边栏，集成ChatGPT
 
 ![](docs/assets/chatbox.gif)
 
