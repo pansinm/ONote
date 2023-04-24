@@ -9,7 +9,7 @@ export function isChatBox(frame: WebFrameMain) {
 function injectJs(cls: string) {
   const messages = document.body;
   const findContentElement = (target: HTMLElement): HTMLElement | null => {
-    if (target.className.startsWith(cls)) {
+    if (target.className.includes(cls)) {
       return target;
     }
     if (!target.parentElement) {
@@ -38,7 +38,10 @@ function injectJs(cls: string) {
         );
       });
       src.appendChild(button);
-      button.addEventListener('mouseleave', () => button?.remove());
+      button.style.background = 'transparent';
+      button.style.color = 'blue';
+      button.style.width = '100%';
+      src.addEventListener('mouseleave', () => button?.remove());
     }
   });
 }
