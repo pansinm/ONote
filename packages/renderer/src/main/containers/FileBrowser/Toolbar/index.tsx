@@ -12,9 +12,12 @@ function Toolbar() {
     if (shown) {
       stores.layoutStore.hideSidebar();
     } else {
-      stores.layoutStore.showSidebar(
-        stores.settingStore.settings[CHATGPT_URL] as string,
-      );
+      const url = stores.settingStore.settings[CHATGPT_URL] as string;
+      if (url) {
+        stores.layoutStore.showSidebar(url);
+      } else {
+        alert('先在设置里面配置ChatGPT');
+      }
     }
   };
   return (

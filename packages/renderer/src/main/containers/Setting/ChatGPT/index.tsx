@@ -31,7 +31,8 @@ const ChatGPT = observer(function EditorPanel() {
       <InputField
         className={styles.input}
         type="text"
-        label="Font Family"
+        label="ChatGPT URL"
+        placeholder="右侧侧边栏会打开该页面"
         defaultValue={url}
         onChange={(e) =>
           stores.settingStore.update(CHATGPT_URL, e.target.value)
@@ -40,7 +41,8 @@ const ChatGPT = observer(function EditorPanel() {
       <InputField
         className={styles.input}
         type="text"
-        label="Font Family"
+        label="消息 Class"
+        placeholder="用于定位插入按钮，一键回填到编辑器"
         defaultValue={cls}
         onChange={(e) =>
           stores.settingStore.update(

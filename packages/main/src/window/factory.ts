@@ -91,6 +91,18 @@ async function createWindow(type: 'main' | 'previewer') {
     }
   });
 
+  browserWindow.webContents.session.webRequest.onHeadersReceived(
+    (details: any, callback: any) => {
+      callback({
+        responseHeaders: Object.fromEntries(
+          Object.entries(details.responseHeaders).filter(
+            (header) => !/x-frame-options/i.test(header[0]),
+          ),
+        ),
+      });
+    },
+  );
+
   /**
    * URL for main window.
    * Vite dev server for development.
