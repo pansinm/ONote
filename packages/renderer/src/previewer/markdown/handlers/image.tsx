@@ -6,6 +6,7 @@ import Icon from '/@/components/Icon';
 import { createLineClass } from './util/position';
 import tunnel from '../../ipc/tunnel';
 import { isEquals } from '/@/common/utils/uri';
+import { copyUrlAsImage } from '../../utils/clipboard';
 function Image(props: {
   className?: string;
   src: string;
@@ -18,7 +19,7 @@ function Image(props: {
   const src = srcUrl.toString();
 
   const handleCopyImg = useCallback(() => {
-    // copyUrlAsImage(src);
+    copyUrlAsImage(src);
   }, [src]);
 
   useEffect(() => {

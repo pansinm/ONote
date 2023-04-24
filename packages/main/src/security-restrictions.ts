@@ -12,6 +12,7 @@ const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<
   Set<
     | 'clipboard-read'
     | 'clipboard-write'
+    | 'clipboard-sanitized-write'
     | 'media'
     | 'display-capture'
     | 'mediaKeySystem'
@@ -29,13 +30,23 @@ const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<
     ? [
         [
           new URL(import.meta.env.VITE_DEV_SERVER_URL).origin,
-          new Set(['clipboard-read', 'clipboard-write', 'openExternal']),
+          new Set([
+            'clipboard-read',
+            'clipboard-write',
+            'clipboard-sanitized-write',
+            'openExternal',
+          ]),
         ],
       ]
     : [
         [
           'null',
-          new Set(['clipboard-read', 'clipboard-write', 'openExternal']),
+          new Set([
+            'clipboard-read',
+            'clipboard-write',
+            'clipboard-sanitized-write',
+            'openExternal',
+          ]),
         ],
       ],
 );
@@ -64,6 +75,7 @@ app.on('web-contents-created', (_, contents) => {
    * @see https://www.electronjs.org/docs/latest/tutorial/security#13-disable-or-limit-navigation
    */
   contents.on('will-navigate', (event, url) => {
+    console.log(event, url);
     const { protocol, origin } = new URL(url);
     if (protocol === 'file:') {
       return;
@@ -91,6 +103,7 @@ app.on('web-contents-created', (_, contents) => {
       const { origin } = new URL(webContents.getURL());
       const permissionGranted =
         !!ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin)?.has(permission);
+
       callback(permissionGranted);
 
       if (!permissionGranted && import.meta.env.DEV) {
