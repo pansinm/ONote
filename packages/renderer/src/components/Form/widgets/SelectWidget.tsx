@@ -1,5 +1,5 @@
 import React from 'react';
-import { SelectField } from '@fluentui/react-components/unstable';
+import { SelectField } from '@fluentui/react-components';
 import type { WidgetProps } from '@rjsf/utils';
 import { processSelectValue } from '@rjsf/utils';
 import _pick from 'lodash/pick';

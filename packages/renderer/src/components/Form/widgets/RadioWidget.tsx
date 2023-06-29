@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { RadioGroupField } from '@fluentui/react-components/unstable';
+import { RadioGroupField } from '@fluentui/react-components';
 import type { WidgetProps } from '@rjsf/utils';
 import { Radio } from '@fluentui/react-components';
 

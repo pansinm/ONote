@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { InputField } from '@fluentui/react-components/unstable';
+import { Field, Input } from '@fluentui/react-components';
 
 function App() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -12,12 +12,9 @@ function App() {
   return (
     <div>
       <form ref={formRef} action="/upload">
-        <InputField
-          onChange={handleChange}
-          name="file"
-          label="插入文件"
-          type={'file' as any}
-        />
+        <Field label="插入文件">
+          <Input onChange={handleChange} name="file" type={'file' as any} />
+        </Field>
       </form>
     </div>
   );

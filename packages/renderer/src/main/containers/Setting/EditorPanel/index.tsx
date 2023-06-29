@@ -1,5 +1,5 @@
 import { Checkbox, makeStyles } from '@fluentui/react-components';
-import { InputField } from '@fluentui/react-components/unstable';
+import { Field } from '@fluentui/react-components';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
@@ -55,7 +55,7 @@ const EditorPanel = observer(function EditorPanel() {
         checked={mode === 'VIM_MODE'}
         onChange={toggleVIMMode}
       />
-      <InputField
+      <Field
         className={styles.input}
         type="text"
         label="Font Family"
