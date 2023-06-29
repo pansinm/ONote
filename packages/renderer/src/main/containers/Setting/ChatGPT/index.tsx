@@ -1,5 +1,5 @@
 import { Checkbox, makeStyles } from '@fluentui/react-components';
-import { InputField } from '@fluentui/react-components/unstable';
+import { Field } from '@fluentui/react-components';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
@@ -28,7 +28,7 @@ const ChatGPT = observer(function EditorPanel() {
 
   return (
     <div>
-      <InputField
+      <Field
         className={styles.input}
         type="text"
         label="ChatGPT URL"
@@ -38,7 +38,7 @@ const ChatGPT = observer(function EditorPanel() {
           stores.settingStore.update(CHATGPT_URL, e.target.value)
         }
       />
-      <InputField
+      <Field
         className={styles.input}
         type="text"
         label="消息 Class"

@@ -1,4 +1,4 @@
-import { CheckboxField, InputField } from '@fluentui/react-components/unstable';
+import { Checkbox as CheckboxField, Field } from '@fluentui/react-components';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
@@ -14,7 +14,7 @@ function PlantUMLPanel() {
 
   return (
     <div>
-      <InputField
+      <Field
         value={server || ''}
         label={'PlantUML Server'}
         onChange={(e, data) =>

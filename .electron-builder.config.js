@@ -31,6 +31,12 @@ const config = {
     icon: 'buildResources/icon.icns',
     maintainer: 'pansinm <pansinm@foxmail.com>',
   },
+  mac: {
+    icon: './buildResources/icon.icns',
+    gatekeeperAssess: false,
+    hardenedRuntime: true,
+    target: ['dmg', 'zip'],
+  },
   artifactName: 'ONote-${os}-${arch}-${version}.${ext}',
   win: {
     target: ['zip', 'nsis'],

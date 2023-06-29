@@ -11,7 +11,7 @@ import react from '@vitejs/plugin-react';
 //   Languages,
 // } from 'vite-plugin-monaco-editor-nls';
 
-const zh_CN = require('vscode-loc/i18n/vscode-language-pack-zh-hans/translations/main.i18n.json');
+// const zh_CN = require('vscode-loc/i18n/vscode-language-pack-zh-hans/translations/main.i18n.json');
 
 const PACKAGE_ROOT = __dirname;
 

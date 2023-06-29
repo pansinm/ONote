@@ -1,5 +1,5 @@
 import React from 'react';
-import { InputField } from '@fluentui/react-components/unstable';
+import { Field } from '@fluentui/react-components';
 import type { WidgetProps } from '@rjsf/utils';
 import { getInputProps } from '@rjsf/utils';
 import _pick from 'lodash/pick';
@@ -78,7 +78,7 @@ const BaseInputTemplate = ({
 
   return (
     <>
-      <InputField
+      <Field
         id={id}
         name={id}
         placeholder={placeholder}

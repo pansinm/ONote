@@ -2,7 +2,7 @@ import type { ChangeEvent } from 'react';
 import React from 'react';
 
 import type { WidgetProps } from '@rjsf/utils';
-import { CheckboxField } from '@fluentui/react-components/unstable';
+import { CheckboxField } from '@fluentui/react-components';
 import type { CheckboxOnChangeData } from '@fluentui/react-components';
 
 const CheckboxWidget = (props: WidgetProps) => {
