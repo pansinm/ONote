@@ -1,5 +1,6 @@
 import type { WebFrameMain } from 'electron';
 import { app, BrowserWindow, nativeImage, shell, webFrameMain } from 'electron';
+import { pathToFileURL } from 'url';
 import { join } from 'path';
 import { manager as pluginManager } from '../plugin';
 import { sendToMain } from './ipc';
@@ -29,8 +30,8 @@ async function createWindow(type: 'main' | 'previewer') {
     icon: import.meta.env.DEV
       ? 'buildResources/icon.png'
       : nativeImage.createFromPath(
-          join(app.getAppPath(), 'buildResources/icon.png'),
-        ),
+        join(app.getAppPath(), 'buildResources/icon.png'),
+      ),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
