@@ -13,8 +13,8 @@
     "build:main": "cd ./packages/main && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
     "build:preload": "cd ./packages/preload && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
     "build:renderer": "cd ./packages/renderer && cross-env NODE_OPTIONS=\"--max-old-space-size=16384\" vite build",
-    "compile": "cross-env MODE=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --linux --win --mac",
-    "compile:win": "cross-env MODE=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --win",
+    "compile": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --linux --win --mac",
+    "compile:win": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --win",
     "bdd": "chokidar \"features/**\" -c \"yarn  cucumber-js\"",
     "test:watch": "yarn jest --watch",
     "test": "jest --coverage=false && yarn build && yarn test:e2e",
@@ -152,7 +152,7 @@
     "yaml": "^1.10.2"
   },
   "dependencies": {
-    "@hpcc-js/wasm": "^1.13.0",
+    "@hpcc-js/wasm": "^2.13.1",
     "default-gateway": "^6.0.3",
     "electron-updater": "4.6.5",
     "events": "^3.3.0",

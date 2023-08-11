@@ -1,0 +1,13 @@
+diff --git a/node_modules/@hpcc-js/wasm/package.json b/node_modules/@hpcc-js/wasm/package.json
+index 68937c0..78b2946 100644
+--- a/node_modules/@hpcc-js/wasm/package.json
++++ b/node_modules/@hpcc-js/wasm/package.json
+@@ -16,7 +16,7 @@
+     "expat-xml-parser",
+     "webassemby"
+   ],
+-  "type": "module",
++  "type": "commonjs",
+   "exports": {
+     ".": {
+       "types": "./types/index.d.ts",
