@@ -12,14 +12,14 @@
     "build": "npm run build:main && npm run build:preload && npm run build:renderer",
     "build:main": "cd ./packages/main && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
     "build:preload": "cd ./packages/preload && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
-    "build:renderer": "cd ./packages/renderer && cross-env NODE_OPTIONS=\"--max-old-space-size=16384\" vite build",
+    "build:renderer": "cd ./packages/renderer && cross-env NODE_OPTIONS=\"--max-old-space-size=16384\" webpack build --config packages/renderer/webpack.config.js  --progress",
     "compile": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --linux --win --mac",
     "compile:win": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --win",
     "bdd": "chokidar \"features/**\" -c \"yarn  cucumber-js\"",
     "test:watch": "yarn jest --watch",
     "test": "jest --coverage=false && yarn build && yarn test:e2e",
     "test:e2e": "yarn cucumber-js",
-    "watch": "node scripts/watch.js",
+    "watch": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" node scripts/watch.js",
     "lint": "eslint . --ext js,ts,tsx"
   },
   "devDependencies": {

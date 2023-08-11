@@ -1,4 +1,8 @@
-import { Checkbox as CheckboxField, Field } from '@fluentui/react-components';
+import {
+  Checkbox as CheckboxField,
+  Field,
+  Input,
+} from '@fluentui/react-components';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
@@ -14,13 +18,14 @@ function PlantUMLPanel() {
 
   return (
     <div>
-      <Field
-        value={server || ''}
-        label={'PlantUML Server'}
-        onChange={(e, data) =>
-          stores.settingStore.update(PLANTUML_ENDPOINT, data.value)
-        }
-      />
+      <Field label={'PlantUML Server'}>
+        <Input
+          value={server || ''}
+          onChange={(e, data) =>
+            stores.settingStore.update(PLANTUML_ENDPOINT, data.value)
+          }
+        />
+      </Field>
       <CheckboxField
         label={'使用本地缓存'}
         checked={useCache}
