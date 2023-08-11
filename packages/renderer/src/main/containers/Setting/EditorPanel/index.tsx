@@ -1,4 +1,4 @@
-import { Checkbox, makeStyles } from '@fluentui/react-components';
+import { Checkbox, Input, makeStyles } from '@fluentui/react-components';
 import { Field } from '@fluentui/react-components';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -45,23 +45,26 @@ const EditorPanel = observer(function EditorPanel() {
   };
   return (
     <div>
-      <Checkbox
-        label={'自动换行'}
-        checked={wordWrap === 'on'}
-        onChange={toggleWordWrap}
-      />
-      <Checkbox
-        label={'VIM 模式'}
-        checked={mode === 'VIM_MODE'}
-        onChange={toggleVIMMode}
-      />
-      <Field
-        className={styles.input}
-        type="text"
-        label="Font Family"
-        defaultValue={family}
-        onChange={(e) => setFamily(e.target.value)}
-      />
+      <Field>
+        <Checkbox
+          label={'自动换行'}
+          checked={wordWrap === 'on'}
+          onChange={toggleWordWrap}
+        />
+      </Field>
+      <Field>
+        <Checkbox
+          label={'VIM 模式'}
+          checked={mode === 'VIM_MODE'}
+          onChange={toggleVIMMode}
+        />
+      </Field>
+      <Field className={styles.input} label="Font Family">
+        <Input
+          defaultValue={family}
+          onChange={(e) => setFamily(e.target.value)}
+        />
+      </Field>
     </div>
   );
 });

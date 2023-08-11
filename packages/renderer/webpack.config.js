@@ -20,6 +20,7 @@ module.exports = {
     type: 'filesystem',
     allowCollectingMemory: true,
   },
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: entry,
   devtool: process.env.NODE_ENV !== 'production' ? 'eval' : undefined,
   module: {

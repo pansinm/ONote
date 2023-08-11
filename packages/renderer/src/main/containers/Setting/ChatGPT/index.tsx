@@ -1,4 +1,4 @@
-import { Checkbox, makeStyles } from '@fluentui/react-components';
+import { Checkbox, Input, makeStyles } from '@fluentui/react-components';
 import { Field } from '@fluentui/react-components';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -28,29 +28,27 @@ const ChatGPT = observer(function EditorPanel() {
 
   return (
     <div>
-      <Field
-        className={styles.input}
-        type="text"
-        label="ChatGPT URL"
-        placeholder="右侧侧边栏会打开该页面"
-        defaultValue={url}
-        onChange={(e) =>
-          stores.settingStore.update(CHATGPT_URL, e.target.value)
-        }
-      />
-      <Field
-        className={styles.input}
-        type="text"
-        label="消息 Class"
-        placeholder="用于定位插入按钮，一键回填到编辑器"
-        defaultValue={cls}
-        onChange={(e) =>
-          stores.settingStore.update(
-            CHATGPT_MESSAGE_CLASS_STARTS_WITH,
-            e.target.value,
-          )
-        }
-      />
+      <Field className={styles.input} label="ChatGPT URL">
+        <Input
+          placeholder="右侧侧边栏会打开该页面"
+          defaultValue={url}
+          onChange={(e) =>
+            stores.settingStore.update(CHATGPT_URL, e.target.value)
+          }
+        ></Input>
+      </Field>
+      <Field className={styles.input} label="消息 Class">
+        <Input
+          placeholder="用于定位插入按钮，一键回填到编辑器"
+          defaultValue={cls}
+          onChange={(e) =>
+            stores.settingStore.update(
+              CHATGPT_MESSAGE_CLASS_STARTS_WITH,
+              e.target.value,
+            )
+          }
+        />
+      </Field>
     </div>
   );
 });
