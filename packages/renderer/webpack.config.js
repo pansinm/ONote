@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 const entryPath = path.resolve(__dirname, 'src/entry');
 
@@ -12,6 +13,8 @@ const entry = fs.readdirSync(entryPath).reduce((pre, file) => {
   return pre;
 }, {});
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 /**
  * @type {import('webpack').Configuration}
  */
@@ -20,9 +23,9 @@ module.exports = {
     type: 'filesystem',
     allowCollectingMemory: true,
   },
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  mode: isDev ? 'development' : 'production',
   entry: entry,
-  devtool: process.env.NODE_ENV !== 'production' ? 'eval' : undefined,
+  devtool: isDev ? 'eval' : undefined,
   module: {
     rules: [
       {
@@ -75,6 +78,12 @@ module.exports = {
     filename: '[contenthash].js',
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'process.env.NODE': JSON.stringify(process.env.NODE_ENV),
+      'process.env.DEBUG': JSON.stringify(process.env.DEBUG || false),
+      'process.env.NODE_DEBUG': JSON.stringify(process.env.NODE_DEBUG || false),
+    }),
     new MonacoWebpackPlugin(),
     ...Object.keys(entry).map(
       (key) =>
