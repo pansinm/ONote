@@ -55,8 +55,7 @@ class LocalDataSourceProvider implements IDataSourceProvider<null> {
     const localPath = url.fileURLToPath(uri);
     const dirname = path.dirname(localPath);
     await fs.mkdir(dirname, { recursive: true }).catch((err) => 0);
-    console.log(localPath, buffer);
-    return fs.writeFile(localPath, buffer);
+    return fs.writeFile(localPath, Buffer.from(buffer));
   }
   delete(uri: string) {
     const localPath = url.fileURLToPath(uri);
