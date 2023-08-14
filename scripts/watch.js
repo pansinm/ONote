@@ -106,11 +106,10 @@ const setupPreloadPackageWatcher = ({ ws }) =>
   });
 
 const compiler = webpack(webpackConfig);
-const devServerOptions = { ...webpackConfig.devServer, open: true };
 
 (async () => {
   try {
-    const server = new WebpackDevServer(devServerOptions, compiler);
+    const server = new WebpackDevServer(webpack.devServer, compiler);
     await server.start();
     server.ws = {
       send: (ev) => {
