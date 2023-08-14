@@ -77,7 +77,7 @@ class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
     assert(this.sftp);
     await this.mkdir(new URL('../', uri).toString()).catch(_.noop);
     const remotePath = uriToPath(uri);
-    await this.sftp.writeFile(remotePath, buffer);
+    await this.sftp.writeFile(remotePath, Buffer.from(buffer));
   }
 
   async delete(uri: string) {
