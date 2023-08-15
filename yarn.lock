@@ -2449,10 +2449,10 @@
   dependencies:
     lodash "^4.17.21"
 
-"@sinm/monaco-plantuml@0.5.4":
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/@sinm/monaco-plantuml/-/monaco-plantuml-0.5.4.tgz#615de3cab4a1c209cc9e93fdc2a0c9cfd432b87b"
-  integrity sha512-pOm4NG+ooUm/2kPUPEf41QbXX6Qc4Jeec0HE+CW2q1C62yiDMzyX0ryQV0FvWKH9C1bAD88psUqwVThrHAVWUg==
+"@sinm/monaco-plantuml@0.5.5":
+  version "0.5.5"
+  resolved "https://registry.npmmirror.com/@sinm/monaco-plantuml/-/monaco-plantuml-0.5.5.tgz#bf34a881704530bda093e1fada17aeaa622e3be8"
+  integrity sha512-xBOr+MTqJ42Xa7AKtebpUBzogX2cQDDUaB7+BYONrkJoHNqHLTEveE/mIpnUoniVXqA9M8nYHVoTP/RP2i7ijQ==
   dependencies:
     dexie "^3.2.2"
     lodash "^4.17.21"
