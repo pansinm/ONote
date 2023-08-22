@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import type { FC} from 'react';
+import type { FC } from 'react';
 import { useRef } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
@@ -9,7 +9,7 @@ import Flex from '/@/components/Flex';
 import DragBar from '/@/components/DragBar';
 import UnSupport from './UnSupport';
 import { filePanelManager } from '../../frame';
-import { isEquals } from '/@/common/utils/uri';
+import { isEquals, isMarkdown } from '/@/common/utils/uri';
 import Toolbar from './Toolbar';
 import stores from '../../stores';
 
@@ -78,7 +78,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
           flexDirection: 'column',
         }}
       >
-        <Toolbar />
+        {isMarkdown(props.uri) && <Toolbar />}
         <Flex position="relative" flex={1}>
           <Flex
             width={
