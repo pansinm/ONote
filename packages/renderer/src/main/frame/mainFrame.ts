@@ -29,6 +29,10 @@ class MainFrame {
     stores.activationStore.activeFile(uri);
   }
 
+  closeTab(uri: string): void {
+    stores.activationStore.closeFile(uri);
+  }
+
   onTabActivated(callback: (tab: { uri: string }) => void) {
     const disposer = reaction(
       () => ({ uri: stores.activationStore.activeFileUri }),
@@ -42,15 +46,19 @@ class MainFrame {
   registerFilePanel(panel: IFilePanel): void {
     filePanelManager.registerFilePanel(panel);
   }
+
   readFile(uri: string): Promise<Buffer> {
     return fileService.readFile(uri);
   }
+
   readText(uri: string): Promise<string> {
     return fileService.readText(uri);
   }
+
   writeFile(uri: string, content: Buffer): Promise<void> {
     return fileService.writeFile(uri, content as Buffer);
   }
+
   writeText(uri: string, content: string): Promise<void> {
     return fileService.writeText(uri, content);
   }
