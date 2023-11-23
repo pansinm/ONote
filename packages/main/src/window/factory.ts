@@ -30,8 +30,8 @@ async function createWindow(type: 'main' | 'previewer') {
     icon: import.meta.env.DEV
       ? 'buildResources/icon.png'
       : nativeImage.createFromPath(
-        join(app.getAppPath(), 'buildResources/icon.png'),
-      ),
+          join(app.getAppPath(), 'buildResources/icon.png'),
+        ),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -52,6 +52,21 @@ async function createWindow(type: 'main' | 'previewer') {
     console.log('destroy');
   });
 
+  browserWindow.webContents.on('will-navigate', (e, url) => {
+    e.preventDefault();
+    shell.openExternal(url);
+  });
+
+  browserWindow.webContents.on('will-frame-navigate', (details) => {
+    if (
+      details.frame === details.initiator &&
+      details.initiator?.name === 'previewer'
+    ) {
+      details.preventDefault();
+      shell.openExternal(details.url);
+    }
+    // details.preventDefault();
+  });
   browserWindow.webContents.on(
     'did-frame-finish-load',
     (
