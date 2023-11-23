@@ -71,7 +71,7 @@ export function isPositionMatch(
 export function isInFence(
   model: monaco.editor.ITextModel,
   position: monaco.Position,
-  lang: string,
+  lang = '',
 ) {
   const prev = model.findPreviousMatch(
     '```',
