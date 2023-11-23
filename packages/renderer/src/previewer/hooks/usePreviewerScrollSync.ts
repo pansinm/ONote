@@ -148,11 +148,11 @@ export default function usePreviewerScrollSync(
         editorScrolling = false;
       }, 500);
     };
-    const dispose = editor.onScrollChanged(handleEditorScroll);
+    const disposer = editor.onScrollChanged(handleEditorScroll);
 
     window.addEventListener('scroll', handleScroll);
     return () => {
-      dispose();
+      disposer.dispose();
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);

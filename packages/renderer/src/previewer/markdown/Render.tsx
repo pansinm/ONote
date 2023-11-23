@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { parse } from './parser';
 import usePreviewerScrollSync from '../hooks/usePreviewerScrollSync';
 import { extname, isPlaintext } from '../../common/utils/uri';
@@ -22,11 +22,14 @@ interface RenderProps {
 
 const Render: FC<RenderProps> = (props) => {
   const ast = parse(props.content);
+
+  console.log(ast);
   usePreviewerScrollSync(props.uri, ast, props.lineNumber);
+
   if (isPlaintext(props.uri)) {
     return <Code code={props.content} lang={extname(props.uri)}></Code>;
   }
   return <>{render(props.uri, ast, props.rootDirUri)}</>;
 };
 
-export default Render;
+export default React.memo(Render);

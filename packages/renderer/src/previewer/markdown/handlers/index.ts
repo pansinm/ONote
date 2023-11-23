@@ -7,11 +7,13 @@ import footnoteReference from './footnote-reference';
 import footnoteDefinition from './footnote-definition';
 import math from './math';
 import inlineMath from './inline-math';
-import emoji from './emoji';
 import footnote from './footnote';
+import containerDirective from './directive/containerDirective';
+import leafDirective from './directive/leafDirective';
 import heading from './heading';
 import html from './html';
 import imageReference from './image-reference';
+import textDirective from './directive/textDirective';
 import image from './image';
 import unknown from './unknown';
 import inlineCode from './inline-code';
@@ -36,7 +38,6 @@ const handlers = {
   code,
   delete: Delete,
   emphasis,
-  emoji,
   math,
   inlineMath,
   footnoteReference,
@@ -57,6 +58,9 @@ const handlers = {
   table,
   text,
   thematicBreak,
+  textDirective,
+  leafDirective,
+  containerDirective,
   /** 单独在root中渲染 */
   footnoteDefinition: () => null,
 };
