@@ -27,6 +27,8 @@ function forMindMap(
       /([-+*])/,
       modifier === monaco.KeyCode.Shift ? '' : '$1$1',
     );
+
+    console.log(modifier === monaco.KeyCode.Shift);
     const range = new monaco.Range(
       selection.startLineNumber,
       0,
@@ -108,7 +110,7 @@ export function bindingKeys(editor: monaco.editor.IStandaloneCodeEditor) {
   );
 
   editor.addCommand(
-    monaco.KeyCode.Tab | monaco.KeyCode.Shift,
+    monaco.KeyCode.Tab | monaco.KeyMod.Shift,
     onKeyPressed.bind(null, editor, monaco.KeyCode.Tab, monaco.KeyCode.Shift),
     editorContext,
   );
