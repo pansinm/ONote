@@ -18,7 +18,7 @@ export interface IConProps {
 
 const Icon: FC<IConProps> = ({
   type,
-  color = '#333',
+  color = 'inherit',
   size = 22,
   className,
   onClick,
@@ -29,7 +29,13 @@ const Icon: FC<IConProps> = ({
     <i
       title={title}
       onClick={onClick}
-      style={{ ...style, fontSize: size, color }}
+      style={{
+        ...style,
+        fontSize: size,
+        color,
+        display: 'inline-flex',
+        verticalAlign: 'middle',
+      }}
       className={`bi bi-${type} ${className || ''}`}
     ></i>
   );
