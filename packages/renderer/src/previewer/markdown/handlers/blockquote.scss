@@ -1,0 +1,38 @@
+.markdown-alert-title {
+    font-weight: 500;
+}
+
+.markdown-body .markdown-alert.markdown-alert-note {
+    border-left-color: var(--color-accent-fg);
+    .markdown-alert-title {
+        color: var(--color-accent-fg);
+    }
+}
+
+.markdown-body .markdown-alert.markdown-alert-important {
+    border-left-color: var(--color-done-fg);
+    .markdown-alert-title {
+        color: var(--color-done-fg);
+    }
+}
+
+.markdown-body .markdown-alert.markdown-alert-warning {
+    border-left-color: var(--color-attention-fg);
+    .markdown-alert-title {
+        color: var(--color-attention-fg);
+    }
+}
+
+.markdown-alert.markdown-alert-tip {
+    border-left-color: #178035;
+    .markdown-alert-title {
+        color: #178035;
+    }
+}
+
+.markdown-alert.markdown-alert-caution {
+    border-left-color: #cc202b;
+    .markdown-alert-title {
+        color: #cc202b;
+    }
+}
