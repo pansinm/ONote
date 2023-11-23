@@ -43,7 +43,8 @@ export type SupportType =
   | 'mermaid'
   | 'plantuml'
   | 'sequence'
-  | 'flow';
+  | 'flow'
+  | 'pintora';
 
 export type RenderResult = {
   type: 'svg' | 'url';
@@ -74,9 +75,14 @@ class DiagramEngine {
   }
 
   isDiagram(type: string) {
-    return ['graphviz', 'mermaid', 'plantuml', 'sequence', 'flow'].includes(
-      type,
-    );
+    return [
+      'graphviz',
+      'mermaid',
+      'plantuml',
+      'sequence',
+      'flow',
+      'pintora',
+    ].includes(type);
   }
 
   async renderGraphviz(code: string, engine: string) {
@@ -110,6 +116,22 @@ class DiagramEngine {
     try {
       const Diagram = Flowchart.parse(code);
       Diagram.drawSVG(container);
+      return {
+        type: 'svg',
+        content: container.innerHTML,
+      };
+    } finally {
+      container.remove();
+    }
+  }
+
+  async renderPintora(code: string): Promise<RenderResult> {
+    const pintora = await import('@pintora/standalone');
+    const container = document.createElement('div');
+    const root = document.querySelector('.markdown-body') as HTMLDivElement;
+    root.appendChild(container);
+    try {
+      pintora.default.renderTo(code, { container });
       return {
         type: 'svg',
         content: container.innerHTML,
@@ -166,6 +188,8 @@ class DiagramEngine {
         return this.renderSequence(code, options.theme);
       case 'flow':
         return this.renderFlow(code);
+      case 'pintora':
+        return this.renderPintora(code);
       default:
         throw new Error('不支持的图表类型');
     }

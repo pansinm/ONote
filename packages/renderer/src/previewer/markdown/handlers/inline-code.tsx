@@ -19,6 +19,7 @@ function ColorDot({ color }: { color: string }) {
         width: 10,
         height: 10,
         marginLeft: 5,
+        verticalAlign: 'middle',
       }}
     ></span>
   );
