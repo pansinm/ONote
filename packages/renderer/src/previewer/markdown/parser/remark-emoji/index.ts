@@ -35,6 +35,8 @@ function variableTokenize(effects: any, ok: any, nok: any) {
       return nok(code);
     }
 
+    console.log(effects);
+
     if (code === FENCE_CHAR) {
       effects.exit('emojiName');
       effects.enter('emojiMarker');

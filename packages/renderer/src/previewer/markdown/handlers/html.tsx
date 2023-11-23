@@ -5,28 +5,8 @@ import { escape, camelCase } from 'lodash';
 import { resolveAssetUri } from './util/uri';
 import { createLineClass } from './util/position';
 import type { ICtx } from '../types';
+import { isVoidElement, parseStyle } from './util/dom';
 
-// @see https://gist.github.com/goldhand/70de06a3bdbdb51565878ad1ee37e92b
-function parseStyle(styles: string) {
-  return styles
-    .split(';')
-    .filter((style) => style.split(':')[0] && style.split(':')[1])
-    .map((style) => [
-      style
-        .split(':')[0]
-        .trim()
-        .replace(/-./g, (c) => c.substr(1).toUpperCase()),
-      style.split(':').slice(1).join(':').trim(),
-    ])
-    .filter(([key]) => !['position', 'display'].includes(key))
-    .reduce(
-      (styleObj, style) => ({
-        ...styleObj,
-        [style[0]]: style[1],
-      }),
-      {},
-    );
-}
 export function parseDom(text: string) {
   const dom = document.createElement('div');
   dom.innerHTML = text;
@@ -46,24 +26,7 @@ export function parseDom(text: string) {
     const node = dom.firstElementChild;
     if (node && node.tagName) {
       const tagName = node.tagName.toLocaleLowerCase();
-      const isVoidEle = [
-        'br',
-        'hr',
-        'img',
-        'input',
-        'link',
-        'meta',
-        'area',
-        'base',
-        'col',
-        'command',
-        'embed',
-        'keygen',
-        'param',
-        'source',
-        'track',
-        'wbr',
-      ].includes(tagName);
+      const isVoidEle = isVoidElement(tagName);
 
       return {
         tagName: node.tagName.toLocaleLowerCase(),

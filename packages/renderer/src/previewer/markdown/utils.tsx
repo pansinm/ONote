@@ -9,7 +9,11 @@ import type { ICtx } from './types';
 export function render(node: Node, ctx: ICtx) {
   const handlers = handlersManager.getHandlers();
   const handler = handlers[node.type] || handlers.unknown;
-  return handler(node, ctx);
+  try {
+    return handler(node, ctx);
+  } catch (err) {
+    return <p>{JSON.stringify(err, null, 2)}</p>;
+  }
 }
 
 export function renderChildren(node: Node & { children?: any[] }, ctx: ICtx) {
