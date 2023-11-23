@@ -52,15 +52,11 @@ async function createWindow(type: 'main' | 'previewer') {
     console.log('destroy');
   });
 
-  browserWindow.webContents.on('will-navigate', (e, url) => {
-    e.preventDefault();
-    shell.openExternal(url);
-  });
-
   browserWindow.webContents.on('will-frame-navigate', (details) => {
     if (
       details.frame === details.initiator &&
-      details.initiator?.name === 'previewer'
+      details.initiator?.name === 'previewer' &&
+      details.frame.url !== details.initiator.url
     ) {
       details.preventDefault();
       shell.openExternal(details.url);
