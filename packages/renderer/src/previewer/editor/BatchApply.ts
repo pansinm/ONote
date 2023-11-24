@@ -26,6 +26,7 @@ class BatchApply {
     const editsMap = BatchApply.editsMap;
     BatchApply.editsMap = {};
     Object.keys(editsMap).forEach((uri) => {
+      console.log('commit', editsMap[uri]);
       editor.applyEdits(uri, editsMap[uri] || []);
     });
   }
