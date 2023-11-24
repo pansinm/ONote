@@ -35,9 +35,12 @@ export const stringify = (node: Node) => {
 
 export const traverse = (
   parent: Parent,
-  indicator: (node: RootContent | Parent) => void,
+  indicator: (node: RootContent | Parent) => void | boolean,
 ) => {
-  indicator(parent);
+  const done = indicator(parent);
+  if (done) {
+    return;
+  }
   if (parent.children) {
     parent.children.forEach((item) => traverse(item as Parent, indicator));
   }

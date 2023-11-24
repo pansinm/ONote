@@ -78,9 +78,9 @@ function generateEdit(
   const { node, data } = frontmatter;
   const position = _.get(node, 'position');
   const type = _.get(node, 'type') || 'yaml';
-  const value = _.set(data, 'comments.' + markId, messages);
+  const value = _.set(_.cloneDeep(data), 'comments.' + markId, messages);
   if (!messages.length) {
-    delete value['comments']['markId'];
+    delete value['comments'][markId];
   }
   const md = stringify({
     type,
@@ -159,6 +159,7 @@ function CommentDrawer({ ctx }: { ctx: ICtx }) {
           children: (node as Parent).children,
         });
         batchApply.applyLater(ctx.fileUri, edit);
+        return true;
       }
     });
     const edit = generateEdit(ctx.fileUri, markId, ctx.frontmatter, []);
