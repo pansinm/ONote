@@ -30,6 +30,7 @@
     "@editorjs/table": "^2.0.1",
     "@fluentui/react-components": "^9.23.1",
     "@fluentui/react-icons": "^2.0.186",
+    "@iarna/toml": "^2.2.5",
     "@pintora/standalone": "^0.6.3",
     "@rjsf/core": "^5.0.0-beta.13",
     "@rjsf/utils": "^5.0.0-beta.13",
@@ -140,6 +141,7 @@
     "sass-loader": "^13.3.2",
     "semver": "^7.3.8",
     "simple-git-hooks": "2.7.0",
+    "stream-browserify": "^3.0.0",
     "style-loader": "^3.3.3",
     "swc-loader": "^0.2.3",
     "tar": "^6.1.12",
@@ -155,6 +157,7 @@
     "webpack": "5.74.0",
     "webpack-cli": "4.10.0",
     "webpack-dev-server": "^4.15.1",
+    "buffer": "^6.0.3",
     "yaml": "^1.10.2"
   },
   "dependencies": {

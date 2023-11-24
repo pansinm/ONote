@@ -31,8 +31,8 @@ import toml from './toml';
 import yaml from './yaml';
 
 const handlers = {
-  toml,
-  yaml,
+  toml: () => null,
+  yaml: () => null,
   blockquote,
   break: Break,
   code,
@@ -61,6 +61,7 @@ const handlers = {
   textDirective,
   leafDirective,
   containerDirective,
+  definition: () => null,
   /** 单独在root中渲染 */
   footnoteDefinition: () => null,
 };

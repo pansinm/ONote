@@ -23,7 +23,6 @@ interface RenderProps {
 const Render: FC<RenderProps> = (props) => {
   const ast = parse(props.content);
 
-  console.log(ast);
   usePreviewerScrollSync(props.uri, ast, props.lineNumber);
 
   if (isPlaintext(props.uri)) {

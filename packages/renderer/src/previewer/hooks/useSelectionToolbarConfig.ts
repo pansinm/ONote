@@ -1,4 +1,21 @@
+import type { MutableRefObject } from 'react';
 import { useEffect, useState } from 'react';
+
+function closest(
+  node: Node | null,
+  indicator: (node: Node) => boolean,
+): Node | null {
+  if (!node) {
+    return null;
+  }
+  if (indicator(node)) {
+    return node;
+  }
+  if (!node.parentNode) {
+    return null;
+  }
+  return closest(node.parentNode, indicator);
+}
 
 export function useSelectionToolbarConfig() {
   const [config, setConfig] = useState({
@@ -8,8 +25,8 @@ export function useSelectionToolbarConfig() {
   });
 
   useEffect(() => {
-    const reset = () => {
-      setConfig({ shown: false, x: 0, y: 0 });
+    const reset = (event: MouseEvent) => {
+      setConfig((config) => ({ ...config, shown: false }));
     };
     const setPos = (event: MouseEvent) => {
       const selection = window.getSelection();
@@ -32,6 +49,6 @@ export function useSelectionToolbarConfig() {
       window.removeEventListener('mousedown', reset);
       window.removeEventListener('mouseup', setPos);
     };
-  });
+  }, []);
   return config;
 }

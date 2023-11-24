@@ -12,24 +12,23 @@
     word-break: break-all;
     flex: 1;
   }
-    i:last-child {
-    display: none;
+  i:last-child {
+    display: none !important;
     color: #ddd !important;
   }
   &:hover {
     background: var(--list-item-hover-background);
     i {
-      display: inline-block;
+      display: inline-block !important;
       &:hover {
         color: rgba($color: #000000, $alpha: 0.9) !important;
       }
     }
   }
-
-&:global.active {
-  background: var(--list-item-active-background);
-& span {
-    color: #fff;
+  &:global.active {
+    background: var(--list-item-active-background);
+    & span {
+      color: #fff;
+    }
   }
-}
 }

@@ -6,12 +6,14 @@ import type {
   IPCGetEditorScrollPositionResponse,
 } from '/@/common/ipc/types';
 
-type Range = {
+export type Range = {
   startLineNumber: number;
   startColumn: number;
   endLineNumber: number;
   endColumn: number;
 };
+
+export type IEdit = { range: Range; text: string };
 
 class EditorAdapter {
   // 滚动至
@@ -28,6 +30,13 @@ class EditorAdapter {
       uri,
       range,
       text,
+    });
+  }
+
+  async applyEdits(uri: string, edits: IEdit[]) {
+    return tunnel.call(IPCMethod.InsertTextToEditor, {
+      uri,
+      edits,
     });
   }
 

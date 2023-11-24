@@ -22,8 +22,10 @@ export default function linkReference(node: LinkReference, ctx: ICtx) {
   return (
     <a
       className={createLineClass(node.position)}
+      target="_blank"
       href={resolveAssetUri(def.url, ctx)}
       title={def.title || undefined}
+      rel="noreferrer"
     >
       {ctx.renderChildren(node, ctx)}
     </a>

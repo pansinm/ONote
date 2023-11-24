@@ -14,6 +14,7 @@ export interface IConProps {
   title?: string;
   className?: string;
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+  onMouseDown?: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
 const Icon: FC<IConProps> = ({
@@ -22,6 +23,7 @@ const Icon: FC<IConProps> = ({
   size = 22,
   className,
   onClick,
+  onMouseDown,
   title,
   style = {},
 }) => {
@@ -29,6 +31,7 @@ const Icon: FC<IConProps> = ({
     <i
       title={title}
       onClick={onClick}
+      onMouseDown={onMouseDown}
       style={{
         ...style,
         fontSize: size,

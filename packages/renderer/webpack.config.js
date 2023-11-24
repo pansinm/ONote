@@ -76,6 +76,10 @@ module.exports = {
     alias: {
       '/@': path.resolve(__dirname, 'src'),
     },
+    fallback: {
+      stream: require.resolve('stream-browserify'),
+      buffer: require.resolve('buffer/'),
+    },
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

@@ -1,7 +1,7 @@
 import { unified } from 'unified';
 import rehypeParse from 'rehype-parse';
 import { toMdast } from 'hast-util-to-mdast';
-import type { Content, Root } from 'mdast';
+import type { Content, Node, Root } from 'mdast';
 import editor from '../ipc/editor';
 import { stringify } from '../markdown/parser';
 // import type {  } from 'hast-util-to-mdast';

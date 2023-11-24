@@ -76,8 +76,14 @@ export interface IPCInsertTextToEditorRequest extends IPCRequest {
   method: IPCMethod.InsertTextToEditor;
   payload: {
     uri: string;
-    range: monaco.Range;
-    text: string;
+    /**@deprecated */
+    range?: monaco.Range;
+    /**@deprecated */
+    text?: string;
+    edits?: {
+      range: monaco.Range;
+      text: string;
+    }[];
   };
 }
 
