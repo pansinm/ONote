@@ -8,7 +8,7 @@ import footnotes from 'remark-footnotes';
 import remarkEmoji from './remark-emoji';
 import remarkDirective from 'remark-directive';
 import remarkMath from 'remark-math';
-import type { Root } from 'mdast';
+import type { Parent, Root, RootContent } from 'mdast';
 
 const parser = unified()
   .use(remarkParse)
@@ -31,4 +31,14 @@ export const parse = (markdown: string) => {
 
 export const stringify = (node: Node) => {
   return parser.stringify(node as Root).trim();
+};
+
+export const traverse = (
+  parent: Parent,
+  indicator: (node: RootContent | Parent) => void,
+) => {
+  indicator(parent);
+  if (parent.children) {
+    parent.children.forEach((item) => traverse(item as Parent, indicator));
+  }
 };

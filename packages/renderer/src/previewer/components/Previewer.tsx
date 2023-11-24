@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import 'github-markdown-css/github-markdown.css';
 import { ErrorBoundary } from 'react-error-boundary';
 import Render from '../markdown/Render';
 import useModel from '../hooks/useModel';
 import Fallback from './Fallback';
-import { useSelectionToolbarConfig } from '../hooks/useSelectionToolbarConfig';
 import { Toolbar } from './SelectionToolbar';
 
 export default function Previewer({ className }: { className: string }) {
   const resource = useModel();
+
   if (!resource.uri) {
     return null;
   }

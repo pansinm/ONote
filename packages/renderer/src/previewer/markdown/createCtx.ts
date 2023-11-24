@@ -1,7 +1,9 @@
-import type { Root, Content, Parent } from 'mdast';
+import type { Root, Content, Parent, RootContent } from 'mdast';
 import { definitions } from 'mdast-util-definitions';
 import { visit } from 'unist-util-visit';
 import type { Node } from 'unist';
+import { parse as parseToml } from 'toml';
+import { parse as parseYaml } from 'yaml';
 import { render, renderChildren } from './utils';
 
 const findParentNode = (parent: Parent, node: Content): Parent | null => {
@@ -19,6 +21,47 @@ const findParentNode = (parent: Parent, node: Content): Parent | null => {
 
 export const CONTINUE = Symbol('CONTINUE');
 
+type FrontMatter = Node & { value: string };
+
+function findFrontmatterNode(parent: {
+  children: Node[];
+  type: string;
+}): FrontMatter | undefined {
+  for (const child of parent.children) {
+    if (['toml', 'yaml'].includes(child.type)) {
+      return child as FrontMatter;
+    }
+    if ((child as any).children) {
+      const found = findFrontmatterNode(child as any);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return undefined;
+}
+
+function parseFrontMatter(node?: FrontMatter) {
+  if (!node) {
+    return {};
+  }
+  const parseMap: Record<string, typeof parseToml> = {
+    toml: parseToml,
+    yaml: parseYaml,
+  };
+  const parse = parseMap[node.type];
+  let data = {};
+  try {
+    data = parse(node.value);
+  } catch (err) {
+    // ignore
+  }
+  return {
+    data,
+    node,
+  };
+}
+
 function createCtx({
   fileUri,
   ast,
@@ -29,10 +72,11 @@ function createCtx({
   rootDirUri: string;
 }) {
   const footnoteById: { [id: string]: any } = {};
-
+  const frontmatterNode = findFrontmatterNode(ast);
   const ctx = {
     render,
     renderChildren,
+    frontmatter: parseFrontMatter(frontmatterNode),
     definition: definitions(ast),
     footnoteById,
     footnoteOrder: [],
@@ -41,7 +85,7 @@ function createCtx({
     continue: () => CONTINUE,
     getRootNode: () => ast,
     getParentNode: (node: Node) =>
-      findParentNode(ast, node as unknown as Content),
+      findParentNode(ast, node as unknown as RootContent),
   };
 
   visit(ast, 'footnoteDefinition', (def) => {

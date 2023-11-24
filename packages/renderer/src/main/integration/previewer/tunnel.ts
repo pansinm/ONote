@@ -81,11 +81,15 @@ mainFrame.onNewTunnel((tunnel) => {
   tunnel.handle(
     IPCMethod.InsertTextToEditor,
     async (payload: IPCInsertTextToEditorRequest['payload']) => {
-      const { range, text, uri } = payload;
+      const { range, text = '', uri, edits } = payload;
       const model = monaco.editor
         .getModels()
         .find((model) => isEquals(model.uri.toString(), uri));
-      model?.applyEdits([{ range, text }]);
+      if (edits) {
+        model?.applyEdits(edits);
+      } else if (range) {
+        model?.applyEdits([{ range, text }]);
+      }
     },
   );
 
