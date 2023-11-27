@@ -3,7 +3,7 @@ import { CONTINUE } from '../markdown/createCtx';
 import handlersManager from '../markdown/handlers/manager';
 
 type Renderer = {
-  [key: string]: (node: any, ctx: any) => React.ReactNode;
+  [key: string]: (node: any, ctx: any) => React.ReactNode | symbol;
 };
 
 export function registerMarkdownRenderer(renderer: Renderer) {
