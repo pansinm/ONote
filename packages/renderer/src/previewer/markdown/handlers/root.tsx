@@ -75,10 +75,10 @@ function generateEdit(
   frontmatter: any,
   messages: Message[],
 ) {
-  const { node, data } = frontmatter;
+  const { node = {}, data = {} } = frontmatter;
   const position = _.get(node, 'position');
   const type = _.get(node, 'type') || 'yaml';
-  const value = _.set(_.cloneDeep(data), 'comments.' + markId, messages);
+  const value = _.set(_.cloneDeep(data || {}), 'comments.' + markId, messages);
   if (!messages.length) {
     delete value['comments'][markId];
   }
