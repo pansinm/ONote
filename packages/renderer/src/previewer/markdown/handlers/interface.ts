@@ -7,10 +7,7 @@ export interface Manifest {
 }
 
 export type Handlers = {
-  [key: string]: (
-    node: any,
-    renderCtx: any
-  ) => React.ReactNode;
+  [key: string]: (node: any, renderCtx: any) => React.ReactNode | symbol;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

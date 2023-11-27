@@ -9,7 +9,7 @@ import editor from '../../ipc/editor';
 import { positionToRange } from '../../editor/utils';
 import { stringify as stringifyYaml } from 'yaml';
 import { stringify as stringifyToml } from '@iarna/toml';
-import { stringify, traverse } from '../parser';
+import { stringify, traverse } from '../../../common/markdown';
 import Icon from '/@/components/Icon';
 import BatchApply from '../../editor/BatchApply';
 

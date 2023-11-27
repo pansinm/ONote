@@ -6,7 +6,7 @@ import remarkHtml from 'remark-html';
 import ETable from '@editorjs/table';
 import EditorJS from '@editorjs/editorjs';
 import { uniqueId } from 'docx';
-import { html2md } from '../../utils/md';
+import { html2md } from '/@/common/markdown';
 import { createLineClass } from './util/position';
 import editor from '../../ipc/editor';
 

@@ -4,7 +4,7 @@ import type { Heading, Paragraph, Root, Text } from 'mdast';
 import { parseDom } from './html';
 import type { Node } from 'unist';
 import { createLineClass } from './util/position';
-import { stringify } from '../parser';
+import { stringify } from '../../../common/markdown';
 
 const voidElements = [
   'area',

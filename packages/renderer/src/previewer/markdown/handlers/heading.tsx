@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Heading } from 'mdast';
-import { stringify } from '../parser';
+import { stringify } from '../../../common/markdown';
 import { createLineClass } from './util/position';
 
 export default function heading(node: Heading, ctx: any) {
