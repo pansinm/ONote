@@ -25,7 +25,7 @@ const config = {
     version: process.env.VITE_APP_VERSION,
   },
   linux: {
-    target: ['deb', 'AppImage'],
+    target: ['deb', 'rpm', 'AppImage'],
     category: 'Utility',
     icon: 'buildResources/icon.icns',
     maintainer: 'pansinm <pansinm@foxmail.com>',
