@@ -5,7 +5,7 @@ import stores from '../../stores';
 import { EDITOR_FILE_SAVE } from '../../eventbus/EventName';
 import { fileType, relative } from '/@/common/utils/uri';
 import { getFileName } from '@sinm/react-file-tree/lib/utils';
-import { html2md } from '/@/previewer/utils/md';
+import { html2md } from '/@/common/markdown';
 
 const EventBus = () => {
   useEffect(() => {
