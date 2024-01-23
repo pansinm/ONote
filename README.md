@@ -35,11 +35,17 @@ yarn watch
 
 ## Compile
 
+### 编译前准备
+
+#### Fedora
 ```bash
-# linux
+sudo dnf install libxcrypt-compat
+sudo dnf install rpm-build
+```
+
+### 编译
+```bash
 yarn compile
-# win
-yarn compile:win
 ```
 
 ## 依赖于
