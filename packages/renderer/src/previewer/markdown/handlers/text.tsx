@@ -6,7 +6,6 @@ import { createLineClass } from './util/position';
 import * as Emoji from 'node-emoji';
 import classNames from 'classnames';
 import type { ICtx } from '../types';
-import { replaceNode } from '../../utils/md';
 import { useLatest } from 'react-use';
 import BatchApply from '../../editor/BatchApply';
 
@@ -90,6 +89,7 @@ function MdText({ node, ctx }: { node: Text; ctx: ICtx }) {
   const nodeParts = parseText(
     String(node.value).replace(/[ \t]*(\r?\n|\r)[ \t]*/g, '$1'),
   );
+
   const nodePartsLatest = useLatest(nodeParts);
   const ctxLatest = useLatest(ctx);
   useEffect(() => {

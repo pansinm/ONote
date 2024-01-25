@@ -10,7 +10,8 @@ import remarkMath from 'remark-math';
 import rehypeParse from 'rehype-parse';
 import { toMdast } from 'hast-util-to-mdast';
 
-import type { Parent, Root, RootContent } from 'mdast';
+import type { Parent, Root, RootContent, Text } from 'mdast';
+import _ from 'lodash';
 
 const parser = unified()
   .use(remarkParse)
@@ -35,6 +36,17 @@ export const stringify = (node: Node) => {
   return parser.stringify(node as Root).trim();
 };
 
+export const getText = (node: Parent) => {
+  let text = '';
+  traverse(node, (node) => {
+    const textNode = node as Text;
+    if (textNode.type === 'text' && textNode.value) {
+      text += textNode.value;
+    }
+  });
+  return text;
+};
+
 export const traverse = (
   parent: Parent,
   indicator: (node: RootContent | Parent) => void | boolean,
@@ -52,17 +64,18 @@ export function html2Mdast(html: string) {
   const hast = unified().use(rehypeParse).parse(html);
   const mdast = toMdast(hast as any, {
     handlers: {
-      comment: (h, node) => {
-        return h(node, 'text', '');
+      comment: (state, node) => {
+        return undefined;
       },
-      mark: (h, node) => {
-        console.log(h, node);
-        return h(
-          node,
-          'textDirective',
-          { attributes: node.properties, name: 'mark' },
-          node.children?.map((child: any) => toMdast(child)),
-        );
+      mark: (state, node) => {
+        const result = {
+          type: 'textDirective',
+          attributes: node.properties,
+          name: 'mark',
+          children: state.toFlow(state.all(node)),
+        } as any;
+        state.patch(node, result);
+        return result;
       },
     },
   });
