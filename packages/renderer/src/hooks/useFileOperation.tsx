@@ -4,6 +4,7 @@ import React, { useCallback } from 'react';
 import stores from '../main/stores';
 import { alertAndThrow } from '../common/utils/alert';
 import fileService from '/@/main/services/fileService';
+import { resolveUri } from '../common/utils/uri';
 
 function useFileOperation() {
   const { open: openPrompt, Prompt } = usePrompt();
@@ -22,12 +23,18 @@ function useFileOperation() {
       name = name + '.md';
     }
 
+    const template = await fileService
+      .readText(resolveUri(dirUri + '/', 'template.md'))
+      .catch(() => '');
+
+    const fileUri = resolveUri(dirUri + '/', name);
     const node = await fileService
       .create(dirUri, {
         type: type,
-        uri: dirUri + '/' + encodeURIComponent(name),
+        uri: fileUri,
       })
       .catch(alertAndThrow);
+    await fileService.writeText(fileUri, template);
     if (type === 'file') {
       await stores.fileListStore.refreshFiles();
       stores.activationStore.activeFile(node.uri);
