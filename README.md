@@ -1,27 +1,17 @@
 # ONote
 
-![drawio](assets/1673256329665.drawio.svg)
+## 主要特性
+- 支持标准"Markdown"和Github风格语法
+- 支持实时预览，双向同步滚动
+- 支持ToC（Table of Contents）、Emoji表情、Task lists等扩展语法
+- 支持TeX科学公式（基于KaTeX）、PlantUML、Mermaid Diagram;
+- 支持插件扩展，当前包括图片标注、Drawio等插件
+- 支持独立窗口预览，充分利用多屏，一屏编辑、一屏预览
+- 支持Markdown模板，按模板创建新文件
+- 支持多数据源，当前支持本地目录和SSH目录
 
-## 截图
-![](docs/assets/screenshot.png)
-
-## 特性
-
-### 支持配置侧边栏，集成ChatGPT
-
-![](docs/assets/chatbox.gif)
-
-### 支持新窗口预览
-
-![](docs/assets/1667632814747.png)
-
-### 支持打开不同数据源
-
-![](docs/assets/1667632524525.png)
-
-### plantuml 智能提示
-
-![](docs/assets/1667632399819.png)
+## 目录
+[TOC]
 
 ## 下载
 
