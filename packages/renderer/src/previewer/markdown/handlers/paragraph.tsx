@@ -4,7 +4,7 @@ import type { Heading, Paragraph, Root, Text } from 'mdast';
 import { parseDom } from './html';
 import type { Node } from 'unist';
 import { createLineClass } from './util/position';
-import { stringify } from '../../../common/markdown';
+import { getText, stringify } from '../../../common/markdown';
 
 const voidElements = [
   'area',
@@ -50,9 +50,7 @@ function renderToc(root: Root, node: Node) {
   return (
     <ul className={`toc ${createLineClass(node.position)}`}>
       {headings.map((heading, index) => {
-        const title = stringify(heading as any)
-          .trim()
-          .slice(heading.depth + 1);
+        const title = getText(heading as any).trim();
         return (
           <li key={index} style={{ marginLeft: 20 * heading.depth }}>
             <a
