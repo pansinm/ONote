@@ -13,7 +13,9 @@ function getAlertTag(node: Blockquote) {
   if (text?.type !== 'text') {
     return null;
   }
-  const results = /^\s*\[!(NOTE|TIP|IMPORT|WARNING|CAUTION)\]/.exec(text.value);
+  const results = /^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/.exec(
+    text.value,
+  );
   if (results?.[1]) {
     return results?.[1];
   }
@@ -27,7 +29,7 @@ function trimAlertTag(node: Blockquote) {
     return;
   }
   text.value = text.value.replace(
-    /^\s*\[!(NOTE|TIP|IMPORT|WARNING|CAUTION)\]\s*/,
+    /^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/,
     '',
   );
   return final;

@@ -4,7 +4,6 @@ import Render from '../markdown/Render';
 import useModel from '../hooks/useModel';
 import Fallback from './Fallback';
 import { Toolbar } from './SelectionToolbar';
-
 import('github-markdown-css/github-markdown.css');
 
 export default function Previewer({ className }: { className: string }) {
