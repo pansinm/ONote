@@ -23,6 +23,7 @@ const SearchList: FC<SearchListProps> = (props) => {
             treeNode={node}
             style={{}}
             indent={0}
+            activated={false}
             indentUnit={''}
             onClick={props.onItemClick}
             treeItemRenderer={function (treeNode: TreeNode) {
@@ -33,7 +34,7 @@ const SearchList: FC<SearchListProps> = (props) => {
                 ></FileTreeItem>
               );
             }}
-          ></TreeItem>
+          />
         );
       })}
     </Flex>
