@@ -1,4 +1,5 @@
 # ONote
+![ONote](./docs/assets/screenshot.gif)
 
 ## 主要特性
 - 支持标准"Markdown"和Github风格语法
