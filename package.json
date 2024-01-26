@@ -105,7 +105,7 @@
     "mime-types": "^2.1.35",
     "mobx": "^6.4.1",
     "mobx-react-lite": "^3.3.0",
-    "monaco-editor": "^0.41.0",
+    "monaco-editor": "^0.45.0",
     "monaco-editor-nls": "^3.0.0",
     "monaco-editor-webpack-plugin": "^7.1.0",
     "monaco-markdown": "^0.0.12",

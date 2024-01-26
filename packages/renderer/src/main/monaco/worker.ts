@@ -1,24 +1,19 @@
 import * as monaco from 'monaco-editor';
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
-import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-(self as any).MonacoEnvironment = {
-  getWorker(_: any, label: string) {
+self.MonacoEnvironment = {
+  getWorkerUrl: function (moduleId, label) {
     if (label === 'json') {
-      return new jsonWorker();
+      return './json.worker.bundle.js';
     }
     if (label === 'css' || label === 'scss' || label === 'less') {
-      return new cssWorker();
+      return './css.worker.bundle.js';
     }
     if (label === 'html' || label === 'handlebars' || label === 'razor') {
-      return new htmlWorker();
+      return './html.worker.bundle.js';
     }
     if (label === 'typescript' || label === 'javascript') {
-      return new tsWorker();
+      return './ts.worker.bundle.js';
     }
-    return new editorWorker();
+    return './editor.worker.bundle.js';
   },
 };
