@@ -17,6 +17,18 @@ export default function ProjectSelector(props: {
   onSelected: (project: Project) => void;
   onOpenChange: (open: boolean) => void;
 }) {
+  if (!props.open) {
+    return (
+      <Button
+        style={{ flex: 1 }}
+        onClick={() => props.onOpenChange(true)}
+        appearance="primary"
+        shape="square"
+      >
+        打开目录
+      </Button>
+    );
+  }
   return (
     <Dialog
       open={props.open}
