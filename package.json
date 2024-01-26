@@ -79,7 +79,7 @@
     "css-loader": "^6.8.1",
     "diff": "^5.0.0",
     "docx": "^7.3.0",
-    "electron": "^25.5.0",
+    "electron": "^28.2.0",
     "electron-builder": "^24.6.3",
     "electron-devtools-installer": "^3.2.0",
     "eslint": "8.9.0",
