@@ -1,4 +1,4 @@
-# ONote
+# ONote 
 ![ONote](./docs/assets/screenshot.gif)
 
 ## 主要特性
