@@ -11,7 +11,6 @@ import rehypeParse from 'rehype-parse';
 import { toMdast } from 'hast-util-to-mdast';
 
 import type { Parent, Root, RootContent, Text } from 'mdast';
-import _ from 'lodash';
 
 const parser = unified()
   .use(remarkParse)
@@ -20,7 +19,7 @@ const parser = unified()
   .use(remarkMath)
   .use(remarkFrontmatter, ['yaml', 'toml'])
   // .use(remarkEmoji)
-  .use(footnotes, { inlineNotes: true })
+  .use(footnotes as any, { inlineNotes: true })
   .use(gfm);
 
 export const parse = (markdown: string) => {
