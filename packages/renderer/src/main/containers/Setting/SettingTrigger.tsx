@@ -25,10 +25,20 @@ const useStyles = makeStyles({
 });
 export default function SettingTrigger() {
   const styles = useStyles();
+  const [open, setOpen] = React.useState(false);
+  if (!open) {
+    return (
+      <Button
+        icon={<SettingsRegular />}
+        onClick={() => setOpen(!open)}
+        shape="square"
+      ></Button>
+    );
+  }
   return (
     <Dialog
-    // open={props.open}
-    // onOpenChange={(e, { open: needOpen }) => props.onOpenChange(needOpen)}
+      open={open}
+      onOpenChange={(e, { open: needOpen }) => setOpen(needOpen)}
     >
       <DialogTrigger>
         <Button icon={<SettingsRegular />} shape="square"></Button>
