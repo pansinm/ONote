@@ -24,7 +24,14 @@ module.exports = {
     allowCollectingMemory: true,
   },
   mode: isDev ? 'development' : 'production',
-  entry: entry,
+  entry: {
+    ...entry,
+    'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker.js',
+    'json.worker': 'monaco-editor/esm/vs/language/json/json.worker',
+    'css.worker': 'monaco-editor/esm/vs/language/css/css.worker',
+    'html.worker': 'monaco-editor/esm/vs/language/html/html.worker',
+    'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker',
+  },
   devtool: isDev ? 'eval' : undefined,
   module: {
     rules: [
@@ -82,8 +89,9 @@ module.exports = {
     },
   },
   output: {
+    globalObject: 'self',
+    filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    filename: '[contenthash].js',
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -92,7 +100,7 @@ module.exports = {
       'process.env.DEBUG': JSON.stringify(process.env.DEBUG || false),
       'process.env.NODE_DEBUG': JSON.stringify(process.env.NODE_DEBUG || false),
     }),
-    new MonacoWebpackPlugin(),
+    // new MonacoWebpackPlugin(),
     ...Object.keys(entry).map(
       (key) =>
         new HtmlWebpackPlugin({
