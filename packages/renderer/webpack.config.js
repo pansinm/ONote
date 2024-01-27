@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 const path = require('path');
 const fs = require('fs');
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 
@@ -95,7 +94,6 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.NODE': JSON.stringify(process.env.NODE_ENV),
       'process.env.DEBUG': JSON.stringify(process.env.DEBUG || false),
       'process.env.NODE_DEBUG': JSON.stringify(process.env.NODE_DEBUG || false),

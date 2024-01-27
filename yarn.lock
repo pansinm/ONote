@@ -8798,7 +8798,7 @@ loader-runner@^4.2.0:
   resolved "https://registry.npmmirror.com/loader-runner/-/loader-runner-4.3.0.tgz#c1b4a163b99f614830353b16755e7149ac2314e1"
   integrity sha512-3R/1M+yS3j5ou80Me59j7F9IMs4PXs3VqRrm0TU3AbKPxlmpoY1TNscJV/oGJXo8qCatFGTfDbY6W6ipGOYXfg==
 
-loader-utils@^2.0.0, loader-utils@^2.0.2:
+loader-utils@^2.0.0:
   version "2.0.4"
   resolved "https://registry.npmmirror.com/loader-utils/-/loader-utils-2.0.4.tgz#8b5cb38b5c34a9a018ee1fc0e6a066d1dfcc528c"
   integrity sha512-xXqpXoINfFhgua9xiqD8fPFHgkoq1mmmpE92WlDbm9rNRd/EbRb+Gqf908T2DMfuHjjJlksiK2RbHVOdD/MqSw==
@@ -9859,13 +9859,6 @@ monaco-editor-nls@^3.0.0:
   version "3.1.0"
   resolved "https://registry.npmmirror.com/monaco-editor-nls/-/monaco-editor-nls-3.1.0.tgz#64086be3b0ee6791ac6bd99c9b1b45ad819c26ee"
   integrity sha512-GdzgKRAiwXlGI/ude/HbzP8ukml28yUoZ7rx/xsSsmYf9W13jTyWjXjoMK/+pjL6JorAThH2WkCYaDoCnIX7Jg==
-
-monaco-editor-webpack-plugin@^7.1.0:
-  version "7.1.0"
-  resolved "https://registry.npmmirror.com/monaco-editor-webpack-plugin/-/monaco-editor-webpack-plugin-7.1.0.tgz#16f265c2b5dbb5fe08681b6b3b7d00d3c5b2ee97"
-  integrity sha512-ZjnGINHN963JQkFqjjcBtn1XBtUATDZBMgNQhDQwd78w2ukRhFXAPNgWuacaQiDZsUr4h1rWv5Mv6eriKuOSzA==
-  dependencies:
-    loader-utils "^2.0.2"
 
 monaco-editor@*, monaco-editor@0.30.1, monaco-editor@0.41.0:
   version "0.41.0"
@@ -12870,11 +12863,6 @@ vite-plugin-commonjs@^0.5.3:
   integrity sha512-E+LkzZ6SSwI8/aarkPI0nk/GE3vmSCm9hqOKOq93YIHVJJgDU651RtP4BBbhrnirxhWZwfj1Jjsy3S0Ae7bBJw==
   dependencies:
     fast-glob "~3.2.11"
-
-vite-plugin-monaco-editor-nls@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.npmmirror.com/vite-plugin-monaco-editor-nls/-/vite-plugin-monaco-editor-nls-2.0.2.tgz#b6be773921672e2e49dea9947e5f0057f6435384"
-  integrity sha512-g7/17LktYHev/UDaafnqbTiDg6Q526jR50+71Kx9Zxuvhji8VF1H4xM/eEgY3+9POZAcbXCmn3GmRCqmzNyxww==
 
 vite@^3.1.8:
   version "3.2.8"
