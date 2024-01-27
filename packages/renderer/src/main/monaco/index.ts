@@ -1,6 +1,6 @@
 import * as monaco from 'monaco-editor';
 import './language';
-// import './worker';
+import './worker';
 import './commands';
 import './completions';
 export * from './editor';
