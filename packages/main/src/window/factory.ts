@@ -27,6 +27,8 @@ async function createWindow(type: 'main' | 'previewer') {
   const browserWindow = new BrowserWindow({
     show: false, // Use 'ready-to-show' event to show window
     autoHideMenuBar: true,
+    width: 1280,
+    height: 768,
     icon: import.meta.env.DEV
       ? 'buildResources/icon.png'
       : nativeImage.createFromPath(
