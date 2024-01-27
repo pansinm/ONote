@@ -2796,7 +2796,7 @@
   resolved "https://registry.npmmirror.com/@sinm/prism-line-break/-/prism-line-break-1.1.0.tgz#fabf2c30c629d063609f6178ebea11783a92b861"
   integrity sha512-kke1KCvo1QDb9wEdpKGeN3e6dPAFxxzsDDu+ThP4b5oMyOjEIGDtvhRhtI8TB8b41ApX65+WpT+eT94W/pTBYA==
 
-"@sinm/react-chrome-tabs@^2.1.2":
+"@sinm/react-chrome-tabs@^2.3.3":
   version "2.3.3"
   resolved "https://registry.npmmirror.com/@sinm/react-chrome-tabs/-/react-chrome-tabs-2.3.3.tgz#985f6022c36a208119c32444bccc0fc45f0b924e"
   integrity sha512-qtjDg4vLniWmLTw1xwxii+UGK+pdAPnFgey68TDqgFwN3qzbRtDAna8hc77gIsNzINrOb8yrWJAeV8sejWw+AQ==
