@@ -19,11 +19,16 @@ export default function linkReference(node: LinkReference, ctx: ICtx) {
       </>
     );
   }
+  let href = resolveAssetUri(def.url, ctx);
+  const isCurrentPage = def.url.startsWith('#');
+  if (isCurrentPage) {
+    href = def.url;
+  }
   return (
     <a
       className={createLineClass(node.position)}
-      target="_blank"
-      href={resolveAssetUri(def.url, ctx)}
+      target={isCurrentPage ? undefined : '_blank'}
+      href={href}
       title={def.title || undefined}
       rel="noreferrer"
     >
