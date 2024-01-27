@@ -1,5 +1,5 @@
-import type { Node, RootContent, Parent } from 'mdast';
-import type { Range, IEdit } from '../ipc/editor';
+import type { RootContent, Parent } from 'mdast';
+import type { IEdit } from '../ipc/editor';
 import editor from '../ipc/editor';
 import { stringify } from '../../common/markdown';
 

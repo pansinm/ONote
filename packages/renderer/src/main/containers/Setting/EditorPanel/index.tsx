@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
   EDITOR_FONT_FAMILY,
+  EDITOR_FONT_SIZE,
   EDITOR_MODE,
   EDITOR_WORD_WRAP,
 } from '/@/common/constants/SettingKey';
@@ -33,6 +34,10 @@ const EditorPanel = observer(function EditorPanel() {
     stores.settingStore.update(EDITOR_FONT_FAMILY, val);
   };
 
+  const setFontSize = (val: string) => {
+    stores.settingStore.update(EDITOR_FONT_SIZE, parseInt(val));
+  };
+
   const wordWrapConfig =
     stores.settingStore.settings[EDITOR_WORD_WRAP] || 'off';
   const wordWrap = wordWrapConfig as 'on' | 'off';
@@ -57,6 +62,12 @@ const EditorPanel = observer(function EditorPanel() {
           label={'VIM 模式'}
           checked={mode === 'VIM_MODE'}
           onChange={toggleVIMMode}
+        />
+      </Field>
+      <Field className={styles.input} label="Font Size">
+        <Input
+          defaultValue={family}
+          onChange={(e) => setFontSize(e.target.value)}
         />
       </Field>
       <Field className={styles.input} label="Font Family">
