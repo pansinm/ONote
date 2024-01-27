@@ -2,6 +2,7 @@ import * as monaco from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
 import {
   EDITOR_FONT_FAMILY,
+  EDITOR_FONT_SIZE,
   EDITOR_WORD_WRAP,
 } from '/@/common/constants/SettingKey';
 import stores from '/@/main/stores';
@@ -20,13 +21,12 @@ function useEditor() {
   const wordWrapConfig =
     stores.settingStore.settings[EDITOR_WORD_WRAP] || 'off';
   const wordWrap = wordWrapConfig as 'on' | 'off';
-  // update font family
+  const fontSize =
+    (stores.settingStore.settings[EDITOR_FONT_SIZE] as number) || 14;
+
   useEffect(() => {
-    editor?.updateOptions({ fontFamily: family });
-  }, [family]);
-  useEffect(() => {
-    editor?.updateOptions({ wordWrap });
-  }, [wordWrap]);
+    editor?.updateOptions({ fontFamily: family, fontSize, wordWrap });
+  }, [family, fontSize, wordWrap]);
 
   useEffect(() => {
     const editor = monaco.editor.create(containerRef.current!, {
