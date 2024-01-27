@@ -30,10 +30,12 @@ const EditorPanel = observer(function EditorPanel() {
   const family =
     (stores.settingStore.settings[EDITOR_FONT_FAMILY] as string) ||
     'Source Han Sans, Noto, Droid Sans Mono, monospace, Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, WenQuanYi Micro Hei, Arial, sans-serif';
+
   const setFamily = (val: string) => {
     stores.settingStore.update(EDITOR_FONT_FAMILY, val);
   };
 
+  const fontSize = stores.settingStore.settings[EDITOR_FONT_SIZE];
   const setFontSize = (val: string) => {
     stores.settingStore.update(EDITOR_FONT_SIZE, parseInt(val));
   };
@@ -66,7 +68,7 @@ const EditorPanel = observer(function EditorPanel() {
       </Field>
       <Field className={styles.input} label="Font Size">
         <Input
-          defaultValue={family}
+          defaultValue={(fontSize as string) || '14'}
           onChange={(e) => setFontSize(e.target.value)}
         />
       </Field>
