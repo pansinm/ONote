@@ -10,7 +10,7 @@ import createCtx from './createCtx';
 
 function render(fileUri: string, ast: Root, rootDirUri: string): ReactNode {
   const ctx = createCtx({ fileUri, ast, rootDirUri });
-  return ctx.render(ast, ctx);
+  return ctx.render(ast, ctx) as ReactNode;
 }
 
 interface RenderProps {
@@ -22,6 +22,8 @@ interface RenderProps {
 
 const Render: FC<RenderProps> = (props) => {
   const ast = parse(props.content);
+
+  console.log(ast);
 
   usePreviewerScrollSync(props.uri, ast, props.lineNumber);
 
