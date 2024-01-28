@@ -3,12 +3,30 @@ import { autorun, makeAutoObservable, reaction, runInAction, when } from 'mobx';
 import fileService from '../services/fileService';
 import type ActivationStore from './ActivationStore';
 import { isEquals } from '/@/common/utils/uri';
+import _ from 'lodash';
 
 class FileListStore {
-  files: TreeNode[] = [];
+  _files: TreeNode[] = [];
 
   activationStore: ActivationStore;
 
+  sorter: 'name-asc' | 'name-desc' | 'time-asc' | 'time-desc' = 'name-asc';
+
+  get files(): TreeNode[] {
+    switch (this.sorter) {
+      case 'name-asc':
+        return _.orderBy(this._files, 'name', 'asc');
+      case 'name-desc':
+        return _.orderBy(this._files, 'name', 'desc');
+      case 'time-asc':
+        return _.orderBy(this._files, 'mtime', 'asc');
+      case 'time-desc':
+        return _.orderBy(this._files, 'mtime', 'asc');
+      default:
+        console.log('sorter', this.sorter, this._files);
+        return this._files;
+    }
+  }
   constructor(activationStore: ActivationStore) {
     this.activationStore = activationStore;
     makeAutoObservable(this);
@@ -21,18 +39,22 @@ class FileListStore {
     );
   }
 
+  setSorter(sorter: typeof this.sorter) {
+    this.sorter = sorter;
+  }
+
   refreshFiles() {
     const dirUri = this.activationStore.activeDirUri;
     if (dirUri) {
       fileService.readdir(dirUri).then((nodes) => {
         if (isEquals(dirUri, this.activationStore.activeDirUri)) {
           runInAction(() => {
-            this.files = nodes.filter((node) => node.type === 'file');
+            this._files = nodes.filter((node) => node.type === 'file');
           });
         }
       });
     } else {
-      this.files = [];
+      this._files = [];
     }
   }
 }

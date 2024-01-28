@@ -7,9 +7,11 @@ import type { IDataSourceProvider } from '/@/dataSource';
 function statsToTreeNode(
   filePath: string,
   stats: Awaited<ReturnType<typeof fs.stat>>,
-): TreeNode {
+): TreeNode<{ mtime: number; name: string }> {
   return {
+    mtime: stats.mtimeMs as number,
     uri: url.pathToFileURL(filePath).toString(),
+    name: path.basename(filePath),
     type: stats.isFile() ? 'file' : 'directory',
   };
 }

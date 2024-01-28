@@ -35,6 +35,8 @@ class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
     const stats = await this.sftp.stat(filePath);
     return {
       type: stats.isDirectory() ? 'directory' : 'file',
+      mtime: stats.mtime,
+      name: path.basename(filePath),
       uri: pathToUri(filePath),
     } as TreeNode;
   }

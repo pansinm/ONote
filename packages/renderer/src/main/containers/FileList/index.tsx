@@ -35,6 +35,28 @@ const menus: MenuItem[] = [
     id: 'DELETE_NOTE',
     title: '删除笔记',
   },
+  {
+    id: 'SORTER',
+    title: '文件排序',
+    children: [
+      {
+        id: 'SORTER_NAME_ASC',
+        title: '名字排序',
+      },
+      {
+        id: 'SORTER_NAME_DESC',
+        title: '名字倒序',
+      },
+      {
+        id: 'SORTER_TIME_ASC',
+        title: '时间排序',
+      },
+      {
+        id: 'SORTER_TIME_DESC',
+        title: '时间倒序',
+      },
+    ],
+  },
 ];
 
 const FileList: FC = observer(() => {
@@ -83,6 +105,16 @@ const FileList: FC = observer(() => {
 
   const handleMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
     const uri = (menuProps as any).uri;
+    const SORTER_PREFIX = 'SORTER_';
+    if (menu.id.startsWith(SORTER_PREFIX)) {
+      stores.fileListStore.setSorter(
+        menu.id
+          .replace(SORTER_PREFIX, '')
+          .replace('_', '-')
+          .toLocaleLowerCase() as typeof stores.fileListStore.sorter,
+      );
+      return;
+    }
     switch (menu.id) {
       case 'CREATE_NOTE':
         return createNote();
