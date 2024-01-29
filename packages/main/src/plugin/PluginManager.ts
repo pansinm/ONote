@@ -10,6 +10,9 @@ import fsc from 'fs';
 import tar from 'tar';
 import onote from '../onote';
 import { getMainFrame, getPreviewerFrames, injectJs } from '../window/frames';
+import { webContents } from 'electron';
+import { waitEvent } from '../utils/event';
+import type EventEmitter from 'events';
 
 const ONOTE_ROOT = path.join(os.homedir(), 'onote');
 export const PLUGIN_ROOT = path.join(ONOTE_ROOT, 'plugins');
@@ -96,7 +99,10 @@ class PluginManager {
       const installDir = path.join(PLUGIN_ROOT, pkg.name);
       await this.recreateDir(installDir);
       if (os.platform() === 'win32') {
-        await fs.cp(path.join(tmpDir), installDir, { recursive: true, force: true });
+        await fs.cp(path.join(tmpDir), installDir, {
+          recursive: true,
+          force: true,
+        });
       } else {
         await fs.rename(path.join(tmpDir), installDir);
       }
@@ -192,10 +198,16 @@ class PluginManager {
     }
     const mainFrame = getMainFrame();
     const previewerFrames = getPreviewerFrames();
+    const isMainFrameLoading = webContents.fromFrame(mainFrame!)?.isLoading();
+    if (isMainFrameLoading) {
+      await waitEvent(mainFrame as EventEmitter, 'dom-ready');
+    }
+
     await mainFrame?.executeJavaScript(
       `window.__plugins = ${JSON.stringify(this.getPlugins())};`,
-    ),
-      await injectJs(mainFrame, plugin.mainJs);
+    );
+    await injectJs(mainFrame, plugin.mainJs);
+
     await Promise.all(
       previewerFrames.map((f) => injectJs(f, plugin.previewerJs)),
     );

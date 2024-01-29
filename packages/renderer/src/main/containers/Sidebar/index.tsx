@@ -27,7 +27,7 @@ export default observer(function ActivityBar() {
     try {
       await fileService.connect(project.type, project.config);
       stores.activationStore.openNoteBook(project.type, project.rootUri);
-      window.simmer.callDataSource('current', 'setRootDirUri', project.rootUri);
+      fileService.setRootDirUri(project.rootUri);
       setProject(project);
       setOpen(false);
     } catch (err) {

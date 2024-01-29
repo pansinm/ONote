@@ -5,9 +5,9 @@ import multer from 'multer';
 import { v2 as webdav } from 'webdav-server';
 import os from 'os';
 import fs from 'fs/promises';
-import { manager } from '../dataSource';
 import { sendToMain } from '../window/ipc';
 import * as dsWebDav from './webdav';
+import { dataSource } from '../dataSource';
 const upload = multer({ dest: os.tmpdir() });
 
 const app = express();
@@ -47,7 +47,6 @@ app.post('/upload', upload.single('file'), async (req, res, next) => {
     if (req.file) {
       const { originalname, path } = req.file;
       const { toFile } = req.body;
-      const dataSource = manager.getDataSource('current');
       const file = new URL('./assets/' + originalname, toFile).toString();
       await dataSource.write(file, await fs.readFile(path));
       sendToMain('message', {

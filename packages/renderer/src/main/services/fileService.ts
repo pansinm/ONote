@@ -1,82 +1,81 @@
 import type { TreeNode } from '@sinm/react-file-tree';
-import type { DataSourceCall } from '../../../../main/src/ipc/dataSource';
 import { sortTreeNodes } from '/@/common/utils/treeNode';
+import { FILE_CONTENT_CHANGED } from '../eventbus/EventName';
+import eventbus from '../eventbus';
 
-const callDataSource: DataSourceCall = (
-  dataSourceId,
-  functionName,
-  ...args
-) => {
-  return (window.simmer.callDataSource as DataSourceCall)(
-    dataSourceId,
-    functionName,
-    ...args,
-  );
-};
+const dataSource = window.onote.dataSource;
 
-const fileService = {
-  getService: async function (): Promise<{
+class FileService {
+  constructor() {
+    dataSource.addListener(FILE_CONTENT_CHANGED, (...args) => {
+      eventbus.emit(FILE_CONTENT_CHANGED, ...args);
+    });
+  }
+  getService = async function (): Promise<{
     service: string | undefined;
     config: any;
   }> {
-    const id = await callDataSource('current', 'getId');
-    const config = await callDataSource('current', 'getConfig');
+    const id = await dataSource.invoke('providerId');
+    const config = await dataSource.invoke('getForm');
     return { service: id, config };
-  },
-  connect: async function (
-    service: 'local' | 'ssh',
+  };
+  connect = async function (
+    providerId: 'local' | 'ssh',
     config: any,
   ): Promise<void> {
-    await callDataSource(service, 'authenticate', config);
-    await callDataSource(service, 'setCurrent');
-  },
-  disconnect: async function (): Promise<void> {
-    await callDataSource('current', 'disconnect');
-  },
-  read: async function (uri: string) {
-    return callDataSource('current', 'getTreeNode', uri);
-  },
-  readdir: function (uri: string): Promise<TreeNode[]> {
-    return callDataSource('current', 'listDir', uri).then(sortTreeNodes);
-  },
-  move: function (uri: string, targetDirUri: string): Promise<TreeNode> {
-    return callDataSource('current', 'move', uri, targetDirUri);
-  },
-  rename: function (uri: string, name: string): Promise<TreeNode> {
-    return callDataSource('current', 'rename', uri, name);
-  },
-  create: async function (dirUri: string, node: TreeNode): Promise<TreeNode> {
+    await dataSource.invoke('setProvider', providerId);
+    await dataSource.invoke('connect', config);
+  };
+  disconnect = async function (): Promise<void> {
+    await dataSource.invoke('disconnect');
+  };
+  setRootDirUri(uri: string) {
+    return dataSource.invoke('setRootDirUri', uri);
+  }
+  getTreeNode = async function (uri: string) {
+    return dataSource.invoke('getTreeNode', uri);
+  };
+  listDir = function (uri: string): Promise<TreeNode[]> {
+    return dataSource.invoke('listDir', uri).then(sortTreeNodes);
+  };
+  move = function (uri: string, targetDirUri: string): Promise<TreeNode> {
+    return dataSource.invoke('move', uri, targetDirUri);
+  };
+  rename = function (uri: string, name: string): Promise<TreeNode> {
+    return dataSource.invoke('rename', uri, name);
+  };
+  create = async function (dirUri: string, node: TreeNode): Promise<TreeNode> {
     if (node.type === 'directory') {
-      await callDataSource('current', 'mkdir', node.uri);
+      await dataSource.invoke('mkdir', node.uri);
     } else {
-      await callDataSource('current', 'writeText', node.uri, '');
+      await dataSource.invoke('writeText', node.uri, '');
     }
-    return callDataSource('current', 'getTreeNode', node.uri);
-  },
-  remove: function (uri: string): Promise<void> {
-    return callDataSource('current', 'delete', uri);
-  },
-  readText: function (uri: string): Promise<string> {
-    return callDataSource('current', 'readText', uri);
-  },
-  writeText: function (uri: string, content: string): Promise<void> {
-    return callDataSource('current', 'writeText', uri, content);
-  },
-  readFile: function (uri: string): Promise<Buffer> {
-    return callDataSource('current', 'read', uri);
-  },
-  writeFile: function (uri: string, buffer: Buffer): Promise<void> {
-    return callDataSource('current', 'write', uri, buffer);
-  },
-  getLocalUri: function (uri: string): Promise<string> {
-    return callDataSource('current', 'cache', uri);
-  },
-  searchFiles: function (
+    return dataSource.invoke('getTreeNode', node.uri);
+  };
+  remove = function (uri: string): Promise<void> {
+    return dataSource.invoke('delete', uri);
+  };
+  readText = function (uri: string): Promise<string> {
+    return dataSource.invoke('readText', uri);
+  };
+  writeText = function (uri: string, content: string): Promise<void> {
+    return dataSource.invoke('writeText', uri, content);
+  };
+  readFile = function (uri: string): Promise<Buffer> {
+    return dataSource.invoke('read', uri);
+  };
+  writeFile = function (uri: string, buffer: Buffer): Promise<void> {
+    return dataSource.invoke('write', uri, buffer);
+  };
+  getLocalUri = function (uri: string): Promise<string> {
+    return dataSource.invoke('cache', uri);
+  };
+  searchFiles = function (
     rootUri: string,
     keywords: string,
   ): Promise<TreeNode[]> {
-    return callDataSource('current', 'search', rootUri, keywords);
-  },
-};
+    return dataSource.invoke('search', rootUri, keywords);
+  };
+}
 
-export default fileService;
+export default new FileService();

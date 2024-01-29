@@ -2,14 +2,14 @@ import type { Readable, Writable } from 'stream';
 import { v2 as webdav } from 'webdav-server';
 import { Serializer } from './DatasourceSerializer';
 import { toDataSourceUri } from './utils';
-import { manager as dataSourceManager } from '/@/dataSource';
 import fs from 'fs';
 import os from 'os';
 import Path from 'path';
 import _ from 'lodash';
+import { dataSource } from '/@/dataSource';
 
 function getDataSource() {
-  return dataSourceManager.getDataSource('current');
+  return dataSource;
 }
 
 function resolveUri(path: string) {

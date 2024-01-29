@@ -1,5 +1,4 @@
 import { first, orderBy } from 'lodash';
-import { getDataSource } from '../ipc';
 
 interface IFilePanel {
   extensions: string[];

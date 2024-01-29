@@ -14,15 +14,20 @@ import _ from 'lodash';
 type AuthForm = ConnectConfig;
 
 class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
-  connect?: Client;
+  private form?: AuthForm;
 
-  sftp?: Sftp;
+  private sftp?: Sftp;
 
-  authenticateFormSchema = {
-    title: '打开本地目录',
-  };
+  private rootUri?: string;
 
-  rootUri?: string;
+  getForm(): ConnectConfig {
+    return this.form!;
+  }
+
+  providerId(): string {
+    return 'ssh';
+  }
+
   setRootDirUri(rootDirUri: string): void {
     this.rootUri = rootDirUri;
   }
@@ -41,7 +46,7 @@ class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
     } as TreeNode;
   }
 
-  async authenticate(config: AuthForm) {
+  async connect(config: AuthForm) {
     const sftp = new Sftp(config);
     try {
       await sftp.connect();
@@ -49,6 +54,7 @@ class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
       sftp.close();
       throw err;
     }
+    this.form = config;
     this.sftp?.close();
     this.sftp = sftp;
   }

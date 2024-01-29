@@ -11,7 +11,6 @@ import type { MenuItem, MenuProps } from '/@/components/Menu';
 import { useContextMenu } from 'react-contexify';
 import useFileOperation from '/@/hooks/useFileOperation';
 import NoDirectory from './NoDirectory';
-import { currentDataSource } from '../../ipc';
 import '@sinm/react-file-tree/styles.css';
 import '@sinm/react-file-tree/icons.css';
 
@@ -34,6 +33,7 @@ const MENUS: MenuItem[] = [
 import orderBy from 'lodash/orderBy';
 import { when } from 'mobx';
 import { getParentUri, isEquals } from '/@/common/utils/uri';
+import fileService from '../../services/fileService';
 
 // directory first and filename dict sort
 const sorter = (treeNodes: TreeNode[]) =>
@@ -59,7 +59,7 @@ const Directory = observer(() => {
       } as any),
     );
     if (loading) {
-      currentDataSource.listDir(treeNode.uri).then((children) => {
+      fileService.listDir(treeNode.uri).then((children) => {
         setTree((t) =>
           utils.assignTreeNode(t, treeNode.uri, {
             loading: false,
@@ -84,7 +84,7 @@ const Directory = observer(() => {
 
   useEffect(() => {
     if (rootUri) {
-      currentDataSource.getTreeNode(rootUri).then((node) => {
+      fileService.getTreeNode(rootUri).then((node) => {
         setTree(node);
         toggleExpanded(node);
       });
@@ -139,7 +139,7 @@ const Directory = observer(() => {
     if (stores.fileStore.states[fromUri] === 'changed') {
       await when(() => stores.fileStore.states[fromUri] !== 'changed');
     }
-    const to = await currentDataSource.move(fromUri, toDirUri);
+    const to = await fileService.move(fromUri, toDirUri);
     await removeTreeNode(fromUri);
     await appendTreeNode(toDirUri, to);
     stores.fileListStore.refreshFiles();

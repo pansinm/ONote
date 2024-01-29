@@ -1,2 +1,5 @@
-export { default as manager } from './manager';
+import DataSource from './DataSource';
+
+export const dataSource = new DataSource('local');
+
 export * from './providers';

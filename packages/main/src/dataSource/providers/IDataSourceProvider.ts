@@ -1,16 +1,15 @@
 import type { TreeNode } from '@sinm/react-file-tree';
 
-type JSONSchema = any;
-
 // 鉴权
 export interface IDataSourceProvider<T> {
-  authenticateFormSchema: JSONSchema;
-  authenticate(form: T): Promise<void>;
+  providerId(): string;
+  getForm(): T;
+
+  connect(form: T): Promise<void>;
+  disconnect(): Promise<void>;
 
   setRootDirUri(rootDirUri: string): void;
   getRootDirUri(): string;
-
-  disconnect(): Promise<void>;
 
   // 对于内容的版本号
   version(uri: string): Promise<number>;
