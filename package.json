@@ -108,7 +108,7 @@
     "monaco-editor": "^0.45.0",
     "monaco-editor-nls": "^3.0.0",
     "monaco-markdown": "^0.0.12",
-    "monaco-vim": "^0.3.5",
+    "monaco-vim": "^0.4.1",
     "multer": "^1.4.5-lts.1",
     "nan": "^2.17.0",
     "nano-staged": "0.5.0",
@@ -168,7 +168,7 @@
     "webdav-server": "^2.6.2"
   },
   "resolutions": {
-    "monaco-editor": "0.41.0",
+    "monaco-editor": "0.45.0",
     "webpack": "5.88.2",
     "@types/mdast": "4.0.3",
     "vfile-message": "4.0.0"
