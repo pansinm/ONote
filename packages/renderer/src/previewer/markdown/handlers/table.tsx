@@ -15,7 +15,7 @@ const toHtml = unified().use(remarkHtml);
 function parseContent(node: Table) {
   const contents = node.children.map((child) => {
     return child.children
-      .map((n) => (toHtml.stringify(n) as unknown as string) || '')
+      .map((n) => (toHtml.stringify(n as any) as unknown as string) || '')
       .map((txt) => txt.replaceAll('<div></div>', ''));
   });
   const maxColumns = contents.reduce((len, item) => {

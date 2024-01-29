@@ -17,6 +17,7 @@ import { callSetting } from '../ipc/setting';
 import { callDevelop } from '../ipc/develop';
 import { nodeCrypto } from '../common/nodeCrypto';
 import * as defaultGateway from 'default-gateway';
+import { onote } from './onote';
 
 // Export for types in contracts.d.ts
 export const simmer = {
@@ -132,7 +133,7 @@ export const simmer = {
     clipboard.writeBuffer('text/uri-list', Buffer.from(url, 'utf-8'));
   },
   async openExternal(uri: string) {
-    const localPath = await window.onote.dataSource.invoke('cache', uri);
+    const localPath = await onote.dataSource.invoke('cache', uri);
     shell.openExternal(pathToFileURL(localPath).toString());
   },
 };
