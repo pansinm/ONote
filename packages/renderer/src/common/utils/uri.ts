@@ -1,6 +1,7 @@
 import * as uri from 'monaco-editor/esm/vs/base/common/uri';
 
 const URI = uri.URI;
+
 export const pathanme = (uri: string) => {
   return new URL(uri).pathname;
 };
@@ -123,4 +124,10 @@ export const isEquals = (uri1?: string, uri2?: string) => {
   } catch (err) {
     return uri1 === uri2;
   }
+};
+
+export const getParentUri = (uri: string) => {
+  const uriObj = URI.parse(uri);
+  uriObj.path = uriObj.path.replace(/\/[^/]*$/, '');
+  return uriObj.toString();
 };

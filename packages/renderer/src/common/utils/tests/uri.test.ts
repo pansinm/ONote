@@ -6,6 +6,7 @@ import {
   toFileUri,
   toONoteUri,
   isEquals,
+  getParentUri,
 } from '../uri';
 
 test('fileType', () => {
@@ -45,4 +46,8 @@ test('relative', () => {
     'assets/b.txt',
   );
   expect(relative('file:///a/b.txt', 'file:///b/c.txt')).toBe('../b/c.txt');
+});
+
+test('getParentUri', () => {
+  expect(getParentUri('file:///a/b.txt')).toBe('file:///a');
 });

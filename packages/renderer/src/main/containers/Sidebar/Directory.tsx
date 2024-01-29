@@ -33,7 +33,7 @@ const MENUS: MenuItem[] = [
 
 import orderBy from 'lodash/orderBy';
 import { when } from 'mobx';
-import { isEquals } from '/@/common/utils/uri';
+import { getParentUri, isEquals } from '/@/common/utils/uri';
 
 // directory first and filename dict sort
 const sorter = (treeNodes: TreeNode[]) =>
@@ -115,7 +115,7 @@ const Directory = observer(() => {
           removeTreeNode(dirUri);
         });
       case 'OPEN_FOLDER':
-        return window.simmer.openPath(dirUri);
+        return window.simmer.openPath(getParentUri(dirUri));
       default:
         return;
     }
