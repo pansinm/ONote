@@ -1,9 +1,8 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useSelectionToolbarConfig } from '../hooks/useSelectionToolbarConfig';
 import _ from 'lodash';
 import type { IConProps } from '/@/components/Icon';
 import Icon from '/@/components/Icon';
-import { Textarea } from '@fluentui/react-components';
 
 function findNodes(
   container: Node,

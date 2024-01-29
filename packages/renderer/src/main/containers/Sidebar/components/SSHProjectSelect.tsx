@@ -15,14 +15,14 @@ const SSHProjectSelect: FC<SSHProjectSelectProps> = (props) => {
   const [config, setConfig] = useState<any>({});
 
   const handleSubmit: SSHFormProps['onSubmit'] = async (data) => {
-    const { config, service } = await fileService.getService();
+    const { config, providerId: providerId } = await fileService.getProvider();
     try {
       await fileService.connect('ssh', data);
       setType('dir');
       setConfig(data);
     } catch (err) {
       alert((err as Error).message);
-      fileService.connect(service as any, config);
+      fileService.connect(providerId, config);
       console.error(err);
     }
   };

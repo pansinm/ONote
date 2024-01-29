@@ -1,4 +1,3 @@
-import { Button } from '@fluentui/react-components';
 import React from 'react';
 
 export default function Fallback({
@@ -14,7 +13,7 @@ export default function Fallback({
       <h3>{error.name}</h3>
       <p>{error.message}</p>
       <p>{error.stack}</p>
-      <Button onClick={resetErrorBoundary}>重试</Button>
+      <button onClick={resetErrorBoundary}>重试</button>
     </div>
   );
 }
