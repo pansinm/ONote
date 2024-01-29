@@ -1,24 +1,18 @@
 import EventEmitter from 'events';
-import type DataSourceManager from './DataSourceManager';
-import type { IDataSourceProvider } from './providers';
+import { dataSourceProviderManager } from './providers';
+import type { IDataSourceProvider } from './providers/IDataSourceProvider';
+import { EventNames } from './constants';
 
-class DataSource extends EventEmitter {
+class DataSource extends EventEmitter implements IDataSourceProvider<unknown> {
   private provider!: IDataSourceProvider<any>;
 
-  private cfg: Record<string, any>;
-  private manager: DataSourceManager;
-
-  private id: string;
-
-  constructor(
-    id: string,
-    cfg: Record<string, any>,
-    manager: DataSourceManager,
-  ) {
+  constructor(defaultProviderId: string) {
     super();
-    this.id = id;
-    this.cfg = cfg;
-    this.manager = manager;
+    this.setProvider(defaultProviderId);
+  }
+
+  getForm(): unknown {
+    return this.provider.getForm();
   }
 
   setRootDirUri(rootDirUri: string) {
@@ -29,32 +23,22 @@ class DataSource extends EventEmitter {
     return this.provider.getRootDirUri();
   }
 
-  getId() {
-    return this.id;
+  providerId() {
+    return this.provider.providerId();
   }
 
-  setCurrent() {
-    this.manager.setCurrentDataSource(this.id);
+  setProvider(dataSourceId: string) {
+    this.provider = dataSourceProviderManager.getProvider(
+      dataSourceId,
+    ) as IDataSourceProvider<unknown>;
   }
 
-  setProvider<T>(provider: IDataSourceProvider<T>) {
-    this.provider = provider;
-  }
-
-  authenticate(form: any) {
-    return this.provider.authenticate(form);
+  connect(form: any) {
+    return this.provider.connect(form);
   }
 
   disconnect() {
     return this.provider.disconnect();
-  }
-
-  getAuthenticateSchema() {
-    return this.provider.authenticateFormSchema;
-  }
-
-  getConfig() {
-    return this.cfg;
   }
 
   //------------ content -------------//
@@ -67,12 +51,12 @@ class DataSource extends EventEmitter {
 
   async write(uri: string, data: Buffer) {
     await this.provider.write(uri, data);
-    this.emit('file.content.changed', uri);
+    this.emit(EventNames.FileContentChanged, uri);
   }
 
   async writeText(uri: string, text: string) {
     await this.provider.write(uri, Buffer.from(text, 'utf-8'));
-    this.emit('file.content.changed', uri);
+    this.emit(EventNames.FileContentChanged, uri);
   }
 
   readText(uri: string) {

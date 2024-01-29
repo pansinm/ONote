@@ -1,14 +1,14 @@
 import { app, crashReporter, dialog, ipcMain, Menu, protocol } from 'electron';
 import './security-restrictions';
 import './ipc';
-import './integration';
 import { restoreOrCreateWindow } from './window';
-import { manager as dataSourceManager } from './dataSource';
 import { manager as pluginManager } from './plugin';
 
 crashReporter.start({ uploadToServer: false });
 
 import './server';
+import { startIpcServer } from './ipc-server';
+import { dataSource } from './dataSource';
 /**
  * Prevent multiple instances
  */
@@ -45,8 +45,9 @@ app.on('activate', () => restoreOrCreateWindow('main'));
  */
 app
   .whenReady()
-  .then(() => pluginManager.loadAll())
+  .then(() => startIpcServer())
   .then(() => restoreOrCreateWindow('main'))
+  .then(() => pluginManager.loadAll())
   .catch((e) => console.error('Failed create window:', e));
 
 app.whenReady().then(() => {
@@ -91,9 +92,7 @@ app.whenReady().then(() => {
   protocol.interceptFileProtocol('onote', async (request, callback) => {
     const url = request.url.split('?')[0];
     try {
-      const localPath = await dataSourceManager
-        .getDataSource('current')
-        .cache(url.replace(/^onote:/, 'file:'));
+      const localPath = await dataSource.cache(url.replace(/^onote:/, 'file:'));
       callback({ path: decodeURI(localPath) });
     } catch (err) {
       callback({ statusCode: 500, data: JSON.stringify(err) });

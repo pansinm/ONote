@@ -2303,7 +2303,7 @@
     railroad-diagrams "^1.0.0"
     randexp "0.4.6"
 
-"@hpcc-js/wasm@^2.13.1":
+"@hpcc-js/wasm@^2.15.3":
   version "2.15.3"
   resolved "https://registry.npmmirror.com/@hpcc-js/wasm/-/wasm-2.15.3.tgz#2a276fb413adcdcd1a04712d1cfeb7edefc84212"
   integrity sha512-enmVW4APrv6jBCRP5V/WdIjYvxidNgBbgdWOdLpiygoE0g0ZurM1qsysBo4TbZfdS81SCdkjRSU/URWf+gpQUA==
@@ -12454,11 +12454,6 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.npmmirror.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
-
-typescript@4.5.5:
-  version "4.5.5"
-  resolved "https://registry.npmmirror.com/typescript/-/typescript-4.5.5.tgz#d8c953832d28924a9e3d37c73d729c846c5896f3"
-  integrity sha512-TCTIul70LyWe6IJWT8QSYeA54WQe8EjQFU4wY52Fasj5UKx88LNYKCgBEHcOMOrFF1rKGbD8v/xcNWVUq9SymA==
 
 typescript@^4.8.4:
   version "4.9.5"

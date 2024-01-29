@@ -3,8 +3,7 @@ import * as path from 'path';
 import * as os from 'os';
 import * as mimetypes from 'mime-types';
 import { fileURLToPath, pathToFileURL } from 'url';
-import type { Engine } from '@hpcc-js/wasm';
-import { graphviz } from '@hpcc-js/wasm';
+import { Graphviz } from '@hpcc-js/wasm';
 import * as https from 'https';
 import * as http from 'http';
 import { encode as encodePlantUML } from 'plantuml-encoder';
@@ -13,7 +12,6 @@ import { shell } from 'electron';
 import { ipcRenderer } from 'electron';
 import { clipboard, nativeImage } from 'electron';
 import { exposeInMainWorld } from './exposeInMainWorld';
-import { callDataSource } from '../ipc/dataSource';
 import { callPlugin } from '../ipc/plugin';
 import { callSetting } from '../ipc/setting';
 import { callDevelop } from '../ipc/develop';
@@ -43,7 +41,6 @@ export const simmer = {
     return os.homedir();
   },
 
-  callDataSource: callDataSource,
   callPlugin: callPlugin,
   callSetting: callSetting,
   callDevelop: callDevelop,
@@ -56,8 +53,9 @@ export const simmer = {
     ipcRenderer.send('window', 'showPreviewerWindow');
   },
 
-  renderGraphviz(dot: string, engine: Engine) {
-    return graphviz.layout(dot, 'svg', engine);
+  async renderGraphviz(dot: string, engine: string) {
+    const graphviz = await Graphviz.load();
+    return graphviz.layout(dot, 'svg', engine as any);
   },
   openDirectory() {
     return ipcRenderer.invoke('open-directory') as ReturnType<
@@ -134,7 +132,7 @@ export const simmer = {
     clipboard.writeBuffer('text/uri-list', Buffer.from(url, 'utf-8'));
   },
   async openExternal(uri: string) {
-    const localPath = await callDataSource('current', 'cache', uri);
+    const localPath = await window.onote.dataSource.invoke('cache', uri);
     shell.openExternal(pathToFileURL(localPath).toString());
   },
 };

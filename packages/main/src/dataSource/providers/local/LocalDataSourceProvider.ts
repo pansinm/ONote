@@ -23,6 +23,14 @@ async function readFileAsTreeNode(filePath: string): Promise<TreeNode> {
 
 class LocalDataSourceProvider implements IDataSourceProvider<null> {
   rootUri?: string;
+
+  getForm(): null {
+    return null;
+  }
+
+  providerId(): string {
+    return 'local';
+  }
   setRootDirUri(rootDirUri: string): void {
     this.rootUri = rootDirUri;
   }
@@ -34,7 +42,7 @@ class LocalDataSourceProvider implements IDataSourceProvider<null> {
     title: '打开本地目录',
   };
 
-  authenticate = <T>() => {
+  connect = <T>() => {
     return Promise.resolve();
   };
   disconnect() {

@@ -8,8 +8,8 @@ import { useEffect } from 'react';
 import React, { useState } from 'react';
 import FileTreeItem from '/@/components/FileTreeItem';
 import View from '/@/components/View';
-import { currentDataSource } from '/@/main/ipc';
 import { isEquals } from '/@/common/utils/uri';
+import fileService from '/@/main/services/fileService';
 
 interface SSHDirSelectProps {
   onOpen(uri: string): void;
@@ -38,7 +38,7 @@ const SSHDirSelect: FC<SSHDirSelectProps> = (props) => {
       } as any),
     );
     if (loading) {
-      currentDataSource.listDir(treeNode.uri).then((children) => {
+      fileService.listDir(treeNode.uri).then((children) => {
         setTree((t) =>
           utils.assignTreeNode(t, treeNode.uri, {
             loading: false,
@@ -49,7 +49,7 @@ const SSHDirSelect: FC<SSHDirSelectProps> = (props) => {
     }
   };
   useEffect(() => {
-    currentDataSource.getTreeNode('file:///').then((node) => {
+    fileService.getTreeNode('file:///').then((node) => {
       setTree(node);
       toggleExpanded(node);
     });

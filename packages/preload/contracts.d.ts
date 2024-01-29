@@ -6,6 +6,11 @@ interface Exposed {
   >;
   readonly versions: Readonly<typeof import('./src/main/versions').versions>;
   readonly simmer: Readonly<typeof import('./src/main/simmer').simmer>;
+  readonly onote: {
+    dataSource: import('./src/ipc/IPCClient').default<
+      import('../main/src/ipc-server/handlers/DataSourceHandler').default
+    >;
+  };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

@@ -46,7 +46,7 @@ class FileListStore {
   refreshFiles() {
     const dirUri = this.activationStore.activeDirUri;
     if (dirUri) {
-      fileService.readdir(dirUri).then((nodes) => {
+      fileService.listDir(dirUri).then((nodes) => {
         if (isEquals(dirUri, this.activationStore.activeDirUri)) {
           runInAction(() => {
             this._files = nodes.filter((node) => node.type === 'file');

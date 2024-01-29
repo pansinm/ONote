@@ -18,5 +18,6 @@
       "/@/*": ["./src/*"]
     },
     "lib": ["ESNext", "dom", "dom.iterable"]
-  }
+  },
+  "include": ["./packages/preload/contracts.d.ts"]
 }
