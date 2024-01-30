@@ -7,9 +7,8 @@ export function findWindow(type: 'main' | 'previewer') {
 }
 
 export const getPageUrl = (type: 'main' | 'previewer') => {
-  return import.meta.env.DEV &&
-    import.meta.env.VITE_DEV_SERVER_URL !== undefined
-    ? import.meta.env.VITE_DEV_SERVER_URL + `${type}.html`
+  return process.env.NODE_ENV === 'development'
+    ? `http://localhost:8080/${type}.html`
     : new URL(
         `../renderer/dist/${type}.html`,
         'file://' + __dirname,

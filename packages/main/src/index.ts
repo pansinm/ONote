@@ -58,7 +58,7 @@ app.whenReady().then(() => {
 /**
  * Install Vue.js or some other devtools in development mode only
  */
-if (import.meta.env.DEV) {
+if (process.env.NODE_ENV === 'development') {
   app
     .whenReady()
     .then(() => import('electron-devtools-installer'))
@@ -75,7 +75,7 @@ if (import.meta.env.DEV) {
 /**
  * Check new app version in production mode only
  */
-if (import.meta.env.PROD) {
+if (process.env.NODE_ENV === 'production') {
   app
     .whenReady()
     .then(() => import('electron-updater'))
