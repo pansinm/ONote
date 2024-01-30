@@ -15,7 +15,7 @@ import useFileOperation from '/@/hooks/useFileOperation';
 import Flex from '/@/components/Flex';
 import SearchList from './SearchList';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
-import { useLatest, usePrevious } from 'react-use';
+import { useLatest } from 'react-use';
 import { isEquals, resolveUri } from '../../../common/utils/uri';
 import { blobToBuffer } from '../../../common/utils/transform';
 import fileService from '../../services/fileService';

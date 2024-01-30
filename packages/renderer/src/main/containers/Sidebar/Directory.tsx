@@ -149,6 +149,19 @@ const Directory = observer(() => {
   if (stores.activationStore.dataSourceId === 'local') {
     menus = [...MENUS, { id: 'OPEN_FOLDER', title: '打开所在文件夹' }];
   }
+
+  const handleItemClick = (treeNode: TreeNode) => {
+    if (
+      !treeNode.expanded ||
+      stores.activationStore.activeDirUri === treeNode.uri
+    ) {
+      toggleExpanded(treeNode);
+    } else {
+      replaceTreeNode(treeNode.uri, { ...treeNode });
+    }
+    stores.activationStore.activeDir(treeNode.uri);
+  };
+
   return (
     <div style={{ flex: 1, width: '100%' }}>
       <FileTree
@@ -157,10 +170,7 @@ const Directory = observer(() => {
         tree={tree}
         onDrop={handleDrop}
         emptyRenderer={() => <NoDirectory>先打开目录...</NoDirectory>}
-        onItemClick={(treeNode) => {
-          stores.activationStore.activeDir(treeNode.uri);
-          toggleExpanded(treeNode);
-        }}
+        onItemClick={handleItemClick}
         itemRenderer={treeItemRenderer}
         rowHeight={34}
       />
