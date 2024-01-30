@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "postinstall": "patch-package && electron-builder install-app-deps",
-    "build": "npm run build:electron && npm run build:renderer",
+    "build": "rm -rf packages/*/dist && npm run build:electron && npm run build:renderer",
     "build:electron": "cd ./packages/electron && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" yarn build",
     "build:renderer": "cross-env NODE_OPTIONS=\"--max-old-space-size=16384\" NODE_ENV=production webpack build --config packages/renderer/webpack.config.js  --progress",
     "compile": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js",
