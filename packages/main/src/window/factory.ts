@@ -29,11 +29,12 @@ async function createWindow(type: 'main' | 'previewer') {
     autoHideMenuBar: true,
     width: 1280,
     height: 768,
-    icon: import.meta.env.DEV
-      ? 'buildResources/icon.png'
-      : nativeImage.createFromPath(
-          join(app.getAppPath(), 'buildResources/icon.png'),
-        ),
+    icon:
+      process.env.NODE_ENV === 'development'
+        ? 'buildResources/icon.png'
+        : nativeImage.createFromPath(
+            join(app.getAppPath(), 'buildResources/icon.png'),
+          ),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -42,7 +43,7 @@ async function createWindow(type: 'main' | 'previewer') {
       preload: join(app.getAppPath(), `packages/preload/dist/${type}.cjs`),
       // webviewTag: false, // The webview tag is not recommended. Consider alternatives like iframe or Electron's BrowserView. https://www.electronjs.org/docs/latest/api/webview-tag#warning
       // preload: join(__dirname, `../../preload/dist/${type}.cjs`),
-      webSecurity: false, //!import.meta.env.DEV,
+      webSecurity: false, //!process.env.NODE_ENV === 'development',
     },
   });
 
@@ -100,7 +101,7 @@ async function createWindow(type: 'main' | 'previewer') {
    */
   browserWindow.on('ready-to-show', () => {
     browserWindow?.show();
-    if (import.meta.env.DEV) {
+    if (process.env.NODE_ENV === 'development') {
       browserWindow?.webContents.openDevTools();
     }
   });

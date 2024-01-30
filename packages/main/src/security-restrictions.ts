@@ -26,10 +26,10 @@ const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<
     | 'unknown'
   >
 >(
-  import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL
+  process.env.NODE_ENV === 'development'
     ? [
         [
-          new URL(import.meta.env.VITE_DEV_SERVER_URL).origin,
+          'http://localhost:8080',
           new Set([
             'clipboard-read',
             'clipboard-write',
@@ -87,7 +87,7 @@ app.on('web-contents-created', (_, contents) => {
     // Prevent navigation
     event.preventDefault();
 
-    if (import.meta.env.DEV) {
+    if (process.env.NODE_ENV === 'development') {
       console.warn('Blocked navigating to an unallowed origin:', origin);
     }
   });
@@ -106,7 +106,7 @@ app.on('web-contents-created', (_, contents) => {
 
       callback(permissionGranted);
 
-      if (!permissionGranted && import.meta.env.DEV) {
+      if (!permissionGranted && process.env.NODE_ENV === 'development') {
         console.warn(
           `${origin} requested permission for '${permission}', but was blocked.`,
         );
@@ -133,7 +133,7 @@ app.on('web-contents-created', (_, contents) => {
       shell.openExternal(url).catch((err) => {
         console.error(`打开 ${url} 失败`, err);
       });
-    } else if (import.meta.env.DEV) {
+    } else if (process.env.NODE_ENV === 'development') {
       console.warn('Blocked the opening of an unallowed origin:', origin);
     }
 
@@ -151,7 +151,7 @@ app.on('web-contents-created', (_, contents) => {
   contents.on('will-attach-webview', (event, webPreferences, params) => {
     const { origin } = new URL(params.src);
     if (!ALLOWED_ORIGINS_AND_PERMISSIONS.has(origin)) {
-      if (import.meta.env.DEV) {
+      if (process.env.NODE_ENV === 'development') {
         console.warn(
           `A webview tried to attach ${params.src}, but was blocked.`,
         );
