@@ -12,10 +12,9 @@
     "packages/*"
   ],
   "scripts": {
-    "postinstall": "patch-package",
-    "build": "npm run build:main && npm run build:preload && npm run build:renderer",
-    "build:main": "cd ./packages/main && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
-    "build:preload": "cd ./packages/preload && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
+    "postinstall": "patch-package && electron-builder install-app-deps",
+    "build": "npm run build:electron && npm run build:renderer",
+    "build:electron": "cd ./packages/electron && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" yarn build",
     "build:renderer": "cross-env NODE_OPTIONS=\"--max-old-space-size=16384\" NODE_ENV=production webpack build --config packages/renderer/webpack.config.js  --progress",
     "compile": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js",
     "compile:win": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --win",
@@ -25,6 +24,14 @@
     "test:e2e": "yarn cucumber-js",
     "watch": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" node scripts/watch.js",
     "lint": "eslint . --ext js,ts,tsx"
+  },
+  "dependencies": {
+    "@hpcc-js/wasm": "^2.15.3",
+    "default-gateway": "^6.0.3",
+    "electron-updater": "^6.1.1",
+    "express": "^4.18.2",
+    "ssh2": "^1.11.0",
+    "webdav-server": "^2.6.2"
   },
   "resolutions": {
     "monaco-editor": "0.45.0",
