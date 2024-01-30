@@ -10,10 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn build:main && yarn build:preload && yarn build:renderer",
-    "build:main": "cd ./packages/electron && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
-    "build:preload": "cd ./packages/preload && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
-    "build:renderer": "cross-env NODE_OPTIONS=\"--max-old-space-size=16384\" NODE_ENV=production webpack build --config packages/renderer/webpack.config.js  --progress",
+    "build": "NODE_ENV=production webpack",
     "compile": "cross-env NODE_ENV=production yarn build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js",
     "compile:win": "cross-env NODE_ENV=production yarn build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --win",
     "bdd": "chokidar \"features/**\" -c \"yarn  cucumber-js\"",
@@ -28,7 +25,6 @@
     "default-gateway": "^6.0.3",
     "electron-updater": "^6.1.1",
     "express": "^4.18.2",
-    "remark-parse": "^11.0.0",
     "ssh2": "^1.11.0",
     "webdav-server": "^2.6.2"
   }

@@ -3,11 +3,13 @@ const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 const isDev = process.env.NODE_ENV !== 'production';
 
-const pkg = require('../../package.json');
+const pkg = require('./package.json');
+
 const externals = Object.keys(pkg.dependencies || {}).reduce((prev, name) => {
-  return Object.assign(prev, { name: 'commonjs ' + name });
+  return Object.assign(prev, { [name]: 'commonjs ' + name });
 }, {});
 
+console.log(externals);
 /**
  * @type {import('webpack').Configuration}
  */
@@ -42,7 +44,7 @@ module.exports = {
     ],
   },
   externalsPresets: { node: true, electron: true },
-  externals: [nodeExternals()],
+  externals: [nodeExternals(), { electron: 'commonjs electron', ...externals }],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {
