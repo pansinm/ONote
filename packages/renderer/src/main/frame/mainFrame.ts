@@ -10,7 +10,7 @@ import filePanelManager from './filePanelManager';
 import monacoExtensionManager from '../monaco/monacoExtensionManager';
 import { reaction } from 'mobx';
 import type Tunnel from '/@/common/tunnel/Tunnel';
-import tunnelPool from '../ipc/tunnelPool';
+import tunnelPool from '../services/tunnelPoolService';
 
 class MainFrame {
   onNewTunnel(callback: (tunnel: Tunnel) => void) {

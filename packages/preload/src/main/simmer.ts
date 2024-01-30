@@ -12,9 +12,6 @@ import { shell } from 'electron';
 import { ipcRenderer } from 'electron';
 import { clipboard, nativeImage } from 'electron';
 import { exposeInMainWorld } from './exposeInMainWorld';
-import { callPlugin } from '../ipc/plugin';
-import { callSetting } from '../ipc/setting';
-import { callDevelop } from '../ipc/develop';
 import { nodeCrypto } from '../common/nodeCrypto';
 import * as defaultGateway from 'default-gateway';
 import { onote } from './onote';
@@ -30,10 +27,6 @@ export const simmer = {
   async invokeIpc(channel: string, ...args: any[]): Promise<unknown> {
     return ipcRenderer.invoke(channel, ...args);
   },
-
-  callPlugin: callPlugin,
-  callSetting: callSetting,
-  callDevelop: callDevelop,
 
   showPreviewerWindow() {
     ipcRenderer.send('window', 'showPreviewerWindow');

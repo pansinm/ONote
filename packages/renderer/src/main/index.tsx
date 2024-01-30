@@ -11,7 +11,6 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import './hotkey';
 import './integration';
-import './ipc';
 
 const root = createRoot(document.getElementById('app') as HTMLDivElement);
 

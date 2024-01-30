@@ -1,8 +1,7 @@
 import { app, crashReporter, dialog, ipcMain, Menu, protocol } from 'electron';
 import './security-restrictions';
-import './ipc';
 import { restoreOrCreateWindow } from './window';
-import { manager as pluginManager } from './plugin';
+import { pluginManager as pluginManager } from './plugin';
 
 crashReporter.start({ uploadToServer: false });
 

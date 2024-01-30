@@ -8,6 +8,8 @@ import { getMainFrame } from '../window';
 import { dataSource } from '../dataSource';
 import SettingHandler from './handlers/SettingHandler';
 import setting from '../setting';
+import DevelopToolsHandler from './handlers/DevelopToolsHandler';
+import PluginManagerHandler from './handlers/PluginManagerHandler';
 
 /**
  * 处理渲染进程事件
@@ -38,4 +40,6 @@ export function startIpcServer() {
   console.log('start ipc server');
   startDataSource();
   startSetting();
+  ipcServer.register(IPCNamespaces.DevelopTools, DevelopToolsHandler);
+  ipcServer.register(IPCNamespaces.PluginManager, PluginManagerHandler);
 }

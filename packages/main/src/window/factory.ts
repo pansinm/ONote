@@ -2,7 +2,7 @@ import type { WebFrameMain } from 'electron';
 import { app, BrowserWindow, nativeImage, shell, webFrameMain } from 'electron';
 import { pathToFileURL } from 'url';
 import { join } from 'path';
-import { manager as pluginManager } from '../plugin';
+import { pluginManager as pluginManager } from '../plugin';
 import { sendToMain } from './ipc';
 import { findWindow, getPageUrl } from './utils';
 import { injectJs } from './frames';
