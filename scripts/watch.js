@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const { createServer, build, createLogger } = require('vite');
 const electronPath = require('electron');
 const { spawn } = require('child_process');
 const webpack = require('webpack');
@@ -14,9 +13,7 @@ const mode = (process.env.MODE = process.env.MODE || 'development');
 /** @type {import('vite').LogLevel} */
 const LOG_LEVEL = 'info';
 
-const logger = createLogger(LOG_LEVEL, {
-  prefix: '[main]',
-});
+const logger = console;
 
 /** Messages on stderr that match any of the contained patterns will be stripped from output */
 const stderrFilterPatterns = [
@@ -40,7 +37,7 @@ const getWatcher = ({ name, configFile, writeBundle }) => {
   );
 };
 
-const setupMainPackageWatcher = ({ server }) => {
+const setupElectronPackageWatcher = ({ server }) => {
   // Create VITE_DEV_SERVER_URL environment variable to pass it to the main process.
   {
     const protocol = server.https ? 'https:' : 'http:';
@@ -55,7 +52,7 @@ const setupMainPackageWatcher = ({ server }) => {
 
   return getWatcher({
     name: 'reload-app-on-main-package-change',
-    configFile: 'packages/main/webpack.config.js',
+    configFile: 'packages/electron/webpack.config.js',
     writeBundle() {
       if (spawnProcess !== null) {
         spawnProcess.off('exit', process.exit);
@@ -84,21 +81,6 @@ const setupMainPackageWatcher = ({ server }) => {
   });
 };
 
-/**
- * Start or restart App when source files are changed
- * @param {{ws: import('vite').WebSocketServer}} WebSocketServer
- */
-const setupPreloadPackageWatcher = ({ ws }) =>
-  getWatcher({
-    name: 'reload-page-on-preload-package-change',
-    configFile: 'packages/preload/webpack.config.js',
-    writeBundle() {
-      ws.send({
-        type: 'full-reload',
-      });
-    },
-  });
-
 const compiler = webpack(webpackConfig);
 
 (async () => {
@@ -112,8 +94,7 @@ const compiler = webpack(webpackConfig);
         }
       },
     };
-    await setupPreloadPackageWatcher(server);
-    await setupMainPackageWatcher(server);
+    await setupElectronPackageWatcher(server);
   } catch (e) {
     console.error(e);
     process.exit(1);
