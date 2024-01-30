@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { dataSourceProviderManager } from './providers';
 import type { IDataSourceProvider } from './providers/IDataSourceProvider';
-import { EventNames } from './constants';
+import { EventNames } from '../constants';
 
 class DataSource extends EventEmitter implements IDataSourceProvider<unknown> {
   private provider!: IDataSourceProvider<any>;

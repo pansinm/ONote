@@ -10,6 +10,9 @@ interface Exposed {
     dataSource: import('./src/ipc/IPCClient').default<
       import('../main/src/ipc-server/handlers/DataSourceHandler').default
     >;
+    setting: import('./src/ipc/IPCClient').default<
+      import('../main/src/ipc-server/handlers/SettingHandler').default
+    >;
   };
 }
 

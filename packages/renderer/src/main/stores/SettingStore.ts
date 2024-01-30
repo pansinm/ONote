@@ -1,14 +1,14 @@
 import { makeAutoObservable } from 'mobx';
-import { settingAdapter } from '../ipc';
+import settingService from '../services/settingService';
 
 class SettingStore {
   settings: Record<string, unknown> = {};
 
   constructor() {
-    settingAdapter.getAll().then((settings) => {
+    settingService.getAll().then((settings) => {
       this.settings = settings;
     });
-    settingAdapter.on('changed', (data) => {
+    settingService.on('changed', (data) => {
       this.replace(data.all);
     });
     makeAutoObservable(this);
@@ -19,7 +19,7 @@ class SettingStore {
   }
 
   update(key: string, value: any) {
-    return settingAdapter.update(key, value);
+    return settingService.update(key, value);
   }
 }
 
