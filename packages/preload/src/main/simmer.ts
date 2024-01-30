@@ -26,29 +26,14 @@ export const simmer = {
     const netInterface = os.networkInterfaces()[gateway.interface];
     return netInterface?.find((a) => a.family === 'IPv4')?.address;
   },
-  /**
-   * 删除目录或文件
-   * @param path
-   */
-  async remove(path: string) {
-    await fs.rm(path, { recursive: true });
-  },
 
   async invokeIpc(channel: string, ...args: any[]): Promise<unknown> {
     return ipcRenderer.invoke(channel, ...args);
   },
 
-  homedir() {
-    return os.homedir();
-  },
-
   callPlugin: callPlugin,
   callSetting: callSetting,
   callDevelop: callDevelop,
-
-  postMessageToPreviewerWindow(message: any) {
-    ipcRenderer.send('window', 'postMessageToPreviewer', message);
-  },
 
   showPreviewerWindow() {
     ipcRenderer.send('window', 'showPreviewerWindow');
@@ -86,9 +71,6 @@ export const simmer = {
       return false;
     }
     return new Blob([img.toPNG()], { type: 'image/png' });
-  },
-  executeScript(script: string) {
-    return eval(script);
   },
   async renderPlantUML(
     plantuml: string,
