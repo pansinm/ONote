@@ -20,6 +20,7 @@ function QRCodeContent() {
     <div>
       <p>从手机插入文件</p>
       {url ? <_QRCode style={{ width: '100%' }} value={url} /> : <p>...</p>}
+      <p>{url}</p>
     </div>
   );
 }
