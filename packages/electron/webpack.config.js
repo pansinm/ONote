@@ -20,6 +20,8 @@ module.exports = {
   mode: isDev ? 'development' : 'production',
   entry: {
     index: path.resolve(__dirname, 'src/index.ts'),
+    'preload/main': path.resolve(__dirname, 'src/preload/main.ts'),
+    'preload/previewer': path.resolve(__dirname, 'src/preload/previewer.ts'),
   },
   devtool: isDev ? 'eval' : undefined,
   module: {

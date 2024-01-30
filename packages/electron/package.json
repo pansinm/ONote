@@ -1,24 +1,21 @@
 {
   "name": "onote",
-  "private": true,
   "engines": {
     "node": ">=v16.13",
     "npm": ">=8.1"
   },
   "version": "0.11.0",
-  "main": "packages/electron/dist/index.cjs",
   "type": "commonjs",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "postinstall": "patch-package",
-    "build": "npm run build:main && npm run build:preload && npm run build:renderer",
-    "build:main": "cd ./packages/main && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
+    "build": "yarn build:main && yarn build:preload && yarn build:renderer",
+    "build:main": "cd ./packages/electron && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
     "build:preload": "cd ./packages/preload && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
     "build:renderer": "cross-env NODE_OPTIONS=\"--max-old-space-size=16384\" NODE_ENV=production webpack build --config packages/renderer/webpack.config.js  --progress",
-    "compile": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js",
-    "compile:win": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --win",
+    "compile": "cross-env NODE_ENV=production yarn build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js",
+    "compile:win": "cross-env NODE_ENV=production yarn build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --win",
     "bdd": "chokidar \"features/**\" -c \"yarn  cucumber-js\"",
     "test:watch": "yarn jest --watch",
     "test": "jest --coverage=false && yarn build && yarn test:e2e",
@@ -26,10 +23,13 @@
     "watch": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" node scripts/watch.js",
     "lint": "eslint . --ext js,ts,tsx"
   },
-  "resolutions": {
-    "monaco-editor": "0.45.0",
-    "webpack": "5.88.2",
-    "@types/mdast": "4.0.3",
-    "vfile-message": "4.0.0"
+  "dependencies": {
+    "@hpcc-js/wasm": "^2.15.3",
+    "default-gateway": "^6.0.3",
+    "electron-updater": "^6.1.1",
+    "express": "^4.18.2",
+    "remark-parse": "^11.0.0",
+    "ssh2": "^1.11.0",
+    "webdav-server": "^2.6.2"
   }
 }

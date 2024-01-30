@@ -1,5 +1,5 @@
 const pluginManager = window.onote.pluginManager;
-import type { IPlugin } from '../../../../main/src/plugin/type';
+import type { IPlugin } from '../../../../electron/src/plugin/type';
 
 export { IPlugin };
 

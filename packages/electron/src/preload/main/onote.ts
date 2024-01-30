@@ -1,10 +1,10 @@
 import IPCClient from '../ipc/IPCClient';
 import { exposeInMainWorld } from './exposeInMainWorld';
-import { IPCNamespaces } from '../../../main/src/constants';
-import type DataSourceHandler from '../../../main/src/ipc-server/handlers/DataSourceHandler';
-import type SettingHandler from '../../../main/src/ipc-server/handlers/SettingHandler';
-import type PluginManagerHandler from '../../../main/src/ipc-server/handlers/PluginManagerHandler';
-import type DevelopToolsHandler from '../../../main/src/ipc-server/handlers/DevelopToolsHandler';
+import { IPCNamespaces } from '../../constants';
+import type DataSourceHandler from '../../ipc-server/handlers/DataSourceHandler';
+import type SettingHandler from '../../ipc-server/handlers/SettingHandler';
+import type PluginManagerHandler from '../../ipc-server/handlers/PluginManagerHandler';
+import type DevelopToolsHandler from '../../ipc-server/handlers/DevelopToolsHandler';
 
 export const onote = {
   dataSource: new IPCClient<DataSourceHandler>(IPCNamespaces.DataSource),
