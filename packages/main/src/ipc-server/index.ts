@@ -1,11 +1,13 @@
 import { webContents } from 'electron';
 import { IPCNamespaces } from '../constants';
-import { EventNames } from '../dataSource/constants';
+import { EventNames } from '../constants';
 import IPCServer from './IPCServer';
 import DataSourceHandler from './handlers/DataSourceHandler';
 import { delegateEvent } from './utils';
 import { getMainFrame } from '../window';
 import { dataSource } from '../dataSource';
+import SettingHandler from './handlers/SettingHandler';
+import setting from '../setting';
 
 /**
  * 处理渲染进程事件
@@ -22,7 +24,18 @@ function startDataSource() {
   );
 }
 
+function startSetting() {
+  ipcServer.register(IPCNamespaces.Setting, SettingHandler);
+  delegateEvent(
+    setting,
+    EventNames.SettingUpdated,
+    IPCNamespaces.Setting,
+    () => webContents.fromFrame(getMainFrame()!)!,
+  );
+}
+
 export function startIpcServer() {
   console.log('start ipc server');
   startDataSource();
+  startSetting();
 }

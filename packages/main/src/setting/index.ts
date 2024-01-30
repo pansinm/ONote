@@ -4,6 +4,7 @@ import * as fsp from 'fs/promises';
 import { decrypt, encrypt } from '../utils/security';
 import { findWindow } from '../window/utils';
 import { defaultSetting } from './defaultSetting';
+import { EventNames } from '../constants';
 
 const configFile = app.getPath('userData') + '/.onote-setting.json';
 
@@ -32,9 +33,9 @@ class Setting extends EventEmitter {
     }
   }
 
-  update(key: string, value: any) {
+  set(key: string, value: any) {
     this._setting[key] = value;
-    this.emit('updated', key, value, this._setting);
+    this.emit(EventNames.SettingUpdated, key, value, this._setting);
     this.syncToFile();
   }
 
@@ -53,13 +54,5 @@ class Setting extends EventEmitter {
 }
 
 const setting = new Setting(configFile);
-
-setting.on('updated', (key, value, all) => {
-  findWindow('main')?.webContents.send('setting.updated', {
-    key,
-    value,
-    all,
-  });
-});
 
 export default setting;
