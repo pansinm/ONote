@@ -1,5 +1,5 @@
 import PluginManager from './PluginManager';
 
-export const manager = new PluginManager();
+export const pluginManager = new PluginManager();
 
 export { PluginManager };

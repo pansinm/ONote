@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
-import tunnelPool from '../../ipc/tunnelPool';
+import tunnelPool from '../../services/tunnelPoolService';
 import stores from '../../stores';
 import FilePanel from './FilePannel';
 

@@ -1,6 +1,8 @@
 export const IPCNamespaces = {
   DataSource: 'DataSource',
   Setting: 'Setting',
+  DevelopTools: 'DevelopTools',
+  PluginManager: 'PluginManager',
 };
 
 export const EventNames = {

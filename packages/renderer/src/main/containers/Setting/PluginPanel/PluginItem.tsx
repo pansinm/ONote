@@ -13,8 +13,8 @@ import {
   Text,
 } from '@fluentui/react-components';
 import { ArrowDownloadRegular, ArrowSyncRegular } from '@fluentui/react-icons';
-import type { IPlugin } from '/@/main/ipc/pluginManager';
-import pluginManager from '/@/main/ipc/pluginManager';
+import type { IPlugin } from '../../../services/pluginManager';
+import pluginManager from '../../../services/pluginManager';
 
 interface PluginItemProps {
   plugin: IPlugin;

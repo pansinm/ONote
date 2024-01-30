@@ -13,6 +13,12 @@ interface Exposed {
     setting: import('./src/ipc/IPCClient').default<
       import('../main/src/ipc-server/handlers/SettingHandler').default
     >;
+    pluginManager: import('./src/ipc/IPCClient').default<
+      import('../main/src/ipc-server/handlers/PluginManagerHandler').default
+    >;
+    developTools: import('./src/ipc/IPCClient').default<
+      import('../main/src/ipc-server/handlers/DevelopToolsHandler').default
+    >;
   };
 }
 

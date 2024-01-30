@@ -1,7 +1,7 @@
 import { Button, makeStyles } from '@fluentui/react-components';
 import React from 'react';
 import PluginItem from './PluginItem';
-import type { IPlugin } from '/@/main/ipc/pluginManager';
+import type { IPlugin } from '../../../services/pluginManager';
 
 export interface IPluginMarketProps {
   plugins: IPlugin[];

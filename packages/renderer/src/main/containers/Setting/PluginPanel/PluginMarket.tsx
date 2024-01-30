@@ -1,7 +1,7 @@
-import { Caption2, makeStyles, shorthands } from '@fluentui/react-components';
+import { makeStyles } from '@fluentui/react-components';
 import React from 'react';
 import PluginItem from './PluginItem';
-import type { IPlugin } from '/@/main/ipc/pluginManager';
+import type { IPlugin } from '/@/main/services/pluginManager';
 
 export interface IPluginMarketProps {
   plugins: IPlugin[];
