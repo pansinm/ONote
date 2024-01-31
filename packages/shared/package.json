@@ -1,0 +1,17 @@
+{
+  "name": "onote-shared",
+  "version": "0.11.0",
+  "description": "ONote shared lib",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "author": "pansinm <pansinm@foxmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.3.1",
+    "ts-jest": "^29.0.3"
+  }
+}
