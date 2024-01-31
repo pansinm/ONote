@@ -21,7 +21,6 @@
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
-    "@cucumber/cucumber": "^8.6.0",
     "@editorjs/editorjs": "^2.23.2",
     "@editorjs/table": "^2.0.1",
     "@fluentui/react-components": "^9.23.1",
@@ -75,9 +74,6 @@
     "css-loader": "^6.8.1",
     "diff": "^5.0.0",
     "docx": "^7.3.0",
-    "electron": "^28.2.0",
-    "electron-builder": "^24.6.3",
-    "electron-devtools-installer": "^3.2.0",
     "eslint": "8.9.0",
     "eslint-plugin-react": "^7.28.0",
     "events": "^3.3.0",
@@ -85,7 +81,6 @@
     "file-saver": "^2.0.5",
     "flowchart.js": "^1.17.1",
     "github-markdown-css": "^5.5.0",
-    "happy-dom": "2.39.1",
     "hast-util-to-mdast": "^10.1.0",
     "html-webpack-plugin": "^5.5.3",
     "html2canvas": "^1.4.1",
@@ -98,7 +93,6 @@
     "mdast-util-definitions": "^6.0.0",
     "mdast-util-math": "^3.0.0",
     "mermaid": "^9.2.2",
-    "mime-types": "^2.1.35",
     "mobx": "^6.4.1",
     "mobx-react-lite": "^3.3.0",
     "monaco-editor": "^0.45.0",
@@ -111,8 +105,7 @@
     "node-emoji": "^1.11.0",
     "ohm-js": "^16.4.0",
     "patch-package": "^6.4.7",
-    "plantuml-encoder": "^1.4.0",
-    "playwright": "1.19.1",
+    "mime-types": "^2.1.35",
     "prismjs": "^1.27.0",
     "react": "^18.2.0",
     "react-collapse": "^5.1.1",
@@ -151,7 +144,8 @@
     "webpack-cli": "4.10.0",
     "webpack-dev-server": "^4.15.1",
     "webpack-node-externals": "^3.0.0",
-    "yaml": "^1.10.2"
+    "yaml": "^1.10.2",
+    "onote-shared": "*"
   },
   "dependencies": {
     "@hpcc-js/wasm": "^2.15.3",

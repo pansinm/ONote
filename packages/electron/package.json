@@ -30,6 +30,13 @@
     "webdav-server": "^2.6.2"
   },
   "devDependencies": {
-    "chokidar": "^3.5.3"
+    "onote-shared": "*",
+    "chokidar": "^3.5.3",
+    "electron": "^28.2.0",
+    "electron-builder": "^24.6.3",
+    "electron-devtools-installer": "^3.2.0",
+    "plantuml-encoder": "^1.4.0",
+    "playwright": "1.19.1",
+    "webpack": "*"
   }
 }
