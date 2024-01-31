@@ -6,12 +6,13 @@ import {
   DeviceMeetingRoomRemoteRegular,
   FolderRegular,
 } from '@fluentui/react-icons';
-import LocalDirSelect from './LocalDirSelect';
-import SSHProjectSelect from './SSHProjectSelect';
+import LocalDirSelect from './local/LocalDirSelect';
+import SSHProjectSelect from './ssh/SSHProjectSelect';
 import View from '/@/components/View';
+import GiteeProjectSelect from './gitee/GiteeProjectSelect';
 
 export type Project = {
-  type: 'local' | 'ssh';
+  type: 'local' | 'ssh' | 'gitee';
   config: any;
   rootUri: string;
 };
@@ -42,15 +43,25 @@ const ProjectSelect: FC<ProjectSelectProps> = (props) => {
         <Tab id="SSH" icon={<DeviceMeetingRoomRemoteRegular />} value="ssh">
           SSH
         </Tab>
+        <Tab id="GITEE" icon={null} value="gitee">
+          Gitee
+        </Tab>
       </TabList>
-      {tab === 'local' && (
-        <LocalDirSelect onOpen={(uri) => handleSelect('local', uri, null)} />
-      )}
-      {tab === 'ssh' && (
-        <SSHProjectSelect
-          onSelect={(uri, config) => handleSelect('ssh', uri, config)}
-        />
-      )}
+      <div style={{ paddingTop: 10 }}>
+        {tab === 'local' && (
+          <LocalDirSelect onOpen={(uri) => handleSelect('local', uri, null)} />
+        )}
+        {tab === 'ssh' && (
+          <SSHProjectSelect
+            onSelect={(uri, config) => handleSelect('ssh', uri, config)}
+          />
+        )}
+        {tab === 'gitee' && (
+          <GiteeProjectSelect
+            onSelect={(uri, config) => handleSelect('gitee', uri, config)}
+          />
+        )}
+      </div>
     </View>
   );
 };
