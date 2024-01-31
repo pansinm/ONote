@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import React, { useState } from 'react';
-import fileService from '../../../services/fileService';
+import fileService from '../../../../services/fileService';
 import SSHDirSelect from './SSHDirSelect';
 import type { SSHFormProps } from './SSHForm';
 import SSHForm from './SSHForm';

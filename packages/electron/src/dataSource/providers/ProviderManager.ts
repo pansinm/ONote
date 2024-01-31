@@ -1,7 +1,7 @@
 import type { IDataSourceProvider } from './IDataSourceProvider';
 
 class ProviderManager {
-  private providers: Record<string, IDataSourceProvider<unknown>> = {};
+  private providers: Record<string, IDataSourceProvider<any>> = {};
 
   register<T>(provider: IDataSourceProvider<T>) {
     this.providers[provider.providerId()] = provider;
