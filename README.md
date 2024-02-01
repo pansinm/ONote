@@ -19,7 +19,8 @@
 ## Development
 
 ```bash
-yarn watch
+npm install turbo --global
+yarn dev
 ```
 
 ## Compile
