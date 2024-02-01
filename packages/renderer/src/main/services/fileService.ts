@@ -29,7 +29,7 @@ class FileService {
   setRootDirUri(uri: string) {
     return dataSource.invoke('setRootDirUri', uri);
   }
-  async getTreeNode(uri: string) {
+  async getTreeNode(uri: string): Promise<TreeNode> {
     return dataSource.invoke('getTreeNode', uri);
   }
   listDir(uri: string): Promise<TreeNode[]> {

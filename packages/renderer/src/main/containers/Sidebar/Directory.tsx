@@ -85,6 +85,9 @@ const Directory = observer(() => {
   useEffect(() => {
     if (rootUri) {
       fileService.getTreeNode(rootUri).then((node) => {
+        node.children = node.children?.filter(
+          (item) => item.type === 'directory',
+        );
         setTree(node);
         toggleExpanded(node);
       });
