@@ -46,6 +46,7 @@ const GiteeForm: FC<GiteeFormProps> = (props) => {
   return (
     <form ref={formRef}>
       <Input
+        type="password"
         disabled={disabled}
         name="access_token"
         placeholder="access_token"
