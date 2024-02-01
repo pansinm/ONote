@@ -1,4 +1,5 @@
 import type { TreeNode } from '@sinm/react-file-tree';
+import * as querystring from 'querystring';
 import * as path from 'path/posix';
 import assert from 'assert';
 import type { IDataSourceProvider } from '/@/dataSource';
@@ -15,11 +16,11 @@ type AuthForm = { access_token: string };
 
 function parseGiteeUri(uri: string) {
   const filePath = url.fileURLToPath(uri);
-  const [_, namespace, repo, pathname] = filePath.split('/');
+  const [_, namespace, repo, ...rest] = filePath.split('/');
   return {
     namespace,
     repo,
-    pathname,
+    pathname: rest.join('/'),
   };
 }
 
@@ -91,44 +92,73 @@ class GiteeDataSourceProvider implements IDataSourceProvider<AuthForm> {
     return this.rootUri || '';
   }
 
-  async readFileAsTreeNode(filePath: string): Promise<TreeNode> {
-    // const stats = await this.sftp.stat(filePath);
-    // return {
-    //   type: stats.isDirectory() ? 'directory' : 'file',
-    //   mtime: stats.mtime,
-    //   name: path.basename(filePath),
-    //   uri: pathToUri(filePath),
-    // } as TreeNode;
-    throw new Error('not implemented');
-  }
-
   async version(uri: string): Promise<number> {
     throw new Error('not implemented');
   }
 
-  private async getRaw(uri: string): Promise<Buffer> {
+  hashMap: Record<string, string> = {};
+
+  private async getContent(uri: string): Promise<Buffer> {
     const { namespace, repo, pathname } = parseGiteeUri(uri);
-    return this.httpClient!.getRaw(
-      `https://gitee.com/api/v5/repos/${namespace}/${repo}/raw/${encodeURIComponent(
+    assert(this.httpClient);
+    const { path, sha, content } = await this.httpClient.get(
+      `https://gitee.com/api/v5/repos/${namespace}/${repo}/contents/${encodeURIComponent(
         pathname,
       )}`,
     );
+    this.hashMap[path] = sha;
+    return Buffer.from(content, 'base64');
   }
 
   read(uri: string): Promise<Buffer> {
-    return this.getRaw(uri);
+    return this.getContent(uri);
   }
 
-  mkdir(uri: string): Promise<void> {
-    throw new Error('not implemented');
+  async mkdir(uri: string): Promise<void> {
+    // ignore
   }
 
   async write(uri: string, buffer: Buffer) {
-    throw new Error('not implemented');
+    const { namespace, repo, pathname } = parseGiteeUri(uri);
+    assert(this.httpClient);
+    const api = `https://gitee.com/api/v5/repos/${namespace}/${repo}/contents/${encodeURIComponent(
+      pathname,
+    )}`;
+    const formData = new FormData();
+    formData.append('content', buffer.toString('base64'));
+    if (this.hashMap[pathname]) {
+      formData.append('sha', this.hashMap[pathname]);
+    }
+    formData.append(
+      'message',
+      `Auto updated by 【ONote】at ${new Date().toLocaleString()}`,
+    );
+    try {
+      const { content } = this.hashMap[pathname]
+        ? await this.httpClient.put(api, formData)
+        : await this.httpClient.post(api, formData);
+      this.hashMap[pathname] = content?.sha;
+    } catch (err) {
+      delete this.hashMap[pathname];
+      throw err;
+    }
   }
 
   async delete(uri: string) {
-    throw new Error('not implemented');
+    const { namespace: owner, repo, pathname } = parseGiteeUri(uri);
+    if (!this.hashMap[pathname]) {
+      await this.getContent(uri);
+    }
+    const query = {
+      message: `Deleted by [ONote] at ${new Date().toLocaleString()}`,
+      sha: this.hashMap[pathname],
+    };
+    const api = `https://gitee.com/api/v5/repos/${owner}/${repo}/contents/${pathname}?${querystring.stringify(
+      query,
+    )}`;
+    assert(this.httpClient);
+    await this.httpClient.delete(api);
+    delete this.hashMap[pathname];
   }
 
   async move(sourceUri: string, targetDirUri: string): Promise<TreeNode> {
@@ -244,7 +274,8 @@ class GiteeDataSourceProvider implements IDataSourceProvider<AuthForm> {
         // ignore
       });
     try {
-      await this.httpClient.download(uri, localPath);
+      const buffer = await this.getContent(uri);
+      await fs.writeFile(localPath, buffer);
     } catch (err) {
       console.log(err, remotePath, localPath, uri);
       throw err;
