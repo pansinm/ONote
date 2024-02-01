@@ -8,6 +8,7 @@ crashReporter.start({ uploadToServer: false });
 import './server';
 import { startIpcServer } from './ipc-server';
 import { dataSource } from './dataSource';
+import { satisfies } from 'semver';
 /**
  * Prevent multiple instances
  */
@@ -24,7 +25,49 @@ import { dataSource } from './dataSource';
  */
 app.disableHardwareAcceleration();
 
-Menu.setApplicationMenu(null);
+if (process.platform !== 'darwin') {
+  const template = [
+    {
+      label: app.getName(),
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' },
+      ],
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'delete' },
+        { role: 'selectAll' },
+      ],
+    },
+    {
+      role: 'window',
+      submenu: [
+        { role: 'close' },
+        { role: 'minimize' },
+        { role: 'zoom' },
+        { type: 'separator' },
+        { role: 'front' },
+      ],
+    },
+  ] satisfies Electron.MenuItemConstructorOptions[];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+}
+
 /**
  * Shout down background process if all windows was closed
  */
