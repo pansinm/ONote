@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import type { Heading } from 'mdast';
 import createCtx from '../../createCtx';
-import { parse } from '../../../../common/markdown';
+import { parse } from '/@/common/markdown';
 import heading from '../heading';
 // import { renderChildren } from '../../utils';
 

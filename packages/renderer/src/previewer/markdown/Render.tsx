@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import React, { useEffect } from 'react';
-import { parse } from '../../common/markdown';
+import { parse } from '/@/common/markdown';
 import usePreviewerScrollSync from '../hooks/usePreviewerScrollSync';
 import { extname, isPlaintext } from '../../common/utils/uri';
 import { Code } from './handlers/code';
