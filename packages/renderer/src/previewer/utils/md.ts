@@ -1,7 +1,6 @@
 import type { Content, Root } from 'mdast';
 import editor from '../ipc/editor';
 import { stringify } from '/@/common/markdown';
-// import type {  } from 'hast-util-to-mdast';
 
 export function replaceNode(
   fileUri: string,
@@ -9,6 +8,14 @@ export function replaceNode(
   after: Root | Content,
 ) {
   const { start, end } = node.position!;
+
+  const lines = stringify(after).trim().split('\n');
+  const afterText = lines
+    .map((line, index) =>
+      index > 0 ? new Array(start.column - 1).fill(' ').join('') + line : line,
+    )
+    .join('\n');
+  console.log(node, after);
   editor.insertText(
     fileUri,
     {
@@ -17,6 +24,6 @@ export function replaceNode(
       endLineNumber: end.line,
       endColumn: end.column,
     },
-    stringify(after).trim(),
+    afterText,
   );
 }
