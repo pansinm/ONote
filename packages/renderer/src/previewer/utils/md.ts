@@ -1,6 +1,6 @@
 import type { Content, Root } from 'mdast';
 import editor from '../ipc/editor';
-import { stringify } from '../../common/markdown';
+import { stringify } from '/@/common/markdown';
 // import type {  } from 'hast-util-to-mdast';
 
 export function replaceNode(

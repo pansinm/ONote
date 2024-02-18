@@ -1,7 +1,7 @@
 import type { RootContent, Parent } from 'mdast';
 import type { IEdit } from '../ipc/editor';
 import editor from '../ipc/editor';
-import { stringify } from '../../common/markdown';
+import { stringify } from '/@/common/markdown';
 
 class BatchApply {
   private static editsMap: Record<string, IEdit[]> = {};
