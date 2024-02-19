@@ -40,6 +40,7 @@ function useEditor() {
         top: 10,
       },
       fontFamily: family,
+      fontSize,
       scrollbar: {
         verticalScrollbarSize: 8,
       },

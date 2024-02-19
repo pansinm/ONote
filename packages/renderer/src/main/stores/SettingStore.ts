@@ -8,7 +8,9 @@ class SettingStore {
     settingService.getAll().then((settings) => {
       this.settings = settings;
     });
+
     settingService.on('changed', (data) => {
+      console.log(data);
       this.replace(data.all);
     });
     makeAutoObservable(this);

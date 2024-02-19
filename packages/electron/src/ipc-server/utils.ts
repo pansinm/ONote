@@ -38,6 +38,6 @@ export function delegateEvent(
   webContents: () => WebContents,
 ) {
   emitter.addListener(eventName, (...args) => {
-    webContents().send(`${ipcNamespace}:${eventName}`, ...args);
+    webContents().send(`${ipcNamespace}.${eventName}`, ...args);
   });
 }
