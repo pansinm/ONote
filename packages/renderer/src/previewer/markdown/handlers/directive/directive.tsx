@@ -125,7 +125,7 @@ const ALL_VALID_TAGS = [
   'menu',
 ];
 
-export function parseDirectiveProps(node: any) {
+export function parseDirectiveProps(node: any): Record<string, any> {
   const { class: className, style = '', ...rest } = node.attributes || {};
   const restPairs = Object.entries(rest).map(([key, val]) => [
     _.camelCase(key),
