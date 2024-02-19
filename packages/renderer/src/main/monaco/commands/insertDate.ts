@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import { applyModelEdits } from '../utils';
 
 monaco.editor.registerCommand(
   'onote.command.insertDate',
@@ -6,7 +7,7 @@ monaco.editor.registerCommand(
     if (!range || !model) {
       return;
     }
-    model?.applyEdits([
+    applyModelEdits(model, [
       {
         range: range,
         text: new Date().toLocaleDateString(),
