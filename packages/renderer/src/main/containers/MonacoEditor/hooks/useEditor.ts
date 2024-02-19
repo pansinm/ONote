@@ -34,6 +34,7 @@ function useEditor() {
       language: 'markdown',
       fixedOverflowWidgets: true,
       wordWrap: wordWrap,
+      lineHeight: fontSize * 1.5,
       // theme: '',
       padding: {
         top: 10,
