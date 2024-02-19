@@ -36,8 +36,10 @@ const EditorPanel = observer(function EditorPanel() {
   };
 
   const fontSize = stores.settingStore.settings[EDITOR_FONT_SIZE];
+  console.log(fontSize);
   const setFontSize = (val: string) => {
-    stores.settingStore.update(EDITOR_FONT_SIZE, parseInt(val));
+    console.log('---', val);
+    stores.settingStore.update(EDITOR_FONT_SIZE, parseInt(val, 10));
   };
 
   const wordWrapConfig =

@@ -34,9 +34,11 @@ class IPCClient<T> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   addListener = (eventName: string, callback: (...args: any) => void) => {
     const channel = `${this.namespace}.${eventName}`;
-    ipcRenderer.on(channel, callback);
+    const listener = (event: Electron.IpcRendererEvent, ...args: any[]) =>
+      callback(...args);
+    ipcRenderer.on(channel, listener);
     return {
-      dispose: () => ipcRenderer.off(channel, callback),
+      dispose: () => ipcRenderer.off(channel, listener),
     };
   };
 }
