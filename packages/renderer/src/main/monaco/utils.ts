@@ -55,6 +55,15 @@ export function getTextAfter(
   return model.getValueInRange(afterRange);
 }
 
+export function applyModelEdits(
+  model: monaco.editor.ITextModel,
+  edits: monaco.editor.IIdentifiedSingleEditOperation[],
+) {
+  model.pushStackElement();
+  model.pushEditOperations([], edits, () => []);
+  model.pushStackElement();
+}
+
 export function isPositionMatch(
   model: monaco.editor.ITextModel,
   position: monaco.Position,

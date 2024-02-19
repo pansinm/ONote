@@ -1,5 +1,5 @@
 import * as monaco from 'monaco-editor';
-import { toggleTask } from '../utils';
+import { applyModelEdits, toggleTask } from '../utils';
 
 const toggleTaskItemAction: monaco.editor.IActionDescriptor = {
   id: 'onote.action.toggleTaskListAction',
@@ -16,7 +16,7 @@ const toggleTaskItemAction: monaco.editor.IActionDescriptor = {
     const pos = editor.getPosition();
     if (model && pos) {
       const line = model.getLineContent(pos.lineNumber);
-      model.applyEdits([
+      applyModelEdits(model, [
         {
           text: toggleTask(line),
           range: new monaco.Range(

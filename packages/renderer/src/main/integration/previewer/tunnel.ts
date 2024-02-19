@@ -19,6 +19,7 @@ import type {
 import { isEquals } from '/@/common/utils/uri';
 import stores from '../../stores';
 import state from './state';
+import { applyModelEdits } from '../../monaco/utils';
 
 mainFrame.onNewTunnel((tunnel) => {
   if (tunnel.groupId !== 'previewer') {
@@ -85,10 +86,13 @@ mainFrame.onNewTunnel((tunnel) => {
       const model = monaco.editor
         .getModels()
         .find((model) => isEquals(model.uri.toString(), uri));
+      if (!model) {
+        return;
+      }
       if (edits) {
-        model?.applyEdits(edits);
+        applyModelEdits(model, edits);
       } else if (range) {
-        model?.applyEdits([{ range, text }]);
+        applyModelEdits(model, [{ range, text }]);
       }
     },
   );
