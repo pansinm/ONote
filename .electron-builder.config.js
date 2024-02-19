@@ -1,6 +1,6 @@
-if (process.env.VITE_APP_VERSION === undefined) {
+if (process.env.APP_VERSION === undefined) {
   const now = new Date();
-  process.env.VITE_APP_VERSION = require('./package.json').version;
+  process.env.APP_VERSION = require('./package.json').version;
 }
 
 /**
@@ -22,7 +22,7 @@ const config = {
     },
   ],
   extraMetadata: {
-    version: process.env.VITE_APP_VERSION,
+    version: process.env.APP_VERSION,
   },
   linux: {
     target: ['deb', 'rpm', 'AppImage'],
