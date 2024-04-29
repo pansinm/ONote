@@ -2,13 +2,13 @@ import { app, crashReporter, dialog, ipcMain, Menu, protocol } from 'electron';
 import './security-restrictions';
 import { restoreOrCreateWindow } from './window';
 import { pluginManager as pluginManager } from './plugin';
-
+import './tunnel';
 crashReporter.start({ uploadToServer: false });
 
 import './server';
 import { startIpcServer } from './ipc-server';
 import { dataSource } from './dataSource';
-import { satisfies } from 'semver';
+
 /**
  * Prevent multiple instances
  */
