@@ -8,6 +8,8 @@ class ActivationStore {
 
   rootUri = '';
 
+  activatedPage: 'notebook' | 'todo' = 'notebook';
+
   dataSourceId = 'local';
 
   activeDirUri = '';
@@ -17,6 +19,11 @@ class ActivationStore {
   hideSidebar = false;
 
   fileStore: FileStateStore;
+
+  activatePage(page: 'notebook' | 'todo') {
+    this.activatedPage = page;
+  }
+
   constructor(fileStore: FileStateStore) {
     this.fileStore = fileStore;
     makeAutoObservable(this);
@@ -38,11 +45,15 @@ class ActivationStore {
 
   activeDir(uri: string) {
     this.activeDirUri = uri;
+    this.activatePage('notebook');
   }
 
   activeFile(uri: string) {
-    this.openedFiles = _.uniq([...this.openedFiles, uri]);
+    if (uri) {
+      this.openedFiles = _.uniq([...this.openedFiles, uri]);
+    }
     this.activeFileUri = uri;
+    this.activatePage('notebook');
   }
 
   closeFile(uri: string) {
@@ -52,8 +63,9 @@ class ActivationStore {
     if (index > -1) {
       this.openedFiles = this.openedFiles.filter((fileUri) => fileUri !== uri);
       if (isEquals(uri, this.activeFileUri)) {
-        this.activeFileUri =
-          this.openedFiles[index - 1] || this.openedFiles[index] || '';
+        this.activeFile(
+          this.openedFiles[index - 1] || this.openedFiles[index] || '',
+        );
       }
     }
   }
@@ -65,10 +77,11 @@ class ActivationStore {
     if (isEquals(this.activeDirUri, dirUri)) {
       this.activeDirUri = '';
     }
-    this.activeFileUri =
+    const activeFileUri =
       this.openedFiles.find((uri) => isEquals(uri, this.activeFileUri)) ||
       _.last(this.openedFiles) ||
       '';
+    this.activeFile(activeFileUri);
   }
 
   toggleSidebar() {
@@ -90,7 +103,7 @@ class ActivationStore {
       return file;
     });
     if (isEquals(this.activeFileUri, newUri)) {
-      this.activeFileUri = newUri;
+      this.activeFile(newUri);
     }
   }
 
@@ -99,10 +112,10 @@ class ActivationStore {
       file.startsWith(dirUri + '/') ? file.replace(dirUri, newDirUri) : file,
     );
     if (isEquals(this.activeDirUri, dirUri)) {
-      this.activeDirUri = newDirUri;
+      this.activeDir(newDirUri);
     }
     if (this.activeFileUri.startsWith(dirUri + '/')) {
-      this.activeFileUri = newDirUri;
+      this.activeDir(newDirUri);
     }
   }
 
@@ -130,10 +143,9 @@ class ActivationStore {
           isEquals(fileUri, this.activeFileUri),
         )
       ) {
-        this.activeFileUri = uri;
+        this.activeFile(uri);
       } else {
-        this.activeFileUri =
-          this.openedFiles[this.openedFiles.length - 1] || '';
+        this.activeFile(this.openedFiles[this.openedFiles.length - 1] || '');
       }
     }
   }
@@ -153,10 +165,9 @@ class ActivationStore {
           isEquals(resource, this.activeFileUri),
         )
       ) {
-        this.activeFileUri = uri;
+        this.activeFile(uri);
       } else {
-        this.activeFileUri =
-          this.openedFiles[this.openedFiles.length - 1] || '';
+        this.activeFile(this.openedFiles[this.openedFiles.length - 1] || '');
       }
     }
   }
@@ -169,12 +180,12 @@ class ActivationStore {
     this.openedFiles = this.openedFiles.filter((fileUri) =>
       isEquals(fileUri, uri),
     );
-    this.activeFileUri = uri;
+    this.activeFile(uri);
   }
 
   /** 关闭所有 */
   closeAllFiles() {
-    this.activeFileUri = '';
+    this.activeFile('');
     this.openedFiles = [];
   }
 
@@ -184,7 +195,7 @@ class ActivationStore {
       this.fileStore.savedFiles.includes(file),
     );
     if (!this.openedFiles.includes(this.activeFileUri)) {
-      this.activeFileUri = _.last(this.openedFiles) || '';
+      this.activeFile(_.last(this.openedFiles) || '');
     }
   }
 }

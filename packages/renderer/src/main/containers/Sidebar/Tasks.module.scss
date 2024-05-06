@@ -1,0 +1,24 @@
+.Tasks {
+  padding: 2px 4px;
+}
+.TimeList {
+  display: inline-flex;
+  // justify-content: space-around;
+}
+
+.TimeItem {
+  padding: 5px;
+  margin: 3px 3px;
+  cursor: default;
+}
+
+.TagList {
+  display: flex;
+}
+
+.TagItem {
+  cursor: default;
+  padding: 5px;
+  margin: 0 5px;
+  border-radius: 4px;
+}
