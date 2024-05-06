@@ -10,13 +10,14 @@ import { useLocalStorage } from 'react-use';
 import fileService from '../../services/fileService';
 import ProjectSelector from './ProjectSelector';
 import SettingTrigger from '../Setting/SettingTrigger';
+import Tasks from './Tasks';
 
 export default observer(function ActivityBar() {
   const [ref] = useDimensions();
   const [open, setOpen] = useState(false);
   const [project, setProject] = useLocalStorage<
     | {
-        type: 'local' | 'ssh';
+        type: 'local' | 'ssh' | 'gitee';
         config: any;
         rootUri: string;
       }
@@ -46,6 +47,7 @@ export default observer(function ActivityBar() {
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
         <Directory />
       </div>
+      <Tasks />
       <Flex justifyContent={'space-between'}>
         <SettingTrigger />
         <ProjectSelector
