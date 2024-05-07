@@ -58,6 +58,11 @@ const useStyles = makeStyles({
       ...shorthands.padding('0'),
     },
   },
+  form: {
+    '& .fui-Flex': {
+      rowGap: '0px',
+    },
+  },
 });
 
 const uiSchema = {
@@ -99,6 +104,10 @@ const Tasks: React.FC<Props> = ({ style, className }) => {
 
   const timeRanges = [
     {
+      label: '全部',
+      value: 'all',
+    },
+    {
       label: '今天',
       value: 'today',
     },
@@ -127,7 +136,9 @@ const Tasks: React.FC<Props> = ({ style, className }) => {
             key={timeRange.value}
             size="small"
             className={styles.timeItem}
-            onClick={() => activateTodo({ timeRange: timeRange.value })}
+            onClick={() =>
+              activateTodo({ timeRange: timeRange.value, tags: [], tab: 'all' })
+            }
           >
             {timeRange.label}
           </Button>
@@ -175,6 +186,7 @@ const Tasks: React.FC<Props> = ({ style, className }) => {
       <Drawer open={open} position="end" title="创建标签" setOpen={setOpen}>
         {open && (
           <Form
+            className={styles.form}
             schema={{
               type: 'object',
               properties: {

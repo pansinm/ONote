@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import styles from './TodoPage.module.scss';
 import stores from '../../stores';
 import Task from './Task';
 import { observer } from 'mobx-react-lite';
@@ -9,7 +8,7 @@ import { Theme as FluentUIRCTheme } from '@rjsf/fluentui-rc';
 import type { RJSFSchema, UiSchema, WidgetProps } from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
 import type { ITask } from '../../stores/TodoStore';
-import { Button, Field, Input } from '@fluentui/react-components';
+import { Button, Field, Input, makeStyles } from '@fluentui/react-components';
 import TagSelector from './TagSelector';
 import Filter from './Filter';
 
@@ -24,7 +23,31 @@ const TagsField = function (props: WidgetProps) {
   );
 };
 
+const useStyles = makeStyles({
+  root: {
+    display: 'flex',
+    flex: 1,
+    height: '100%',
+  },
+  content: {
+    padding: '10px',
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+  },
+  list: {
+    paddingTop: '10px',
+    overflow: 'auto',
+  },
+  form: {
+    '& .fui-Flex': {
+      rowGap: '0px',
+    },
+  },
+});
+
 const TodoPage: React.FC = () => {
+  const styles = useStyles();
   const [text, setText] = useState('');
   // const [activateTaskId, setActivateTaskId] = useState<''>;
   const [formData, setFormData] = React.useState<Partial<ITask>>({ title: '' });
@@ -80,7 +103,6 @@ const TodoPage: React.FC = () => {
       },
     },
   };
-
   const uiSchema: UiSchema = {
     title: {},
     description: {
@@ -95,8 +117,8 @@ const TodoPage: React.FC = () => {
   };
 
   return (
-    <div className={styles.TodoPage}>
-      <div className={styles.Content}>
+    <div className={styles.root}>
+      <div className={styles.content}>
         <div>
           <Input
             style={{ width: '100%' }}
@@ -118,7 +140,7 @@ const TodoPage: React.FC = () => {
           />
           <Filter />
         </div>
-        <div className={styles.TodoList}>
+        <div className={styles.list}>
           {stores.todoStore.tasks.map((task) => (
             <Task
               key={task.id}
@@ -137,6 +159,7 @@ const TodoPage: React.FC = () => {
         title={formData.id ? '任务详情' : '新建任务'}
       >
         <Form
+          className={styles.form}
           formData={formData}
           onChange={({ formData }) => setFormData(formData)}
           schema={jsonSchema}
