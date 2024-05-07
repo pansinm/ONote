@@ -8,6 +8,7 @@ crashReporter.start({ uploadToServer: false });
 import './server';
 import { startIpcServer } from './ipc-server';
 import { dataSource } from './dataSource';
+import { createTrayIcon } from './tray';
 
 /**
  * Prevent multiple instances
@@ -68,12 +69,16 @@ if (process.platform !== 'darwin') {
   Menu.setApplicationMenu(menu);
 }
 
+app.on('will-quit', () => {
+  // TODO: clear all caches
+  app.exit();
+});
 /**
  * Shout down background process if all windows was closed
  */
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit();
+    // app.quit();
   }
 });
 
@@ -91,6 +96,13 @@ app
   .then(() => restoreOrCreateWindow('main'))
   .then(() => pluginManager.loadAll())
   .catch((e) => console.error('Failed create window:', e));
+
+app.whenReady().then(() => {
+  const tray = createTrayIcon();
+  tray.on('click', () => {
+    restoreOrCreateWindow('main');
+  });
+});
 
 app.whenReady().then(() => {
   ipcMain.handle('open-directory', (event) => {
