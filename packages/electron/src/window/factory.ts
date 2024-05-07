@@ -150,13 +150,16 @@ export async function restoreOrCreateWindow(type: 'main' | 'previewer') {
   if (window === undefined) {
     window = await createWindow(type);
     if (type === 'main') {
-      window.on('close', () => app.quit());
+      window.on('close', (e) => {
+        e.preventDefault();
+        window?.hide();
+      });
     }
   }
 
   if (window.isMinimized()) {
     window.restore();
   }
-
+  window.show();
   window.focus();
 }
