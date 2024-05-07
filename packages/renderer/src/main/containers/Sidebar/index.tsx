@@ -47,7 +47,7 @@ export default observer(function ActivityBar() {
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
         <Directory />
       </div>
-      <Tasks />
+      {stores.activationStore.rootUri ? <Tasks /> : null}
       <Flex justifyContent={'space-between'}>
         <SettingTrigger />
         <ProjectSelector
