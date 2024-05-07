@@ -42,13 +42,14 @@ const useStyles = makeStyles({
   },
   tagList: {
     display: 'flex',
+    flexWrap: 'wrap',
     alignItems: 'center',
     ...shorthands.padding('2px', '4px'),
   },
   tagItem: {
     alignItems: 'center',
     cursor: 'default',
-    ...shorthands.margin('4px'),
+    ...shorthands.margin('4px', 0),
     '& span': {
       ...shorthands.padding('0'),
     },
@@ -109,27 +110,28 @@ const Tasks: React.FC<Props> = ({ style, className }) => {
           本月
         </div> */}
       </div>
-      <div className={styles.tagList}>
-        <TagGroup onDismiss={(e, { value }) => removeTag(value)}>
-          {stores.todoStore.tags.map((tag) => (
-            <Tag
-              key={tag.name}
-              value={tag.name}
-              className={styles.tagItem}
-              dismissible
-              style={createTagColorStyle(tag.name, tag.color)}
-              size="small"
-              shape="rounded"
-              onClick={(ev) => {
-                ev.preventDefault();
-                ev.stopPropagation();
-                stores.todoStore.activate();
-              }}
-            >
-              {tag.name}
-            </Tag>
-          ))}
-        </TagGroup>
+      <TagGroup
+        className={styles.tagList}
+        onDismiss={(e, { value }) => removeTag(value)}
+      >
+        {stores.todoStore.tags.map((tag) => (
+          <Tag
+            key={tag.name}
+            value={tag.name}
+            className={styles.tagItem}
+            dismissible
+            style={createTagColorStyle(tag.name, tag.color)}
+            size="small"
+            shape="rounded"
+            onClick={(ev) => {
+              ev.preventDefault();
+              ev.stopPropagation();
+              stores.todoStore.activate();
+            }}
+          >
+            {tag.name}
+          </Tag>
+        ))}
         <Tag
           className={styles.tagItem}
           media={<AddRegular />}
@@ -140,7 +142,7 @@ const Tasks: React.FC<Props> = ({ style, className }) => {
         >
           标签
         </Tag>
-      </div>
+      </TagGroup>
       <Drawer open={open} position="end" title="创建标签" setOpen={setOpen}>
         {open && (
           <Form
