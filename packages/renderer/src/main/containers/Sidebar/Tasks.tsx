@@ -3,7 +3,12 @@ import classNames from 'classnames';
 import Icon from '/@/components/Icon';
 import stores from '../../stores';
 import { observer } from 'mobx-react-lite';
-import { AddRegular } from '@fluentui/react-icons';
+import {
+  AddRegular,
+  ClosedCaption16Regular,
+  DeleteRegular,
+  Dismiss12Regular,
+} from '@fluentui/react-icons';
 import {
   makeStyles,
   shorthands,
@@ -110,16 +115,22 @@ const Tasks: React.FC<Props> = ({ style, className }) => {
           本月
         </div> */}
       </div>
-      <TagGroup
-        className={styles.tagList}
-        onDismiss={(e, { value }) => removeTag(value)}
-      >
+      <TagGroup className={styles.tagList}>
         {stores.todoStore.tags.map((tag) => (
           <Tag
             key={tag.name}
             value={tag.name}
             className={styles.tagItem}
             dismissible
+            dismissIcon={
+              <Dismiss12Regular
+                onClick={(ev) => {
+                  ev.preventDefault();
+                  ev.stopPropagation();
+                  removeTag(tag.name);
+                }}
+              />
+            }
             style={createTagColorStyle(tag.name, tag.color)}
             size="small"
             shape="rounded"
