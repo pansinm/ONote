@@ -12,11 +12,11 @@ export interface ITag {
 }
 
 export interface ITask {
+  description?: string;
   id: string;
   title: string;
   tags?: ITag[];
   done: boolean;
-  content?: string;
   filename: string;
   ref?: string;
   doneAt: number;
@@ -81,7 +81,7 @@ class TodoStore {
       title: text,
       tags: [],
       done: false,
-      content: '',
+      description: '',
       filename: file,
       ref: '',
       doneAt: 0,
@@ -91,6 +91,18 @@ class TodoStore {
     records[task.id] = task;
     this.taskFiles[file] = { ...records };
     this.saveTaskFile(file);
+    return task;
+  }
+
+  removeTask(taskId: string) {
+    const task = this.tasksById[taskId];
+    if (task) {
+      const file = task.filename;
+      const records = this.taskFiles[file];
+      delete records[taskId];
+      this.taskFiles[file] = { ...records };
+      this.saveTaskFile(file);
+    }
   }
 
   updateTask(

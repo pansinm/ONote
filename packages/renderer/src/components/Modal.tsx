@@ -7,6 +7,7 @@ export interface ModalProps {
   style?: React.CSSProperties;
   title?: string;
   isOpen: boolean;
+  children?: React.ReactNode;
 }
 
 const Modal: React.FC<ModalProps> = (props) => {

@@ -1,9 +1,13 @@
 .TodoPage {
   display: flex;
   flex: 1;
-  padding: 10px;
-  flex-direction: column;
   height: 100%;
+}
+.Content {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .TodoList {
