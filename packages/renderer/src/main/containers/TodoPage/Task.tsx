@@ -26,6 +26,9 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    '& .fui-TagGroup': {
+      columnGap: '4px',
+    },
   },
   activated: {
     backgroundColor: '#eee',
@@ -38,7 +41,7 @@ const useStyles = makeStyles({
     },
   },
   tagItem: {
-    ...shorthands.margin('4px'),
+    ...shorthands.margin('4px', 0),
     '& span': {
       ...shorthands.padding('0'),
     },
