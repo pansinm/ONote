@@ -9,17 +9,7 @@ import { Theme as FluentUIRCTheme } from '@rjsf/fluentui-rc';
 import type { RJSFSchema, UiSchema, WidgetProps } from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
 import type { ITask } from '../../stores/TodoStore';
-import { Button, Field, Input, Tag } from '@fluentui/react-components';
-import {
-  TagPicker,
-  TagPickerList,
-  TagPickerInput,
-  TagPickerControl,
-  TagPickerProps,
-  TagPickerOption,
-  TagPickerGroup,
-} from '@fluentui/react-tag-picker-preview';
-import { createTagColorStyle } from '/@/common/utils/style';
+import { Button, Field, Input } from '@fluentui/react-components';
 import TagSelector from './TagSelector';
 import Filter from './Filter';
 
