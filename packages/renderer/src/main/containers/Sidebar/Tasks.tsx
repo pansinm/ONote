@@ -42,7 +42,7 @@ const useStyles = makeStyles({
     flexWrap: 'wrap',
   },
   timeItem: {
-    minWidth: 10,
+    minWidth: '10px',
   },
   tagList: {
     display: 'flex',
