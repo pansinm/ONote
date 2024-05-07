@@ -20,56 +20,16 @@ import {
   TagPickerGroup,
 } from '@fluentui/react-tag-picker-preview';
 import { createTagColorStyle } from '/@/common/utils/style';
+import TagSelector from './TagSelector';
+import Filter from './Filter';
 
 const Form = withTheme(FluentUIRCTheme);
 
-const TagSelector = function (props: WidgetProps) {
-  const tagPickerOptions: string[] = (props.schema.items! as any).enum;
+const TagsField = function (props: WidgetProps) {
   const selectedOptions: string[] = props.value || [];
   return (
     <Field label={props.schema.title} style={{ maxWidth: 400 }}>
-      <TagPicker
-        size="medium"
-        onOptionSelect={(_, { selectedOptions }) => {
-          props.onChange(selectedOptions);
-        }}
-        selectedOptions={selectedOptions}
-      >
-        <TagPickerControl>
-          <TagPickerGroup>
-            {selectedOptions.map((option) => (
-              <Tag
-                key={option}
-                shape="rounded"
-                value={option}
-                style={createTagColorStyle(
-                  option,
-                  stores.todoStore.tagRecords[option]?.color,
-                )}
-              >
-                {option}
-              </Tag>
-            ))}
-          </TagPickerGroup>
-          <TagPickerInput />
-        </TagPickerControl>
-        <TagPickerList>
-          {tagPickerOptions.length > 0
-            ? tagPickerOptions.map((option) => (
-                <TagPickerOption
-                  value={option}
-                  key={option}
-                  style={createTagColorStyle(
-                    option,
-                    stores.todoStore.tagRecords[option]?.color,
-                  )}
-                >
-                  {option}
-                </TagPickerOption>
-              ))
-            : 'No options available'}
-        </TagPickerList>
-      </TagPicker>
+      <TagSelector tags={selectedOptions} onChange={props.onChange} />
     </Field>
   );
 };
@@ -140,7 +100,7 @@ const TodoPage: React.FC = () => {
       },
     },
     tags: {
-      'ui:widget': TagSelector,
+      'ui:widget': TagsField,
     },
   };
 
@@ -150,7 +110,7 @@ const TodoPage: React.FC = () => {
         <div>
           <Input
             style={{ width: '100%' }}
-            placeholder="输入任务"
+            placeholder="创建任务"
             value={text}
             size="medium"
             autoFocus
@@ -166,6 +126,7 @@ const TodoPage: React.FC = () => {
               setOpen(true);
             }}
           />
+          <Filter />
         </div>
         <div className={styles.TodoList}>
           {stores.todoStore.tasks.map((task) => (

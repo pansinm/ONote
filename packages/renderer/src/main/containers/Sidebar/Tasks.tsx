@@ -38,12 +38,11 @@ const useStyles = makeStyles({
     boxShadow: '0 -2px 50px rgba(0, 0, 0, 0.1)',
   },
   timeList: {
-    display: 'inline-flex',
+    display: 'flex',
+    flexWrap: 'wrap',
   },
   timeItem: {
-    ...shorthands.padding('5px'),
-    ...shorthands.margin('3px', '3px'),
-    cursor: 'default',
+    minWidth: 10,
   },
   tagList: {
     display: 'flex',
@@ -87,33 +86,52 @@ const uiSchema = {
 const Tasks: React.FC<Props> = ({ style, className }) => {
   const styles = useStyles();
   const [open, setOpen] = useState(false);
-  const handleClick = () => {
-    stores.todoStore.activate();
+  const activateTodo = (filter: Partial<typeof stores.todoStore.filter>) => {
+    stores.todoStore.activate(filter);
   };
+
   const removeTag = (name: string) => {
     const confirmed = window.confirm(`确定删除该标签【${name}】吗？`);
     if (confirmed) {
       stores.todoStore.removeTag(name);
     }
   };
+
+  const timeRanges = [
+    {
+      label: '今天',
+      value: 'today',
+    },
+    {
+      label: '明天',
+      value: 'tomorrow',
+    },
+    {
+      label: '本周',
+      value: 'week',
+    },
+    {
+      label: '本月',
+      value: 'month',
+    },
+  ] as const;
+
   return (
     <div className={classNames(className, styles.root)} style={style}>
       <h4 style={{ color: '#666' }}>
         <Icon type="list-task" size={18}></Icon> 待办清单
       </h4>
       <div className={styles.timeList}>
-        <div className={styles.timeItem} onClick={handleClick}>
-          全部
-        </div>
-        {/* <div className={styles.TimeItem} onClick={handleClick}>
-          今天
-        </div>
-        <div className={styles.TimeItem} onClick={handleClick}>
-          本周
-        </div>
-        <div className={styles.TimeItem} onClick={handleClick}>
-          本月
-        </div> */}
+        {timeRanges.map((timeRange) => (
+          <Button
+            key={timeRange.value}
+            size="small"
+            className={styles.timeItem}
+            onClick={() => activateTodo({ timeRange: timeRange.value })}
+          >
+            {timeRange.label}
+          </Button>
+        ))}
       </div>
       <TagGroup className={styles.tagList}>
         {stores.todoStore.tags.map((tag) => (
@@ -137,7 +155,7 @@ const Tasks: React.FC<Props> = ({ style, className }) => {
             onClick={(ev) => {
               ev.preventDefault();
               ev.stopPropagation();
-              stores.todoStore.activate();
+              activateTodo({ tags: [tag.name] });
             }}
           >
             {tag.name}

@@ -32,6 +32,24 @@ class TodoStore {
     );
   }
 
+  filter = {
+    timeRange: 'all' as 'all' | 'today' | 'tomorrow' | 'week' | 'month',
+    tab: 'all' as 'all' | 'todo' | 'done',
+    tags: [] as string[],
+  };
+
+  setFilterTimeRange(range: 'all' | 'today' | 'tomorrow' | 'week' | 'month') {
+    this.filter.timeRange = range;
+  }
+
+  setFilterTab(tab: 'all' | 'todo' | 'done') {
+    this.filter.tab = tab;
+  }
+
+  setFilterTags(tags: string[]) {
+    this.filter.tags = tags;
+  }
+
   taskFiles: Record<string, Record<string, ITask>> = {};
 
   get tasksById(): Record<string, ITask> {
@@ -42,10 +60,50 @@ class TodoStore {
   }
 
   get tasks(): ITask[] {
+    const all = Object.values(this.tasksById);
+    const filtered = all
+      .filter((item) => {
+        if (this.filter.tags.length > 0) {
+          return this.filter.tags.some((tag) => item.tags?.includes(tag));
+        }
+        return true;
+      })
+      .filter((item) => {
+        const range = this.filter.timeRange;
+        if (range === 'all') {
+          return true;
+        }
+        const time = item.done ? item.doneAt : item.createdAt;
+        const now = Date.now();
+        if (range === 'today') {
+          return time > now - 1000 * 60 * 60 * 24;
+        }
+        if (range === 'tomorrow') {
+          return (
+            time > now - 1000 * 60 * 60 * 24 && time < now + 1000 * 60 * 60 * 24
+          );
+        }
+        if (range === 'week') {
+          return time > now - 1000 * 60 * 60 * 24 * 7;
+        }
+        if (range === 'month') {
+          return time > now - 1000 * 60 * 60 * 24 * 30;
+        }
+      })
+      .filter((item) => {
+        const tab = this.filter.tab;
+        if (tab === 'all') {
+          return true;
+        }
+        if (tab === 'done') {
+          return item.done;
+        }
+        return !item.done;
+      });
     return _.orderBy(
-      Object.values(this.tasksById),
-      ['done', 'createdAt'],
-      ['asc', 'desc'],
+      filtered,
+      ['done', 'doneAt', 'createdAt'],
+      ['asc', 'desc', 'desc'],
     );
   }
 
@@ -175,7 +233,8 @@ class TodoStore {
     }
   }
 
-  activate(timeRange?: [number, number], tags?: string[]) {
+  activate(filter: Partial<typeof this.filter>) {
+    this.filter = { ...this.filter, ...filter };
     this.activationStore.activatePage('todo');
   }
 }
