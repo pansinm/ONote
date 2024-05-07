@@ -25,6 +25,7 @@
     "@editorjs/table": "^2.0.1",
     "@fluentui/react-components": "^9.49.2",
     "@fluentui/react-icons": "^2.0.239",
+    "@fluentui/react-tag-picker-preview": "^0.5.0",
     "@iarna/toml": "^2.2.5",
     "@pintora/standalone": "^0.6.3",
     "@rjsf/core": "^5.18.3",

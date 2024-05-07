@@ -15,7 +15,7 @@ export interface ITask {
   description?: string;
   id: string;
   title: string;
-  tags?: ITag[];
+  tags?: string[];
   done: boolean;
   filename: string;
   ref?: string;
@@ -74,11 +74,26 @@ class TodoStore {
     };
   }
 
-  createTask(text: string, options: { ref?: string; tags?: ITag[] } = {}) {
+  createTag(name: string, color?: string) {
+    this.tagRecords[name] = { name, color };
+    this.saveTagFile();
+  }
+
+  removeTag(tagName: string) {
+    delete this.tagRecords[tagName];
+    this.tagRecords = { ...this.tagRecords };
+    this.saveTagFile();
+  }
+
+  private saveTagFile() {
+    fileService.writeText(
+      this.tagFileUri,
+      JSON.stringify(this.tagRecords, null, 2),
+    );
+  }
+  createTask(text: string, options: Partial<ITask> = {}) {
     const { file, records } = this.currentFile;
     const task: ITask = {
-      id: nanoid(),
-      title: text,
       tags: [],
       done: false,
       description: '',
@@ -87,6 +102,8 @@ class TodoStore {
       doneAt: 0,
       createdAt: Date.now(),
       ...options,
+      id: nanoid(),
+      title: text,
     };
     records[task.id] = task;
     this.taskFiles[file] = { ...records };
@@ -105,16 +122,7 @@ class TodoStore {
     }
   }
 
-  updateTask(
-    task: ITask,
-    options: {
-      ref?: string;
-      tags?: ITag[];
-      done?: boolean;
-      title?: string;
-      content?: string;
-    } = {},
-  ) {
+  updateTask(task: ITask, options: Partial<ITask> = {}) {
     const file = task.filename;
     const records = this.taskFiles[file];
     if (task.id) {
@@ -134,7 +142,7 @@ class TodoStore {
     );
   }
 
-  private get taskFileUri() {
+  private get tagFileUri() {
     const todoRoot = this.activationStore.rootUri + '/.onote/todo';
     return todoRoot + '/tags.json';
   }
@@ -150,7 +158,7 @@ class TodoStore {
       this.tagRecords = {};
     }
     try {
-      const tagsJson = await fileService.readText(this.taskFileUri);
+      const tagsJson = await fileService.readText(this.tagFileUri);
       this.tagRecords = JSON.parse(tagsJson);
     } catch (err) {
       // ignore

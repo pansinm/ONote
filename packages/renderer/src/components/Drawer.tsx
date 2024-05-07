@@ -30,13 +30,20 @@ export const Drawer: React.FC<DrawerSeparatorExampleProps> = ({
 }) => {
   const DrawerComponent = type === 'inline' ? InlineDrawer : OverlayDrawer;
   return (
-    <DrawerComponent separator position={position} open={open}>
+    <DrawerComponent
+      separator
+      position={position}
+      open={open}
+      onOpenChange={(_, { open }) => setOpen(open)}
+    >
       <DrawerHeader>
         <DrawerHeaderTitle
           action={
             <Button
               appearance="subtle"
               aria-label="Close"
+              autoFocus={false}
+              tabIndex={-1}
               icon={<Dismiss24Regular />}
               onClick={() => setOpen(false)}
             />

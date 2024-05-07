@@ -1,4 +1,3 @@
-// react sfc component
 import React, { useEffect, useState } from 'react';
 import styles from './TodoPage.module.scss';
 import stores from '../../stores';
@@ -7,37 +6,72 @@ import { observer } from 'mobx-react-lite';
 import { Drawer } from '/@/components';
 import { withTheme } from '@rjsf/core';
 import { Theme as FluentUIRCTheme } from '@rjsf/fluentui-rc';
-import type { RJSFSchema, UiSchema } from '@rjsf/utils';
+import type { RJSFSchema, UiSchema, WidgetProps } from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
 import type { ITask } from '../../stores/TodoStore';
-import { Button, Input } from '@fluentui/react-components';
+import { Button, Field, Input, Tag } from '@fluentui/react-components';
+import {
+  TagPicker,
+  TagPickerList,
+  TagPickerInput,
+  TagPickerControl,
+  TagPickerProps,
+  TagPickerOption,
+  TagPickerGroup,
+} from '@fluentui/react-tag-picker-preview';
+import { createTagColorStyle } from '/@/common/utils/style';
 
 const Form = withTheme(FluentUIRCTheme);
 
-const jsonSchema: RJSFSchema = {
-  required: ['title'],
-  properties: {
-    title: {
-      type: 'string',
-      title: '名称',
-      default: '',
-    },
-    description: {
-      type: 'string',
-      title: '描述',
-      default: '',
-    },
-  },
-};
-
-const uiSchema: UiSchema = {
-  title: {},
-  description: {
-    'ui:widget': 'textarea',
-    'ui:options': {
-      rows: 5,
-    },
-  },
+const TagSelector = function (props: WidgetProps) {
+  const tagPickerOptions: string[] = (props.schema.items! as any).enum;
+  const selectedOptions: string[] = props.value || [];
+  return (
+    <Field label={props.schema.title} style={{ maxWidth: 400 }}>
+      <TagPicker
+        size="medium"
+        onOptionSelect={(_, { selectedOptions }) => {
+          props.onChange(selectedOptions);
+        }}
+        selectedOptions={selectedOptions}
+      >
+        <TagPickerControl>
+          <TagPickerGroup>
+            {selectedOptions.map((option) => (
+              <Tag
+                key={option}
+                shape="rounded"
+                value={option}
+                style={createTagColorStyle(
+                  option,
+                  stores.todoStore.tagRecords[option]?.color,
+                )}
+              >
+                {option}
+              </Tag>
+            ))}
+          </TagPickerGroup>
+          <TagPickerInput />
+        </TagPickerControl>
+        <TagPickerList>
+          {tagPickerOptions.length > 0
+            ? tagPickerOptions.map((option) => (
+                <TagPickerOption
+                  value={option}
+                  key={option}
+                  style={createTagColorStyle(
+                    option,
+                    stores.todoStore.tagRecords[option]?.color,
+                  )}
+                >
+                  {option}
+                </TagPickerOption>
+              ))
+            : 'No options available'}
+        </TagPickerList>
+      </TagPicker>
+    </Field>
+  );
 };
 
 const TodoPage: React.FC = () => {
@@ -72,6 +106,44 @@ const TodoPage: React.FC = () => {
     }
   };
 
+  const jsonSchema: RJSFSchema = {
+    required: ['title'],
+    properties: {
+      title: {
+        type: 'string',
+        title: '名称',
+        default: '',
+      },
+      tags: {
+        type: 'array',
+        title: '标签',
+        items: {
+          type: 'string',
+          enum: stores.todoStore.tags.map((tag) => tag.name),
+        },
+        uniqueItems: true,
+      },
+      description: {
+        type: 'string',
+        title: '描述',
+        default: '',
+      },
+    },
+  };
+
+  const uiSchema: UiSchema = {
+    title: {},
+    description: {
+      'ui:widget': 'textarea',
+      'ui:options': {
+        rows: 5,
+      },
+    },
+    tags: {
+      'ui:widget': TagSelector,
+    },
+  };
+
   return (
     <div className={styles.TodoPage}>
       <div className={styles.Content}>
@@ -99,6 +171,7 @@ const TodoPage: React.FC = () => {
           {stores.todoStore.tasks.map((task) => (
             <Task
               key={task.id}
+              activated={task.id === formData.id}
               task={task}
               onClick={() => activateTask(task)}
             />
