@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import React, { useState } from 'react';
 import type { TabListProps } from '@fluentui/react-components';
-import { TabList, Tab } from '@fluentui/react-components';
+import { TabList, Tab, makeStyles } from '@fluentui/react-components';
 import {
   DeviceMeetingRoomRemoteRegular,
   FolderRegular,
@@ -16,11 +16,22 @@ export type Project = {
   config: any;
   rootUri: string;
 };
+
+const useStyles = makeStyles({
+  tabContent: {
+    paddingTop: '10px',
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+  },
+});
+
 interface ProjectSelectProps {
   onSelect(project: Project): void;
 }
 
 const ProjectSelect: FC<ProjectSelectProps> = (props) => {
+  const styles = useStyles();
   const [tab, setTab] = useState<Project['type']>('local');
   const handleSelect = async (type: typeof tab, uri: string, config: any) => {
     props.onSelect({
@@ -47,7 +58,7 @@ const ProjectSelect: FC<ProjectSelectProps> = (props) => {
           Gitee
         </Tab>
       </TabList>
-      <div style={{ paddingTop: 10 }}>
+      <div className={styles.tabContent}>
         {tab === 'local' && (
           <LocalDirSelect onOpen={(uri) => handleSelect('local', uri, null)} />
         )}
