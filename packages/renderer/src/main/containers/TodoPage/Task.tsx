@@ -26,9 +26,6 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    '& .fui-TagGroup': {
-      columnGap: '4px',
-    },
   },
   activated: {
     backgroundColor: '#eee',
@@ -40,11 +37,17 @@ const useStyles = makeStyles({
       color: 'red !important',
     },
   },
+  tagGroup: {
+    marginLeft: '4px',
+    columnGap: '2px',
+    marginRight: '4px',
+  },
   tagItem: {
     ...shorthands.margin('4px', 0),
     '& span': {
       ...shorthands.padding('0'),
     },
+    height: '20px',
   },
 });
 
@@ -109,7 +112,7 @@ const Task = ({
             }}
           >
             {task.title}
-            <TagGroup>
+            <TagGroup className={styles.tagGroup}>
               {task.tags?.map((name) => (
                 <Tag
                   key={name}
