@@ -11,6 +11,7 @@ import type { ITask } from '../../stores/TodoStore';
 import { Button, Field, Input, makeStyles } from '@fluentui/react-components';
 import TagSelector from './TagSelector';
 import Filter from './Filter';
+import TagCreateForm from './TagCreateForm';
 
 const Form = withTheme(FluentUIRCTheme);
 
