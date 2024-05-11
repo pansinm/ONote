@@ -18,8 +18,22 @@ const Form = withTheme(FluentUIRCTheme);
 const TagsField = function (props: WidgetProps) {
   const selectedOptions: string[] = props.value || [];
   return (
-    <Field label={props.schema.title} style={{ maxWidth: 400 }}>
-      <TagSelector tags={selectedOptions} onChange={props.onChange} />
+    <Field
+      label={props.schema.title}
+      style={{
+        maxWidth: 400,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          columnGap: '3px',
+        }}
+      >
+        <TagSelector tags={selectedOptions} onChange={props.onChange} />
+        <TagCreateForm />
+      </div>
     </Field>
   );
 };
