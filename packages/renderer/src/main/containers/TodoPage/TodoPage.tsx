@@ -3,6 +3,7 @@ import stores from '../../stores';
 import Task from './Task';
 import { observer } from 'mobx-react-lite';
 import { Drawer } from '/@/components';
+import type { FormProps } from '@rjsf/core';
 import { withTheme } from '@rjsf/core';
 import { Theme as FluentUIRCTheme } from '@rjsf/fluentui-rc';
 import type { RJSFSchema, UiSchema, WidgetProps } from '@rjsf/utils';
@@ -12,6 +13,7 @@ import { Button, Field, Input, makeStyles } from '@fluentui/react-components';
 import TagSelector from './TagSelector';
 import Filter from './Filter';
 import TagCreateForm from './TagCreateForm';
+import { isEqual } from 'lodash';
 
 const Form = withTheme(FluentUIRCTheme);
 
@@ -65,31 +67,42 @@ const TodoPage: React.FC = () => {
   const styles = useStyles();
   const [text, setText] = useState('');
   // const [activateTaskId, setActivateTaskId] = useState<''>;
-  const [formData, setFormData] = React.useState<Partial<ITask>>({ title: '' });
-  const [open, setOpen] = useState(false);
+  const [createFormData, setCreateFormData] = React.useState<Partial<ITask>>({
+    title: '',
+    tags: stores.todoStore.filter.tags,
+  });
+
+  const [currentTaskId, setCurrentTaskId] = useState('');
+  const [editFormData, setEditFormData] = React.useState<Partial<ITask>>({
+    title: '',
+    tags: stores.todoStore.filter.tags,
+  });
+
+  const [open, setOpen] = useState(true);
 
   const createTask = () => {
-    stores.todoStore.createTask(text, formData);
+    stores.todoStore.createTask(text, createFormData);
     setText('');
-    setFormData({ title: '' });
+    setCreateFormData({ title: '', ...createFormData });
+    setCurrentTaskId('');
   };
 
   const activateTask = (task: ITask) => {
     setOpen(true);
-    setFormData({ ...task });
+    setCurrentTaskId(task.id);
+    setEditFormData({ ...task });
   };
 
   useEffect(() => {
-    setFormData({ ...formData, title: text });
+    setCreateFormData({ ...createFormData, title: text });
   }, [text]);
 
-  const handleSubmit = () => {
-    if (formData.id) {
-      const task = stores.todoStore.tasksById[formData.id];
-      stores.todoStore.updateTask(task, formData as ITask);
+  const handleSubmit: FormProps['onSubmit'] = ({ formData }) => {
+    if (currentTaskId) {
+      stores.todoStore.updateTask(currentTaskId, formData as ITask);
       return;
     }
-    if (formData.title) {
+    if (createFormData.title) {
       createTask();
     }
   };
@@ -131,6 +144,19 @@ const TodoPage: React.FC = () => {
     },
   };
 
+  const formData = currentTaskId ? editFormData : createFormData;
+  const handleChange = (nextFormData: typeof editFormData) => {
+    if (currentTaskId) {
+      const nextTags = [...(nextFormData?.tags || [])];
+      const currentTags = [...(editFormData?.tags || [])];
+      const needSubmit = !isEqual(nextTags, currentTags);
+      setEditFormData({ ...nextFormData });
+      if (needSubmit) {
+        stores.todoStore.updateTask(currentTaskId, nextFormData);
+      }
+    }
+    setCreateFormData(nextFormData);
+  };
   return (
     <div className={styles.root}>
       <div className={styles.content}>
@@ -148,9 +174,7 @@ const TodoPage: React.FC = () => {
               }
             }}
             onFocus={() => {
-              const form = formData.id ? {} : formData;
-              setFormData({ ...form, title: text });
-              setOpen(true);
+              setCurrentTaskId('');
             }}
           />
           <Filter />
@@ -159,7 +183,7 @@ const TodoPage: React.FC = () => {
           {stores.todoStore.tasks.map((task) => (
             <Task
               key={task.id}
-              activated={task.id === formData.id}
+              activated={task.id === currentTaskId}
               task={task}
               onClick={() => activateTask(task)}
             />
@@ -171,12 +195,12 @@ const TodoPage: React.FC = () => {
         open={open}
         setOpen={setOpen}
         position="end"
-        title={formData.id ? '任务详情' : '新建任务'}
+        title={currentTaskId ? '编辑任务' : '新建任务'}
       >
         <Form
           className={styles.form}
           formData={formData}
-          onChange={({ formData }) => setFormData(formData)}
+          onChange={({ formData }) => handleChange(formData)}
           schema={jsonSchema}
           uiSchema={uiSchema}
           validator={validator}

@@ -87,7 +87,7 @@ const Task = ({
   const toggleDone = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    stores.todoStore.updateTask(task, { done: !task.done });
+    stores.todoStore.updateTask(task.id, { done: !task.done });
   };
   const styles = useStyles();
   return (
