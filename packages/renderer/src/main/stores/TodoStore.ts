@@ -233,7 +233,7 @@ class TodoStore {
     }
   }
 
-  activate(filter: Partial<typeof this.filter>) {
+  activate(filter: Partial<typeof this.filter> = {}) {
     this.filter = { ...this.filter, ...filter };
     this.activationStore.activatePage('todo');
   }

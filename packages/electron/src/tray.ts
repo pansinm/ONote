@@ -1,5 +1,5 @@
 import { Tray, app, nativeImage, Menu } from 'electron';
-import { join } from 'path';
+import { resolve } from 'path';
 import { restoreOrCreateWindow } from './window';
 
 let tray: Tray | null = null;
@@ -7,9 +7,7 @@ let tray: Tray | null = null;
 const icon =
   process.env.NODE_ENV === 'development'
     ? 'buildResources/icon.png'
-    : nativeImage.createFromPath(
-        join(app.getAppPath(), 'buildResources/icon.png'),
-      );
+    : resolve(app.getAppPath(), 'buildResources/icon.png');
 
 export function createTrayIcon() {
   if (!tray) {
