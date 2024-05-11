@@ -180,7 +180,8 @@ class TodoStore {
     }
   }
 
-  updateTask(task: ITask, options: Partial<ITask> = {}) {
+  updateTask(taskId: string, options: Partial<ITask> = {}) {
+    const task = this.tasksById[taskId];
     const file = task.filename;
     const records = this.taskFiles[file];
     if (task.id) {
