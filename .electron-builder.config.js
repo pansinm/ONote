@@ -27,7 +27,7 @@ const config = {
   linux: {
     target: ['deb', 'rpm', 'AppImage'],
     category: 'Utility',
-    icon: 'buildResources/icon.icns',
+    icon: 'buildResources/icon.png',
     maintainer: 'pansinm <pansinm@foxmail.com>',
   },
   mac: {

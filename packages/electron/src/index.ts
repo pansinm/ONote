@@ -1,8 +1,18 @@
-import { app, crashReporter, dialog, ipcMain, Menu, protocol } from 'electron';
+import {
+  app,
+  crashReporter,
+  dialog,
+  ipcMain,
+  Menu,
+  nativeImage,
+  protocol,
+} from 'electron';
+import * as path from 'path';
 import './security-restrictions';
 import { restoreOrCreateWindow } from './window';
 import { pluginManager as pluginManager } from './plugin';
 import './tunnel';
+
 crashReporter.start({ uploadToServer: false });
 
 import './server';
@@ -24,49 +34,49 @@ import { createTrayIcon } from './tray';
 /**
  * Disable Hardware Acceleration for more power-save
  */
-app.disableHardwareAcceleration();
+// app.disableHardwareAcceleration();
 
 if (process.platform !== 'darwin') {
-  const template = [
-    {
-      label: app.getName(),
-      submenu: [
-        { role: 'about' },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideOthers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'quit' },
-      ],
-    },
-    {
-      label: 'Edit',
-      submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
-        { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        { role: 'delete' },
-        { role: 'selectAll' },
-      ],
-    },
-    {
-      role: 'window',
-      submenu: [
-        { role: 'close' },
-        { role: 'minimize' },
-        { role: 'zoom' },
-        { type: 'separator' },
-        { role: 'front' },
-      ],
-    },
-  ] satisfies Electron.MenuItemConstructorOptions[];
+  // const template = [
+  //   {
+  //     label: app.getName(),
+  //     submenu: [
+  //       { role: 'about' },
+  //       { type: 'separator' },
+  //       { role: 'hide' },
+  //       { role: 'hideOthers' },
+  //       { role: 'unhide' },
+  //       { type: 'separator' },
+  //       { role: 'quit' },
+  //     ],
+  //   },
+  //   {
+  //     label: 'Edit',
+  //     submenu: [
+  //       { role: 'undo' },
+  //       { role: 'redo' },
+  //       { type: 'separator' },
+  //       { role: 'cut' },
+  //       { role: 'copy' },
+  //       { role: 'paste' },
+  //       { role: 'delete' },
+  //       { role: 'selectAll' },
+  //     ],
+  //   },
+  //   {
+  //     role: 'window',
+  //     submenu: [
+  //       { role: 'close' },
+  //       { role: 'minimize' },
+  //       { role: 'zoom' },
+  //       { type: 'separator' },
+  //       { role: 'front' },
+  //     ],
+  //   },
+  // ] satisfies Electron.MenuItemConstructorOptions[];
 
-  const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
+  // const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(null);
 }
 
 app.on('will-quit', () => {
@@ -102,6 +112,10 @@ app.whenReady().then(() => {
   tray.on('click', () => {
     restoreOrCreateWindow('main');
   });
+});
+
+app.whenReady().then(() => {
+  app.setUserTasks([]);
 });
 
 app.whenReady().then(() => {
