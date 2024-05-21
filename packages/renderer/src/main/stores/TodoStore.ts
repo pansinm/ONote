@@ -157,9 +157,9 @@ class TodoStore {
       description: '',
       filename: file,
       ref: '',
+      ...options,
       doneAt: 0,
       createdAt: Date.now(),
-      ...options,
       id: nanoid(),
       title: text,
     };
