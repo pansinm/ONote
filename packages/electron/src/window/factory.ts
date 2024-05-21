@@ -1,6 +1,5 @@
 import type { WebFrameMain } from 'electron';
 import { app, BrowserWindow, nativeImage, shell, webFrameMain } from 'electron';
-import { pathToFileURL } from 'url';
 import { join } from 'path';
 import { pluginManager as pluginManager } from '../plugin';
 import { sendToMain } from './ipc';
@@ -24,17 +23,21 @@ async function injectPluginJs(frame: WebFrameMain) {
 }
 
 async function createWindow(type: 'main' | 'previewer') {
+  const iconPath = app.isPackaged
+    ? join(process.cwd(), '../../buildResources/icon.png')
+    : join(app.getAppPath(), 'buildResources/icon.png');
+  const icon = nativeImage
+    .createFromPath(iconPath)
+    .resize({ width: 64, height: 64 });
+
+  // app.dock.setIcon(icon);
   const browserWindow = new BrowserWindow({
     show: false, // Use 'ready-to-show' event to show window
     autoHideMenuBar: true,
     width: 1280,
     height: 768,
-    icon:
-      process.env.NODE_ENV === 'development'
-        ? 'buildResources/icon.png'
-        : nativeImage.createFromPath(
-            join(app.getAppPath(), 'buildResources/icon.png'),
-          ),
+    icon: icon,
+
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -48,6 +51,8 @@ async function createWindow(type: 'main' | 'previewer') {
       webSecurity: false, //!process.env.NODE_ENV === 'development',
     },
   });
+
+  browserWindow.setIcon(icon);
 
   browserWindow.webContents.on('render-process-gone', (e, detail) => {
     console.log(e, detail);
