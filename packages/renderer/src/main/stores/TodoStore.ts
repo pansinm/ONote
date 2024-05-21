@@ -16,6 +16,7 @@ export interface ITask {
   id: string;
   title: string;
   tags?: string[];
+  dueDate?: string;
   done: boolean;
   filename: string;
   ref?: string;

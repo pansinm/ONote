@@ -83,7 +83,7 @@ const TodoPage: React.FC = () => {
   const createTask = () => {
     stores.todoStore.createTask(text, createFormData);
     setText('');
-    setCreateFormData({ title: '', ...createFormData });
+    setCreateFormData({ ...createFormData, title: '' });
     setCurrentTaskId('');
   };
 
@@ -124,6 +124,11 @@ const TodoPage: React.FC = () => {
         },
         uniqueItems: true,
       },
+      dueDate: {
+        type: 'string',
+        title: '截止日期',
+        format: 'date',
+      },
       description: {
         type: 'string',
         title: '描述',
@@ -149,11 +154,14 @@ const TodoPage: React.FC = () => {
     if (currentTaskId) {
       const nextTags = [...(nextFormData?.tags || [])];
       const currentTags = [...(editFormData?.tags || [])];
-      const needSubmit = !isEqual(nextTags, currentTags);
+      const needSubmit =
+        !isEqual(nextTags, currentTags) ||
+        !isEqual(nextFormData.dueDate, editFormData.dueDate);
       setEditFormData({ ...nextFormData });
       if (needSubmit) {
         stores.todoStore.updateTask(currentTaskId, nextFormData);
       }
+      return;
     }
     setCreateFormData(nextFormData);
   };
