@@ -35,7 +35,7 @@ class TodoStore {
   }
 
   private async startJob() {
-    const cronId = await window.onote.cron.invoke('startJob', '* * 9,13 * * *');
+    const cronId = await window.onote.cron.invoke('startJob', '0 0 9,13 * * *');
     window.onote.cron.addListener('ticked', ({ id }: { id: number }) => {
       console.log('ticked:', cronId, id);
       if (cronId === id) {
