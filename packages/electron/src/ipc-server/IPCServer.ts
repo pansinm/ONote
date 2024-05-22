@@ -12,7 +12,7 @@ class IPCServer {
     const methods = getPrototypeFunctionKeys(Handler);
     methods.forEach((method) => {
       ipcMain.handle(`${namespace}.${method}`, async (event, ...args) => {
-        const instance = new Handler(event.sender);
+        const instance = new Handler(event.sender, namespace);
         const fn = Reflect.get(instance as object, method) as (
           ...args: unknown[]
         ) => unknown;

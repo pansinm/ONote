@@ -157,5 +157,6 @@
     "webpack": "5.88.2",
     "@types/mdast": "4.0.3",
     "vfile-message": "4.0.0"
-  }
+  },
+  "dependencies": {}
 }
