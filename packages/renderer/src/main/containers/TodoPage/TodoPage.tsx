@@ -81,6 +81,9 @@ const TodoPage: React.FC = () => {
   const [open, setOpen] = useState(true);
 
   const createTask = () => {
+    if (!text.trim()) {
+      return;
+    }
     stores.todoStore.createTask(text, createFormData);
     setText('');
     setCreateFormData({ ...createFormData, title: '' });
