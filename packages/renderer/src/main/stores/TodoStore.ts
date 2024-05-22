@@ -31,6 +31,40 @@ class TodoStore {
       () => activationStore.rootUri,
       () => this.load(),
     );
+    this.startJob();
+  }
+
+  private async startJob() {
+    const cronId = await window.onote.cron.invoke('startJob', '* * 9,13 * * *');
+    window.onote.cron.addListener('ticked', ({ id }: { id: number }) => {
+      console.log('ticked:', cronId, id);
+      if (cronId === id) {
+        this.notify();
+      }
+    });
+  }
+
+  private notify() {
+    const tasks = Object.values(this.tasksById).filter(
+      (item) => !item.done && item.dueDate,
+    );
+    console.log(JSON.stringify(tasks));
+    const now = new Date();
+    const dueTasks = tasks.filter((item) => {
+      const due = new Date(item.dueDate!);
+      return (
+        now.toLocaleDateString() === due.toLocaleDateString() &&
+        now.getTime() > due.getTime()
+      );
+    });
+
+    const notification = new Notification('ONote', {
+      body: `今天有 ${dueTasks.length} 个任务未完成`,
+    });
+
+    notification.onclick = () => {
+      window.focus();
+    };
   }
 
   filter = {

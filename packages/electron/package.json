@@ -30,8 +30,8 @@
     "webdav-server": "^2.6.2"
   },
   "devDependencies": {
-    "onote-shared": "*",
     "chokidar": "^3.5.3",
+    "cron": "^3.1.7",
     "electron": "^28.2.0",
     "electron-builder": "^24.6.3",
     "electron-devtools-installer": "^3.2.0",
