@@ -63,7 +63,7 @@ const TagSelector = function ({ onChange, tags }: TagSelectorProps) {
                 {option}
               </TagPickerOption>
             ))
-          : 'No options available'}
+          : '没有发现标签'}
       </TagPickerList>
     </TagPicker>
   );
