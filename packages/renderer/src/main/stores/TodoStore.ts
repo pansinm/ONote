@@ -53,11 +53,14 @@ class TodoStore {
     const dueTasks = tasks.filter((item) => {
       const due = new Date(item.dueDate!);
       return (
-        now.toLocaleDateString() === due.toLocaleDateString() &&
+        new Date(now.toLocaleDateString()) >= due &&
         now.getTime() > due.getTime()
       );
     });
 
+    if (!dueTasks.length) {
+      return;
+    }
     const notification = new Notification('ONote', {
       body: `今天有 ${dueTasks.length} 个任务未完成`,
     });

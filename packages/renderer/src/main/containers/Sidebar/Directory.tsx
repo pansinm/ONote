@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type { FileTreeProps } from '@sinm/react-file-tree';
 import { utils } from '@sinm/react-file-tree';
 import { FileTree } from '@sinm/react-file-tree';
@@ -16,6 +16,10 @@ import '@sinm/react-file-tree/icons.css';
 
 const MENU_ID = 'DIRECTORY_MENU';
 const MENUS: MenuItem[] = [
+  {
+    id: 'CREATE_FILE',
+    title: '创建笔记',
+  },
   {
     id: 'CREATE_DIRECTORY',
     title: '创建目录',
@@ -109,6 +113,10 @@ const Directory = observer(() => {
         return createFile(dirUri, 'directory').then((treeNode) => {
           treeNode && appendTreeNode(dirUri, treeNode);
         });
+      case 'CREATE_FILE':
+        return createFile(dirUri, 'file').then(() =>
+          stores.activationStore.activeDir(dirUri),
+        );
       case 'RENAME_DIRECTORY':
         return renameFile(dirUri, 'directory').then((node) => {
           replaceTreeNode(dirUri, node);
