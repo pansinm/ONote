@@ -3364,6 +3364,13 @@
   dependencies:
     undici-types "~5.26.4"
 
+"@types/node@^20.9.0":
+  version "20.16.3"
+  resolved "https://registry.npmmirror.com/@types/node/-/node-20.16.3.tgz#7b4f9a37091cf03a0c2561bf76a9a55f03f4f523"
+  integrity sha512-/wdGiWRkMOm53gAsSyFMXFZHbVg7C6CbkrzHNpaHoYfsUWPg7m6ZRKtvQjgvQ9i8WT540a3ydRlRQbxjY30XxQ==
+  dependencies:
+    undici-types "~6.19.2"
+
 "@types/normalize-package-data@^2.4.0":
   version "2.4.4"
   resolved "https://registry.npmmirror.com/@types/normalize-package-data/-/normalize-package-data-2.4.4.tgz#56e2cc26c397c038fab0e3a917a12d5c5909e901"
@@ -5880,7 +5887,7 @@ ejs@^3.1.8:
   dependencies:
     jake "^10.8.5"
 
-electron-builder@^24.6.3:
+electron-builder@^24.13.3:
   version "24.13.3"
   resolved "https://registry.npmmirror.com/electron-builder/-/electron-builder-24.13.3.tgz#c506dfebd36d9a50a83ee8aa32d803d83dbe4616"
   integrity sha512-yZSgVHft5dNVlo31qmJAe4BVKQfFdwpRw7sFp1iQglDRCDD6r22zfRJuZlhtB5gp9FHUxCMEoWGq10SkCnMAIg==
@@ -5939,13 +5946,27 @@ electron-updater@^6.1.1:
     semver "^7.3.8"
     tiny-typed-emitter "^2.1.0"
 
-electron@^28.2.0:
-  version "28.3.1"
-  resolved "https://registry.npmmirror.com/electron/-/electron-28.3.1.tgz#babb3ff8e246336e9cd1c1966f16a55ba723ea06"
-  integrity sha512-aF9fONuhVDJlctJS7YOw76ynxVAQdfIWmlhRMKits24tDcdSL0eMHUS0wWYiRfGWbQnUKB6V49Rf17o32f4/fg==
+electron-updater@^6.2.1:
+  version "6.2.1"
+  resolved "https://registry.npmmirror.com/electron-updater/-/electron-updater-6.2.1.tgz#1c9adb9ba2a21a5dc50a8c434c45360d5e9fe6c9"
+  integrity sha512-83eKIPW14qwZqUUM6wdsIRwVKZyjmHxQ4/8G+1C6iS5PdDt7b1umYQyj1/qPpH510GmHEQe4q0kCPe3qmb3a0Q==
+  dependencies:
+    builder-util-runtime "9.2.4"
+    fs-extra "^10.1.0"
+    js-yaml "^4.1.0"
+    lazy-val "^1.0.5"
+    lodash.escaperegexp "^4.1.2"
+    lodash.isequal "^4.5.0"
+    semver "^7.3.8"
+    tiny-typed-emitter "^2.1.0"
+
+electron@^32.0.1:
+  version "32.0.1"
+  resolved "https://registry.npmmirror.com/electron/-/electron-32.0.1.tgz#8bfc186b81a645c6b3b12f91e71db4231fd0c934"
+  integrity sha512-5Hd5Jaf9niYVR2hZxoRd3gOrcxPOxQV1XPV5WaoSfT9jLJHFadhlKtuSDIk3U6rQZke+aC7GqPPAv55nWFCMsA==
   dependencies:
     "@electron/get" "^2.0.0"
-    "@types/node" "^18.11.18"
+    "@types/node" "^20.9.0"
     extract-zip "^2.0.1"
 
 elkjs@^0.8.2:
@@ -12334,6 +12355,11 @@ undici-types@~5.26.4:
   version "5.26.5"
   resolved "https://registry.npmmirror.com/undici-types/-/undici-types-5.26.5.tgz#bcd539893d00b56e964fd2657a4866b221a65617"
   integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
+
+undici-types@~6.19.2:
+  version "6.19.8"
+  resolved "https://registry.npmmirror.com/undici-types/-/undici-types-6.19.8.tgz#35111c9d1437ab83a7cdc0abae2f26d88eda0a02"
+  integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"

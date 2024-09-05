@@ -56,7 +56,8 @@ const setupElectronPackageWatcher = ({ server }) => {
     writeBundle() {
       if (spawnProcess !== null) {
         spawnProcess.off('exit', process.exit);
-        spawnProcess.kill('SIGINT');
+        spawnProcess.kill('SIGKILL');
+
         spawnProcess = null;
       }
 
