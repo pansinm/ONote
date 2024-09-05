@@ -109,41 +109,49 @@ class PluginManager {
       return {
         name: pkg.name,
         title: pkg.title || pkg.name,
-        backendJs:
-          pkg.backend && require.resolve(path.join(installDir, pkg.backend)),
-        mainJs: pkg.main && require.resolve(path.join(installDir, pkg.main)),
-        previewerJs:
-          pkg.previewer &&
-          require.resolve(path.join(installDir, pkg.previewer)),
+        backendJs: pkg.backend && path.resolve(installDir, pkg.backend),
+        mainJs: pkg.main && path.resolve(installDir, pkg.main),
+        previewerJs: pkg.previewer && path.resolve(installDir, pkg.previewer),
         description: pkg.description || pkg.name || '-',
         author: pkg.author || '-',
         version: pkg.version,
         installDir: installDir,
         homepage: pkg.homepage || pkg.repository,
       };
+    } catch (err) {
+      console.error('extract error', err);
+      throw err;
     } finally {
       fs.rm(tmpDir, { recursive: true }).catch(() => 0);
     }
   }
 
   async install(urlOrPath: string) {
-    const tgzPath = await this.wget(urlOrPath);
-    const plugin = await this.extract(tgzPath);
-    this.updateConfig((prev) => {
-      prev.plugins = Object.assign({}, prev.plugins, {
-        [plugin.name]: {
-          ...plugin,
-          downloadUrl: urlOrPath,
-        },
+    try {
+      console.log('downloading', urlOrPath);
+      const tgzPath = await this.wget(urlOrPath);
+      console.log('extracting', tgzPath);
+      const plugin = await this.extract(tgzPath);
+      this.updateConfig((prev) => {
+        prev.plugins = Object.assign({}, prev.plugins, {
+          [plugin.name]: {
+            ...plugin,
+            downloadUrl: urlOrPath,
+          },
+        });
+        return prev;
       });
-      return prev;
-    });
-    this.plugins[plugin.name] = {
-      ...plugin,
-      downloadUrl: urlOrPath,
-      state: 'installed',
-    };
-    return this.load(this.plugins[plugin.name]);
+      this.plugins[plugin.name] = {
+        ...plugin,
+        downloadUrl: urlOrPath,
+        state: 'installed',
+      };
+      console.log('loading', plugin.name);
+      await this.load(this.plugins[plugin.name]);
+    } catch (err) {
+      console.error(urlOrPath, err);
+      throw err;
+    }
   }
 
   private updateConfig(callback: (prev: any) => any) {

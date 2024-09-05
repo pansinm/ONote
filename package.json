@@ -8,6 +8,7 @@
   "version": "0.12.0-alpha",
   "main": "packages/electron/dist/index.cjs",
   "type": "commonjs",
+  "packageManager": "yarn@1.22.22",
   "workspaces": [
     "packages/*"
   ],

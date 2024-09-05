@@ -7,7 +7,7 @@ import {
   nativeImage,
   protocol,
 } from 'electron';
-import * as path from 'path';
+import * as os from 'os';
 import './security-restrictions';
 import { restoreOrCreateWindow } from './window';
 import { pluginManager as pluginManager } from './plugin';
@@ -114,9 +114,11 @@ app.whenReady().then(() => {
   });
 });
 
-app.whenReady().then(() => {
-  app.setUserTasks([]);
-});
+if (process.platform === 'win32') {
+  app.whenReady().then(() => {
+    app.setUserTasks([]);
+  });
+}
 
 app.whenReady().then(() => {
   ipcMain.handle('open-directory', (event) => {
