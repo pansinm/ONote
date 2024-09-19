@@ -19,5 +19,5 @@
     },
     "lib": ["ESNext", "dom", "dom.iterable"]
   },
-  "include": ["./packages/preload/contracts.d.ts"]
+  "include": ["./packages/electron/contracts.d.ts"]
 }

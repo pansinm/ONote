@@ -21,6 +21,14 @@ class DiagramRenderer {
   ): Promise<IPCRenderPlantUMLDiagramResponse['payload']> {
     return tunnel.call(IPCMethod.RenderPlantUmlDiagram, { code }) as any;
   }
+
+  renderTysp(uri: string, content: string, type: string) {
+    return tunnel.call(IPCMethod.RenderTysp, {
+      uri,
+      content,
+      type,
+    }) as Promise<string>;
+  }
 }
 
 export default new DiagramRenderer();

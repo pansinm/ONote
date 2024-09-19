@@ -4,6 +4,7 @@ export const IPCNamespaces = {
   DevelopTools: 'DevelopTools',
   Cron: 'Cron',
   PluginManager: 'PluginManager',
+  Typst: 'Typst',
 };
 
 export const EventNames = {

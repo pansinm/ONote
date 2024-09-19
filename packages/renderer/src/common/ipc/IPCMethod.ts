@@ -33,6 +33,7 @@ enum IPCMethod {
    */
   RenderPlantUmlDiagram = 'RenderPlantUmlDiagram',
   RenderGraphvizDiagram = 'RenderGraphvizDiagram',
+  RenderTysp = 'RenderTysp',
 }
 
 export default IPCMethod;

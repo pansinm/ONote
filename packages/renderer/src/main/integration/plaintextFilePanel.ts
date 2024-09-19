@@ -6,3 +6,10 @@ filePanelManager.registerFilePanel({
   languageId: 'plaintext',
   previewer: './previewer.html',
 });
+
+filePanelManager.registerFilePanel({
+  extensions: ['.typ'],
+  editable: true,
+  languageId: 'plaintext',
+  previewer: './previewer.html',
+});

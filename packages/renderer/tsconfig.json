@@ -23,9 +23,9 @@
     "src/**/*.vue",
     "src/**/*.ts",
     "src/**/*.tsx",
+    "global.d.ts",
     "types/**/*.d.ts",
-    "../../types/**/*.d.ts",
-    "../preload/contracts.d.ts"
+    "../../types/**/*.d.ts"
   ],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }
