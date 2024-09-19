@@ -5,13 +5,16 @@ import {
   ipcMain,
   Menu,
   nativeImage,
+  net,
   protocol,
 } from 'electron';
 import * as os from 'os';
+import path from 'path';
 import './security-restrictions';
 import { restoreOrCreateWindow } from './window';
 import { pluginManager as pluginManager } from './plugin';
 import './tunnel';
+import { pathToFileURL } from 'url';
 
 crashReporter.start({ uploadToServer: false });
 
@@ -159,13 +162,19 @@ if (process.env.NODE_ENV === 'production') {
 // });
 
 app.whenReady().then(() => {
-  protocol.interceptFileProtocol('onote', async (request, callback) => {
-    const url = request.url.split('?')[0];
+  protocol.handle('onote', async (request) => {
+    const requestUrl = request.url.split('?')[0];
     try {
-      const localPath = await dataSource.cache(url.replace(/^onote:/, 'file:'));
-      callback({ path: decodeURI(localPath) });
+      const localPath = await dataSource.cache(
+        requestUrl.replace(/^onote:/, 'file:'),
+      );
+      return net.fetch(pathToFileURL(localPath).toString());
     } catch (err) {
-      callback({ statusCode: 500, data: JSON.stringify(err) });
+      console.log('error:', err);
+      return new Response('bad', {
+        status: 404,
+        headers: { 'content-type': 'text/html' },
+      });
     }
   });
 });

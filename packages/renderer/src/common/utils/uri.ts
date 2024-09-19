@@ -33,6 +33,10 @@ export const fileType = (uri: string) => {
     return 'image';
   }
 
+  if (/\.typ$/.test(filename)) {
+    return 'typst';
+  }
+
   return 'unknown';
 };
 
@@ -42,6 +46,10 @@ export const isMarkdown = (uri: string) => {
 
 export const isPlaintext = (uri: string) => {
   return fileType(uri) === 'plaintext';
+};
+
+export const isTypst = (uri: string) => {
+  return fileType(uri) === 'typst';
 };
 
 export const isUnSupport = (uri: string) => {

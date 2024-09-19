@@ -131,6 +131,11 @@ mainFrame.onNewTunnel((tunnel) => {
     },
   );
 
+  tunnel.handle(IPCMethod.RenderTysp, async (payload) => {
+    const { uri, content, type } = payload;
+    return window.onote.typst.invoke('compile', uri, content, type);
+  });
+
   tunnel.on(
     IPCMethod.PreviewerScrollChangedEvent,
     (payload: IPCPreviewerScrollChangedEvent['payload']) => {

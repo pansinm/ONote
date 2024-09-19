@@ -1,8 +1,5 @@
-import type { Root, Content, Parent } from 'mdast';
-import { definitions } from 'mdast-util-definitions';
-import { visit } from 'unist-util-visit';
 import handlersManager from './handlers/manager';
-import React, { ReactFragment } from 'react';
+import React from 'react';
 import type { Node } from 'unist';
 import type { ICtx } from './types';
 
@@ -21,7 +18,7 @@ export function renderChildren(node: Node & { children?: any[] }, ctx: ICtx) {
     return null;
   }
   return (node.children as Node[]).map((n, index) => {
-    const node = render(n, ctx);
-    return <React.Fragment key={index}>{node}</React.Fragment>;
+    const ele = render(n, ctx) as React.ReactNode;
+    return <React.Fragment key={index}>{ele}</React.Fragment>;
   });
 }

@@ -5,9 +5,11 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 const pkg = require('./package.json');
 
-const externals = Object.keys(pkg.dependencies || {}).reduce((prev, name) => {
+let externals = Object.keys(pkg.dependencies || {}).reduce((prev, name) => {
+  if (name === 'typst') return prev;
   return Object.assign(prev, { [name]: 'commonjs ' + name });
 }, {});
+externals = [{ electron: 'commonjs electron', ...externals }];
 
 console.log(externals);
 /**
@@ -29,22 +31,29 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.[jt]sx?$/,
+
         loader: 'swc-loader',
-        exclude: /node_modules/,
+        // exclude: {
+        //   and: [/node_modules/, { not: /typst/ }],
+        // },
         options: {
+          module: {
+            type: 'commonjs',
+          },
           jsc: {
             parser: {
               syntax: 'typescript',
-              tsx: true,
+              // tsx: true,
             },
+            target: 'es2019',
           },
         },
       },
     ],
   },
   externalsPresets: { node: true, electron: true },
-  externals: [nodeExternals(), { electron: 'commonjs electron', ...externals }],
+  externals,
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {

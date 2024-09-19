@@ -11,6 +11,7 @@ import setting from '../setting';
 import DevelopToolsHandler from './handlers/DevelopToolsHandler';
 import PluginManagerHandler from './handlers/PluginManagerHandler';
 import CronHandler from './handlers/CronHandler';
+import TypstHandler from './handlers/TypstHandler';
 
 /**
  * 处理渲染进程事件
@@ -44,4 +45,5 @@ export function startIpcServer() {
   ipcServer.register(IPCNamespaces.DevelopTools, DevelopToolsHandler);
   ipcServer.register(IPCNamespaces.PluginManager, PluginManagerHandler);
   ipcServer.register(IPCNamespaces.Cron, CronHandler);
+  ipcServer.register(IPCNamespaces.Typst, TypstHandler);
 }
