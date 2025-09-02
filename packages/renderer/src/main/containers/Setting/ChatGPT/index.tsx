@@ -4,9 +4,11 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
   CHATGPT_MESSAGE_CLASS_STARTS_WITH,
-  CHATGPT_URL,
+  LLM_BASE_URL,
   EDITOR_FONT_FAMILY,
   EDITOR_MODE,
+  LLM_MODEL_NAME,
+  LLM_API_KEY,
 } from '/@/common/constants/SettingKey';
 import stores from '/@/main/stores';
 
@@ -21,31 +23,40 @@ const useStyles = makeStyles({
 
 const ChatGPT = observer(function EditorPanel() {
   const styles = useStyles();
-  const url = stores.settingStore.settings[CHATGPT_URL] as string;
+  const baseUrl = stores.settingStore.settings[LLM_BASE_URL] as string;
+  const modelName = stores.settingStore.settings[LLM_MODEL_NAME] as string;
+  const apiKey = stores.settingStore.settings[LLM_API_KEY] as string;
   const cls = stores.settingStore.settings[
     CHATGPT_MESSAGE_CLASS_STARTS_WITH
   ] as string;
 
   return (
     <div>
-      <Field className={styles.input} label="ChatGPT URL">
+      <Field className={styles.input} label="LLM BASE URL">
         <Input
-          placeholder="右侧侧边栏会打开该页面"
-          defaultValue={url}
+          placeholder="BASE URL"
+          defaultValue={baseUrl}
           onChange={(e) =>
-            stores.settingStore.update(CHATGPT_URL, e.target.value)
+            stores.settingStore.update(LLM_BASE_URL, e.target.value)
           }
         ></Input>
       </Field>
-      <Field className={styles.input} label="消息 Class">
+      <Field className={styles.input} label="MODEL NAME">
         <Input
-          placeholder="用于定位插入按钮，一键回填到编辑器"
-          defaultValue={cls}
+          placeholder="MODEL NAME"
+          defaultValue={modelName}
           onChange={(e) =>
-            stores.settingStore.update(
-              CHATGPT_MESSAGE_CLASS_STARTS_WITH,
-              e.target.value,
-            )
+            stores.settingStore.update(LLM_MODEL_NAME, e.target.value)
+          }
+        />
+      </Field>
+      <Field className={styles.input} label="API KEY">
+        <Input
+          type="password"
+          placeholder="API Key"
+          defaultValue={apiKey}
+          onChange={(e) =>
+            stores.settingStore.update(LLM_API_KEY, e.target.value)
           }
         />
       </Field>
