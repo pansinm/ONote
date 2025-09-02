@@ -6,6 +6,7 @@ import { sendToMain } from './ipc';
 import { findWindow, getPageUrl } from './utils';
 import { injectJs } from './frames';
 import { injectScript, isChatBox } from '../chatbox';
+import setting from '../setting';
 
 async function injectPluginJs(frame: WebFrameMain) {
   const plugins = Object.values(pluginManager.getPlugins());
@@ -95,9 +96,18 @@ async function createWindow(type: 'main' | 'previewer') {
         .then(() => {
           return injectPluginJs(frame);
         });
+      frame?.executeJavaScript(
+        `window.__settings = ${JSON.stringify(setting.getAll())}`,
+      );
       if (isChatBox(frame)) {
         injectScript(frame);
       }
+      frame?.executeJavaScript(
+        `(()=>{
+          const event = new Event('onote:ready');
+          window.dispatchEvent(event)}
+        )()`,
+      );
     },
   );
   /**

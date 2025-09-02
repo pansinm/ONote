@@ -4,7 +4,7 @@ import Flex from '/@/components/Flex';
 import Icon from '/@/components/Icon';
 import { observer } from 'mobx-react-lite';
 import stores from '/@/main/stores';
-import { CHATGPT_URL } from '/@/common/constants/SettingKey';
+import { LLM_BASE_URL } from '/@/common/constants/SettingKey';
 
 function Toolbar() {
   const toggleChatBox = () => {
@@ -12,7 +12,7 @@ function Toolbar() {
     if (shown) {
       stores.layoutStore.hideSidebar();
     } else {
-      const url = stores.settingStore.settings[CHATGPT_URL] as string;
+      const url = './llmbox.html';
       if (url) {
         stores.layoutStore.showSidebar(url);
       } else {

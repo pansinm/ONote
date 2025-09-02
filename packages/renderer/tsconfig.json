@@ -16,7 +16,8 @@
     "paths": {
       "/@/*": ["./src/*"]
     },
-    "lib": ["ESNext", "dom", "dom.iterable", "WebWorker"]
+    "lib": ["ESNext", "dom", "dom.iterable", "WebWorker"],
+    "types": ["@testing-library/jest-dom"]
   },
 
   "include": [

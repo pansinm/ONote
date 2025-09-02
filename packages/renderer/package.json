@@ -18,6 +18,42 @@
     "watch": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" node scripts/watch.js",
     "lint": "eslint . --ext js,ts,tsx"
   },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-dom"
+    ],
+    "moduleNameMapper": {
+      "^/@/(.*)$": "<rootDir>/src/$1"
+    },
+    "modulePaths": [
+      "<rootDir>/src"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!react-markdown|mdast-util-definitions|monaco-editor)"
+    ],
+    "testEnvironment": "jsdom",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "extensionsToTreatAsEsm": [
+      ".ts",
+      ".tsx"
+    ],
+    "globals": {
+      "ts-jest": {
+        "useESM": true,
+        "tsconfig": "./tsconfig.json"
+      }
+    }
+  },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
@@ -40,6 +76,8 @@
     "@sinm/react-file-tree": "^1.0.2",
     "@swc/core": "^1.3.76",
     "@swc/jest": "^0.2.24",
+    "openai": "^5.5.1",
+    "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^13.4.0",
     "@types/color-hash": "*",
     "@types/default-gateway": "^3.0.1",
@@ -64,6 +102,7 @@
     "@types/ssh2": "^1.11.5",
     "@types/ssh2-sftp-client": "^7.1.0",
     "@types/tar": "^6.1.3",
+    "@types/testing-library__jest-dom": "^5.14.7",
     "@types/uuid": "^8.3.4",
     "@types/yaml": "^1.9.7",
     "@typescript-eslint/eslint-plugin": "5.12.0",
@@ -95,6 +134,7 @@
     "magic-string": "^0.26.7",
     "mdast": "^3.0.0",
     "mdast-util-definitions": "^6.0.0",
+    "mdast-util-from-markdown": "^2.0.0",
     "mdast-util-math": "^3.0.0",
     "mermaid": "^9.2.2",
     "mime-types": "^2.1.35",
@@ -119,6 +159,7 @@
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.5",
     "react-error-boundary": "^3.1.4",
+    "react-markdown": "^10.1.0",
     "react-modal": "^3.14.4",
     "react-qr-code": "^2.0.11",
     "react-test-renderer": "^17.0.2",
@@ -146,10 +187,13 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.3.3",
     "unified": "^11.0.4",
+    "unist-util-stringify-position": "^4.0.0",
     "webpack": "5.74.0",
     "webpack-cli": "4.10.0",
     "webpack-dev-server": "^4.15.1",
     "webpack-node-externals": "^3.0.0",
+    "@ai-sdk/openai": "^1.3.22",
+    "ai": "^4.3.16",
     "yaml": "^1.10.2"
   },
   "resolutions": {
