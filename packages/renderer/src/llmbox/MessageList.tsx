@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { Message } from './types';
 import MessageItem from './MessageItem';
 import styles from './MessageList.module.scss';
@@ -9,6 +9,13 @@ interface MessageListProps {
 }
 
 const MessageList: React.FC<MessageListProps> = ({ messages, isLoading }) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // 自动滚动到底部
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
+
   return (
     <div className={styles.messageList}>
       {messages.map((message) => (
@@ -23,6 +30,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading }) => {
           </div>
         </div>
       )}
+      <div ref={messagesEndRef} />
     </div>
   );
 };
