@@ -76,6 +76,7 @@ interface Message {
   role: 'user' | 'assistant';
   timestamp: Date;
   imageUrls?: string[]; // 图片URL数组
+  isStreaming?: boolean; // 是否为流式消息
 }
 ```
 

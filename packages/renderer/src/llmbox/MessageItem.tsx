@@ -29,8 +29,17 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
             ))}
           </div>
         )}
-        <div className={styles.textContent}>{message.content}</div>
-        <div className={styles.timestamp}>{formatTime(message.timestamp)}</div>
+        <div className={styles.textContent}>
+          {message.content}
+          {message.isStreaming && (
+            <span className={styles.streamingCursor}>▊</span>
+          )}
+        </div>
+        {!message.isStreaming && (
+          <div className={styles.timestamp}>
+            {formatTime(message.timestamp)}
+          </div>
+        )}
       </div>
     </div>
   );

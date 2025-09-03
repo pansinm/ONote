@@ -4,12 +4,14 @@ export interface Message {
   role: 'user' | 'assistant';
   timestamp: Date;
   imageUrls?: string[];
+  isStreaming?: boolean;
 }
 
 export interface ChatState {
   messages: Message[];
   isLoading: boolean;
   error: string | null;
+  streamingMessageId?: string;
 }
 
 export interface LLMBoxProps {

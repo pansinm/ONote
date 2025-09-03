@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { Message, ChatState } from './types';
+import { uuid } from '../common/tunnel/utils';
 
 interface UseLLMChatOptions {
   apiKey?: string;
@@ -12,17 +13,44 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
     messages: [],
     isLoading: false,
     error: null,
+    streamingMessageId: undefined,
   });
 
   const addMessage = useCallback((message: Omit<Message, 'id'>) => {
     const newMessage: Message = {
       ...message,
-      id: Date.now().toString(),
+      id: uuid('message-'),
     };
 
     setChatState((prev) => ({
       ...prev,
       messages: [...prev.messages, newMessage],
+    }));
+
+    return newMessage.id;
+  }, []);
+
+  const updateStreamingMessage = useCallback(
+    (messageId: string, content: string) => {
+      setChatState((prev) => ({
+        ...prev,
+        messages: prev.messages.map((msg) =>
+          msg.id === messageId
+            ? { ...msg, content: msg.content + content, isStreaming: true }
+            : msg,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const completeStreamingMessage = useCallback((messageId: string) => {
+    setChatState((prev) => ({
+      ...prev,
+      messages: prev.messages.map((msg) =>
+        msg.id === messageId ? { ...msg, isStreaming: false } : msg,
+      ),
+      streamingMessageId: undefined,
     }));
   }, []);
 
@@ -43,7 +71,7 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
         imageUrls,
       };
 
-      addMessage(userMessage);
+      const userMessageId = addMessage(userMessage);
 
       setChatState((prev) => ({
         ...prev,
@@ -52,6 +80,21 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
       }));
 
       try {
+        // 创建助理消息占位符
+        const assistantMessage: Omit<Message, 'id'> = {
+          content: '',
+          role: 'assistant',
+          timestamp: new Date(),
+          isStreaming: true,
+        };
+
+        const assistantMessageId = addMessage(assistantMessage);
+
+        setChatState((prev) => ({
+          ...prev,
+          streamingMessageId: assistantMessageId,
+        }));
+
         const response = await fetch(
           options.apiBase || 'https://api.openai.com/v1/chat/completions',
           {
@@ -68,7 +111,7 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
                   content: content,
                 },
               ],
-              stream: false,
+              stream: true, // 启用流式响应
             }),
           },
         );
@@ -81,20 +124,82 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
           );
         }
 
-        const data = await response.json();
-        const assistantMessage: Omit<Message, 'id'> = {
-          content: data.choices[0]?.message?.content || '没有收到回复',
-          role: 'assistant',
-          timestamp: new Date(),
-        };
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
 
-        addMessage(assistantMessage);
+        if (reader) {
+          try {
+            let isReading = true;
+            while (isReading) {
+              const { done, value } = await reader.read();
+              if (done) {
+                isReading = false;
+                break;
+              }
+
+              // 解码并添加到缓冲区
+              buffer += decoder.decode(value, { stream: true });
+
+              // 处理完整的行
+              const lines = buffer.split('\n');
+              buffer = lines.pop() || ''; // 保留未完成的行
+
+              for (const line of lines) {
+                if (line.trim() === '') continue;
+                if (line.trim() === 'data: [DONE]') continue;
+
+                if (line.startsWith('data: ')) {
+                  try {
+                    const jsonData = line.slice(6); // 移除 'data: ' 前缀
+                    const data = JSON.parse(jsonData);
+                    const content = data.choices[0]?.delta?.content;
+
+                    if (content) {
+                      updateStreamingMessage(assistantMessageId, content);
+                    }
+                  } catch (e) {
+                    console.warn('Failed to parse SSE data:', line, e);
+                  }
+                }
+              }
+            }
+
+            // 处理缓冲区中剩余的数据
+            if (buffer.trim() !== '') {
+              if (buffer.startsWith('data: ')) {
+                try {
+                  const jsonData = buffer.slice(6);
+                  const data = JSON.parse(jsonData);
+                  const content = data.choices[0]?.delta?.content;
+
+                  if (content) {
+                    updateStreamingMessage(assistantMessageId, content);
+                  }
+                } catch (e) {
+                  console.warn('Failed to parse remaining buffer:', buffer, e);
+                }
+              }
+            }
+          } finally {
+            reader.releaseLock();
+          }
+        }
+
+        completeStreamingMessage(assistantMessageId);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : '发送消息失败';
         setChatState((prev) => ({
           ...prev,
           error: errorMessage,
+          streamingMessageId: undefined,
+        }));
+
+        // 移除流式消息占位符
+        setChatState((prev) => ({
+          ...prev,
+          messages: prev.messages.filter((msg) => msg.isStreaming !== true),
         }));
       } finally {
         setChatState((prev) => ({
@@ -103,7 +208,14 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
         }));
       }
     },
-    [options.apiKey, options.model, options.apiBase, addMessage],
+    [
+      options.apiKey,
+      options.model,
+      options.apiBase,
+      addMessage,
+      updateStreamingMessage,
+      completeStreamingMessage,
+    ],
   );
 
   const clearMessages = useCallback(() => {
@@ -111,6 +223,7 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
       ...prev,
       messages: [],
       error: null,
+      streamingMessageId: undefined,
     }));
   }, []);
 
@@ -120,5 +233,6 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
     error: chatState.error,
     sendMessage,
     clearMessages,
+    streamingMessageId: chatState.streamingMessageId,
   };
 };
