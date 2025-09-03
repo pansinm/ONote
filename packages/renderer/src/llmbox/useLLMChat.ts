@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { Message, ChatState } from './types';
 import { uuid } from '../common/tunnel/utils';
+import { useLatest } from 'react-use';
 
 interface UseLLMChatOptions {
   apiKey?: string;
@@ -8,13 +9,47 @@ interface UseLLMChatOptions {
   apiBase?: string;
 }
 
+function buildSystemMessage(note: string, selection: string) {
+  const prompt = `
+请担任专业的笔记助手，基于用户提供的笔记上下文，对其**选中的内容**进行精准操作。
+
+## 笔记全文
+<markdown>
+${note}
+</markdown>
+
+## 选中内容
+<markdown>
+${selection}
+</markdown>
+
+## 指令
+请根据上述“选中内容”，并结合“笔记全文”的上下文，执行以下任务：
+1.  **核心任务**：直接对选中内容进行【用户在此处描述具体需求，例如：解释、总结、扩写、翻译、查找关联概念等】。
+2.  **输出要求**：
+    *   **聚焦**：回答需紧密围绕选中内容，无需复述或概括全文。
+    *   **简洁**：语言精炼，条理清晰，避免冗长的引言和结尾。
+    *   **准确**：确保信息正确，不引入笔记上下文外的无关信息。
+    *   **格式**：请使用恰当的Markdown格式（如列表、加粗、代码块等）来组织你的回答，使其易于阅读。
+
+`.trim();
+
+  return {
+    role: 'system',
+    content: prompt,
+  };
+}
+
 export const useLLMChat = (options: UseLLMChatOptions = {}) => {
   const [chatState, setChatState] = useState<ChatState>({
     messages: [],
     isLoading: false,
     error: null,
+    selection: '',
     streamingMessageId: undefined,
   });
+
+  const latestState = useLatest(chatState);
 
   const addMessage = useCallback((message: Omit<Message, 'id'>) => {
     const newMessage: Message = {
@@ -39,6 +74,17 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
             ? { ...msg, content: msg.content + content, isStreaming: true }
             : msg,
         ),
+      }));
+    },
+    [],
+  );
+
+  const updateEditorContent = useCallback(
+    (content: string, selection: string) => {
+      setChatState((prev) => ({
+        ...prev,
+        note: content,
+        selection,
       }));
     },
     [],
@@ -80,6 +126,7 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
       }));
 
       try {
+        const history = [...latestState.current.messages];
         // 创建助理消息占位符
         const assistantMessage: Omit<Message, 'id'> = {
           content: '',
@@ -106,6 +153,14 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
             body: JSON.stringify({
               model: options.model || 'gpt-3.5-turbo',
               messages: [
+                {
+                  role: 'system',
+                  content: buildSystemMessage(
+                    latestState.current.note || '',
+                    latestState.current.selection || '',
+                  ),
+                },
+                ...history,
                 {
                   role: 'user',
                   content: content,
@@ -213,6 +268,7 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
       options.model,
       options.apiBase,
       addMessage,
+      updateEditorContent,
       updateStreamingMessage,
       completeStreamingMessage,
     ],
@@ -226,11 +282,13 @@ export const useLLMChat = (options: UseLLMChatOptions = {}) => {
       streamingMessageId: undefined,
     }));
   }, []);
-
+  // console.log(chatState.selection);
   return {
     messages: chatState.messages,
+    selection: chatState.selection || '',
     isLoading: chatState.isLoading,
     error: chatState.error,
+    updateEditorContent,
     sendMessage,
     clearMessages,
     streamingMessageId: chatState.streamingMessageId,

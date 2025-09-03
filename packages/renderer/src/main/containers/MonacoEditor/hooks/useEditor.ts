@@ -7,6 +7,11 @@ import {
 } from '/@/common/constants/SettingKey';
 import stores from '/@/main/stores';
 import _ from 'lodash';
+import eventbus from '../../../eventbus/eventbus';
+import {
+  EDITOR_CONTENT_CHANGED,
+  EDITOR_SELECTION_CHANGED,
+} from '/@/main/eventbus/EventName';
 
 /**
  * 创建editor实例
@@ -50,8 +55,28 @@ function useEditor() {
       autoClosingBrackets: 'always',
       autoClosingQuotes: 'always',
     });
+    const selectionDisposer = editor.onDidChangeCursorSelection((e) => {
+      const selection = editor.getSelection();
+      if (selection) {
+        const content = editor.getModel()?.getValueInRange(selection);
+        eventbus.emit(EDITOR_SELECTION_CHANGED, {
+          uri: editor.getModel()?.uri.toString(),
+          content: editor.getValue(),
+          selection: content || '',
+        });
+      }
+    });
+    const modelChangeDisposer = editor.onDidChangeModelContent(() => {
+      const content = editor.getValue();
+      eventbus.emit(EDITOR_CONTENT_CHANGED, {
+        uri: editor.getModel()?.uri.toString(),
+        content,
+      });
+    });
     setEditor(editor);
     return () => {
+      selectionDisposer.dispose();
+      modelChangeDisposer.dispose();
       editor.dispose();
     };
   }, []);

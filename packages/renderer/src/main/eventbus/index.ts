@@ -1,12 +1,4 @@
-import { EventEmitter } from 'events';
+import eventbus from './eventbus';
+import { subscription } from './subscription';
 
-const eventbus = new EventEmitter();
-
-window.addEventListener('message', (ev) => {
-  const { channel, payload, meta } = ev.data || {};
-  if (channel && !['request', 'response'].includes(meta?.type)) {
-    eventbus.emit(channel, payload, meta);
-  }
-});
-
-export default eventbus;
+export { eventbus, subscription };

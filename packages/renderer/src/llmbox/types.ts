@@ -12,6 +12,8 @@ export interface ChatState {
   isLoading: boolean;
   error: string | null;
   streamingMessageId?: string;
+  note?: string;
+  selection?: string;
 }
 
 export interface LLMBoxProps {

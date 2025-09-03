@@ -7,20 +7,39 @@ import {
   LLM_BASE_URL,
   LLM_MODEL_NAME,
 } from '../common/constants/SettingKey';
+import { createChannel } from 'bidc';
+import {
+  EDITOR_CONTENT_CHANGED,
+  EDITOR_SELECTION_CHANGED,
+} from '../main/eventbus/EventName';
+
+const { send, receive } = createChannel('MAIN_FRAME-LLM_BOX');
 
 const MyChatComponent: React.FC = () => {
   const settings = (window as any).__settings;
-  const { messages, isLoading, error, sendMessage } = useLLMChat({
-    apiKey: settings[LLM_API_KEY], // 必填
-    model: settings[LLM_MODEL_NAME], // 可选，默认为gpt-3.5-turbo
-    apiBase: `${settings[LLM_BASE_URL]}/chat/completions`, // 可选，支持自定义API端点
-  });
+  const { messages, isLoading, error, sendMessage, updateEditorContent } =
+    useLLMChat({
+      apiKey: settings[LLM_API_KEY], // 必填
+      model: settings[LLM_MODEL_NAME], // 可选，默认为gpt-3.5-turbo
+      apiBase: `${settings[LLM_BASE_URL]}/chat/completions`, // 可选，支持自定义API端点
+    });
 
   useEffect(() => {
     if (error) {
       alert(error);
     }
   }, [error]);
+
+  useEffect(() => {
+    receive(async ({ type, data }: any) => {
+      if (
+        type === EDITOR_SELECTION_CHANGED ||
+        type === EDITOR_CONTENT_CHANGED
+      ) {
+        updateEditorContent(data?.content || '', data?.selection || '');
+      }
+    });
+  }, [updateEditorContent]);
 
   return (
     <div style={{ height: '100vh' }}>
