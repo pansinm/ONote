@@ -1,17 +1,23 @@
 import React, { useState, useRef, useCallback } from 'react';
 import styles from './InputArea.module.scss';
-import { useLLMChat } from './useLLMChat';
+import { observer } from 'mobx-react-lite';
 
 interface InputAreaProps {
   onSendMessage: (content: string, imageUrls?: string[]) => Promise<void>;
   isLoading: boolean;
+  selection?: string;
 }
 
-const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
+const InputArea: React.FC<InputAreaProps> = ({
+  onSendMessage,
+  isLoading,
+  selection,
+}) => {
   const [inputValue, setInputValue] = useState('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { selection } = useLLMChat();
+
+  console.log(selection);
 
   const handleSend = useCallback(async () => {
     if ((!inputValue.trim() && imageUrls.length === 0) || isLoading) return;
@@ -91,18 +97,7 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
       {/* 显示引用内容区域 */}
       {selection && (
         <div className={styles.selectionContainer}>
-          <div className={styles.selectionHeader}>
-            <span>引用内容</span>
-            <button
-              onClick={() => {
-                /* TODO: 实现清除选择功能 */
-              }}
-              className={styles.clearSelection}
-            >
-              ×
-            </button>
-          </div>
-          <div className={styles.selectionContent}>{selection}</div>
+          <pre className={styles.selectionContent}>{selection}</pre>
         </div>
       )}
 
@@ -167,4 +162,4 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
   );
 };
 
-export default InputArea;
+export default observer(InputArea);

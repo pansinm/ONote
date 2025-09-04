@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { observer } from 'mobx-react-lite';
 import type { Message } from './types';
 import MessageList from './MessageList';
 import styles from './ChatArea.module.scss';
@@ -41,4 +42,4 @@ const ChatArea: React.FC<ChatAreaProps> = ({ messages, isLoading }) => {
   );
 };
 
-export default ChatArea;
+export default observer(ChatArea);
