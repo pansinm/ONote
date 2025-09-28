@@ -68,6 +68,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
   const previewerUri = panel?.previewer;
   const layout = stores.layoutStore.layout;
 
+  const showEditorOnly = layout === 'editor-only' || !previewerUri;
   const editorContainerRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -92,8 +93,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               style={{
                 maxWidth: '100%',
                 overflow: 'hidden',
-                width:
-                  layout === 'editor-only' ? '100%' : 'var(--editor-width)',
+                width: showEditorOnly ? '100%' : 'var(--editor-width)',
                 position: 'relative',
                 display:
                   panel?.editable && layout !== 'previewer-only'
@@ -105,7 +105,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
                 needLoad={/\.mdx?$/.test(props.uri)}
                 uri={props.uri}
               />
-              {layout !== 'editor-only' && (
+              {showEditorOnly && (
                 <DragBar
                   onStart={() => setDragging(true)}
                   onStop={(delta) => {
@@ -119,8 +119,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               style={{
                 flex: 1,
                 position: 'relative',
-                display:
-                  previewerUri && layout !== 'editor-only' ? 'flex' : 'none',
+                display: showEditorOnly ? 'flex' : 'none',
               }}
             >
               <Previewer previewerUri={previewerUri} />
