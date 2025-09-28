@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { observer } from 'mobx-react-lite';
 import type { Message } from './types';
 import styles from './MessageItem.module.scss';
 import Markdown from 'react-markdown';
@@ -74,4 +75,4 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
   );
 };
 
-export default MessageItem;
+export default observer(MessageItem);

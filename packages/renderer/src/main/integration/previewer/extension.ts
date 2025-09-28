@@ -3,7 +3,7 @@ import * as monaco from 'monaco-editor';
 import IPCMethod from '/@/common/ipc/IPCMethod';
 import stores from '../../stores';
 import state from './state';
-import eventbus from '../../eventbus';
+import eventbus from '../../eventbus/eventbus';
 import { FILE_CONTENT_CHANGED } from '../../eventbus/EventName';
 
 function broadcastToPreviewer(channel: string, payload: any) {

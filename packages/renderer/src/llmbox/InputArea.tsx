@@ -1,19 +1,26 @@
 import React, { useState, useRef, useCallback } from 'react';
 import styles from './InputArea.module.scss';
+import { observer } from 'mobx-react-lite';
 
 interface InputAreaProps {
   onSendMessage: (content: string, imageUrls?: string[]) => Promise<void>;
   isLoading: boolean;
+  selection?: string;
 }
 
-const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
+const InputArea: React.FC<InputAreaProps> = ({
+  onSendMessage,
+  isLoading,
+  selection,
+}) => {
   const [inputValue, setInputValue] = useState('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  console.log(selection);
+
   const handleSend = useCallback(async () => {
     if ((!inputValue.trim() && imageUrls.length === 0) || isLoading) return;
-
     try {
       await onSendMessage(
         inputValue.trim(),
@@ -39,7 +46,6 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     const items = e.clipboardData?.items;
     if (!items) return;
-
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       if (item.type.startsWith('image/')) {
@@ -57,7 +63,6 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
     const imageFiles = files.filter((file) => file.type.startsWith('image/'));
-
     if (imageFiles.length > 0) {
       const newUrls = imageFiles.map((file) => URL.createObjectURL(file));
       setImageUrls((prev) => [...prev, ...newUrls]);
@@ -68,7 +73,6 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
       if (!files) return;
-
       const imageFiles = Array.from(files).filter((file) =>
         file.type.startsWith('image/'),
       );
@@ -87,8 +91,16 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
     });
   }, []);
 
+  // console.log('-->', selection);
   return (
     <div className={styles.inputArea}>
+      {/* 显示引用内容区域 */}
+      {selection && (
+        <div className={styles.selectionContainer}>
+          <pre className={styles.selectionContent}>{selection}</pre>
+        </div>
+      )}
+
       {imageUrls.length > 0 && (
         <div className={styles.imagePreviews}>
           {imageUrls.map((url, index) => (
@@ -105,7 +117,6 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
           ))}
         </div>
       )}
-
       <div className={styles.inputContainer}>
         <textarea
           value={inputValue}
@@ -118,25 +129,23 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
           className={styles.textInput}
           rows={1}
         />
-
         <div className={styles.actions}>
           <input
-            ref={fileInputRef}
             type="file"
-            accept="image/*"
-            multiple
+            ref={fileInputRef}
             onChange={handleFileSelect}
             className={styles.fileInput}
+            accept="image/*"
+            multiple
           />
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className={styles.attachButton}
             disabled={isLoading}
+            className={styles.attachButton}
           >
             📎
           </button>
-
           <button
             type="button"
             onClick={handleSend}
@@ -153,4 +162,4 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading }) => {
   );
 };
 
-export default InputArea;
+export default observer(InputArea);

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import * as monaco from 'monaco-editor';
-import eventbus from '../../eventbus';
+import eventbus from '../../eventbus/eventbus';
 import stores from '../../stores';
 import { EDITOR_FILE_SAVE } from '../../eventbus/EventName';
 import { fileType, relative } from '/@/common/utils/uri';

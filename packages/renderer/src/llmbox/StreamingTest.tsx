@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useLLMChat } from './useLLMChat';
+import { observer } from 'mobx-react-lite';
+import { LLMChatStore } from './LLMChatStore';
 import LLMBox from './LLMBox';
 import { verifyStreamingSupport } from './verify-streaming';
 
 // 流式功能测试组件
-export const StreamingTest: React.FC = () => {
-  const { messages, isLoading, error, sendMessage } = useLLMChat({
-    apiKey: process.env.OPENAI_API_KEY || 'test-key', // 从环境变量获取或使用测试密钥
-  });
+export const StreamingTest: React.FC = observer(() => {
+  const [store] = useState(
+    () =>
+      new LLMChatStore({
+        apiKey: process.env.OPENAI_API_KEY || 'test-key', // 从环境变量获取或使用测试密钥
+      }),
+  );
 
   const [testContent, setTestContent] = useState('');
   const [streamingSupported, setStreamingSupported] = useState(false);
@@ -34,7 +38,7 @@ export const StreamingTest: React.FC = () => {
     setTestStatus('发送消息中...');
 
     try {
-      await sendMessage(testContent);
+      await store.sendMessage(testContent);
       setTestStatus('消息发送完成');
     } catch (err) {
       setTestStatus(
@@ -67,9 +71,9 @@ export const StreamingTest: React.FC = () => {
         <button
           onClick={testStreaming}
           style={{ padding: '8px 16px' }}
-          disabled={!streamingSupported || isLoading}
+          disabled={!streamingSupported || store.isLoading}
         >
-          {isLoading ? '发送中...' : '测试流式响应'}
+          {store.isLoading ? '发送中...' : '测试流式响应'}
         </button>
       </div>
 
@@ -81,13 +85,13 @@ export const StreamingTest: React.FC = () => {
         }}
       >
         <LLMBox
-          onSendMessage={sendMessage}
-          messages={messages}
-          isLoading={isLoading}
+          onSendMessage={store.sendMessage}
+          messages={store.messages}
+          isLoading={store.isLoading}
         />
       </div>
 
-      {error && (
+      {store.error && (
         <div
           style={{
             color: 'red',
@@ -96,7 +100,7 @@ export const StreamingTest: React.FC = () => {
             background: '#ffe6e6',
           }}
         >
-          错误: {error}
+          错误: {store.error}
         </div>
       )}
 
@@ -118,6 +122,6 @@ export const StreamingTest: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
 export default StreamingTest;
