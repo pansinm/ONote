@@ -1,10 +1,21 @@
 import { filePanelManager } from '../frame';
 
 filePanelManager.registerFilePanel({
-  extensions: ['.gitignore', '.lock', '.json', '.txt'],
+  extensions: [
+    '.gitignore',
+    '.lock',
+    '.json',
+    '.txt',
+    '.js',
+    '.jsx',
+    '.ts',
+    '.tsx',
+    '.log',
+    '.html',
+  ],
   editable: true,
   languageId: 'plaintext',
-  previewer: './previewer.html',
+  previewer: undefined,
 });
 
 filePanelManager.registerFilePanel({

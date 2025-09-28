@@ -1,6 +1,6 @@
 import * as monaco from 'monaco-editor';
 import { EDITOR_FILE_SAVE } from '../../eventbus/EventName';
-import emitter from '../../eventbus';
+import emitter from '../../eventbus/eventbus';
 import { getFenceContent, isInFence } from '../utils';
 
 function forMindMap(

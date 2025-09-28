@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { observer } from 'mobx-react-lite';
 import type { Message } from './types';
 import MessageItem from './MessageItem';
 import styles from './MessageList.module.scss';
@@ -35,4 +36,4 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading }) => {
   );
 };
 
-export default MessageList;
+export default observer(MessageList);

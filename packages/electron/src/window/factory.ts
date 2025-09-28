@@ -67,7 +67,7 @@ async function createWindow(type: 'main' | 'previewer') {
     if (
       details.frame === details.initiator &&
       details.initiator?.name === 'previewer' &&
-      details.frame.url !== details.initiator.url
+      details.frame?.url !== details.initiator.url
     ) {
       details.preventDefault();
       shell.openExternal(details.url);

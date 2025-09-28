@@ -4,7 +4,7 @@
 import './monaco';
 import React from 'react';
 import '../styles/utils.scss';
-import './index.scss';
+import '../styles/index.scss';
 import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 
 import { createRoot } from 'react-dom/client';

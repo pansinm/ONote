@@ -12,6 +12,7 @@ import { filePanelManager } from '../../frame';
 import { isEquals, isMarkdown } from '/@/common/utils/uri';
 import Toolbar from './Toolbar';
 import stores from '../../stores';
+import LLMBoxFrame from '../LLMBox/LLMBoxFrame';
 
 function handleDrag(delta: number) {
   const editorContainerEle = document.querySelector('.editor-container')!;
@@ -146,16 +147,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
                 display: stores.layoutStore.sidebarShown ? 'block' : 'none',
               }}
             >
-              <iframe
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 0,
-                  height: '100%',
-                  width: '100%',
-                }}
-                src={stores.layoutStore.sidebarUrl}
-              />
+              <LLMBoxFrame />
             </div>
           )}
         </Flex>

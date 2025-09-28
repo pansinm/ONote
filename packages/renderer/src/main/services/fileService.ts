@@ -1,7 +1,7 @@
 import type { TreeNode } from '@sinm/react-file-tree';
 import { sortTreeNodes } from '/@/common/utils/treeNode';
 import { FILE_CONTENT_CHANGED } from '../eventbus/EventName';
-import eventbus from '../eventbus';
+import eventbus from '../eventbus/eventbus';
 
 const dataSource = window.onote.dataSource;
 

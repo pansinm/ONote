@@ -16,7 +16,7 @@ function Toolbar() {
       if (url) {
         stores.layoutStore.showSidebar(url);
       } else {
-        alert('先在设置里面配置ChatGPT');
+        alert('先在设置里面配置LLM API URL');
       }
     }
   };
