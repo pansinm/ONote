@@ -1,13 +1,9 @@
 /**
- * ONote 统一日志系统
+ * ONote 统一日志系统（浏览器版本）
  *
- * 基于 electron-log 实现跨进程的统一日志管理
- * 提供日志级别控制、格式化输出、文件记录等功能
+ * 为渲染进程提供轻量级日志系统
+ * 不依赖 Node.js 模块，使用 console API
  */
-
-
-
-
 
 /**
  * 日志级别
@@ -25,24 +21,14 @@ export enum LogLevel {
 export interface LoggerConfig {
   level: LogLevel;
   format?: boolean;
-  fileOptions?: {
-    logPath?: string;
-    maxSize?: number;
-    fileLevel?: LogLevel;
-  };
 }
 
 /**
  * 默认配置
  */
 const defaultConfig: LoggerConfig = {
-  level: process.env.NODE_ENV === 'production' ? LogLevel.INFO : LogLevel.DEBUG,
+  level: (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') ? LogLevel.INFO : LogLevel.DEBUG,
   format: true,
-  fileOptions: {
-    logPath: 'onote.log',
-    maxSize: 10 * 1024 * 1024, // 10MB
-    fileLevel: LogLevel.INFO,
-  },
 };
 
 /**
@@ -102,7 +88,6 @@ class Logger {
   debug(message: string, ...args: any[]): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       const formatted = this.formatMessage(LogLevel.DEBUG, message, ...args);
-      log.debug(formatted);
       if (currentConfig.format) {
         console.debug(formatted);
       }
@@ -115,7 +100,6 @@ class Logger {
   info(message: string, ...args: any[]): void {
     if (this.shouldLog(LogLevel.INFO)) {
       const formatted = this.formatMessage(LogLevel.INFO, message, ...args);
-      log.info(formatted);
       if (currentConfig.format) {
         console.info(formatted);
       }
@@ -128,7 +112,6 @@ class Logger {
   warn(message: string, ...args: any[]): void {
     if (this.shouldLog(LogLevel.WARN)) {
       const formatted = this.formatMessage(LogLevel.WARN, message, ...args);
-      log.warn(formatted);
       if (currentConfig.format) {
         console.warn(formatted);
       }
@@ -160,7 +143,6 @@ class Logger {
         formatted += `\n  ${formattedArgs}`;
       }
 
-      log.error(formatted);
       if (currentConfig.format) {
         console.error(formatted);
       }
@@ -186,20 +168,6 @@ const defaultLogger = new Logger();
  */
 export function configureLogger(config: Partial<LoggerConfig>): void {
   currentConfig = { ...currentConfig, ...config };
-
-  // 配置 electron-log
-  if (currentConfig.fileOptions) {
-    log.transports.file.level = currentConfig.fileOptions.fileLevel || LogLevel.INFO;
-    log.transports.file.maxSize = currentConfig.fileOptions.maxSize || 10485760;
-
-    if (currentConfig.fileOptions.logPath) {
-      log.transports.file.resolvePathFn = () => currentConfig.fileOptions!.logPath!;
-    }
-  }
-
-  // 设置控制台日志级别
-  log.transports.console.level = currentConfig.level;
-
   defaultLogger.info('Logger configured', { level: currentConfig.level });
 }
 
@@ -233,13 +201,13 @@ export function initLogger(config?: Partial<LoggerConfig>): void {
   }
 
   // 捕获全局错误
-  if (typeof process !== 'undefined') {
-    process.on('uncaughtException', (error) => {
-      logger.error('Uncaught Exception', error);
+  if (typeof window !== 'undefined') {
+    window.addEventListener('error', (event) => {
+      logger.error('Uncaught Error', event.error);
     });
 
-    process.on('unhandledRejection', (reason, promise) => {
-      logger.error('Unhandled Rejection', reason, { promise });
+    window.addEventListener('unhandledrejection', (event) => {
+      logger.error('Unhandled Rejection', event.reason);
     });
   }
 
