@@ -4,7 +4,7 @@ import './index.scss';
 import App from './components/App';
 import '/@/common/emoji/emoji.scss';
 import './integration';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('Previewer');
 

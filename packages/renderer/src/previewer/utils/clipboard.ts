@@ -1,7 +1,7 @@
 import html2canvas from 'html2canvas';
 import { base64Unicode } from './crypto';
 import clipboardService from '/@/common/services/clipboardService';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('ClipboardUtils');
 

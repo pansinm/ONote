@@ -15,7 +15,7 @@ import { restoreOrCreateWindow } from './window';
 import { pluginManager as pluginManager } from './plugin';
 import './tunnel';
 import { pathToFileURL } from 'url';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('Main');
 

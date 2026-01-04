@@ -2,7 +2,7 @@ import type { Server } from 'http';
 import setting from '../setting';
 
 import app from './app';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('Server');
 

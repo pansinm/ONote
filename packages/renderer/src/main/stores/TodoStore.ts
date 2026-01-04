@@ -5,7 +5,7 @@ import { makeAutoObservable, reaction } from 'mobx';
 import fileService from '../services/fileService';
 import { getFileName } from '@sinm/react-file-tree/lib/utils';
 import _ from 'lodash';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('TodoStore');
 

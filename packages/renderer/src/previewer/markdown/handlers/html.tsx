@@ -6,7 +6,7 @@ import { resolveAssetUri } from './util/uri';
 import { createLineClass } from './util/position';
 import type { ICtx } from '../types';
 import { isVoidElement, parseStyle } from './util/dom';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('HtmlHandler');
 

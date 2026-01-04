@@ -1,7 +1,7 @@
 import { app, shell } from 'electron';
 import { URL } from 'url';
 import { sendToMain } from './window/ipc';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('SecurityRestrictions');
 

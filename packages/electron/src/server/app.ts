@@ -8,7 +8,7 @@ import fs from 'fs/promises';
 import { sendToMain } from '../window/ipc';
 import * as dsWebDav from './webdav';
 import { dataSource } from '../dataSource';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('ServerApp');
 const upload = multer({ dest: os.tmpdir() });

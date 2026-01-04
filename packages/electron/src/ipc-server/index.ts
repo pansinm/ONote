@@ -12,7 +12,7 @@ import DevelopToolsHandler from './handlers/DevelopToolsHandler';
 import PluginManagerHandler from './handlers/PluginManagerHandler';
 import CronHandler from './handlers/CronHandler';
 import TypstHandler from './handlers/TypstHandler';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('IPCServer');
 

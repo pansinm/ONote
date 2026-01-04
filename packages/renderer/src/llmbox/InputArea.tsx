@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import styles from './InputArea.module.scss';
 import { observer } from 'mobx-react-lite';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('InputArea');
 

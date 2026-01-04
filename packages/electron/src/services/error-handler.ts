@@ -5,8 +5,8 @@
  */
 
 import { app, BrowserWindow, dialog } from 'electron';
-import { AppError, ErrorCode, ErrorSeverity, wrapError } from 'shared/errors';
-import { getLogger } from 'shared/logger';
+import { AppError, ErrorCode, ErrorSeverity, wrapError } from '/@/shared/errors';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('ErrorHandler');
 

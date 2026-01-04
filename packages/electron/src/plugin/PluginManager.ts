@@ -13,7 +13,7 @@ import { getMainFrame, getPreviewerFrames, injectJs } from '../window/frames';
 import { webContents } from 'electron';
 import { waitEvent } from '../utils/event';
 import type EventEmitter from 'events';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('PluginManager');
 

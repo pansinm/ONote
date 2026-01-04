@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 import settingService from '../services/settingService';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('SettingStore');
 

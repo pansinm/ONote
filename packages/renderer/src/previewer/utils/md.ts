@@ -1,7 +1,7 @@
 import type { Content, Root } from 'mdast';
 import editor from '../ipc/editor';
 import { stringify } from '/@/common/markdown';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('MarkdownUtils');
 

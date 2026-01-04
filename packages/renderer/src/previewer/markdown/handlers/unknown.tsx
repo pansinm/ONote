@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Node } from 'unist';
 import { createLineClass } from './util/position';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('UnknownNodeHandler');
 

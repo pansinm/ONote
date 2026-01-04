@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction, toJS } from 'mobx';
 import type { Message, ChatState } from './types';
 import { uuid } from '../common/tunnel/utils';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('LLMChatStore');
 

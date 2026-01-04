@@ -12,7 +12,7 @@ import { stringify as stringifyToml } from '@iarna/toml';
 import { stringify, traverse } from '/@/common/markdown';
 import Icon from '/@/components/Icon';
 import BatchApply from '../../editor/BatchApply';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('RootHandler');
 

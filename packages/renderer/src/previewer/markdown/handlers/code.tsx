@@ -9,7 +9,7 @@ import Icon from '/@/components/Icon';
 import lineBreak from '@sinm/prism-line-break';
 import { copyElementAsImage } from '../../utils/clipboard';
 import { useMeasure, useSize } from 'react-use';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('CodeHandler');
 

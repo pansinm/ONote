@@ -8,7 +8,7 @@ import stores from './stores';
 import EventBus from './containers/EventBus';
 import DragBar from '../components/DragBar';
 import Page from './containers/Page';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 const logger = getLogger('App');

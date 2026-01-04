@@ -5,8 +5,8 @@
  */
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AppError, wrapError } from 'shared/errors';
-import { getLogger } from 'shared/logger';
+import { AppError, wrapError } from '/@/shared/errors';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('ErrorBoundary');
 

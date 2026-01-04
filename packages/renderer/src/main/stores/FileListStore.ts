@@ -4,7 +4,7 @@ import fileService from '../services/fileService';
 import type ActivationStore from './ActivationStore';
 import { isEquals } from '/@/common/utils/uri';
 import _ from 'lodash';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('FileListStore');
 

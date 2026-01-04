@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import { getLogger } from 'shared/logger';
+import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('IPCClient');
 
