@@ -1,6 +1,9 @@
 import type { Content, Root } from 'mdast';
 import editor from '../ipc/editor';
 import { stringify } from '/@/common/markdown';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('MarkdownUtils');
 
 export function replaceNode(
   fileUri: string,
@@ -15,7 +18,7 @@ export function replaceNode(
       index > 0 ? new Array(start.column - 1).fill(' ').join('') + line : line,
     )
     .join('\n');
-  console.log(node, after);
+  logger.debug('Replacing node', { node, after });
   editor.insertText(
     fileUri,
     {

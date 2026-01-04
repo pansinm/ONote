@@ -1,6 +1,9 @@
 import { makeAutoObservable, runInAction, toJS } from 'mobx';
 import type { Message, ChatState } from './types';
 import { uuid } from '../common/tunnel/utils';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('LLMChatStore');
 
 interface LLMChatStoreOptions {
   apiKey?: string;
@@ -143,7 +146,7 @@ export class LLMChatStore implements ChatState {
           content: content,
         },
       ];
-      console.log(messages);
+      logger.debug('Sending messages to LLM', { messageCount: messages.length });
       const response = await fetch(
         this.options.apiBase || 'https://api.openai.com/v1/chat/completions',
         {
@@ -202,7 +205,7 @@ export class LLMChatStore implements ChatState {
                     this.updateStreamingMessage(assistantMessageId, content);
                   }
                 } catch (e) {
-                  console.warn('Failed to parse SSE data:', line, e);
+                  logger.warn('Failed to parse SSE data', e, { line });
                 }
               }
             }
@@ -220,7 +223,7 @@ export class LLMChatStore implements ChatState {
                   this.updateStreamingMessage(assistantMessageId, content);
                 }
               } catch (e) {
-                console.warn('Failed to parse remaining buffer:', buffer, e);
+                logger.warn('Failed to parse remaining buffer', e, { buffer });
               }
             }
           }

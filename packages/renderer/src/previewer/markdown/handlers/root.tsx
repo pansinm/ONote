@@ -12,6 +12,9 @@ import { stringify as stringifyToml } from '@iarna/toml';
 import { stringify, traverse } from '/@/common/markdown';
 import Icon from '/@/components/Icon';
 import BatchApply from '../../editor/BatchApply';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('RootHandler');
 
 function renderFootDefinitions(ctx: any) {
   if (!ctx.footnoteOrder.length) {
@@ -135,7 +138,7 @@ function CommentDrawer({ ctx }: { ctx: ICtx }) {
   }, []);
 
   useClickAway(ref, (event) => {
-    console.log(event);
+    logger.debug('Click away detected', { event });
     if (isOpen) setIsOpen(false);
   });
 

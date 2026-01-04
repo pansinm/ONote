@@ -1,6 +1,9 @@
 import { app, shell } from 'electron';
 import { URL } from 'url';
 import { sendToMain } from './window/ipc';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('SecurityRestrictions');
 
 /**
  * List of origins that you allow open INSIDE the application and permissions for each of them.
@@ -78,7 +81,7 @@ app.on('web-contents-created', (_, contents) => {
    * @see https://www.electronjs.org/docs/latest/tutorial/security#13-disable-or-limit-navigation
    */
   contents.on('will-navigate', (event, url) => {
-    console.log(event, url);
+    logger.debug('Will navigate', { url });
     const { protocol, origin } = new URL(url);
     if (protocol === 'file:') {
       return;
@@ -91,7 +94,7 @@ app.on('web-contents-created', (_, contents) => {
     event.preventDefault();
 
     if (process.env.NODE_ENV === 'development') {
-      console.warn('Blocked navigating to an unallowed origin:', origin);
+      logger.warn('Blocked navigating to unallowed origin', { origin });
     }
   });
 
@@ -110,9 +113,7 @@ app.on('web-contents-created', (_, contents) => {
       callback(permissionGranted);
 
       if (!permissionGranted && process.env.NODE_ENV === 'development') {
-        console.warn(
-          `${origin} requested permission for '${permission}', but was blocked.`,
-        );
+        logger.warn('Blocked permission request', { origin, permission });
       }
     },
   );
@@ -134,10 +135,10 @@ app.on('web-contents-created', (_, contents) => {
     if (ALLOWED_EXTERNAL_ORIGINS.has(origin)) {
       // Open default browser
       shell.openExternal(url).catch((err) => {
-        console.error(`打开 ${url} 失败`, err);
+        logger.error('Failed to open external URL', err, { url });
       });
     } else if (process.env.NODE_ENV === 'development') {
-      console.warn('Blocked the opening of an unallowed origin:', origin);
+      logger.warn('Blocked opening external URL', { origin });
     }
 
     // Prevent creating new window in application
@@ -155,9 +156,7 @@ app.on('web-contents-created', (_, contents) => {
     const { origin } = new URL(params.src);
     if (!ALLOWED_ORIGINS_AND_PERMISSIONS.has(origin)) {
       if (process.env.NODE_ENV === 'development') {
-        console.warn(
-          `A webview tried to attach ${params.src}, but was blocked.`,
-        );
+        logger.warn('Blocked webview attachment', { src: params.src });
       }
 
       event.preventDefault();

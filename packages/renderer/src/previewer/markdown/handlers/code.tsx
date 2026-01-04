@@ -9,6 +9,9 @@ import Icon from '/@/components/Icon';
 import lineBreak from '@sinm/prism-line-break';
 import { copyElementAsImage } from '../../utils/clipboard';
 import { useMeasure, useSize } from 'react-use';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('CodeHandler');
 
 interface CodeProps {
   lang?: string;
@@ -24,7 +27,7 @@ export const Code = React.forwardRef<HTMLPreElement, CodeBlockProps>(
     useEffect(() => {
       setEle(codeRef.current!);
     });
-    console.log(width);
+    logger.debug('Code block width', { width });
     useEffect(() => {
       if (codeRef.current) {
         Prism.highlightElement(codeRef.current, false, () => {

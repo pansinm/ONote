@@ -1,4 +1,7 @@
 import { ipcRenderer } from 'electron';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('IPCClient');
 
 type PickMethods<T> = {
   // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
@@ -12,7 +15,7 @@ class IPCClient<T> {
     method: TP,
     ...args: Parameters<TM[TP]>
   ): Promise<Awaited<ReturnType<TM[TP]>>> => {
-    console.log('invoke method', this.namespace, method);
+    logger.debug('IPC invoke', { namespace: this.namespace, method });
     try {
       return await ipcRenderer.invoke(
         `${this.namespace}.${method as string}`,

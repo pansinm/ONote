@@ -1,5 +1,8 @@
 import { makeAutoObservable } from 'mobx';
 import settingService from '../services/settingService';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('SettingStore');
 
 class SettingStore {
   settings: Record<string, unknown> = {};
@@ -7,10 +10,11 @@ class SettingStore {
   constructor() {
     settingService.getAll().then((settings) => {
       this.settings = settings;
+      logger.info('Settings loaded', { count: Object.keys(settings).length });
     });
 
     settingService.on('changed', (data) => {
-      console.log(data);
+      logger.debug('Settings changed', data);
       this.replace(data.all);
     });
     makeAutoObservable(this);

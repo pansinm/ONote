@@ -6,6 +6,9 @@ import { resolveAssetUri } from './util/uri';
 import { createLineClass } from './util/position';
 import type { ICtx } from '../types';
 import { isVoidElement, parseStyle } from './util/dom';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('HtmlHandler');
 
 export function parseDom(text: string) {
   const dom = document.createElement('div');
@@ -77,7 +80,7 @@ export default function html(node: HTML, ctx: ICtx) {
     });
     return <ErrorBoundary fallback={<>{node.value}</>}>{child}</ErrorBoundary>;
   } catch (err) {
-    console.error(err);
+    logger.error('Failed to parse HTML', err);
     return node.value;
   }
 }

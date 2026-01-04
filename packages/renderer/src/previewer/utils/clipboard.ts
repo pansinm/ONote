@@ -1,6 +1,9 @@
 import html2canvas from 'html2canvas';
 import { base64Unicode } from './crypto';
 import clipboardService from '/@/common/services/clipboardService';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('ClipboardUtils');
 
 export function copyElementAsImage(ele: HTMLElement) {
   const newPre = ele.cloneNode(true) as HTMLPreElement;
@@ -77,7 +80,7 @@ export function renderImage(imageUrl: string): Promise<Blob | null> {
       });
     };
     img.onerror = (err) => {
-      console.log(err);
+      logger.error('Failed to load image', err, { imageUrl });
       reject(err);
     };
     img.src = imageUrl;

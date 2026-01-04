@@ -1,6 +1,9 @@
 import React, { useState, useRef, useCallback } from 'react';
 import styles from './InputArea.module.scss';
 import { observer } from 'mobx-react-lite';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('InputArea');
 
 interface InputAreaProps {
   onSendMessage: (content: string, imageUrls?: string[]) => Promise<void>;
@@ -17,7 +20,7 @@ const InputArea: React.FC<InputAreaProps> = ({
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  console.log(selection);
+  logger.debug('InputArea rendered', { selection });
 
   const handleSend = useCallback(async () => {
     if ((!inputValue.trim() && imageUrls.length === 0) || isLoading) return;
@@ -29,7 +32,7 @@ const InputArea: React.FC<InputAreaProps> = ({
       setInputValue('');
       setImageUrls([]);
     } catch (error) {
-      console.error('Failed to send message:', error);
+      logger.error('Failed to send message', error);
     }
   }, [inputValue, imageUrls, isLoading, onSendMessage]);
 

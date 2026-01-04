@@ -13,6 +13,9 @@ import { getMainFrame, getPreviewerFrames, injectJs } from '../window/frames';
 import { webContents } from 'electron';
 import { waitEvent } from '../utils/event';
 import type EventEmitter from 'events';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('PluginManager');
 
 const ONOTE_ROOT = path.join(os.homedir(), 'onote');
 export const PLUGIN_ROOT = path.join(ONOTE_ROOT, 'plugins');
@@ -119,7 +122,7 @@ class PluginManager {
         homepage: pkg.homepage || pkg.repository,
       };
     } catch (err) {
-      console.error('extract error', err);
+      logger.error('extract error', err);
       throw err;
     } finally {
       fs.rm(tmpDir, { recursive: true }).catch(() => 0);
@@ -128,9 +131,9 @@ class PluginManager {
 
   async install(urlOrPath: string) {
     try {
-      console.log('downloading', urlOrPath);
+      logger.info('downloading', urlOrPath);
       const tgzPath = await this.wget(urlOrPath);
-      console.log('extracting', tgzPath);
+      logger.info('extracting', tgzPath);
       const plugin = await this.extract(tgzPath);
       this.updateConfig((prev) => {
         prev.plugins = Object.assign({}, prev.plugins, {
@@ -146,10 +149,10 @@ class PluginManager {
         downloadUrl: urlOrPath,
         state: 'installed',
       };
-      console.log('loading', plugin.name);
+      logger.info('loading', plugin.name);
       await this.load(this.plugins[plugin.name]);
     } catch (err) {
-      console.error(urlOrPath, err);
+      logger.error(urlOrPath, err);
       throw err;
     }
   }
@@ -195,9 +198,9 @@ class PluginManager {
       try {
         const { setup } = require(plugin.backendJs);
         this.disposers[plugin.name] = setup(onote);
-        console.log(`plugin ${plugin.name} load success`, plugin.installDir);
+        logger.info(`plugin ${plugin.name} load success`, plugin.installDir);
       } catch (err) {
-        console.error(
+        logger.error(
           `plugin ${plugin.name} load failed`,
           plugin.installDir,
           err,

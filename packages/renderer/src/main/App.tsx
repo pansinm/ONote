@@ -8,6 +8,10 @@ import stores from './stores';
 import EventBus from './containers/EventBus';
 import DragBar from '../components/DragBar';
 import Page from './containers/Page';
+import { getLogger } from 'shared/logger';
+import ErrorBoundary from '../components/ErrorBoundary';
+
+const logger = getLogger('App');
 
 function handleSidebarDrag(delta: number) {
   const sidebarEle = document.querySelector('.sidebar')!;
@@ -23,19 +27,25 @@ function handleSidebarDrag(delta: number) {
 
 const App: FC = observer(() => {
   return (
-    <div className={styles.App}>
-      <div
-        className="fill-height sidebar"
-        style={{
-          display: stores.activationStore.hideSidebar ? 'none' : 'block',
-        }}
-      >
-        <Sidebar />
-        <DragBar onStart={console.log} onStop={handleSidebarDrag} />
+    <ErrorBoundary
+      onError={(error) => {
+        logger.error('App component error', error);
+      }}
+    >
+      <div className={styles.App}>
+        <div
+          className="fill-height sidebar"
+          style={{
+            display: stores.activationStore.hideSidebar ? 'none' : 'block',
+          }}
+        >
+          <Sidebar />
+          <DragBar onStart={() => logger.debug('Drag started')} onStop={handleSidebarDrag} />
+        </div>
+        <Page />
+        <EventBus />
       </div>
-      <Page />
-      <EventBus />
-    </div>
+    </ErrorBoundary>
   );
 });
 

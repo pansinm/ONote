@@ -4,6 +4,9 @@ import fileService from '../services/fileService';
 import type ActivationStore from './ActivationStore';
 import { isEquals } from '/@/common/utils/uri';
 import _ from 'lodash';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('FileListStore');
 
 class FileListStore {
   _files: TreeNode[] = [];
@@ -23,7 +26,7 @@ class FileListStore {
       case 'time-desc':
         return _.orderBy(this._files, 'mtime', 'asc');
       default:
-        console.log('sorter', this.sorter, this._files);
+        logger.warn('Unknown sorter', { sorter: this.sorter, fileCount: this._files.length });
         return this._files;
     }
   }

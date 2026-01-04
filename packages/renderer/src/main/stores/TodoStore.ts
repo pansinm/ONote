@@ -5,6 +5,9 @@ import { makeAutoObservable, reaction } from 'mobx';
 import fileService from '../services/fileService';
 import { getFileName } from '@sinm/react-file-tree/lib/utils';
 import _ from 'lodash';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('TodoStore');
 
 export interface ITag {
   name: string;
@@ -37,7 +40,7 @@ class TodoStore {
   private async startJob() {
     const cronId = await window.onote.cron.invoke('startJob', '0 0 9,13 * * *');
     window.onote.cron.addListener('ticked', ({ id }: { id: number }) => {
-      console.log('ticked:', cronId, id);
+      logger.debug('Cron ticked', { cronId, id });
       if (cronId === id) {
         this.notify();
       }
@@ -48,7 +51,7 @@ class TodoStore {
     const tasks = Object.values(this.tasksById).filter(
       (item) => !item.done && item.dueDate,
     );
-    console.log(JSON.stringify(tasks));
+    logger.debug('Due tasks checked', { count: tasks.length });
     const now = new Date();
     const dueTasks = tasks.filter((item) => {
       const due = new Date(item.dueDate!);

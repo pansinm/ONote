@@ -8,6 +8,9 @@ import fs from 'fs/promises';
 import { sendToMain } from '../window/ipc';
 import * as dsWebDav from './webdav';
 import { dataSource } from '../dataSource';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('ServerApp');
 const upload = multer({ dest: os.tmpdir() });
 
 const app = express();
@@ -69,7 +72,7 @@ app.use('/mobile', (req, res, next) => {
 
 const useWebdav = webdav.extensions.express('/', webdavServer);
 app.use((req, res, next) => {
-  console.log(req.method, req.headers);
+  logger.debug('HTTP request', { method: req.method, url: req.url });
   next();
 });
 app.use((req, res, next) => {

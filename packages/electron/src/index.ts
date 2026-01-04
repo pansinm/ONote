@@ -15,6 +15,9 @@ import { restoreOrCreateWindow } from './window';
 import { pluginManager as pluginManager } from './plugin';
 import './tunnel';
 import { pathToFileURL } from 'url';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('Main');
 
 crashReporter.start({ uploadToServer: false });
 
@@ -22,6 +25,7 @@ import './server';
 import { startIpcServer } from './ipc-server';
 import { dataSource } from './dataSource';
 import { createTrayIcon } from './tray';
+import './services/error-handler'; // 初始化错误处理器
 
 /**
  * Prevent multiple instances
@@ -108,7 +112,7 @@ app
   .then(() => startIpcServer())
   .then(() => restoreOrCreateWindow('main'))
   .then(() => pluginManager.loadAll())
-  .catch((e) => console.error('Failed create window:', e));
+  .catch((e) => logger.error('Failed create window', e));
 
 app.whenReady().then(() => {
   const tray = createTrayIcon();
@@ -143,7 +147,7 @@ if (process.env.NODE_ENV === 'development') {
         },
       }),
     )
-    .catch((e) => console.error('Failed install extension:', e));
+    .catch((e) => logger.error('Failed install extension', e));
 }
 
 /**
@@ -154,7 +158,7 @@ if (process.env.NODE_ENV === 'production') {
     .whenReady()
     .then(() => import('electron-updater'))
     .then(({ autoUpdater }) => autoUpdater.checkForUpdatesAndNotify())
-    .catch((e) => console.error('Failed check updates:', e));
+    .catch((e) => logger.error('Failed check updates', e));
 }
 
 // app.on('renderer-process-crashed', (event, webContents, kill) => {
@@ -170,7 +174,7 @@ app.whenReady().then(() => {
       );
       return net.fetch(pathToFileURL(localPath).toString());
     } catch (err) {
-      console.log('error:', err);
+      logger.error('Failed to load onote protocol resource', err);
       return new Response('bad', {
         status: 404,
         headers: { 'content-type': 'text/html' },

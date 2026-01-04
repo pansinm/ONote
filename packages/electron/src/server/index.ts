@@ -2,6 +2,9 @@ import type { Server } from 'http';
 import setting from '../setting';
 
 import app from './app';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('Server');
 
 let server: Server | undefined;
 
@@ -11,14 +14,14 @@ function getPort() {
 
 export function start(port: string) {
   server?.close(() => {
-    console.log('server closed');
+    logger.info('Server closed');
   });
   server = app.listen(port);
 }
 
 export function stop() {
   server?.close(() => {
-    console.log('server closed');
+    logger.info('Server stopped');
   });
 }
 

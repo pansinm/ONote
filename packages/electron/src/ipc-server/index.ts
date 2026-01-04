@@ -12,6 +12,9 @@ import DevelopToolsHandler from './handlers/DevelopToolsHandler';
 import PluginManagerHandler from './handlers/PluginManagerHandler';
 import CronHandler from './handlers/CronHandler';
 import TypstHandler from './handlers/TypstHandler';
+import { getLogger } from 'shared/logger';
+
+const logger = getLogger('IPCServer');
 
 /**
  * 处理渲染进程事件
@@ -39,11 +42,12 @@ function startSetting() {
 }
 
 export function startIpcServer() {
-  console.log('start ipc server');
+  logger.info('Starting IPC server');
   startDataSource();
   startSetting();
   ipcServer.register(IPCNamespaces.DevelopTools, DevelopToolsHandler);
   ipcServer.register(IPCNamespaces.PluginManager, PluginManagerHandler);
   ipcServer.register(IPCNamespaces.Cron, CronHandler);
   ipcServer.register(IPCNamespaces.Typst, TypstHandler);
+  logger.info('IPC server started');
 }
