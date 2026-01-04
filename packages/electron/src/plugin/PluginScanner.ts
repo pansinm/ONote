@@ -1,6 +1,9 @@
 import fs from 'fs/promises';
-import type { IPlugin } from './type';
 import path from 'path';
+import { getLogger } from '/@/shared/logger';
+import type { IPlugin } from './type';
+
+const logger = getLogger('PluginScanner');
 
 class PluginScanner {
   pluginsDir: string;
@@ -16,7 +19,7 @@ class PluginScanner {
       const { plugins: plugins } = JSON.parse(pkg);
       return plugins;
     } catch (err) {
-      console.error('scan error', err);
+      logger.error('Failed to scan plugins', err);
       return {};
     }
   }

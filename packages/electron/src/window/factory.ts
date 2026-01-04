@@ -7,6 +7,9 @@ import { findWindow, getPageUrl } from './utils';
 import { injectJs } from './frames';
 import { injectScript, isChatBox } from '../chatbox';
 import setting from '../setting';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('WindowFactory');
 
 async function injectPluginJs(frame: WebFrameMain) {
   const plugins = Object.values(pluginManager.getPlugins());
@@ -18,7 +21,7 @@ async function injectPluginJs(frame: WebFrameMain) {
     try {
       await injectJs(frame, isMainFrame ? plugin.mainJs : plugin.previewerJs);
     } catch (err) {
-      console.warn('load js failed', err);
+      logger.warn('Failed to load plugin JS', err);
     }
   }
 }
@@ -56,11 +59,11 @@ async function createWindow(type: 'main' | 'previewer') {
   browserWindow.setIcon(icon);
 
   browserWindow.webContents.on('render-process-gone', (e, detail) => {
-    console.log(e, detail);
+    logger.warn('Render process gone', { event: e, detail });
   });
 
   browserWindow.webContents.on('destroyed', () => {
-    console.log('destroy');
+    logger.debug('Window destroyed');
   });
 
   browserWindow.webContents.on('will-frame-navigate', (details) => {
