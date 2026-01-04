@@ -4,7 +4,7 @@
     "target": "esnext",
     "sourceMap": false,
     "moduleResolution": "Node",
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "strict": true,
     "jsx": "react",
     "isolatedModules": true,
@@ -15,9 +15,19 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "/@/*": ["./src/*"]
+      "/@/*": ["packages/electron/src/*", "packages/renderer/src/*"],
+      "@/*": ["packages/electron/src/*", "packages/renderer/src/*"],
+      "/@/shared/*": ["packages/shared/src/*"],
+      "@/shared/*": ["packages/shared/src/*"]
     },
-    "lib": ["ESNext", "dom", "dom.iterable"]
+    "lib": ["ESNext", "dom", "dom.iterable"],
+    // 改进的类型检查选项（逐步启用）
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["./packages/electron/contracts.d.ts"]
+  "include": ["packages/*/src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.d.ts"]
 }

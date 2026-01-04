@@ -1,7 +1,11 @@
 import { ipcRenderer } from 'electron';
-import { getLogger } from '/@/shared/logger';
 
-const logger = getLogger('IPCClient');
+// Preload 脚本中不使用 logger，避免引入 electron-log 等主进程模块
+const debugLog = (...args: any[]) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.debug('[IPCClient]', ...args);
+  }
+};
 
 type PickMethods<T> = {
   // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
@@ -15,7 +19,7 @@ class IPCClient<T> {
     method: TP,
     ...args: Parameters<TM[TP]>
   ): Promise<Awaited<ReturnType<TM[TP]>>> => {
-    logger.debug('IPC invoke', { namespace: this.namespace, method });
+    debugLog('IPC invoke', { namespace: this.namespace, method });
     try {
       return await ipcRenderer.invoke(
         `${this.namespace}.${method as string}`,
