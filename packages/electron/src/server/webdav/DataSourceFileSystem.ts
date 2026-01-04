@@ -7,6 +7,9 @@ import os from 'os';
 import Path from 'path';
 import _ from 'lodash';
 import { dataSource } from '/@/dataSource';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('WebDAVFileSystem');
 
 function getDataSource() {
   return dataSource;
@@ -93,7 +96,7 @@ export class FileSystem extends webdav.FileSystem {
 
     const stream = fs.createWriteStream(tmp);
     stream.on('finish', async () => {
-      console.log('write', path);
+      logger.debug('write', path);
       getDataSource()
         .write(resolveUri(validPath), await fs.promises.readFile(tmp))
         .catch(console.error);

@@ -6,13 +6,16 @@
 
 import dotenv from 'dotenv';
 import path from 'path';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('EnvConfig');
 
 // 加载 .env 文件
 const envPath = path.join(process.cwd(), '.env');
 const result = dotenv.config({ path: envPath });
 
 if (result.error) {
-  console.warn('Warning: .env file not found or invalid, using defaults');
+  logger.warn('.env file not found or invalid, using defaults');
 }
 
 /**
@@ -120,7 +123,7 @@ function getEnv<T>(
   try {
     return validator(value);
   } catch (error) {
-    console.warn(`Warning: Invalid ${key}, using default: ${defaultValue}`);
+    logger.warn(`Warning: Invalid ${key}, using default: ${defaultValue}`);
     return defaultValue;
   }
 }
@@ -232,7 +235,7 @@ export function validateRequiredConfig(): { valid: boolean; errors: string[] } {
   // 检查 OpenAI 配置（如果使用 LLM 功能）
   // 注意：这里只是警告，不是错误，因为 LLM 功能是可选的
   if (!config.OPENAI_API_KEY) {
-    console.warn('Warning: OPENAI_API_KEY not set, LLM features will be disabled');
+    logger.warn('Warning: OPENAI_API_KEY not set, LLM features will be disabled');
   }
 
   return {

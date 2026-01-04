@@ -10,6 +10,9 @@ import * as fs from 'fs/promises';
 import * as platformPath from 'path';
 import { md5 } from '/@/utils/security';
 import _ from 'lodash';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('SSHDataSourceProvider');
 
 type AuthForm = ConnectConfig;
 
@@ -168,7 +171,7 @@ class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
     try {
       await this.sftp.fastGet(remotePath, localPath);
     } catch (err) {
-      console.log(err, remotePath, localPath, uri);
+      logger.error('Failed to download file via SFTP', err, { remotePath, localPath, uri });
       throw err;
     }
     return localPath;

@@ -11,6 +11,9 @@ import * as platformPath from 'path';
 import _ from 'lodash';
 import HttpClient from './HttpClient';
 import { md5 } from '/@/utils/security';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('GiteeDataSourceProvider');
 
 type AuthForm = { access_token: string };
 
@@ -222,7 +225,7 @@ class GiteeDataSourceProvider implements IDataSourceProvider<AuthForm> {
         'https://gitee.com/api/v5/user/repos?type=owner&sort=full_name&page=1&per_page=100',
       );
       this.rootTreeNode = reposToTreeNode(result);
-      console.log(this.rootTreeNode, Object.keys(result));
+      logger.debug('Root tree node loaded', { node: this.rootTreeNode, keys: Object.keys(result) });
       return this.rootTreeNode!;
     }
     assert(this.rootTreeNode);
@@ -277,7 +280,7 @@ class GiteeDataSourceProvider implements IDataSourceProvider<AuthForm> {
       const buffer = await this.getContent(uri);
       await fs.writeFile(localPath, buffer);
     } catch (err) {
-      console.log(err, remotePath, localPath, uri);
+      logger.error('Failed to write file', err, { remotePath, localPath, uri });
       throw err;
     }
     return localPath;
