@@ -99,7 +99,7 @@ export class FileSystem extends webdav.FileSystem {
       logger.debug('write', path);
       getDataSource()
         .write(resolveUri(validPath), await fs.promises.readFile(tmp))
-        .catch(console.error);
+        .catch((err) => logger.error('Failed to write data to source', err));
     });
     callback(undefined, stream);
   }

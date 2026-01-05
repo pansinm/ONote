@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron';
 
-// Preload 脚本中不使用 logger，避免引入 electron-log 等主进程模块
+// Preload 脚本使用简化的日志实现，避免依赖主进程模块
 const debugLog = (...args: any[]) => {
   if (process.env.NODE_ENV === 'development') {
     console.debug('[IPCClient]', ...args);

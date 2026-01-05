@@ -173,10 +173,6 @@ if (process.env.NODE_ENV === 'production') {
     .catch((e) => logger.error('Failed check updates', e));
 }
 
-// app.on('renderer-process-crashed', (event, webContents, kill) => {
-//   console.warn('app:renderer-process-crashed', event, webContents, kill);
-// });
-
 app.whenReady().then(() => {
   protocol.handle('onote', async (request) => {
     const requestUrl = request.url.split('?')[0];
