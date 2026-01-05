@@ -100,150 +100,58 @@ export class LLMChatStore implements ChatState {
     });
   }
 
+  /**
+   * 发送消息到 LLM 并处理流式响应
+   * @param content - 用户消息内容
+   * @param imageUrls - 可选的图片 URL 数组
+   */
   sendMessage = async (content: string, imageUrls?: string[]) => {
-    if (!this.options.apiKey) {
-      runInAction(() => {
-        this.error = 'API密钥未配置';
-      });
-      return;
-    }
-
-    const userMessage: Omit<Message, 'id'> = {
-      content,
-      role: 'user',
-      timestamp: new Date(),
-      imageUrls,
-    };
-
-    const userMessageId = this.addMessage(userMessage);
-
-    runInAction(() => {
-      this.isLoading = true;
-      this.error = null;
-    });
-
     try {
-      // 创建助理消息占位符
+      // 1. 验证请求
+      this.validateRequest();
+
+      // 2. 创建并添加用户消息
+      const userMessage: Omit<Message, 'id'> = {
+        content,
+        role: 'user',
+        timestamp: new Date(),
+        imageUrls,
+      };
+      this.addMessage(userMessage);
+
+      // 3. 更新状态
+      runInAction(() => {
+        this.isLoading = true;
+        this.error = null;
+      });
+
+      // 4. 创建助理消息占位符
       const assistantMessage: Omit<Message, 'id'> = {
         content: '',
         role: 'assistant',
         timestamp: new Date(),
         isStreaming: true,
       };
-
       const assistantMessageId = this.addMessage(assistantMessage);
 
       runInAction(() => {
         this.streamingMessageId = assistantMessageId;
       });
-      const messages = [
-        buildSystemMessage(this.note || '', this.selection || ''),
-        ...this.messages
-          .filter((msg) => msg.id !== assistantMessageId)
-          .map((msg) => toJS(msg)),
-        {
-          role: 'user',
-          content: content,
-        },
-      ];
-      logger.debug('Sending messages to LLM', { messageCount: messages.length });
-      const response = await fetch(
-        this.options.apiBase || 'https://api.openai.com/v1/chat/completions',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.options.apiKey}`,
-          },
-          body: JSON.stringify({
-            model: this.options.model || 'gpt-3.5-turbo',
-            messages: messages,
-            stream: true, // 启用流式响应
-          }),
-        },
-      );
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error?.message || `HTTP error! status: ${response.status}`,
-        );
-      }
+      // 5. 构建并发送请求
+      const messages = this.buildRequestMessages(content, assistantMessageId);
+      const response = await this.callLLMAPI(messages);
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
+      // 6. 处理流式响应
+      await this.processStreamResponse(response, assistantMessageId);
 
-      if (reader) {
-        try {
-          let isReading = true;
-          while (isReading) {
-            const { done, value } = await reader.read();
-            if (done) {
-              isReading = false;
-              break;
-            }
-
-            // 解码并添加到缓冲区
-            buffer += decoder.decode(value, { stream: true });
-
-            // 处理完整的行
-            const lines = buffer.split('\n');
-            buffer = lines.pop() || ''; // 保留未完成的行
-
-            for (const line of lines) {
-              if (line.trim() === '') continue;
-              if (line.trim() === 'data: [DONE]') continue;
-
-              if (line.startsWith('data: ')) {
-                try {
-                  const jsonData = line.slice(6); // 移除 'data: ' 前缀
-                  const data = JSON.parse(jsonData);
-                  const content = data.choices[0]?.delta?.content;
-
-                  if (content) {
-                    this.updateStreamingMessage(assistantMessageId, content);
-                  }
-                } catch (e) {
-                  logger.warn('Failed to parse SSE data', e, { line });
-                }
-              }
-            }
-          }
-
-          // 处理缓冲区中剩余的数据
-          if (buffer.trim() !== '') {
-            if (buffer.startsWith('data: ')) {
-              try {
-                const jsonData = buffer.slice(6);
-                const data = JSON.parse(jsonData);
-                const content = data.choices[0]?.delta?.content;
-
-                if (content) {
-                  this.updateStreamingMessage(assistantMessageId, content);
-                }
-              } catch (e) {
-                logger.warn('Failed to parse remaining buffer', e, { buffer });
-              }
-            }
-          }
-        } finally {
-          reader.releaseLock();
-        }
-      }
-
+      // 7. 完成流式消息
       this.completeStreamingMessage(assistantMessageId);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : '发送消息失败';
-
-      runInAction(() => {
-        this.error = errorMessage;
-        this.streamingMessageId = undefined;
-        // 移除流式消息占位符
-        this.messages = this.messages.filter((msg) => msg.isStreaming !== true);
-      });
+      // 8. 错误处理
+      this.handleSendError(error);
     } finally {
+      // 9. 清理状态
       runInAction(() => {
         this.isLoading = false;
       });
@@ -256,5 +164,174 @@ export class LLMChatStore implements ChatState {
       this.error = null;
       this.streamingMessageId = undefined;
     });
+  }
+
+  /**
+   * 验证发送消息的前置条件
+   * @throws {Error} 当 API Key 未配置时抛出错误
+   */
+  private validateRequest(): void {
+    if (!this.options.apiKey) {
+      runInAction(() => {
+        this.error = 'API密钥未配置';
+      });
+      throw new Error('API密钥未配置');
+    }
+  }
+
+  /**
+   * 构建要发送给 LLM 的消息数组
+   * @param content - 用户消息内容
+   * @param assistantMessageId - 助理消息 ID（需要过滤掉）
+   * @returns 消息数组
+   */
+  private buildRequestMessages(
+    content: string,
+    assistantMessageId: string
+  ): Array<{ role: string; content: string }> {
+    const messages = [
+      buildSystemMessage(this.note || '', this.selection || ''),
+      ...this.messages
+        .filter((msg) => msg.id !== assistantMessageId)
+        .map((msg) => toJS(msg)),
+      {
+        role: 'user',
+        content: content,
+      },
+    ];
+
+    logger.debug('Sending messages to LLM', { messageCount: messages.length });
+    return messages;
+  }
+
+  /**
+   * 调用 LLM API 并返回响应
+   * @param messages - 要发送的消息数组
+   * @returns Fetch Response 对象
+   * @throws {Error} 当 HTTP 请求失败时抛出错误
+   */
+  private async callLLMAPI(
+    messages: Array<{ role: string; content: string }>
+  ): Promise<Response> {
+    const response = await fetch(
+      this.options.apiBase || 'https://api.openai.com/v1/chat/completions',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.options.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: this.options.model || 'gpt-3.5-turbo',
+          messages: messages,
+          stream: true,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.error?.message || `HTTP error! status: ${response.status}`,
+      );
+    }
+
+    return response;
+  }
+
+  /**
+   * 解析 SSE（Server-Sent Events）数据行
+   * @param line - SSE 数据行
+   * @returns 解析后的内容，如果无法解析则返回 null
+   */
+  private parseSSELine(line: string): string | null {
+    if (line.trim() === '' || line.trim() === 'data: [DONE]') {
+      return null;
+    }
+
+    if (!line.startsWith('data: ')) {
+      return null;
+    }
+
+    try {
+      const jsonData = line.slice(6); // 移除 'data: ' 前缀
+      const data = JSON.parse(jsonData);
+      return data.choices[0]?.delta?.content || null;
+    } catch (e) {
+      logger.warn('Failed to parse SSE data', e, { line });
+      return null;
+    }
+  }
+
+  /**
+   * 处理流式响应
+   * @param response - Fetch Response 对象
+   * @param assistantMessageId - 助理消息 ID
+   * @returns Promise，处理完成时 resolve
+   */
+  private async processStreamResponse(
+    response: Response,
+    assistantMessageId: string
+  ): Promise<void> {
+    const reader = response.body?.getReader();
+    if (!reader) {
+      return;
+    }
+
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    try {
+      let isReading = true;
+      while (isReading) {
+        const { done, value } = await reader.read();
+        if (done) {
+          isReading = false;
+          break;
+        }
+
+        // 解码并添加到缓冲区
+        buffer += decoder.decode(value, { stream: true });
+
+        // 处理完整的行
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // 保留未完成的行
+
+        for (const line of lines) {
+          const content = this.parseSSELine(line);
+          if (content) {
+            this.updateStreamingMessage(assistantMessageId, content);
+          }
+        }
+      }
+
+      // 处理缓冲区中剩余的数据
+      if (buffer.trim() !== '') {
+        const content = this.parseSSELine(buffer);
+        if (content) {
+          this.updateStreamingMessage(assistantMessageId, content);
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
+
+  /**
+   * 处理发送消息过程中的错误
+   * @param error - 错误对象
+   */
+  private handleSendError(error: unknown): void {
+    const errorMessage =
+      error instanceof Error ? error.message : '发送消息失败';
+
+    runInAction(() => {
+      this.error = errorMessage;
+      this.streamingMessageId = undefined;
+      // 移除流式消息占位符
+      this.messages = this.messages.filter((msg) => msg.isStreaming !== true);
+    });
+
+    logger.error('Failed to send message', error);
   }
 }
