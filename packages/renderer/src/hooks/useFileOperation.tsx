@@ -23,10 +23,6 @@ function useFileOperation() {
       name = name + '.md';
     }
 
-    const template = await fileService
-      .readText(resolveUri(dirUri + '/', 'template.md'))
-      .catch(() => '');
-
     const fileUri = resolveUri(dirUri + '/', name);
     const node = await fileService
       .create(dirUri, {
@@ -34,8 +30,13 @@ function useFileOperation() {
         uri: fileUri,
       })
       .catch(alertAndThrow);
-    await fileService.writeText(fileUri, template);
+
+    // 只为文件写入模板内容，目录不需要写入
     if (type === 'file') {
+      const template = await fileService
+        .readText(resolveUri(dirUri + '/', 'template.md'))
+        .catch(() => '');
+      await fileService.writeText(fileUri, template);
       await stores.fileListStore.refreshFiles();
       stores.activationStore.activeFile(node.uri);
     }
