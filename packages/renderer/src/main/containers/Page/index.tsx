@@ -33,7 +33,10 @@ const Page = () => {
     <>
       <div className="fill-height file-list">
         <FileList />
-        <DragBar onStart={() => logger.debug('Drag started')} onStop={handleFileListDrag} />
+        <DragBar
+          onStart={() => logger.debug('Drag started')}
+          onStop={handleFileListDrag}
+        />
       </div>
       <View
         flexDirection="column"

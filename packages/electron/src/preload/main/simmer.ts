@@ -15,9 +15,13 @@ import { exposeInMainWorld } from './exposeInMainWorld';
 import { nodeCrypto } from '../common/nodeCrypto';
 import * as defaultGateway from 'default-gateway';
 import { onote } from './onote';
-import { getLogger } from '/@/shared/logger';
 
-const logger = getLogger('Simmer');
+// Preload 脚本中不使用 logger，避免引入 electron-log 等主进程模块
+const debugLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.debug('[Simmer]', ...args);
+  }
+};
 
 // Export for types in contracts.d.ts
 export const simmer = {
@@ -47,7 +51,7 @@ export const simmer = {
   async readBlobsFromClipboard() {
     const uriList = clipboard.read('text/uri-list');
     const uris = uriList.trim().split(/\s+/);
-    logger.debug('Reading blobs from clipboard', { uris });
+    debugLog('Reading blobs from clipboard', { uris });
     return Promise.all(
       uris
         .map((uri) => fileURLToPath(uri))
@@ -92,7 +96,7 @@ export const simmer = {
   },
   async copyImage(content: any, type: 'dataURL' | 'ArrayBuffer') {
     let img: NativeImage;
-    logger.debug('Copying image', { type });
+    debugLog('Copying image', { type });
     if (type === 'dataURL') {
       img = nativeImage.createFromDataURL(content);
     } else {

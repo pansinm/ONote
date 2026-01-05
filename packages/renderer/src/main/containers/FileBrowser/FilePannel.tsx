@@ -119,7 +119,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               style={{
                 flex: 1,
                 position: 'relative',
-                display: showEditorOnly ? 'flex' : 'none',
+                display: showEditorOnly ? 'none' : 'flex',
               }}
             >
               <Previewer previewerUri={previewerUri} />
