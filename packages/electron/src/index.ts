@@ -15,9 +15,21 @@ import { restoreOrCreateWindow } from './window';
 import { pluginManager as pluginManager } from './plugin';
 import './tunnel';
 import { pathToFileURL } from 'url';
-import { getLogger } from '/@/shared/logger';
+import { initLogger, getLogger, LogLevel } from '/@/shared/logger';
+
+// 初始化日志系统
+initLogger({
+  level: LogLevel.INFO,
+  format: true,
+  fileOptions: {
+    maxSize: 10 * 1024 * 1024, // 10MB
+    fileLevel: LogLevel.INFO,
+  },
+});
 
 const logger = getLogger('Main');
+
+logger.info('Application starting');
 
 crashReporter.start({ uploadToServer: false });
 

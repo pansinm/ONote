@@ -7,6 +7,9 @@ import pluginManager from '/@/main/services/pluginManager';
 import { decodeBase64 } from '/@/common/utils/crypto';
 import PluginInstalled from './PluginInstalled';
 import { compare } from 'semver';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('PluginManager');
 
 async function getDefaultRepo(): Promise<Record<string, IPlugin>> {
   const url = await fetch(
@@ -66,8 +69,8 @@ export default function PluginManager() {
           plugins={marketPlugins}
           onInstalled={refetch}
           onUninstalled={() => {
-            console.log('uninstalle---d');
-            refetch().then(console.log);
+            logger.info('Plugin uninstalled');
+            refetch().then((plugins) => logger.debug('Plugins refetched', plugins));
           }}
         />
       )}

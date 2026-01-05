@@ -3,6 +3,9 @@ import * as monaco from 'monaco-editor';
 import fileService from '../../services/fileService';
 import manager from '../manager';
 import clipboardService from '/@/common/services/clipboardService';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('PasteAction');
 
 async function saveAsset(editor: monaco.editor.ICodeEditor, blob: Blob) {
   const uri = editor.getModel()?.uri.toString();
@@ -72,7 +75,7 @@ monaco.editor.registerCommand(
         }
       } catch (err) {
         // ignore
-        console.error(err);
+        logger.error('Failed to paste file', err);
       }
       const blob = await clipboardService.readImage();
       if (blob) {

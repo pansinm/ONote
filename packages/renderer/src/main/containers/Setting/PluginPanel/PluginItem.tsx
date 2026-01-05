@@ -15,6 +15,9 @@ import {
 import { ArrowDownloadRegular, ArrowSyncRegular } from '@fluentui/react-icons';
 import type { IPlugin } from '../../../services/pluginManager';
 import pluginManager from '../../../services/pluginManager';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('PluginItem');
 
 interface PluginItemProps {
   plugin: IPlugin;
@@ -50,7 +53,7 @@ function PluginItem({ plugin, onInstalled, onUninstalled }: PluginItemProps) {
                 onClick={() => {
                   pluginManager
                     .uninstall(plugin.name)
-                    .then(() => console.log('uninstalled', onUninstalled))
+                    .then(() => logger.debug('Plugin uninstalled', { plugin }))
                     .then(() => onUninstalled?.(plugin));
                 }}
               >

@@ -8,6 +8,9 @@ import View from '/@/components/View';
 import DragBar from '/@/components/DragBar';
 import TodoPage from '../TodoPage/TodoPage';
 import { observer } from 'mobx-react-lite';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('Page');
 
 const Page = () => {
   function handleFileListDrag(delta: number) {
@@ -30,7 +33,7 @@ const Page = () => {
     <>
       <div className="fill-height file-list">
         <FileList />
-        <DragBar onStart={console.log} onStop={handleFileListDrag} />
+        <DragBar onStart={() => logger.debug('Drag started')} onStop={handleFileListDrag} />
       </div>
       <View
         flexDirection="column"

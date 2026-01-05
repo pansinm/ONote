@@ -5,6 +5,9 @@ import SSHDirSelect from './SSHDirSelect';
 import type { SSHFormProps } from './SSHForm';
 import SSHForm from './SSHForm';
 import View from '/@/components/View';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('SSHProjectSelect');
 
 interface SSHProjectSelectProps {
   onSelect(uri: string, config: any): void;
@@ -23,7 +26,7 @@ const SSHProjectSelect: FC<SSHProjectSelectProps> = (props) => {
     } catch (err) {
       alert((err as Error).message);
       fileService.connect(providerId, config);
-      console.error(err);
+      logger.error('Failed to connect SSH', err);
     }
   };
 

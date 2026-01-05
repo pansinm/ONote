@@ -19,6 +19,9 @@ import { useLatest } from 'react-use';
 import { isEquals, resolveUri } from '../../../common/utils/uri';
 import { blobToBuffer } from '../../../common/utils/transform';
 import fileService from '../../services/fileService';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('FileList');
 
 const MENU_ID = 'NOTE_MENU';
 
@@ -157,14 +160,14 @@ const FileList: FC = observer(() => {
               .then(() => {
                 stores.fileListStore.refreshFiles();
               })
-              .catch(console.log);
+              .catch((error) => logger.error('Failed to write file', error));
           }
         }
       });
     } else {
       // Use DataTransfer interface to access the file(s)
       [...ev.dataTransfer.files].forEach((file, i) => {
-        console.log(`… file[${i}].name = ${file.name}`);
+        logger.debug('Dropped file', { index: i, fileName: file.name });
       });
     }
   };

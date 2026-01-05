@@ -1,5 +1,8 @@
 import type { MutableRefObject } from 'react';
 import { useEffect, useState } from 'react';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('SelectionToolbarConfig');
 
 function closest(
   node: Node | null,
@@ -30,7 +33,7 @@ export function useSelectionToolbarConfig() {
     };
     const setPos = (event: MouseEvent) => {
       const selection = window.getSelection();
-      console.log(selection);
+      logger.debug('Selection changed', { selection: selection?.toString() });
       if (selection?.isCollapsed) {
         return;
       }

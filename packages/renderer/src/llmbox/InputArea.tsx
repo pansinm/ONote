@@ -94,7 +94,6 @@ const InputArea: React.FC<InputAreaProps> = ({
     });
   }, []);
 
-  // console.log('-->', selection);
   return (
     <div className={styles.inputArea}>
       {/* 显示引用内容区域 */}

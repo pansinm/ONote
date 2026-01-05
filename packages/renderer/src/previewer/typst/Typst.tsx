@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toONoteUri } from '/@/common/utils/uri';
 import diagramRenderer from '../ipc/diagramRenderer';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('Typst');
 
 export const Typst = ({ uri, content }: { uri: string; content: string }) => {
   const [ouput, setOutput] = useState<string>('');
@@ -19,7 +22,7 @@ export const Typst = ({ uri, content }: { uri: string; content: string }) => {
       const output = await diagramRenderer.renderTysp(uri, content, 'svg');
       setOutput(output + '?' + Date.now());
     } catch (err) {
-      console.error(err);
+      logger.error('Typst rendering failed', err);
     }
     next.compiling = false;
     if (next.uri !== uri || next.content !== content) {

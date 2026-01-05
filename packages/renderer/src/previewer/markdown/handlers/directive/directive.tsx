@@ -5,6 +5,9 @@ import { createLineClass } from '../util/position';
 import classNames from 'classnames';
 import _ from 'lodash';
 import { isVoidElement, parseStyle } from '../util/dom';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('DirectiveHandler');
 
 const ALL_VALID_TAGS = [
   'section',
@@ -146,7 +149,7 @@ export function DefaultDirective({ node, ctx }: { node: any; ctx: ICtx }) {
   const props = parseDirectiveProps(node);
   if (Tag === 'mark') {
     (props as any).onClick = (event: MouseEvent) => {
-      console.log(event, props);
+      logger.debug('Mark directive clicked', { event, props });
       const id = _.get(props, 'id');
       if (!id) {
         return;

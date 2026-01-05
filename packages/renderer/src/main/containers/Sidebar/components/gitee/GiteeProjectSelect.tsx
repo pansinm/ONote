@@ -5,6 +5,9 @@ import View from '/@/components/View';
 import type { GiteeFormProps } from './GiteeForm';
 import GiteeForm from './GiteeForm';
 import GiteeDirSelect from './GiteeDirSelect';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('GiteeProjectSelect');
 
 interface SSHProjectSelectProps {
   onSelect(uri: string, config: any): void;
@@ -23,7 +26,7 @@ const GiteeProjectSelect: FC<SSHProjectSelectProps> = (props) => {
     } catch (err) {
       alert((err as Error).message);
       fileService.connect(providerId, config);
-      console.error(err);
+      logger.error('Failed to connect Gitee', err);
     }
   };
 

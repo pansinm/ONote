@@ -2,6 +2,9 @@ import type { RootContent, Parent } from 'mdast';
 import type { IEdit } from '../ipc/editor';
 import editor from '../ipc/editor';
 import { stringify } from '/@/common/markdown';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('BatchApply');
 
 class BatchApply {
   private static editsMap: Record<string, IEdit[]> = {};
@@ -26,7 +29,7 @@ class BatchApply {
     const editsMap = BatchApply.editsMap;
     BatchApply.editsMap = {};
     Object.keys(editsMap).forEach((uri) => {
-      console.log('commit', editsMap[uri]);
+      logger.debug('Committing edits', { uri, editCount: editsMap[uri]?.length });
       editor.applyEdits(uri, editsMap[uri] || []);
     });
   }

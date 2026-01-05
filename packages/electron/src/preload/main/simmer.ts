@@ -15,6 +15,9 @@ import { exposeInMainWorld } from './exposeInMainWorld';
 import { nodeCrypto } from '../common/nodeCrypto';
 import * as defaultGateway from 'default-gateway';
 import { onote } from './onote';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('Simmer');
 
 // Export for types in contracts.d.ts
 export const simmer = {
@@ -44,7 +47,7 @@ export const simmer = {
   async readBlobsFromClipboard() {
     const uriList = clipboard.read('text/uri-list');
     const uris = uriList.trim().split(/\s+/);
-    console.log(uris);
+    logger.debug('Reading blobs from clipboard', { uris });
     return Promise.all(
       uris
         .map((uri) => fileURLToPath(uri))
@@ -89,7 +92,7 @@ export const simmer = {
   },
   async copyImage(content: any, type: 'dataURL' | 'ArrayBuffer') {
     let img: NativeImage;
-    console.log(content, type);
+    logger.debug('Copying image', { type });
     if (type === 'dataURL') {
       img = nativeImage.createFromDataURL(content);
     } else {

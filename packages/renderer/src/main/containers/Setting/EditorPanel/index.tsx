@@ -9,6 +9,9 @@ import {
   EDITOR_WORD_WRAP,
 } from '/@/common/constants/SettingKey';
 import stores from '/@/main/stores';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('EditorPanel');
 
 const useStyles = makeStyles({
   input: {
@@ -36,9 +39,8 @@ const EditorPanel = observer(function EditorPanel() {
   };
 
   const fontSize = stores.settingStore.settings[EDITOR_FONT_SIZE];
-  console.log(fontSize);
   const setFontSize = (val: string) => {
-    console.log('---', val);
+    logger.debug('Setting font size', { fontSize: val });
     stores.settingStore.update(EDITOR_FONT_SIZE, parseInt(val, 10));
   };
 

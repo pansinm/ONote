@@ -9,8 +9,11 @@ import remarkDirective from 'remark-directive';
 import remarkMath from 'remark-math';
 import rehypeParse from 'rehype-parse';
 import { toMdast } from 'hast-util-to-mdast';
+import { getLogger } from '/@/shared/logger';
 
 import type { Parent, Root, RootContent, Text } from 'mdast';
+
+const logger = getLogger('MarkdownParser');
 
 const parser = unified()
   .use(remarkParse)
@@ -26,7 +29,7 @@ export const parse = (markdown: string) => {
   try {
     return parser.parse(markdown);
   } catch (err) {
-    console.error('parse markdown error', err);
+    logger.error('Parse markdown error', err);
     throw err;
   }
 };

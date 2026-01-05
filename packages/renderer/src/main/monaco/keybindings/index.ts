@@ -2,6 +2,9 @@ import * as monaco from 'monaco-editor';
 import { EDITOR_FILE_SAVE } from '../../eventbus/EventName';
 import emitter from '../../eventbus/eventbus';
 import { getFenceContent, isInFence } from '../utils';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('MonacoKeybindings');
 
 function forMindMap(
   lineTextBefore: string,
@@ -28,7 +31,7 @@ function forMindMap(
       modifier === monaco.KeyCode.Shift ? '' : '$1$1',
     );
 
-    console.log(modifier === monaco.KeyCode.Shift);
+    logger.debug('Tab key pressed', { hasShiftModifier: modifier === monaco.KeyCode.Shift });
     const range = new monaco.Range(
       selection.startLineNumber,
       0,

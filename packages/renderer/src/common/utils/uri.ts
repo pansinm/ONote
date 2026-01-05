@@ -1,4 +1,7 @@
 import * as uri from 'monaco-editor/esm/vs/base/common/uri';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('URIUtils');
 
 const URI = uri.URI;
 
@@ -57,7 +60,7 @@ export const isUnSupport = (uri: string) => {
 };
 
 export const relative = (from: string, to: string) => {
-  console.log(from, to);
+  logger.debug('Computing relative path', { from, to });
   if (from === to) {
     return '';
   }
