@@ -1,11 +1,8 @@
-import React from 'react';
-import type { Strong } from 'mdast';
-import { createLineClass } from './util/position';
+import { createInlineHandler } from './util/handlerFactory';
 
-export default function paragraph(node: Strong, ctx: any) {
-  return (
-    <strong className={createLineClass(node.position)}>
-      {ctx.renderChildren(node, ctx)}
-    </strong>
-  );
-}
+/**
+ * Strong（粗体）Handler
+ *
+ * 将 Markdown 的粗体文本渲染为 <strong> 标签
+ */
+export default createInlineHandler('strong');

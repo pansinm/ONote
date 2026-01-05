@@ -1,11 +1,8 @@
-import React from 'react';
-import type { Node } from 'unist';
-import { createLineClass } from './util/position';
+import { createInlineHandler } from './util/handlerFactory';
 
-export default function emphasis(node: Node, ctx: any) {
-  return (
-    <em className={createLineClass(node.position)}>
-      {ctx.renderChildren(node, ctx)}
-    </em>
-  );
-}
+/**
+ * Emphasis（斜体）Handler
+ *
+ * 将 Markdown 的斜体文本渲染为 <em> 标签
+ */
+export default createInlineHandler('em');

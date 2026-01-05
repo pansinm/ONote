@@ -1,11 +1,8 @@
-import React from 'react';
-import type { Node } from 'unist';
-import { createLineClass } from './util/position';
+import { createInlineHandler } from './util/handlerFactory';
 
-export default function strikethrough(node: Node, ctx: any) {
-  return (
-    <del className={createLineClass(node.position)}>
-      {ctx.renderChildren(node, ctx)}
-    </del>
-  );
-}
+/**
+ * Delete（删除线）Handler
+ *
+ * 将 Markdown 的删除线文本渲染为 <del> 标签
+ */
+export default createInlineHandler('del');
