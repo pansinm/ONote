@@ -1,10 +1,44 @@
 import IpcHandler from '../IpcHandler';
-
+import type { WebContents } from 'electron';
 import type { TreeNode } from '@sinm/react-file-tree';
 import type { IDataSourceProvider } from '/@/dataSource';
 import { dataSource } from '/@/dataSource';
+import { getLogger } from '/@/shared/logger';
 
+const logger = getLogger('DataSourceHandler');
+
+/**
+ * DataSource Handler
+ *
+ * 使用代理模式自动将 dataSource 对象的方法转换为 IPC handlers
+ * 避免手动编写重复的代理方法
+ */
 class DataSourceHandler extends IpcHandler implements IDataSourceProvider<any> {
+  constructor(sender: WebContents, namespace: string) {
+    super(sender, namespace);
+    this.proxyMethods();
+  }
+
+  /**
+   * 自动代理 dataSource 的所有方法
+   */
+  private proxyMethods(): void {
+    // 获取 dataSource 原型上的所有方法
+    const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(dataSource))
+      .filter(name => name !== 'constructor' && typeof dataSource[name as keyof typeof dataSource] === 'function');
+
+    // 为每个方法创建代理
+    methods.forEach(methodName => {
+      (this as any)[methodName] = (...args: unknown[]) => {
+        logger.debug(`Proxying method: ${methodName}`, { args: args.length });
+        return (dataSource as any)[methodName](...args);
+      };
+    });
+
+    logger.info(`Proxied ${methods.length} methods from dataSource`);
+  }
+
+  // 显式实现 IDataSourceProvider 接口（可选，用于类型检查）
   setRootDirUri(rootDirUri: string): void {
     return dataSource.setRootDirUri(rootDirUri);
   }
