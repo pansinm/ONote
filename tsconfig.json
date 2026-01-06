@@ -28,6 +28,6 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["packages/*/src/**/*"],
+  "include": ["packages/*/src/**/*", "packages/renderer/global.d.ts"],
   "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.d.ts"]
 }

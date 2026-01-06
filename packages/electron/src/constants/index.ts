@@ -6,6 +6,7 @@ export const IPCNamespaces = {
   PluginManager: 'PluginManager',
   Typst: 'Typst',
   LLMConversation: 'LLMConversation',
+  AgentContext: 'AgentContext',
 };
 
 export const EventNames = {

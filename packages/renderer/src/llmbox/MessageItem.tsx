@@ -44,7 +44,9 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                 <pre className={styles.rawContent}>{message.content}</pre>
               ) : (
                 <div className={styles.markdownContent}>
-                  <Markdown>{message.content}</Markdown>
+                  <div className="markdown-body">
+                    <Markdown>{message.content}</Markdown>
+                  </div>
                 </div>
               )}
               {!message.isStreaming && (

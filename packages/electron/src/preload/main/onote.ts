@@ -8,6 +8,7 @@ import type DevelopToolsHandler from '../../ipc-server/handlers/DevelopToolsHand
 import type CronHandler from '../../ipc-server/handlers/CronHandler';
 import type TypstHandler from '../../ipc-server/handlers/TypstHandler';
 import type LLMConversationHandler from '../../ipc-server/handlers/LLMConversationHandler';
+import type AgentContextHandler from '../../ipc-server/handlers/AgentContextHandler';
 
 export const onote = {
   dataSource: new IPCClient<DataSourceHandler>(IPCNamespaces.DataSource),
@@ -19,6 +20,7 @@ export const onote = {
   developTools: new IPCClient<DevelopToolsHandler>(IPCNamespaces.DevelopTools),
   typst: new IPCClient<TypstHandler>(IPCNamespaces.Typst),
   llmConversation: new IPCClient<LLMConversationHandler>(IPCNamespaces.LLMConversation),
+  agentContext: new IPCClient<AgentContextHandler>(IPCNamespaces.AgentContext),
 };
 
 exposeInMainWorld('onote', onote);
