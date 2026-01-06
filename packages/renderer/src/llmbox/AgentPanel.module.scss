@@ -68,7 +68,7 @@
 }
 
 // ==================== 主容器 ====================
-.agent-panel {
+.AgentPanel {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -80,7 +80,7 @@
 }
 
 // ==================== 顶部工具栏 ====================
-.agent-toolbar {
+.AgentToolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -91,7 +91,7 @@
   min-height: 44px;
 }
 
-.toolbar-left {
+.ToolbarLeft {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -99,14 +99,14 @@
   min-width: 0;
 }
 
-.toolbar-right {
+.ToolbarRight {
   display: flex;
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
 }
 
-.agent-title {
+.AgentTitle {
   display: flex;
   align-items: center;
   font-size: 14px;
@@ -116,7 +116,7 @@
   flex-shrink: 0;
 }
 
-.status-indicator {
+.StatusIndicator {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -130,17 +130,17 @@
   text-overflow: ellipsis;
 }
 
-.status-text {
+.StatusText {
   color: var(--text-primary);
   font-weight: 600;
 }
 
-.task-count {
+.TaskCount {
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-.error-indicator {
+.ErrorIndicator {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,7 +159,7 @@
   }
 }
 
-.status-dot {
+.StatusDot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -190,20 +190,20 @@
   }
 }
 
-.status-text {
+.StatusText {
   font-weight: 600;
   color: var(--text-primary);
   text-transform: capitalize;
   font-size: 13px;
 }
 
-.agent-actions {
+.AgentActions {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.action-btn {
+.ActionBtn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -216,7 +216,7 @@
   transition: all var(--transition-normal);
   font-size: 16px;
 
-  &.icon-only {
+  &.IconOnly {
     width: 32px;
     height: 32px;
     padding: 0;
@@ -247,7 +247,7 @@
   font-size: 13px;
 }
 
-.stop-btn {
+.StopBtn {
   background: var(--error-color) !important;
   color: white !important;
   border-color: var(--error-color) !important;
@@ -258,15 +258,15 @@
   }
 }
 
-.clear-btn:hover:not(:disabled) {
+.ClearBtn:hover:not(:disabled) {
   background: var(--bg-tertiary);
   border-color: var(--border-hover);
 }
 
 // ==================== 可折叠的面板 ====================
-.tools-section,
-.execution-section,
-.status-section {
+.ToolsSection,
+.ExecutionSection,
+.StatusSection {
   border-bottom: 1px solid var(--border-color);
   transition: all var(--transition-normal);
 
@@ -277,7 +277,7 @@
 
 .collapsed {
   .execution-list,
-  .status-content {
+  .StatusContent {
     display: none;
   }
 
@@ -332,12 +332,12 @@
 }
 
 // ==================== Tabs ====================
-.toolbar-tabs {
+.ToolbarTabs {
   display: flex;
   gap: 4px;
 }
 
-.tab-item {
+.TabItem {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -366,7 +366,7 @@
 }
 
 // ==================== 底部 Tabs ====================
-.bottom-tabs {
+.BottomTabs {
   display: flex;
   gap: 1px;
   background: var(--border-color);
@@ -374,7 +374,7 @@
   flex-shrink: 0;
 }
 
-.bottom-tab-item {
+.BottomTabItem {
   flex: 1;
   display: flex;
   align-items: center;
@@ -403,7 +403,7 @@
 }
 
 // ==================== Tab Content ====================
-.tab-content {
+.TabContent {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -411,7 +411,7 @@
   background: var(--bg-secondary);
 }
 
-.tab-pane {
+.TabPane {
   flex: 1;
   overflow-y: auto;
   display: none;
@@ -423,7 +423,7 @@
 }
 
 // ==================== 执行日志 ====================
-.execution-log {
+.ExecutionLog {
   padding: 16px;
   padding-bottom: 120px;
   max-height: 100%;
@@ -432,14 +432,14 @@
 }
 
 // ==================== 工具内容 ====================
-.tools-content {
+.ToolsContent {
   padding: 16px;
   overflow-y: auto;
   max-height: 100%;
 }
 
 // ==================== 工具面板 ====================
-.tools-grid {
+.ToolsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
@@ -449,7 +449,7 @@
   scroll-behavior: smooth;
 }
 
-.tool-card {
+.ToolCard {
   position: relative;
   padding: 16px;
   border: 2px solid var(--border-color);
@@ -481,7 +481,7 @@
       background: linear-gradient(90deg, transparent 0%, var(--primary-color) 50%, transparent 100%);
     }
 
-    .tool-desc {
+    .ToolDesc {
       color: var(--text-primary);
     }
   }
@@ -491,7 +491,7 @@
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.1) 100%);
   }
 
-  .tool-icon {
+  .ToolIcon {
     font-size: 32px;
     margin-bottom: 12px;
     display: flex;
@@ -504,37 +504,37 @@
     transition: all var(--transition-normal);
   }
 
-  &:hover .tool-icon {
+  &:hover .ToolIcon {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
   }
 }
 
-.tool-info {
+.ToolInfo {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.tool-header-info {
+.ToolHeaderInfo {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
 }
 
-.tool-name {
+.ToolName {
   font-size: 15px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.2px;
 }
 
-.tool-badges {
+.ToolBadges {
   display: flex;
   gap: 6px;
 }
 
-.tool-badge {
+.ToolBadge {
   padding: 3px 8px;
   border-radius: var(--radius-sm);
   font-size: 11px;
@@ -560,7 +560,7 @@
   }
 }
 
-.tool-desc {
+.ToolDesc {
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.5;
@@ -568,7 +568,7 @@
 }
 
 // ==================== 执行日志 ====================
-.execution-log {
+.ExecutionLog {
   padding: 16px;
   padding-bottom: 120px;
   max-height: 100%;
@@ -577,19 +577,19 @@
 }
 
 // ==================== 工具内容 ====================
-.tools-content {
+.ToolsContent {
   padding: 16px;
   overflow-y: auto;
   max-height: 100%;
 }
 
-.log-list {
+.LogList {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.log-item {
+.LogItem {
   border-left: 3px solid var(--border-color);
   background: var(--bg-primary);
   border-radius: var(--radius-sm);
@@ -602,27 +602,27 @@
     box-shadow: var(--shadow-sm);
   }
 
-  &.log-item-thinking {
+  &.LogItem-thinking {
     border-left-color: var(--info-color);
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(59, 130, 246, 0.08) 100%);
   }
 
-  &.log-item-tool_call {
+  &.LogItem-tool_call {
     border-left-color: var(--warning-color);
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.03) 0%, rgba(245, 158, 11, 0.08) 100%);
   }
 
-  &.log-item-tool_result {
+  &.LogItem-tool_result {
     border-left-color: var(--success-color);
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, rgba(16, 185, 129, 0.08) 100%);
   }
 
-  &.log-item-final_answer {
+  &.LogItem-final_answer {
     border-left-color: var(--primary-color);
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.1) 100%);
   }
 
-  &.log-item-error {
+  &.LogItem-error {
     border-left-color: var(--error-color);
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.03) 0%, rgba(239, 68, 68, 0.08) 100%);
   }
@@ -639,7 +639,7 @@
   }
 }
 
-.log-header {
+.LogHeader {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -647,7 +647,7 @@
   flex-wrap: wrap;
 }
 
-.log-index {
+.LogIndex {
   width: 24px;
   height: 24px;
   display: flex;
@@ -661,7 +661,7 @@
   flex-shrink: 0;
 }
 
-.log-type {
+.LogType {
   padding: 2px 8px;
   background: var(--bg-tertiary);
   border-radius: var(--radius-sm);
@@ -672,13 +672,13 @@
   letter-spacing: 0.5px;
 }
 
-.log-time {
+.LogTime {
   font-size: 11px;
   color: var(--text-tertiary);
   margin-left: auto;
 }
 
-.log-duration {
+.LogDuration {
   padding: 2px 6px;
   background: rgba(16, 185, 129, 0.1);
   border-radius: var(--radius-sm);
@@ -687,13 +687,13 @@
   color: var(--success-color);
 }
 
-.log-body {
+.LogBody {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.log-content {
+.LogContent {
   font-size: 13px;
   color: var(--text-primary);
   line-height: 1.5;
@@ -703,7 +703,7 @@
   }
 }
 
-.log-tool {
+.LogTool {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -713,33 +713,33 @@
   font-size: 12px;
 }
 
-.log-tool-label {
+.LogTool-label {
   font-weight: 700;
   color: var(--text-secondary);
 }
 
-.log-tool-name {
+.LogTool-name {
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.log-details {
+.LogDetails {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   overflow: hidden;
 
   &[open] {
-    .log-details-toggle {
+    .LogDetails-toggle {
       background: var(--bg-tertiary);
     }
   }
 }
 
-.log-details-result[open] {
+.LogDetails-result[open] {
   border-color: var(--success-color);
 }
 
-.log-details-toggle {
+.LogDetails-toggle {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -762,7 +762,7 @@
   }
 }
 
-.log-details-content {
+.LogDetails-content {
   margin: 0;
   padding: 12px;
   background: #1e1e1e;
@@ -802,7 +802,7 @@
   }
 }
 
-.log-error {
+.LogError {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -813,12 +813,12 @@
   font-size: 12px;
 }
 
-.log-error-icon {
+.LogError-icon {
   flex-shrink: 0;
   font-size: 16px;
 }
 
-.log-error-text {
+.LogError-text {
   font-weight: 600;
   color: var(--error-color);
   line-height: 1.4;
@@ -829,7 +829,7 @@
   }
 }
 
-.empty-state {
+.EmptyState {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -838,38 +838,38 @@
   min-height: 200px;
 }
 
-.empty-icon {
+.EmptyIcon {
   font-size: 64px;
   margin-bottom: 16px;
   opacity: 0.3;
 }
 
-.empty-message {
+.EmptyMessage {
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 8px;
 }
 
-.empty-hint {
+.EmptyHint {
   font-size: 14px;
   color: var(--text-tertiary);
 }
 
 // ==================== 状态面板 ====================
-.status-content {
+.StatusContent {
   padding: 16px;
   max-height: calc(100vh - 200px);
   overflow-y: auto;
 }
 
-.status-grid {
+.StatusGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
-.status-item {
+.StatusItem {
   background: var(--bg-primary);
   padding: 12px;
   border: 1px solid var(--border-color);
@@ -882,7 +882,7 @@
   }
 }
 
-.status-label {
+.StatusLabel {
   font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
@@ -891,25 +891,25 @@
   margin-bottom: 4px;
 }
 
-.status-value {
+.StatusValue {
   font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.state-idle {
+.StateIdle {
   color: var(--success-color);
 }
 
-.state-thinking {
+.StateThinking {
   color: var(--info-color);
 }
 
-.state-executing {
+.StateExecuting {
   color: var(--warning-color);
 }
 
-.error-alert {
+.ErrorAlert {
   padding: 16px;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid var(--error-color);
@@ -927,28 +927,28 @@
   20%, 40%, 60%, 80% { transform: translateX(3px); }
 }
 
-.error-alert-icon {
+.ErrorAlert-icon {
   font-size: 24px;
 }
 
-.error-alert-content {
+.ErrorAlert-content {
   flex: 1;
 }
 
-.error-alert-title {
+.ErrorAlert-title {
   font-size: 14px;
   font-weight: 700;
   color: var(--error-color);
   margin-bottom: 4px;
 }
 
-.error-alert-message {
+.ErrorAlert-message {
   font-size: 13px;
   color: var(--text-primary);
   line-height: 1.5;
 }
 
-.success-alert {
+.SuccessAlert {
   padding: 16px;
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid var(--success-color);
@@ -971,11 +971,11 @@
   }
 }
 
-.success-icon {
+.SuccessIcon {
   font-size: 24px;
 }
 
-.success-message {
+.SuccessMessage {
   font-size: 14px;
   font-weight: 600;
   color: var(--success-color);
@@ -983,79 +983,79 @@
 
 // ==================== 响应式设计 ====================
 @media (max-width: 768px) {
-  .agent-toolbar {
+  .AgentToolbar {
     padding: 8px 10px;
   }
 
-  .agent-title {
+  .AgentTitle {
     font-size: 13px;
   }
 
-  .status-indicator {
+  .StatusIndicator {
     padding: 3px 8px;
     font-size: 11px;
   }
 
-  .toolbar-right {
+  .ToolbarRight {
     gap: 2px;
   }
 
-  .bottom-tab-item {
+  .BottomTabItem {
     padding: 6px 8px;
     font-size: 11px;
   }
 
-  .tools-grid {
+  .ToolsGrid {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 8px;
   }
 
-  .tool-card {
+  .ToolCard {
     padding: 12px;
   }
 
-  .tool-icon {
+  .ToolIcon {
     width: 48px;
     height: 48px;
     font-size: 24px;
   }
 
-  .status-grid {
+  .StatusGrid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 480px) {
-  .agent-toolbar {
+  .AgentToolbar {
     padding: 6px 8px;
   }
 
-  .toolbar-left {
+  .ToolbarLeft {
     gap: 8px;
   }
 
-  .status-indicator {
-    .task-count {
+  .StatusIndicator {
+    .TaskCount {
       display: none;
     }
   }
 
-  .bottom-tab-item {
+  .BottomTabItem {
     font-size: 10px;
     padding: 6px;
     gap: 4px;
   }
 
-  .tools-grid {
+  .ToolsGrid {
     grid-template-columns: 1fr;
   }
 
-  .tool-card {
+  .ToolCard {
     flex-direction: row;
     padding: 12px;
   }
 
-  .tool-icon {
+  .ToolIcon {
     width: 40px;
     height: 40px;
     font-size: 20px;
@@ -1069,16 +1069,16 @@
 }
 
 @media (max-width: 480px) {
-  .tools-grid {
+  .ToolsGrid {
     grid-template-columns: 1fr;
   }
 
-  .tool-card {
+  .ToolCard {
     flex-direction: row;
     padding: 12px;
   }
 
-  .tool-icon {
+  .ToolIcon {
     width: 40px;
     height: 40px;
     font-size: 20px;
@@ -1120,17 +1120,17 @@
     --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
   }
 
-  .agent-toolbar {
+  .AgentToolbar {
     background: var(--bg-secondary);
     border-color: var(--border-color);
   }
 
-  .status-indicator {
+  .StatusIndicator {
     background: var(--bg-tertiary);
     border-color: var(--border-color);
   }
 
-  .error-indicator {
+  .ErrorIndicator {
     background: rgba(239, 68, 68, 0.2);
 
     &:hover {
@@ -1138,7 +1138,7 @@
     }
   }
 
-  .tab-item {
+  .TabItem {
     background: var(--bg-tertiary);
     color: var(--text-secondary);
 
@@ -1154,7 +1154,7 @@
     }
   }
 
-  .bottom-tab-item {
+  .BottomTabItem {
     background: var(--bg-secondary);
     color: var(--text-tertiary);
 
@@ -1169,7 +1169,7 @@
     }
   }
 
-  .tab-content {
+  .TabContent {
     background: var(--bg-secondary);
   }
 
@@ -1181,13 +1181,13 @@
     }
   }
 
-  .tools-section,
-  .execution-section,
-  .status-section {
+  .ToolsSection,
+  .ExecutionSection,
+  .StatusSection {
     border-color: var(--border-color);
   }
 
-  .tool-card {
+  .ToolCard {
     background: var(--bg-secondary);
     border-color: var(--border-color);
 
@@ -1197,46 +1197,46 @@
     }
   }
 
-  .tool-icon {
+  .ToolIcon {
     background: var(--bg-tertiary);
   }
 
-  .log-item {
+  .LogItem {
     background: var(--bg-secondary);
     border-left-color: var(--border-color);
 
-    &.log-item-thinking {
+    &.LogItem-thinking {
       background: linear-gradient(135deg, rgba(96, 165, 250, 0.08) 0%, rgba(96, 165, 250, 0.03) 100%);
     }
 
-    &.log-item-tool_call {
+    &.LogItem-tool_call {
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.03) 100%);
     }
 
-    &.log-item-tool_result {
+    &.LogItem-tool_result {
       background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.03) 100%);
     }
 
-    &.log-item-final_answer {
+    &.LogItem-final_answer {
       background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%);
     }
 
-    &.log-item-error {
+    &.LogItem-error {
       background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.03) 100%);
     }
   }
 
-  .log-index {
+  .LogIndex {
     background: var(--bg-tertiary);
     color: var(--text-secondary);
   }
 
-  .log-type {
+  .LogType {
     background: var(--bg-tertiary);
     color: var(--text-secondary);
   }
 
-  .status-item {
+  .StatusItem {
     background: var(--bg-secondary);
     border-color: var(--border-color);
 
@@ -1246,13 +1246,13 @@
     }
   }
 
-  .log-details-content {
+  .LogDetails-content {
     background: #0d1117;
     color: #93c5fd;
     border-color: #333;
   }
 
-  .log-details-toggle {
+  .LogDetails-toggle {
     background: var(--bg-tertiary);
     border-color: var(--border-color);
     color: var(--text-secondary);
@@ -1265,7 +1265,7 @@
 }
 
 // ==================== 动画增强 ====================
-.agent-panel {
+.AgentPanel {
   animation: panel-appear 0.3s ease-out;
 }
 
