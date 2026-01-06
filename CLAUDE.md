@@ -278,11 +278,155 @@ await onote.llmConversation.invoke('saveConversation', {
 - [LLM 对话持久化实现](./docs/technical/LLM对话持久化实现.md) - 对话持久化完整实现
 - [日志系统使用指南](./docs/technical/日志系统使用指南.md) - 日志系统使用
 
+### 开发指南
+- [UI 拖拽调整功能开发指南](./docs/guides/UI拖拽调整功能开发指南.md) - 拖拽功能实现
+- [对话复盘-LLMBox 拖拽调整功能](./docs/guides/对话复盘-LLMBox拖拽调整功能.md) - 经验教训总结
+
 ### 其他文档
 - [插件开发指南](./docs/reference/插件开发指南.md) - 插件开发
 - [错误处理使用指南](./docs/reference/错误处理使用指南.md) - 错误处理
 - [示例](./docs/examples/示例.md) - 代码示例
 - [贡献指南](./CONTRIBUTING.md) - 如何贡献
+
+## 开发经验与最佳实践
+
+### 开发流程
+
+**推荐的开发步骤：**
+```
+需求分析 → 设计方案 → MVP 实现 → 测试验证
+→ 优化改进 → 用户确认 → 提交代码
+```
+
+**关键原则：**
+1. **测试驱动**：每次修改后运行 `yarn build` 验证
+2. **渐进式开发**：先实现基础功能，再优化体验
+3. **用户确认**：重要修改前征得用户同意
+
+### 代码修改注意事项
+
+**修改文件前：**
+1. 搜索依赖关系：
+   ```bash
+   grep -r "ComponentName" packages/renderer/src/
+   ```
+2. 检查是否有其他文件引用
+3. 考虑向后兼容性
+
+**删除文件时：**
+1. 先确认没有其他引用
+2. 如需兼容，创建导出文件：
+   ```typescript
+   // 向后兼容的导出
+   export { NewComponent as OldComponent } from './NewComponent';
+   ```
+3. 或者修改引用后再删除
+
+### 性能优化原则
+
+**何时优化：**
+- ✅ 修复明显的性能问题（如 useEffect 依赖）
+- ✅ 移除不必要的 DOM 操作
+- ✅ 减少重复计算
+
+**何时不要优化：**
+- ❌ 只用一次的逻辑
+- ❌ 过度设计，增加复杂度
+- ❌ 不必要的 memoization
+
+**优先级：**
+1. 高优先级：修复明显的性能问题
+2. 中优先级：抽取 Hook、使用 React.memo
+3. 低优先级：微优化、过度抽象
+
+### Git 操作规范
+
+**重要：未经用户明确同意，不要执行以下操作：**
+- ❌ `git commit`
+- ❌ `git push`
+- ❌ `git rebase` 或 `git reset`
+- ✅ `git add` - 添加到暂存区
+- ✅ `git diff` - 查看更改
+- ✅ `git status` - 查看状态
+
+**提交流程：**
+1. 使用 Conventional Commits 规范
+2. 提交前确保 `yarn build` 通过
+3. 每次提交聚焦一个功能或修复
+
+### 复杂功能开发
+
+**设计阶段：**
+1. 先画架构图
+2. 明确边界条件
+3. 设计测试方案
+
+**实现阶段：**
+1. 拆分为小任务
+2. 每个任务完成后验证
+3. 及时记录决策原因
+
+**常见模式：**
+
+1. **CSS 变量用于动态布局**
+   ```css
+   :root {
+     --panel-width: 50%;
+   }
+   .panel {
+     width: var(--panel-width);
+   }
+   ```
+
+2. **window 级别事件监听**
+   ```tsx
+   useEffect(() => {
+     window.addEventListener('mousemove', handleMouseMove);
+     return () => {
+       window.removeEventListener('mousemove', handleMouseMove);
+     };
+   }, [dependencies]);
+   ```
+
+3. **自定义 Hook 封装逻辑**
+   - 场景：跨组件使用相同逻辑
+   - 原则：超过 3 个使用就抽象
+
+4. **配置常量集中管理**
+   ```typescript
+   export const CONFIG = {
+     min: 10,
+     max: 90,
+     default: 50,
+   } as const;
+   ```
+
+### 问题排查流程
+
+```
+发现问题 → 定位原因 → 分析影响 → 设计方案
+→ 实现修复 → 测试验证 → 更新文档
+```
+
+**常用工具：**
+- `grep` - 搜索代码引用
+- `git blame` - 查看修改历史
+- `git log --oneline` - 查看提交记录
+- `yarn build` - 编译检查
+- 控制台 DevTools - 调试
+
+### 文档更新
+
+**何时更新文档：**
+- ✅ 复杂功能实现后
+- ✅ 发现新问题或解决方案
+- ✅ API 变更后
+- ✅ 重要决策记录
+
+**文档类型：**
+1. 开发指南 - 开发流程、最佳实践
+2. 技术文档 - 架构设计、实现细节
+3. 复盘总结 - 经验教训、改进建议
 
 ## Claude Code 使用建议
 
