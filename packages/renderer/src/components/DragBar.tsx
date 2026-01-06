@@ -16,21 +16,21 @@ function DragBar(props: DragBarProps) {
 
   return (
     <Draggable
-      // axis="x"
       handle=".resize-handle"
-      // defaultPosition={{ x: 0, y: 0 }}
-      // position={undefined}
       grid={[1, 1]}
       scale={1}
       onStart={(event, data) => {
         beforeX.current = data.lastX;
+        setX(0);
+        props.onStart?.();
       }}
       onDrag={(_, data) => {
         setX(data.lastX - beforeX.current);
         props.onStart?.();
       }}
       onStop={(event, data) => {
-        props.onStop(data.lastX - beforeX.current);
+        const delta = data.lastX - beforeX.current;
+        props.onStop(delta);
         setX(0);
       }}
     >

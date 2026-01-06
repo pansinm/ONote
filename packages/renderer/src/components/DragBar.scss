@@ -1,12 +1,12 @@
 .resize-handle {
   position: absolute;
-  right: -2px;
+  right: -3px;
   top: 0;
-  width: 4px;
+  width: 6px;
   height: 100%;
-  background: transparent;
+  background: rgba(56, 147, 199, 0.2);
   cursor: ew-resize;
-  z-index: 100;
+  z-index: 9999;
 
   &:hover,
   &.moving {
