@@ -44,7 +44,8 @@ ONote/
 │   │   │   ├── components/        # 通用组件
 │   │   │   ├── previewer/         # Markdown 预览器
 │   │   │   │   └── handlers/      # 渲染处理器
-│   │   │   ├── llmbox/            # AI 对话框
+│   │   │   ├── llmbox/            # AI 对话框（对话持久化）
+│   │   │   ├── entry/             # 独立入口（llmbox.tsx）
 │   │   │   ├── common/            # 通用工具
 │   │   │   ├── styles/            # 样式文件
 │   │   │   └── monaco/            # Monaco 配置
@@ -91,8 +92,9 @@ class DataSourceHandler {
 // 注册 Handler
 ipcServer.register(IPCNamespaces.DataSource, DataSourceHandler);
 
-// 渲染进程调用
-const files = await window.api.invoke('DataSource.list', '/path');
+// 渲染进程调用（通过 IPCClient）
+const onote = (window as any).onote;
+const files = await onote.dataSource.invoke('list', '/path');
 ```
 
 ### MobX 状态管理
@@ -115,6 +117,45 @@ class SettingStore {
 const ThemedComponent = observer(() => {
   const { settingStore } = stores;
   return <div>{settingStore.theme}</div>;
+});
+```
+
+### Iframe 通信模式 (bidc)
+
+使用 bidc 库实现 iframe 父子窗口通信：
+
+```typescript
+// 父窗口 (主应用)
+const { send, receive } = createChannel(iframe.contentWindow, 'MAIN_FRAME-LLM_BOX');
+
+// 发送消息
+send({
+  type: 'EDITOR_FILE_OPEN',
+  data: { uri: 'file:///path/to/file.md' },
+});
+
+// 接收消息
+receive(async ({ type, data }) => {
+  if (type === 'LLM_CONVERSATION_LOAD') {
+    const messages = await onote.llmConversation.invoke('loadConversation', data);
+    return { messages };
+  }
+});
+
+// 子窗口
+const { send, receive } = createChannel('MAIN_FRAME-LLM_BOX');
+
+// 发送消息
+send({
+  type: 'LLM_CONVERSATION_LOAD',
+  data: { fileUri: 'file:///path/to/file.md' },
+});
+
+// 接收消息
+receive(({ type, data }) => {
+  if (type === 'EDITOR_FILE_OPEN') {
+    console.log('File opened:', data.uri);
+  }
 });
 ```
 
@@ -178,7 +219,8 @@ docs: 更新 API 文档
 
 1. 在 `packages/electron/src/ipc-server/handlers/` 创建 Handler
 2. 在 `packages/electron/src/ipc-server/index.ts` 注册
-3. 在渲染进程使用 `window.api.invoke()` 调用
+3. 在 `packages/electron/src/preload/main/onote.ts` 暴露 API
+4. 在渲染进程使用 `window.onote.namespace.invoke('methodName', params)` 调用
 
 ### 添加新的 MobX Store
 
@@ -191,26 +233,56 @@ docs: 更新 API 文档
 1. 在 `packages/renderer/src/previewer/handlers/` 创建 Handler
 2. 在 `packages/renderer/src/previewer/index.ts` 注册到管道
 
+### LLM 对话持久化
+
+**实现位置**:
+- 主进程 Handler: `packages/electron/src/ipc-server/handlers/LLMConversationHandler.ts`
+- IPC 注册: `packages/electron/src/ipc-server/index.ts`
+- Preload 暴露: `packages/electron/src/preload/main/onote.ts`
+- 父窗口容器: `packages/renderer/src/main/containers/LLMBox/LLMBoxFrame.tsx`
+- 子窗口入口: `packages/renderer/src/entry/llmbox.tsx`
+- 状态管理: `packages/renderer/src/llmbox/LLMChatStore.ts`
+
+**使用方法**:
+```typescript
+// 主进程调用（通过 IPC）
+await onote.llmConversation.invoke('loadConversation', {
+  fileUri: 'file:///path/to/file.md',
+  rootUri: 'file:///path/to/root',
+});
+
+await onote.llmConversation.invoke('saveConversation', {
+  fileUri: 'file:///path/to/file.md',
+  rootUri: 'file:///path/to/root',
+  messages: [...],
+});
+```
+
+**数据存储**:
+- 路径: `{rootUri}/.onote/data/{fileHash}/ai/conversation.json`
+- 文件名: 通过文件相对路径 MD5 哈希生成
+
 ## 项目文档
 
-详细文档请查看：
-- [架构说明](./docs/架构说明.md)
-- [开发指南](./docs/开发指南.md)
-- [新手教程](./docs/新手教程.md)
-- [代码规范](./docs/代码规范.md)
-- [常见问题](./docs/常见问题.md)
-- [插件开发指南](./docs/插件开发指南.md)
-- [贡献指南](./CONTRIBUTING.md)
+完整文档目录请查看：[文档中心](./docs/README.md)
 
-## 当前改进计划
+### 核心文档
+- [架构说明](./docs/overview/架构说明.md) - 系统架构设计
+- [新手教程](./docs/guides/新手教程.md) - 快速入门
+- [开发指南](./docs/guides/开发指南.md) - 开发流程
+- [代码规范](./docs/reference/代码规范.md) - 编码标准
+- [常见问题](./docs/reference/常见问题.md) - 问题解答
 
-项目正在进行长期改进，重点关注：
-1. 性能优化（内存泄漏、渲染性能、启动速度）
-2. 文档完善（已完成 ✅）
-3. 安全加固（依赖更新、环境配置）
-4. 代码质量提升（日志系统、错误处理、重构）
+### 技术文档
+- [LLMBox 架构说明](./docs/technical/LLMBox架构说明.md) - AI 对话架构
+- [LLM 对话持久化实现](./docs/technical/LLM对话持久化实现.md) - 对话持久化完整实现
+- [日志系统使用指南](./docs/technical/日志系统使用指南.md) - 日志系统使用
 
-详细计划见：`/Users/pansinm/.claude/plans/concurrent-dreaming-spring.md`
+### 其他文档
+- [插件开发指南](./docs/reference/插件开发指南.md) - 插件开发
+- [错误处理使用指南](./docs/reference/错误处理使用指南.md) - 错误处理
+- [示例](./docs/examples/示例.md) - 代码示例
+- [贡献指南](./CONTRIBUTING.md) - 如何贡献
 
 ## Claude Code 使用建议
 
