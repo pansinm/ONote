@@ -10,8 +10,9 @@ interface MessageItemProps {
 
 const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
   const [showRawContent, setShowRawContent] = useState(false);
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('zh-CN', {
+  const formatTime = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleTimeString('zh-CN', {
       hour: '2-digit',
       minute: '2-digit',
     });
