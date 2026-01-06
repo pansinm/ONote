@@ -13,13 +13,9 @@ import Toolbar from './Toolbar';
 import stores from '../../stores';
 import LLMBoxFrame from '../LLMBox/LLMBoxFrame';
 import { DragIndicator, DragHandle } from '/@/components/DragBarNew';
-
-interface DragState {
-  isDragging: boolean;
-  type: 'editor-preview' | 'llmbox' | null;
-  startX: number;
-  currentX: number;
-}
+import { useResizable } from '/@/common/hooks/useResizable';
+import { resetWidths, loadSavedWidths } from '/@/common/constants/resize';
+import { RESIZE_CONFIG } from '/@/common/constants/resize';
 
 interface MarkdownResourcePanelProps {
   uri: string;
@@ -52,13 +48,6 @@ function Previewer({ previewerUri }: { previewerUri?: string }) {
 }
 
 const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
-  const [dragState, setDragState] = useState<DragState>({
-    isDragging: false,
-    type: null,
-    startX: 0,
-    currentX: 0,
-  });
-
   const panel = filePanelManager.getPanel(props.uri);
   const previewerUri = panel?.previewer;
   const layout = stores.layoutStore.layout;
@@ -67,62 +56,13 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // 加载保存的宽度设置
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!dragState.isDragging || !containerRef.current) return;
+    loadSavedWidths();
+  }, []);
 
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const relativeX = e.clientX - containerRect.left;
-      setDragState((prev) => ({ ...prev, currentX: relativeX }));
-    };
-
-    const handleMouseUp = (e: MouseEvent) => {
-      if (!dragState.isDragging) return;
-
-      const containerRect = containerRef.current!.getBoundingClientRect();
-      const delta = e.clientX - dragState.startX;
-      const containerWidth = containerRect.width;
-
-      const root = document.documentElement;
-
-      if (dragState.type === 'editor-preview') {
-        const editorWidthStr = getComputedStyle(document.documentElement).getPropertyValue('--editor-width').trim();
-        const editorWidth = parseFloat(editorWidthStr) || 50;
-        const currentEditorPixels = (editorWidth / 100) * containerWidth;
-        const newEditorPixels = currentEditorPixels + delta;
-        const newWidth = (newEditorPixels / containerWidth) * 100;
-        root.style.setProperty('--editor-width', `${Math.max(10, Math.min(90, newWidth))}%`);
-      } else if (dragState.type === 'llmbox') {
-        const llmboxWidthStr = getComputedStyle(document.documentElement).getPropertyValue('--llmbox-width').trim();
-        const llmboxWidth = parseFloat(llmboxWidthStr) || 30;
-        const currentLlmboxPixels = (llmboxWidth / 100) * containerWidth;
-        const newLlmboxPixels = currentLlmboxPixels - delta;
-        const newWidth = (newLlmboxPixels / containerWidth) * 100;
-        root.style.setProperty('--llmbox-width', `${Math.max(10, Math.min(50, newWidth))}%`);
-      }
-
-      setDragState({ isDragging: false, type: null, startX: 0, currentX: 0 });
-    };
-
-    if (dragState.isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [dragState]);
-
-  const handleStartDrag = (type: 'editor-preview' | 'llmbox', startX: number) => {
-    setDragState({
-      isDragging: true,
-      type,
-      startX,
-      currentX: 0,
-    });
-  };
+  // 使用自定义 Hook 处理拖拽
+  const { dragState, startDrag } = useResizable({ containerRef });
 
   return (
     <>
@@ -167,7 +107,8 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
                 <DragHandle
                   type="editor-preview"
                   right="-2px"
-                  onStartDrag={handleStartDrag}
+                  onStartDrag={startDrag}
+                  onDoubleClick={resetWidths}
                 />
               )}
             </div>
@@ -221,7 +162,8 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               <DragHandle
                 type="llmbox"
                 left="-2px"
-                onStartDrag={handleStartDrag}
+                onStartDrag={startDrag}
+                onDoubleClick={resetWidths}
               />
               <LLMBoxFrame />
             </div>

@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import React, { useState } from 'react';
+import { RESIZE_CONFIG } from '/@/common/constants/resize';
 
 interface DragIndicatorProps {
   visible: boolean;
@@ -15,12 +16,12 @@ function DragIndicator({ visible, x, height }: DragIndicatorProps) {
         top: 0,
         bottom: 0,
         left: x,
-        width: '2px',
+        width: RESIZE_CONFIG.dragIndicator.width,
         height,
-        background: 'rgb(56, 147, 199)',
+        background: RESIZE_CONFIG.dragIndicator.color,
         pointerEvents: 'none',
-        zIndex: 10000,
-        opacity: visible ?1 : 0,
+        zIndex: RESIZE_CONFIG.dragIndicator.zIndex,
+        opacity: visible ? 1 : 0,
         transition: 'opacity 0.1s',
       }}
     />
@@ -32,9 +33,10 @@ interface DragHandleProps {
   left?: string;
   right?: string;
   onStartDrag: (type: 'editor-preview' | 'llmbox', startX: number) => void;
+  onDoubleClick?: () => void;
 }
 
-function DragHandle({ type, left, right, onStartDrag }: DragHandleProps) {
+function DragHandle({ type, left, right, onStartDrag, onDoubleClick }: DragHandleProps) {
   const [hovering, setHovering] = useState(false);
 
   return (
@@ -45,14 +47,17 @@ function DragHandle({ type, left, right, onStartDrag }: DragHandleProps) {
         right,
         top: 0,
         bottom: 0,
-        width: '4px',
-        background: hovering ? 'rgb(56, 147, 199)' : 'rgba(56, 147, 199, 0.2)',
+        width: RESIZE_CONFIG.dragHandle.width,
+        background: hovering
+          ? RESIZE_CONFIG.dragHandle.hoverColor
+          : RESIZE_CONFIG.dragHandle.defaultColor,
         cursor: 'ew-resize',
-        zIndex: 1000,
+        zIndex: RESIZE_CONFIG.dragHandle.zIndex,
         transition: 'background 0.1s',
       }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
+      onDoubleClick={onDoubleClick}
       onMouseDown={(e) => {
         e.preventDefault();
         onStartDrag(type, e.clientX);
