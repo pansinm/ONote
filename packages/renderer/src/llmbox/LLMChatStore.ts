@@ -9,6 +9,7 @@ interface LLMChatStoreOptions {
   apiKey?: string;
   model?: string;
   apiBase?: string;
+  fileUri?: string;
 }
 
 function buildSystemMessage(note: string, selection: string) {
@@ -51,14 +52,37 @@ export class LLMChatStore implements ChatState {
   selection?: string;
 
   private options: LLMChatStoreOptions;
+  private currentFileUri: string | undefined;
+  private loadConversationFn: ((fileUri: string) => Promise<void>) | undefined;
+  private saveConversationFn: ((fileUri: string, messages: Message[]) => Promise<void>) | undefined;
 
   constructor(options: LLMChatStoreOptions = {}) {
     this.options = options;
+    this.currentFileUri = options.fileUri;
     makeAutoObservable(this);
   }
 
   updateOptions(options: LLMChatStoreOptions) {
     this.options = { ...this.options, ...options };
+  }
+
+  updateFileUri(fileUri: string) {
+    console.log('[LLMChatStore] updateFileUri called:', fileUri);
+    this.currentFileUri = fileUri;
+  }
+
+  setLoadConversation(fn: (fileUri: string) => Promise<void>) {
+    this.loadConversationFn = fn;
+  }
+
+  setSaveConversation(fn: (fileUri: string, messages: Message[]) => Promise<void>) {
+    this.saveConversationFn = fn;
+  }
+
+  setMessages(messages: Message[]) {
+    runInAction(() => {
+      this.messages = messages;
+    });
   }
 
   addMessage(message: Omit<Message, 'id'>): string {
@@ -98,6 +122,53 @@ export class LLMChatStore implements ChatState {
       );
       this.streamingMessageId = undefined;
     });
+
+    logger.debug('completeStreamingMessage called', {
+      messageId,
+      messageCount: this.messages.length,
+      currentFileUri: this.currentFileUri,
+    });
+
+    this.saveConversation();
+  }
+
+  async loadConversation(): Promise<void> {
+    if (!this.currentFileUri || !this.loadConversationFn) {
+      logger.debug('No file URI or load function provided, skipping conversation load', {
+        currentFileUri: this.currentFileUri,
+        hasLoadFn: !!this.loadConversationFn,
+      });
+      return;
+    }
+
+    try {
+      logger.info('Loading conversation', { fileUri: this.currentFileUri });
+      await this.loadConversationFn(this.currentFileUri);
+      logger.info('Conversation load requested');
+    } catch (error) {
+      logger.error('Failed to load conversation', error);
+    }
+  }
+
+  async saveConversation(): Promise<void> {
+    if (!this.currentFileUri || !this.saveConversationFn) {
+      logger.debug('No file URI or save function provided, skipping conversation save', {
+        currentFileUri: this.currentFileUri,
+        hasSaveFn: !!this.saveConversationFn,
+      });
+      return;
+    }
+
+    try {
+      logger.info('Saving conversation', {
+        fileUri: this.currentFileUri,
+        messageCount: this.messages.length,
+      });
+      await this.saveConversationFn(this.currentFileUri, toJS(this.messages));
+      logger.info('Conversation save requested');
+    } catch (error) {
+      logger.error('Failed to save conversation', error);
+    }
   }
 
   /**
