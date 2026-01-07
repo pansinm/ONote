@@ -285,53 +285,52 @@ ipcServer.register(IPCNamespaces.MyNamespace, MyHandler);
 ### CSS Modules
 
 **命名规则：**
-- CSS 类名使用 kebab-case（短横线命名）
-- TypeScript 中使用驼峰命名（camelCase）访问
+- CSS 类名使用 PascalCase（首字母大写）
+- TypeScript 中使用 PascalCase 访问
 
-**驼峰命名规则：**
+**PascalCase 命名规则：**
 ```scss
 // SCSS 文件
-.my-component {
-  &.my-component-active { ... }
-  &.my-component-disabled { ... }
+.MyComponent {
+  &.MyComponentActive { ... }
+  &.MyComponentDisabled { ... }
 }
 ```
 
 ```typescript
 // TypeScript 文件
 import styles from './Component.module.scss';
-<div className={styles.myComponent}>           // ✅ 使用驼峰命名
-<div className={styles.myComponentActive}>      // ✅ 驼峰命名
-<div className={styles.myComponentDisabled}>    // ✅ 驼峰命名
-<div className={styles['my-component-active']}> // ❌ 避免使用短横线访问
+<div className={styles.MyComponent}>           // ✅ 使用 PascalCase
+<div className={styles.MyComponentActive}>      // ✅ PascalCase
+<div className={styles.MyComponentDisabled}>    // ✅ PascalCase
 ```
 
 **复合类名：**
 ```scss
 // SCSS 文件
-.log-item {
-  &.log-item-thinking { ... }
-  &.log-item-tool-call { ... }
+.LogItem {
+  &.LogItemThinking { ... }
+  &.LogItemToolCall { ... }
 }
 ```
 
 ```typescript
 // TypeScript 文件
-<div className={`${styles.logItem} ${styles.logItemThinking}`}>  // ✅ 驼峰命名
-<div className={`${styles.logItem} ${styles.logItemToolCall}`}>  // ✅ 驼峰命名
+<div className={`${styles.LogItem} ${styles.LogItemThinking}`}>  // ✅ PascalCase
+<div className={`${styles.LogItem} ${styles.LogItemToolCall}`}>  // ✅ PascalCase
 ```
 
 **动态类名：**
 ```scss
 // SCSS 文件
-.state-idle { ... }
-.state-thinking { ... }
-.state-executing { ... }
+.StateIdle { ... }
+.StateThinking { ... }
+.StateExecuting { ... }
 ```
 
 ```typescript
 // TypeScript 文件
-<div className={`${styles.container} ${styles[`state${capitalize(store.agentState)}`]}`}>
+<div className={`${styles.Container} ${styles['State' + capitalize(store.agentState)]}`}>
 ```
 
 ### 测试
@@ -450,15 +449,15 @@ useEffect(() => {
 **CSS Module 正确使用:**
 ```tsx
 // ✅ 正确: 在 SCSS 中定义所有变体
-.log-item {
-  &.log-item-thinking { ... }
-  &.log-item-tool_call { ... }
+.LogItem {
+  &.LogItemThinking { ... }
+  &.LogItemToolCall { ... }
 }
 
-<div className={`${styles['log-item']} ${styles[`log-item-${step.type}`]}`}>
+<div className={`${styles.LogItem} ${styles['LogItem' + capitalize(step.type)]}`}>
 
 // ✅ 正确: 使用模板字符串混合
-<div className={`${styles.container} ${someCondition ? 'active' : ''}`}>
+<div className={`${styles.Container} ${someCondition ? 'active' : ''}`}>
 ```
 
 **配置常量:**
