@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import type { AgentStore } from './AgentStore';
 import { useState } from 'react';
@@ -13,6 +13,20 @@ interface AgentPanelProps {
 const AgentPanel = observer(({ store }: AgentPanelProps) => {
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'execution' | 'tools'>('execution');
+
+  const logContainerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'execution' && store.isRunning) {
+      scrollToBottom();
+    }
+  }, [store.executionLog, store.agentState, activeTab, store.isRunning]);
 
   const handleToolClick = (toolName: string) => {
     setSelectedTool(toolName === selectedTool ? null : toolName);
@@ -78,7 +92,7 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
               </div>
             </div>
           ) : (
-            <div className={styles.ExecutionLog}>
+            <div className={styles.ExecutionLog} ref={logContainerRef}>
               <div className={styles.LogList}>
                 {store.executionLog.map((step, index) => (
                   <div
