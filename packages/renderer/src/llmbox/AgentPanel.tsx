@@ -12,7 +12,9 @@ interface AgentPanelProps {
 
 const AgentPanel = observer(({ store }: AgentPanelProps) => {
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'execution' | 'tools'>('execution');
+  const [activeTab, setActiveTab] = useState<'execution' | 'tools'>(
+    'execution',
+  );
 
   const logContainerRef = useRef<HTMLDivElement>(null);
 
@@ -23,10 +25,10 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
   };
 
   useEffect(() => {
-    if (activeTab === 'execution' && store.isRunning) {
+    if (activeTab === 'execution') {
       scrollToBottom();
     }
-  }, [store.executionLog, store.agentState, activeTab, store.isRunning]);
+  }, [store.executionLog, store.agentState, activeTab]);
 
   const handleToolClick = (toolName: string) => {
     setSelectedTool(toolName === selectedTool ? null : toolName);
@@ -38,10 +40,17 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
         <div className={styles.ToolbarLeft}>
           <div className={styles.AgentTitle}>🤖 AI Agent</div>
           <div className={styles.StatusIndicator}>
-            <span className={styles.StatusDot} data-state={store.agentState}></span>
+            <span
+              className={styles.StatusDot}
+              data-state={store.agentState}
+            ></span>
             <span className={styles.StatusText}>{store.agentState}</span>
-            <span className={styles.TaskCount}>{store.executionLog.length} tasks</span>
-            <span className={styles.MessageCount}>{store.conversationHistory.length} messages</span>
+            <span className={styles.TaskCount}>
+              {store.executionLog.length} tasks
+            </span>
+            <span className={styles.MessageCount}>
+              {store.conversationHistory.length} messages
+            </span>
           </div>
           {store.error && (
             <div className={styles.ErrorIndicator} title={store.error}>
@@ -82,11 +91,17 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
       </div>
 
       <div className={styles.TabContent}>
-        <div className={`${styles.TabPane} ${activeTab === 'execution' ? styles.active : ''}`}>
+        <div
+          className={`${styles.TabPane} ${
+            activeTab === 'execution' ? styles.active : ''
+          }`}
+        >
           {store.executionLog.length === 0 ? (
             <div className={styles.EmptyState}>
               <div className={styles.EmptyIcon}>📝</div>
-              <div className={styles.EmptyMessage}>No execution history yet</div>
+              <div className={styles.EmptyMessage}>
+                No execution history yet
+              </div>
               <div className={styles.EmptyHint}>
                 Enter a task below to start the agent
               </div>
@@ -97,14 +112,20 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
                 {store.executionLog.map((step, index) => (
                   <div
                     key={step.id}
-                    className={`${styles.LogItem} ${styles[`logItem${capitalize(step.type)}`]}`}
+                    className={`${styles.LogItem} ${
+                      styles[`logItem${capitalize(step.type)}`]
+                    }`}
                   >
                     <div className={styles.LogHeader}>
                       <span className={styles.LogIndex}>{index + 1}</span>
                       <span className={styles.LogType}>{step.type}</span>
-                      <span className={styles.LogTime}>{formatTime(step.timestamp)}</span>
+                      <span className={styles.LogTime}>
+                        {formatTime(step.timestamp)}
+                      </span>
                       {step.duration && (
-                        <span className={styles.LogDuration}>{(step.duration / 1000).toFixed(2)}s</span>
+                        <span className={styles.LogDuration}>
+                          {(step.duration / 1000).toFixed(2)}s
+                        </span>
                       )}
                     </div>
 
@@ -122,7 +143,9 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
                       {step.toolName && (
                         <div className={styles.LogTool}>
                           <span className={styles.LogToolLabel}>→</span>
-                          <span className={styles.LogToolName}>{step.toolName}</span>
+                          <span className={styles.LogToolName}>
+                            {step.toolName}
+                          </span>
                         </div>
                       )}
 
@@ -138,7 +161,9 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
                       )}
 
                       {step.toolResult && (
-                        <details className={`${styles.LogDetails} ${styles.LogDetailsResult}`}>
+                        <details
+                          className={`${styles.LogDetails} ${styles.LogDetailsResult}`}
+                        >
                           <summary className={styles.LogDetailsToggle}>
                             <span>✅ Result</span>
                           </summary>
@@ -150,7 +175,9 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
                                 </Markdown>
                               </div>
                             ) : (
-                              <pre>{JSON.stringify(step.toolResult, null, 2)}</pre>
+                              <pre>
+                                {JSON.stringify(step.toolResult, null, 2)}
+                              </pre>
                             )}
                           </div>
                         </details>
@@ -176,13 +203,19 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
           )}
         </div>
 
-        <div className={`${styles.TabPane} ${activeTab === 'tools' ? styles.active : ''}`}>
+        <div
+          className={`${styles.TabPane} ${
+            activeTab === 'tools' ? styles.active : ''
+          }`}
+        >
           <div className={styles.ToolsContent}>
             <div className={styles.ToolsGrid}>
-              {store.tools.map(tool => (
+              {store.tools.map((tool) => (
                 <div
                   key={tool.name}
-                  className={`${styles.ToolCard} ${selectedTool === tool.name ? styles.Selected : ''}`}
+                  className={`${styles.ToolCard} ${
+                    selectedTool === tool.name ? styles.Selected : ''
+                  }`}
                   onClick={() => handleToolClick(tool.name)}
                   title={tool.description}
                 >
@@ -195,7 +228,11 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
                       {tool.metadata?.dangerous && (
                         <span className={styles.ToolBadge}>⚠️</span>
                       )}
-                      <span className={`${styles.ToolBadge} ${styles.Permission} ${styles[tool.metadata?.permission || 'read']}`}>
+                      <span
+                        className={`${styles.ToolBadge} ${styles.Permission} ${
+                          styles[tool.metadata?.permission || 'read']
+                        }`}
+                      >
                         {tool.metadata?.permission}
                       </span>
                     </div>
@@ -210,13 +247,17 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
 
       <div className={styles.BottomTabs}>
         <button
-          className={`${styles.BottomTabItem} ${activeTab === 'execution' ? styles.active : ''}`}
+          className={`${styles.BottomTabItem} ${
+            activeTab === 'execution' ? styles.active : ''
+          }`}
           onClick={() => setActiveTab('execution')}
         >
           📋 Execution Log
         </button>
         <button
-          className={`${styles.BottomTabItem} ${activeTab === 'tools' ? styles.active : ''}`}
+          className={`${styles.BottomTabItem} ${
+            activeTab === 'tools' ? styles.active : ''
+          }`}
           onClick={() => setActiveTab('tools')}
         >
           🔧 Tools ({store.tools.length})

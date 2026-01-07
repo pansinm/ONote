@@ -24,13 +24,16 @@ const { send, receive } = createChannel('MAIN_FRAME-LLM_BOX');
 
 const LLMBoxApp = observer(() => {
   const settings = (window as any).__settings;
-  const [mode, setMode] = useState<'chat' | 'agent'>('chat');
+  const [mode, setMode] = useState<'chat' | 'agent'>('agent');
 
   const previousFileUriRef = useRef<string | null>(null);
 
   const saveAgentContextHandler = useRef(async (fileUri: string) => {
     try {
-      console.log('[llmbox.tsx] Saving agent context:', { fileUri, stepCount: agentStore.executionLog.length });
+      console.log('[llmbox.tsx] Saving agent context:', {
+        fileUri,
+        stepCount: agentStore.executionLog.length,
+      });
       await agentStore.saveContext(fileUri);
       console.log('[llmbox.tsx] Agent context saved');
     } catch (error) {
@@ -52,7 +55,10 @@ const LLMBoxApp = observer(() => {
 
   const handleFileChange = useRef(async (fileUri: string) => {
     if (previousFileUriRef.current && previousFileUriRef.current !== fileUri) {
-      console.log('[llmbox.tsx] File changed, saving agent context for:', previousFileUriRef.current);
+      console.log(
+        '[llmbox.tsx] File changed, saving agent context for:',
+        previousFileUriRef.current,
+      );
       await saveAgentContextHandler(previousFileUriRef.current);
     }
 
@@ -71,26 +77,33 @@ const LLMBoxApp = observer(() => {
       }),
   );
 
-  const [agentStore] = useState(() =>
-    new AgentStore(
-      {
-        apiKey: settings[LLM_API_KEY],
-        model: settings[LLM_MODEL_NAME],
-        apiBase: `${settings[LLM_BASE_URL]}/chat/completions`,
-        maxIterations: 10,
-        showThinking: true,
-        timeout: 60000,
-      },
-      { send },
-    ),
+  const [agentStore] = useState(
+    () =>
+      new AgentStore(
+        {
+          apiKey: settings[LLM_API_KEY],
+          model: settings[LLM_MODEL_NAME],
+          apiBase: `${settings[LLM_BASE_URL]}/chat/completions`,
+          maxIterations: 10,
+          showThinking: true,
+          timeout: 60000,
+        },
+        { send },
+      ),
   );
 
   useEffect(() => {
     console.log('[llmbox.tsx] Initial setup');
 
-    const saveConversationHandler = async (fileUri: string, messages: any[]) => {
+    const saveConversationHandler = async (
+      fileUri: string,
+      messages: any[],
+    ) => {
       try {
-        console.log('[llmbox.tsx] Saving conversation:', { fileUri, messageCount: messages.length });
+        console.log('[llmbox.tsx] Saving conversation:', {
+          fileUri,
+          messageCount: messages.length,
+        });
         await send({
           type: LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_SAVE,
           data: { fileUri, messages },
@@ -107,17 +120,23 @@ const LLMBoxApp = observer(() => {
     const loadConversation = async (fileUri: string) => {
       try {
         console.log('[llmbox.tsx] Loading conversation for:', fileUri);
-        const response = await send({
+        const response = (await send({
           type: LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_LOAD,
           data: { fileUri },
-        }) as { error?: string; messages?: any[] };
+        })) as { error?: string; messages?: any[] };
 
         console.log('[llmbox.tsx] LLM_CONVERSATION_LOAD response:', response);
 
         if (response.error) {
-          console.error('[llmbox.tsx] Failed to load conversation:', response.error);
+          console.error(
+            '[llmbox.tsx] Failed to load conversation:',
+            response.error,
+          );
         } else {
-          console.log('[llmbox.tsx] Setting messages:', response.messages?.length);
+          console.log(
+            '[llmbox.tsx] Setting messages:',
+            response.messages?.length,
+          );
           chatStore.setMessages(response.messages || []);
         }
       } catch (error) {
@@ -151,17 +170,23 @@ const LLMBoxApp = observer(() => {
         type === LLM_BOX_MESSAGE_TYPES.EDITOR_CONTENT_CHANGED ||
         type === LLM_BOX_MESSAGE_TYPES.EDITOR_SELECTION_CHANGED
       ) {
-        chatStore.updateEditorContent(data?.content || '', data?.selection || '');
-        agentStore.updateEditorContent(data?.content || '', data?.selection || '');
+        chatStore.updateEditorContent(
+          data?.content || '',
+          data?.selection || '',
+        );
+        agentStore.updateEditorContent(
+          data?.content || '',
+          data?.selection || '',
+        );
       }
     });
 
     const getCurrentFileInfo = async () => {
       try {
         console.log('[llmbox.tsx] Requesting current file info');
-        const response = await send({
+        const response = (await send({
           type: LLM_BOX_MESSAGE_TYPES.GET_CURRENT_FILE_INFO,
-        }) as { fileUri?: string; rootUri?: string };
+        })) as { fileUri?: string; rootUri?: string };
 
         console.log('[llmbox.tsx] Got current file info:', response);
 
@@ -204,13 +229,15 @@ const LLMBoxApp = observer(() => {
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* 模式切换 */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '8px', 
-        padding: '12px 16px',
-        background: '#ffffff',
-        borderBottom: '1px solid #e0e0e0'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          padding: '12px 16px',
+          background: '#ffffff',
+          borderBottom: '1px solid #e0e0e0',
+        }}
+      >
         <button
           style={{
             flex: 1,
@@ -221,7 +248,7 @@ const LLMBoxApp = observer(() => {
             color: mode === 'chat' ? '#ffffff' : '#333333',
             cursor: 'pointer',
             fontSize: '14px',
-            fontWeight: '500'
+            fontWeight: '500',
           }}
           onClick={() => setMode('chat')}
         >
@@ -237,7 +264,7 @@ const LLMBoxApp = observer(() => {
             color: mode === 'agent' ? '#ffffff' : '#333333',
             cursor: 'pointer',
             fontSize: '14px',
-            fontWeight: '500'
+            fontWeight: '500',
           }}
           onClick={() => setMode('agent')}
         >
@@ -250,7 +277,10 @@ const LLMBoxApp = observer(() => {
         {mode === 'chat' ? (
           <LLMBox store={chatStore} />
         ) : (
-          <div className="agent-mode" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <div
+            className="agent-mode"
+            style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+          >
             <div style={{ flex: 1, overflow: 'hidden' }}>
               {(() => {
                 const AgentPanelModule = require('../llmbox/AgentPanel');
@@ -258,11 +288,13 @@ const LLMBoxApp = observer(() => {
                 return <AgentPanel store={agentStore} />;
               })()}
             </div>
-            <div style={{ 
-              padding: '12px 16px', 
-              background: '#ffffff',
-              borderTop: '1px solid #e0e0e0'
-            }}>
+            <div
+              style={{
+                padding: '12px 16px',
+                background: '#ffffff',
+                borderTop: '1px solid #e0e0e0',
+              }}
+            >
               <textarea
                 placeholder="Enter a task for the agent..."
                 disabled={agentStore.isRunning}
@@ -275,7 +307,7 @@ const LLMBoxApp = observer(() => {
                   borderRadius: '6px',
                   resize: 'vertical',
                   fontFamily: 'inherit',
-                  fontSize: '14px'
+                  fontSize: '14px',
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -288,7 +320,13 @@ const LLMBoxApp = observer(() => {
                   }
                 }}
               />
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginTop: '8px',
+                }}
+              >
                 {agentStore.isRunning ? (
                   <button
                     onClick={() => agentStore.stopAgent()}
@@ -300,7 +338,7 @@ const LLMBoxApp = observer(() => {
                       borderRadius: '4px',
                       cursor: 'pointer',
                       fontSize: '14px',
-                      fontWeight: '500'
+                      fontWeight: '500',
                     }}
                   >
                     ⏹️ Stop
@@ -326,7 +364,7 @@ const LLMBoxApp = observer(() => {
                       cursor: agentStore.isRunning ? 'not-allowed' : 'pointer',
                       fontSize: '14px',
                       fontWeight: '500',
-                      opacity: agentStore.isRunning ? 0.6 : 1
+                      opacity: agentStore.isRunning ? 0.6 : 1,
                     }}
                   >
                     🚀 Run Agent
