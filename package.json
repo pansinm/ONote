@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "postinstall": "patch-package && electron-builder install-app-deps",
+    "generate-tray-icon": "node scripts/generate-tray-icon.js",
     "build": "rm -rf packages/*/dist && turbo build",
     "compile": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js",
     "bdd": "chokidar \"features/**\" -c \"yarn  cucumber-js\"",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@cucumber/cucumber": "^10.3.1",
-    "chokidar": "^3.5.3"
+    "chokidar": "^3.5.3",
+    "sharp": "^0.34.5"
   }
 }

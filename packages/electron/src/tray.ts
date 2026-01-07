@@ -1,17 +1,30 @@
 import { Tray, app, nativeImage, Menu } from 'electron';
-import { resolve } from 'path';
+import { join } from 'path';
 import { restoreOrCreateWindow } from './window';
 
 let tray: Tray | null = null;
 
-const icon =
-  process.env.NODE_ENV === 'development'
-    ? 'buildResources/icon.png'
-    : resolve(app.getAppPath(), 'buildResources/icon.png');
+function getIconPath() {
+  if (app.isPackaged) {
+    return join(process.cwd(), '../../buildResources/tray-icon.png');
+  }
+  return join(app.getAppPath(), '../buildResources/tray-icon.png');
+}
 
 export function createTrayIcon() {
   if (!tray) {
+    const iconPath = getIconPath();
+    let icon = nativeImage.createFromPath(iconPath);
+
+    if (process.platform === 'darwin') {
+      icon = icon.resize({ width: 16, height: 16 });
+      icon.setTemplateImage(true);
+    } else {
+      icon = icon.resize({ width: 16, height: 16 });
+    }
+
     tray = new Tray(icon);
+
     const contextMenu = Menu.buildFromTemplate([
       {
         label: '显示窗口',
