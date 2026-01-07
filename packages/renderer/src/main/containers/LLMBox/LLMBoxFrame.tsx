@@ -7,7 +7,7 @@ import {
   EDITOR_SELECTION_CHANGED,
 } from '../../eventbus/EventName';
 import { subscription } from '../../eventbus';
-import { LLM_BOX_MESSAGE_TYPES } from './constants';
+import { LLM_BOX_MESSAGE_TYPES } from '../../../llmbox/constants/LLMBoxConstants';
 import {
   ConversationLoadHandler,
   ConversationSaveHandler,

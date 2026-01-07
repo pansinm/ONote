@@ -1,5 +1,6 @@
 import type { Tool } from './types';
 import { getLogger } from '../../shared/logger';
+import { LLM_BOX_MESSAGE_TYPES } from '../constants/LLMBoxConstants';
 
 const logger = getLogger('ToolRegistry');
 
@@ -62,13 +63,13 @@ class ToolRegistry {
     // 读取文件
     this.register({
       name: 'readFile',
-      description: 'Read the content of a file',
+      description: '读取文件内容。用于查看和分析文件，支持所有文本文件格式（.md, .txt, .js, .ts 等）。',
       parameters: {
         type: 'object',
         properties: {
           uri: {
             type: 'string',
-            description: 'The URI of file to read (e.g., file:///path/to/file.md)',
+            description: '要读取的文件 URI，必须是完整路径，例如：file:///Users/username/notes/file.md',
           },
         },
         required: ['uri'],
@@ -76,7 +77,7 @@ class ToolRegistry {
       metadata: { category: 'file', permission: 'read' },
       executor: async (params) => {
         const response = await this.channel.send({
-          type: 'AGENT_FILE_READ',
+          type: LLM_BOX_MESSAGE_TYPES.AGENT_FILE_READ,
           data: params,
         });
         
@@ -91,17 +92,17 @@ class ToolRegistry {
     // 写入文件
     this.register({
       name: 'writeFile',
-      description: 'Write content to a file (overwrites existing content)',
+      description: '写入文件内容。会覆盖文件的现有内容，用于更新或修改文件。',
       parameters: {
         type: 'object',
         properties: {
           uri: {
             type: 'string',
-            description: 'The URI of the file to write',
+            description: '要写入的文件 URI，必须是完整路径',
           },
           content: {
             type: 'string',
-            description: 'The content to write to the file',
+            description: '要写入文件的内容',
           },
         },
         required: ['uri', 'content'],
@@ -113,7 +114,7 @@ class ToolRegistry {
       },
       executor: async (params) => {
         const response = await this.channel.send({
-          type: 'AGENT_FILE_WRITE',
+          type: LLM_BOX_MESSAGE_TYPES.AGENT_FILE_WRITE,
           data: params,
         });
         
@@ -128,17 +129,17 @@ class ToolRegistry {
     // 创建文件
     this.register({
       name: 'createFile',
-      description: 'Create a new file with content',
+      description: '创建新文件。如果文件已存在，会提示错误。',
       parameters: {
         type: 'object',
         properties: {
           uri: {
             type: 'string',
-            description: 'The URI where the file should be created',
+            description: '要创建的文件 URI，必须是完整路径',
           },
           content: {
             type: 'string',
-            description: 'The initial content of the file',
+            description: '文件的初始内容，默认为空字符串',
             default: '',
           },
         },
@@ -151,7 +152,7 @@ class ToolRegistry {
       },
       executor: async (params) => {
         const response = await this.channel.send({
-          type: 'AGENT_FILE_CREATE',
+          type: LLM_BOX_MESSAGE_TYPES.AGENT_FILE_CREATE,
           data: params,
         });
         
@@ -166,13 +167,13 @@ class ToolRegistry {
     // 删除文件
     this.register({
       name: 'deleteFile',
-      description: 'Delete a file permanently',
+      description: '永久删除文件。此操作不可逆，请谨慎使用。',
       parameters: {
         type: 'object',
         properties: {
           uri: {
             type: 'string',
-            description: 'The URI of the file to delete',
+            description: '要删除的文件 URI，必须是完整路径',
           },
         },
         required: ['uri'],
@@ -184,7 +185,7 @@ class ToolRegistry {
       },
       executor: async (params) => {
         const response = await this.channel.send({
-          type: 'AGENT_FILE_DELETE',
+          type: LLM_BOX_MESSAGE_TYPES.AGENT_FILE_DELETE,
           data: params,
         });
         
@@ -199,13 +200,13 @@ class ToolRegistry {
     // 列出目录
     this.register({
       name: 'listFiles',
-      description: 'List files and directories in a directory',
+      description: '列出目录中的文件和子目录。用于浏览文件结构。',
       parameters: {
         type: 'object',
         properties: {
           uri: {
             type: 'string',
-            description: 'The URI of the directory to list',
+            description: '要列出的目录 URI，必须是完整路径',
           },
         },
         required: ['uri'],
@@ -213,7 +214,7 @@ class ToolRegistry {
       metadata: { category: 'file', permission: 'read' },
       executor: async (params) => {
         const response = await this.channel.send({
-          type: 'AGENT_FILE_LIST',
+          type: LLM_BOX_MESSAGE_TYPES.AGENT_FILE_LIST,
           data: params,
         });
         
@@ -228,17 +229,17 @@ class ToolRegistry {
     // 搜索文件
     this.register({
       name: 'searchFiles',
-      description: 'Search for files by keywords in file names',
+      description: '根据关键词搜索文件。在指定目录及其子目录中搜索文件名包含关键词的文件。',
       parameters: {
         type: 'object',
         properties: {
           rootUri: {
             type: 'string',
-            description: 'The root URI to search in',
+            description: '搜索的根目录 URI',
           },
           keywords: {
             type: 'string',
-            description: 'Keywords to search for',
+            description: '要搜索的关键词',
           },
         },
         required: ['rootUri', 'keywords'],
@@ -246,7 +247,7 @@ class ToolRegistry {
       metadata: { category: 'file', permission: 'read' },
       executor: async (params) => {
         const response = await this.channel.send({
-          type: 'AGENT_FILE_SEARCH',
+          type: LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH,
           data: params,
         });
         
@@ -261,17 +262,17 @@ class ToolRegistry {
     // 搜索文件内容
     this.register({
       name: 'searchInFile',
-      description: 'Search for a pattern within a file',
+      description: '在文件中搜索内容。使用正则表达式模式搜索文件内容，返回匹配的行号和内容。',
       parameters: {
         type: 'object',
         properties: {
           uri: {
             type: 'string',
-            description: 'The URI of the file to search in',
+            description: '要搜索的文件 URI，必须是完整路径',
           },
           pattern: {
             type: 'string',
-            description: 'The pattern to search for (supports regex)',
+            description: '要搜索的模式，支持正则表达式',
           },
         },
         required: ['uri', 'pattern'],
@@ -279,7 +280,7 @@ class ToolRegistry {
       metadata: { category: 'search', permission: 'read' },
       executor: async (params) => {
         const response = await this.channel.send({
-          type: 'AGENT_FILE_SEARCH_IN',
+          type: LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH_IN,
           data: params,
         });
         

@@ -17,7 +17,7 @@ import {
   EDITOR_CONTENT_CHANGED,
   EDITOR_SELECTION_CHANGED,
 } from '../main/eventbus/EventName';
-import { LLM_BOX_MESSAGE_TYPES } from '../main/containers/LLMBox/constants';
+import { LLM_BOX_MESSAGE_TYPES } from '../llmbox/constants/LLMBoxConstants';
 import '../styles/index.scss';
 import('github-markdown-css/github-markdown.css');
 

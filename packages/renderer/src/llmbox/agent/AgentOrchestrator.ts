@@ -222,7 +222,23 @@ export class AgentOrchestrator {
         // 获取工具并执行
         const tool = this.toolRegistry.get(toolName);
         if (!tool) {
-          throw new Error(`Tool not found: ${toolName}`);
+          const errorMsg = `Tool not found: ${toolName}`;
+          const duration = Date.now() - startTime;
+
+          this.addStep({
+            type: 'tool_result',
+            content: `Tool ${toolName} failed`,
+            toolName,
+            error: errorMsg,
+            duration,
+          });
+
+          toolResults.push({
+            toolCallId: toolCall.id,
+            result: { error: errorMsg },
+          });
+
+          continue;
         }
 
         const result = await tool.executor(toolParams);
@@ -245,16 +261,25 @@ export class AgentOrchestrator {
         });
 
       } catch (error) {
+        const duration = Date.now() - startTime;
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+
         logger.error('Tool execution failed', error, { toolName });
 
         this.addStep({
           type: 'tool_result',
           content: `Tool ${toolName} failed`,
           toolName,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: errorMsg,
+          duration,
         });
 
-        throw error;
+        toolResults.push({
+          toolCallId: toolCall.id,
+          result: { error: errorMsg },
+        });
+
+        continue;
       }
     }
 
@@ -282,35 +307,38 @@ export class AgentOrchestrator {
       .join('\n');
 
     return `
-You are an intelligent AI assistant with access to tools that help users with their tasks in ONote.
+你是一名智能助手，帮助用户在 ONote 笔记应用中高效完成各种任务。
 
-## Available Tools
+## 可用工具
 
 ${toolDescriptions}
 
-## Instructions
+## 工作原则
 
-1. When you need to use a tool, include a tool_calls array in your response.
-2. After using a tool, analyze the results and decide whether to:
-   - Use another tool to gather more information
-   - Complete the task and provide a final answer
-3. Always explain your reasoning before using tools.
-4. Be concise and focused on the user's request.
-5. Use tools efficiently - don't repeat the same tool call unnecessarily.
+1. **目标导向**：始终以完成任务为目标，合理规划工具使用顺序
+2. **安全第一**：谨慎使用 writeFile、deleteFile 等危险操作，必要时确认
+3. **高效执行**：避免重复调用相同工具，充分利用工具返回结果
+4. **清晰解释**：在使用工具前说明意图，使用后解释结果
 
-## Tool Usage Format
+## 任务流程
 
-When you need to call a tool, format your response as:
+1. **分析需求**：理解用户想要完成什么任务
+2. **选择工具**：根据任务需求选择合适的工具
+3. **执行操作**：按逻辑顺序执行工具调用
+4. **总结结果**：向用户说明任务完成情况和关键发现
+
+## 工具使用示例
+
+当需要调用工具时，使用以下格式：
 
 \`\`\`json
 {
-  "content": "I'll help you with that. Let me read the file...",
   "tool_calls": [
     {
-      "id": "call_${Date.now()}",
+      "id": "call_unique_id",
       "type": "function",
       "function": {
-        "name": "tool-name",
+        "name": "readFile",
         "arguments": "{\\"uri\\": \\"file:///path/to/file.md\\"}"
       }
     }
@@ -318,13 +346,22 @@ When you need to call a tool, format your response as:
 }
 \`\`\`
 
-## Important Notes
+## 重要提示
 
-- Some tools may be dangerous (like writeFile or deleteFile) - use them carefully
-- Always provide context about what you're doing and why
-- File URIs should be in the format: file:///absolute/path/to/file
-- If you encounter an error, explain it clearly and suggest alternatives
-- Keep your responses concise and actionable
+- **文件 URI 格式**：必须是完整路径，例如 \`file:///Users/username/notes/file.md\`
+- **参数 JSON 格式**：arguments 字段必须是 JSON 字符串，确保转义正确
+- **工具错误处理**：如果工具调用失败，分析错误原因并采取以下措施：
+  - **临时错误**（如网络超时）：可以重试相同工具
+  - **参数错误**：检查并修正参数后重试
+  - **文件不存在**：先使用 listFiles 确认文件是否存在
+  - **权限错误**：向用户说明需要手动解决该问题
+  - **其他错误**：向用户说明遇到的问题，提供替代方案
+- **错误恢复**：工具失败后不要放弃任务，尝试：
+  - 使用其他工具完成任务
+  - 修改参数后重试
+  - 或向用户说明无法完成的原因
+- **任务完成**：如果没有工具需要调用，直接给出最终答案
+- **迭代限制**：最多迭代 10 次，如果未完成任务，给出中间结果和建议
 `.trim();
   }
 

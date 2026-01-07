@@ -172,7 +172,14 @@ export class AgentStore {
         .map(msg => `${msg.role}: ${msg.content}`)
         .join('\n\n');
 
-      const summaryPrompt = `Please summarize the following conversation concisely in 2-3 sentences, focusing on the main topics and outcomes:\n\n${conversationText}`;
+      const summaryPrompt = `请用中文简洁总结以下对话内容，2-3 句话即可：
+
+1. 主要讨论了什么主题
+2. 得出了什么结论或结果
+3. 还有什么未完成的任务
+
+对话内容：
+${conversationText}`;
 
       const response = await fetch(this.config.apiBase, {
         method: 'POST',
