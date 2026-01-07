@@ -50,13 +50,13 @@
 .inputArea {
   border-top: 1px solid #e9ecef;
   background: #ffffff;
-  padding: 16px;
+  padding: 8px;
   position: relative;
 }
 .imagePreviews {
   display: flex;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   flex-wrap: wrap;
 }
 .imagePreview {
@@ -93,16 +93,17 @@
 }
 .inputContainer {
   display: flex;
-  gap: 12px;
-  align-items: flex-end;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
 }
 .textInput {
-  flex: 1;
-  min-height: 40px;
+  width: 100%;
+  min-height: 50px;
   max-height: 120px;
-  padding: 10px 12px;
+  padding: 8px 12px;
   border: 1px solid #ddd;
-  border-radius: 20px;
+  border-radius: 18px;
   resize: none;
   font-family: inherit;
   font-size: 14px;
@@ -124,13 +125,14 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  align-self: flex-end;
 }
 .fileInput {
   display: none;
 }
 .attachButton {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border: 1px solid #ddd;
   background: white;
   border-radius: 50%;
@@ -138,7 +140,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 13px;
   &:hover {
     background: #f8f9fa;
     border-color: #ccc;
@@ -149,14 +151,14 @@
   }
 }
 .sendButton {
-  height: 40px;
-  padding: 0 16px;
+  height: 32px;
+  padding: 0 10px;
   border: none;
   background: #007bff;
   color: white;
-  border-radius: 20px;
+  border-radius: 16px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   &:hover:not(:disabled) {
     background: #0056b3;

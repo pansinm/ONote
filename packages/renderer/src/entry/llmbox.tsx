@@ -6,6 +6,7 @@ import { runInAction } from 'mobx';
 import { LLMBox } from '../llmbox';
 import { LLMChatStore } from '../llmbox/LLMChatStore';
 import { AgentStore } from '../llmbox/AgentStore';
+import InputArea from '../llmbox/InputArea';
 import {
   LLM_API_KEY,
   LLM_BASE_URL,
@@ -288,90 +289,15 @@ const LLMBoxApp = observer(() => {
                 return <AgentPanel store={agentStore} />;
               })()}
             </div>
-            <div
-              style={{
-                padding: '12px 16px',
-                background: '#ffffff',
-                borderTop: '1px solid #e0e0e0',
+            <InputArea
+              onSendMessage={async (content, imageUrls) => {
+                if (content.trim()) {
+                  await handleAgentRun(content);
+                }
               }}
-            >
-              <textarea
-                placeholder="Enter a task for the agent..."
-                disabled={agentStore.isRunning}
-                style={{
-                  width: '100%',
-                  minHeight: '60px',
-                  maxHeight: '150px',
-                  padding: '12px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '6px',
-                  resize: 'vertical',
-                  fontFamily: 'inherit',
-                  fontSize: '14px',
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    const textarea = e.target as HTMLTextAreaElement;
-                    if (textarea.value.trim()) {
-                      handleAgentRun(textarea.value);
-                      textarea.value = '';
-                    }
-                  }
-                }}
-              />
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  marginTop: '8px',
-                }}
-              >
-                {agentStore.isRunning ? (
-                  <button
-                    onClick={() => agentStore.stopAgent()}
-                    style={{
-                      padding: '8px 16px',
-                      background: '#ff5722',
-                      color: '#ffffff',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                    }}
-                  >
-                    ⏹️ Stop
-                  </button>
-                ) : (
-                  <button
-                    disabled={agentStore.isRunning}
-                    onClick={() => {
-                      const textarea = document.querySelector(
-                        '.agent-mode textarea',
-                      ) as HTMLTextAreaElement;
-                      if (textarea?.value.trim()) {
-                        handleAgentRun(textarea.value);
-                        textarea.value = '';
-                      }
-                    }}
-                    style={{
-                      padding: '8px 16px',
-                      background: '#28a745',
-                      color: '#ffffff',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: agentStore.isRunning ? 'not-allowed' : 'pointer',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      opacity: agentStore.isRunning ? 0.6 : 1,
-                    }}
-                  >
-                    🚀 Run Agent
-                  </button>
-                )}
-              </div>
-            </div>
+              isLoading={agentStore.isRunning}
+              selection={agentStore.selection}
+            />
           </div>
         )}
       </div>
