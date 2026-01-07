@@ -370,26 +370,38 @@ ${conversationText}`;
       const response = await this.channel.send({
         type: 'AGENT_CONTEXT_LOAD',
         data: { fileUri },
-      }) as { error?: string; context?: any };
+      }) as { error?: string; agentContext?: any };
 
       if (response.error) {
         logger.error('Failed to load agent context', response.error);
         return null;
       }
 
-      const context = response.context;
-      if (!context) {
-        return null;
+      const agentContext = response.agentContext;
+      
+      if (!agentContext) {
+        logger.debug('No context found for file, resetting all data', { fileUri });
+
+        runInAction(() => {
+          this.fileUri = null;
+          this.error = null;
+          this.content = '';
+          this.selection = '';
+          this.executionLog = [];
+          this.conversationHistory = [];
+        });
+
+        return;
       }
 
       runInAction(() => {
-        this.fileUri = context.fileUri || null;
-        this.error = context.error || null;
-        this.content = context.content || '';
-        this.selection = context.selection || '';
+        this.fileUri = agentContext.fileUri || null;
+        this.error = agentContext.error || null;
+        this.content = agentContext.content || '';
+        this.selection = agentContext.selection || '';
 
-        if (context.executionLog && Array.isArray(context.executionLog)) {
-          this.executionLog = context.executionLog.map((step: any) => ({
+        if (agentContext.executionLog && Array.isArray(agentContext.executionLog)) {
+          this.executionLog = agentContext.executionLog.map((step: any) => ({
             ...step,
             timestamp: step.timestamp ? new Date(step.timestamp) : new Date(),
           }));
@@ -397,8 +409,8 @@ ${conversationText}`;
           this.executionLog = [];
         }
 
-        if (context.conversationHistory && Array.isArray(context.conversationHistory)) {
-          this.conversationHistory = context.conversationHistory.map((msg: any) => ({
+        if (agentContext.conversationHistory && Array.isArray(agentContext.conversationHistory)) {
+          this.conversationHistory = agentContext.conversationHistory.map((msg: any) => ({
             ...msg,
             timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
           }));
@@ -408,8 +420,102 @@ ${conversationText}`;
       });
 
       logger.info('Agent context loaded', {
-        stepCount: context.executionLog?.length || 0,
-        messageCount: context.conversationHistory?.length || 0,
+        fileUri,
+        hasContext: !!agentContext,
+        executionLogCount: agentContext.executionLog?.length || 0,
+        conversationCount: agentContext.conversationHistory?.length || 0,
+      });
+    } catch (error) {
+      logger.error('Failed to load agent context', error);
+      return null;
+    }
+  }
+
+      const agentContext = response.context;
+      
+      runInAction(() => {
+        if (!context) {
+          logger.debug('No context found for file, resetting all data', { fileUri });
+
+          this.fileUri = null;
+          this.error = null;
+          this.content = '';
+          this.selection = '';
+          this.executionLog = [];
+          this.conversationHistory = [];
+
+          return;
+        }
+
+        this.fileUri = agentContext.fileUri || null;
+        this.error = agentContext.error || null;
+        this.content = agentContext.content || '';
+        this.selection = agentContext.selection || '';
+
+        if (agentContext.executionLog && Array.isArray(agentContext.executionLog)) {
+          this.executionLog = agentContext.executionLog.map((step: any) => ({
+            ...step,
+            timestamp: step.timestamp ? new Date(step.timestamp) : new Date(),
+          }));
+        } else {
+          this.executionLog = [];
+        }
+
+        if (agentContext.conversationHistory && Array.isArray(agentContext.conversationHistory)) {
+          this.conversationHistory = agentContext.conversationHistory.map((msg: any) => ({
+            ...msg,
+            timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+          }));
+        } else {
+          this.conversationHistory = [];
+        }
+      });
+
+      logger.info('Agent context loaded', {
+        fileUri,
+        hasContext: !!context,
+        executionLogCount: agentContext.executionLog?.length || 0,
+        conversationCount: agentContext.conversationHistory?.length || 0,
+      });
+    } catch (error) {
+      logger.error('Failed to load agent context', error);
+      return null;
+    }
+  }
+
+      const agentContext = response.context;
+      if (!context) {
+        return null;
+      }
+
+      runInAction(() => {
+        this.fileUri = agentContext.fileUri || null;
+        this.error = agentContext.error || null;
+        this.content = agentContext.content || '';
+        this.selection = agentContext.selection || '';
+
+        if (agentContext.executionLog && Array.isArray(agentContext.executionLog)) {
+          this.executionLog = agentContext.executionLog.map((step: any) => ({
+            ...step,
+            timestamp: step.timestamp ? new Date(step.timestamp) : new Date(),
+          }));
+        } else {
+          this.executionLog = [];
+        }
+
+        if (agentContext.conversationHistory && Array.isArray(agentContext.conversationHistory)) {
+          this.conversationHistory = agentContext.conversationHistory.map((msg: any) => ({
+            ...msg,
+            timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+          }));
+        } else {
+          this.conversationHistory = [];
+        }
+      });
+
+      logger.info('Agent context loaded', {
+        stepCount: agentContext.executionLog?.length || 0,
+        messageCount: agentContext.conversationHistory?.length || 0,
       });
 
       return context;
