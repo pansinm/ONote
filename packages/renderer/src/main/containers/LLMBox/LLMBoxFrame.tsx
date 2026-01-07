@@ -8,30 +8,81 @@ import {
 } from '../../eventbus/EventName';
 import { subscription } from '../../eventbus';
 import { LLM_BOX_MESSAGE_TYPES } from './constants';
-import fileService from '../../services/fileService';
-import * as monaco from 'monaco-editor';
+import {
+  ConversationLoadHandler,
+  ConversationSaveHandler,
+} from './handlers/ConversationHandler';
+import {
+  AgentFileReadHandler,
+  AgentFileWriteHandler,
+  AgentFileCreateHandler,
+  AgentFileDeleteHandler,
+  AgentFileListHandler,
+  AgentFileSearchHandler,
+  AgentFileSearchInHandler,
+} from './handlers/AgentFileHandler';
+import {
+  AgentContextLoadHandler,
+  AgentContextSaveHandler,
+} from './handlers/AgentContextHandler';
+import {
+  GetCurrentFileInfoHandler,
+  AgentGetRootUriHandler,
+  AgentGetActiveFileUriHandler,
+} from './handlers/EditorEventHandler';
 
 function LLMBoxFrame() {
   const ref = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    console.log(
-      '[LLMBoxFrame] useEffect triggered, ref.current:',
-      ref.current,
-      'sidebarUrl:',
-      stores.layoutStore.sidebarUrl,
-    );
-
     if (!ref.current?.contentWindow) {
-      console.log('[LLMBoxFrame] contentWindow not ready, waiting...');
       return;
     }
 
-    console.log('[LLMBoxFrame] contentWindow ready, creating channel');
     const { send, receive } = createChannel(
       ref.current!.contentWindow!,
       'MAIN_FRAME-LLM_BOX',
     );
+
+    const onote = (window as any).onote;
+
+    const handlers: Record<string, any> = {
+      [LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_LOAD]:
+        new ConversationLoadHandler(stores, onote),
+      [LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_SAVE]:
+        new ConversationSaveHandler(stores, onote),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_READ]: new AgentFileReadHandler(stores),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_WRITE]: new AgentFileWriteHandler(
+        stores,
+      ),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_CREATE]: new AgentFileCreateHandler(
+        stores,
+      ),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_DELETE]: new AgentFileDeleteHandler(
+        stores,
+      ),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_LIST]: new AgentFileListHandler(stores),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH]: new AgentFileSearchHandler(
+        stores,
+      ),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH_IN]:
+        new AgentFileSearchInHandler(stores),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_CONTEXT_LOAD]: new AgentContextLoadHandler(
+        stores,
+        onote,
+      ),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_CONTEXT_SAVE]: new AgentContextSaveHandler(
+        stores,
+        onote,
+      ),
+      [LLM_BOX_MESSAGE_TYPES.GET_CURRENT_FILE_INFO]:
+        new GetCurrentFileInfoHandler(stores),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_GET_ROOT_URI]: new AgentGetRootUriHandler(
+        stores,
+      ),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_GET_ACTIVE_FILE_URI]:
+        new AgentGetActiveFileUriHandler(stores),
+    };
 
     const contentChanged = subscription.subscribe(
       EDITOR_CONTENT_CHANGED,
@@ -56,329 +107,34 @@ function LLMBoxFrame() {
     const activeFileDisposer = reaction(
       () => stores.activationStore.activeFileUri,
       (uri) => {
-        console.log('[LLMBoxFrame] Active file changed:', uri);
         if (uri) {
           send({
             type: LLM_BOX_MESSAGE_TYPES.EDITOR_FILE_OPEN,
             data: { uri },
           });
-          console.log('[LLMBoxFrame] Sent EDITOR_FILE_OPEN:', uri);
         }
       },
     );
 
     receive(async ({ type, data }: any) => {
-      console.log('[LLMBoxFrame] Received message:', { type, data });
+      const handler = handlers[type];
+      if (!handler) {
+        console.warn(`[LLMBoxFrame] No handler for type: ${type}`);
+        return;
+      }
 
-      if (type === LLM_BOX_MESSAGE_TYPES.GET_CURRENT_FILE_INFO) {
-        const { fileUri, rootUri } = {
-          fileUri: stores.activationStore.activeFileUri,
-          rootUri: stores.activationStore.rootUri,
+      try {
+        const result = await handler.handle(data);
+        return result;
+      } catch (error) {
+        console.error(`[LLMBoxFrame] Handler error for ${type}:`, error);
+        return {
+          error: error instanceof Error ? error.message : 'Unknown error',
         };
-        console.log('[LLMBoxFrame] Handling GET_CURRENT_FILE_INFO:', {
-          fileUri,
-          rootUri,
-        });
-        return { fileUri, rootUri };
       }
-
-      if (type === LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_LOAD) {
-        const { fileUri } = data;
-        const rootUri = stores.activationStore.rootUri;
-        console.log('[LLMBoxFrame] Handling LLM_CONVERSATION_LOAD:', {
-          fileUri,
-          rootUri,
-        });
-
-        try {
-          const onote = (window as any).onote;
-          console.log('[LLMBoxFrame] window.onote available:', !!onote);
-          console.log(
-            '[LLMBoxFrame] window.onote.llmConversation available:',
-            !!onote?.llmConversation,
-          );
-
-          if (!onote?.llmConversation) {
-            throw new Error('llmConversation not available');
-          }
-
-          const messages = await onote.llmConversation.invoke(
-            'loadConversation',
-            {
-              fileUri,
-              rootUri,
-            },
-          );
-          console.log('[LLMBoxFrame] Loaded messages:', messages?.length);
-          return { messages };
-        } catch (error) {
-          console.error('[LLMBoxFrame] Failed to load conversation:', error);
-          return {
-            error: error instanceof Error ? error.message : '加载对话历史失败',
-          };
-        }
-      }
-
-      if (type === LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_SAVE) {
-        const { fileUri, messages } = data;
-        const rootUri = stores.activationStore.rootUri;
-        console.log('[LLBoxFrame] Handling LLM_CONVERSATION_SAVE:', {
-          fileUri,
-          rootUri,
-          messageCount: messages?.length,
-        });
-
-        try {
-          const onote = (window as any).onote;
-          console.log('[LLMBoxFrame] window.onote available:', !!onote);
-          console.log(
-            '[LLMBoxFrame] window.onote.llmConversation available:',
-            !!onote?.llmConversation,
-          );
-
-          if (!onote?.llmConversation) {
-            throw new Error('llmConversation not available');
-          }
-
-          await onote.llmConversation.invoke('saveConversation', {
-            fileUri,
-            messages,
-            rootUri,
-          });
-          console.log('[LLMBoxFrame] Saved conversation successfully');
-          return { success: true };
-        } catch (error) {
-          console.error('[MBoxFrame] Failed to save conversation:', error);
-          return {
-            error: error instanceof Error ? error.message : '保存对话历史失败',
-          };
-        }
-      }
-
-      // === 新增：Agent 文件操作处理 ===
-
-      // 获取根 URI
-      if (type === LLM_BOX_MESSAGE_TYPES.AGENT_GET_ROOT_URI) {
-        return { rootUri: stores.activationStore.rootUri };
-      }
-
-      // 获取当前文件 URI
-      if (type === LLM_BOX_MESSAGE_TYPES.AGENT_GET_ACTIVE_FILE_URI) {
-        return { fileUri: stores.activationStore.activeFileUri };
-      }
-
-      // 读取文件（使用 fileStore 以支持编辑器同步）
-      if (type === LLM_BOX_MESSAGE_TYPES.AGENT_FILE_READ) {
-        try {
-          const { uri } = data;
-          const model = await stores.fileStore.getOrCreateModel(uri);
-          const content = model.getValue();
-          return { content };
-        } catch (error) {
-          return {
-            error:
-              error instanceof Error ? error.message : 'Failed to read file',
-          };
-        }
-      }
-
-      // 写入文件（使用 fileStore 以同步到编辑器）
-      if (type === LLM_BOX_MESSAGE_TYPES.AGENT_FILE_WRITE) {
-        try {
-          const { uri, content } = data;
-          const model = await stores.fileStore.getOrCreateModel(uri);
-          model.setValue(content);
-          await stores.fileStore.saveFile(uri, content);
-          return { success: true };
-        } catch (error) {
-          return {
-            error:
-              error instanceof Error ? error.message : 'Failed to write file',
-          };
-        }
-      }
-
-      // 创建文件（使用 fileStore 以同步到编辑器）
-      if (type === LLM_BOX_MESSAGE_TYPES.AGENT_FILE_CREATE) {
-        try {
-          const { uri, content } = data;
-          await stores.fileStore.saveFile(uri, content || '');
-          return { success: true };
-        } catch (error) {
-          return {
-            error:
-              error instanceof Error ? error.message : 'Failed to create file',
-          };
-        }
-      }
-
-      // 删除文件
-      if (type === LLM_BOX_MESSAGE_TYPES.AGENT_FILE_DELETE) {
-        try {
-          const { uri } = data;
-          await stores.fileStore.closeFile(uri);
-          await fileService.remove(uri);
-          return { success: true };
-        } catch (error) {
-          return {
-            error:
-              error instanceof Error ? error.message : 'Failed to delete file',
-          };
-        }
-      }
-
-      // 列出目录
-      if (type === LLM_BOX_MESSAGE_TYPES.AGENT_FILE_LIST) {
-        try {
-          let { uri } = data;
-          const treeNode = await fileService.getTreeNode(uri);
-          if (treeNode.type === 'file') {
-            throw new Error('Cannot list files in a file');
-          }
-          const treeNodes = await fileService.listDir(uri);
-          const files = treeNodes.map((node: any) => ({
-            name: node.name,
-            uri: node.uri,
-            isDirectory: node.isDirectory,
-          }));
-          return { files };
-        } catch (error) {
-          return {
-            error:
-              error instanceof Error
-                ? error.message
-                : 'Failed to list directory',
-          };
-        }
-      }
-
-      // 搜索文件
-      if (type === LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH) {
-        try {
-          const { rootUri, keywords } = data;
-          const treeNodes = await fileService.searchFiles(rootUri, keywords);
-          const results = treeNodes.map((node: any) => ({
-            name: node.name,
-            uri: node.uri,
-            isDirectory: node.isDirectory,
-          }));
-          return { results };
-        } catch (error) {
-          return {
-            error:
-              error instanceof Error ? error.message : 'Failed to search files',
-          };
-        }
-      }
-
-      // 文件内搜索
-      if (type === LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH_IN) {
-        try {
-          const { uri, pattern } = data;
-          const content = await fileService.readText(uri);
-
-          const regex = new RegExp(pattern, 'gi');
-          const matches: Array<{ line: number; text: string }> = [];
-
-          const lines = content.split('\n');
-          lines.forEach((line: string, index: number) => {
-            if (regex.test(line)) {
-              matches.push({ line: index + 1, text: line.trim() });
-            }
-          });
-
-          return { matches, count: matches.length };
-        } catch (error) {
-          return {
-            error:
-              error instanceof Error
-                ? error.message
-                : 'Failed to search in file',
-          };
-        }
-      }
-
-      // === Agent 上下文处理 ===
-
-      // 加载 Agent 上下文
-      if (type === LLM_BOX_MESSAGE_TYPES.AGENT_CONTEXT_LOAD) {
-        const { fileUri } = data;
-        const rootUri = stores.activationStore.rootUri;
-        console.log('[LLMBoxFrame] Handling AGENT_CONTEXT_LOAD:', {
-          fileUri,
-          rootUri,
-        });
-
-        try {
-          const onote = (window as any).onote;
-          console.log('[LLMBoxFrame] window.onote available:', !!onote);
-          console.log(
-            '[LLMBoxFrame] window.onote.agentContext available:',
-            !!onote?.agentContext,
-          );
-
-          if (!onote?.agentContext) {
-            throw new Error('agentContext not available');
-          }
-
-          const context = await onote.agentContext.invoke('loadAgentContext', {
-            fileUri,
-            rootUri,
-          });
-          console.log('[LLMBoxFrame] Loaded agent context:', context);
-          return { context };
-        } catch (error) {
-          console.error('[LLMBoxFrame] Failed to load agent context:', error);
-          return {
-            error:
-              error instanceof Error ? error.message : '加载Agent上下文失败',
-          };
-        }
-      }
-
-      // 保存 Agent 上下文
-      if (type === LLM_BOX_MESSAGE_TYPES.AGENT_CONTEXT_SAVE) {
-        const { fileUri, context } = data;
-        const rootUri = stores.activationStore.rootUri;
-        console.log('[LLMBoxFrame] Handling AGENT_CONTEXT_SAVE:', {
-          fileUri,
-          rootUri,
-          stepCount: context?.executionLog?.length || 0,
-        });
-
-        try {
-          const onote = (window as any).onote;
-          console.log('[LLMBoxFrame] window.onote available:', !!onote);
-          console.log(
-            '[LLMBoxFrame] window.onote.agentContext available:',
-            !!onote?.agentContext,
-          );
-
-          if (!onote?.agentContext) {
-            throw new Error('agentContext not available');
-          }
-
-          await onote.agentContext.invoke('saveAgentContext', {
-            fileUri,
-            rootUri,
-            context,
-          });
-          console.log('[LLMBoxFrame] Saved agent context successfully');
-          return { success: true };
-        } catch (error) {
-          console.error('[LLMBoxFrame] Failed to save agent context:', error);
-          return {
-            error:
-              error instanceof Error ? error.message : '保存Agent上下文失败',
-          };
-        }
-      }
-
-      return undefined;
     });
 
     return () => {
-      console.log('[LLMBoxFrame] Cleaning up');
       contentChanged.dispose();
       selectionChanged.dispose();
       activeFileDisposer();

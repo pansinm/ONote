@@ -4,9 +4,17 @@ import crypto from 'node:crypto';
 import { uriToPath } from '/@/dataSource/providers/ssh/uri';
 import IpcHandler from '../IpcHandler';
 import { getLogger } from '/@/shared/logger';
-import type { Message } from '/@/renderer/src/llmbox/types';
 
 const logger = getLogger('LLMConversationHandler');
+
+export interface Message {
+  id: string;
+  content: string;
+  role: 'user' | 'assistant';
+  timestamp: Date;
+  imageUrls?: string[];
+  isStreaming?: boolean;
+}
 
 interface LoadConversationParams {
   fileUri: string;
