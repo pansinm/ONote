@@ -88,11 +88,11 @@ export class AgentOrchestrator {
         const assistantMessage = llmResponse.choices[0].message;
         messages.push(assistantMessage);
 
-        // 通知回调添加消息
-        if (this.onMessage && assistantMessage.content) {
+        // 通知回调添加消息（所有 assistant 消息都记录）
+        if (this.onMessage) {
           this.onMessage({
             role: 'assistant' as const,
-            content: assistantMessage.content,
+            content: assistantMessage.content || '',
           });
         }
 
@@ -156,6 +156,7 @@ export class AgentOrchestrator {
   stop(): void {
     if (this.abortController) {
       this.abortController.abort();
+      this.onStateChange('idle');
       this.addStep({
         type: 'thinking',
         content: 'Agent stopped by user',

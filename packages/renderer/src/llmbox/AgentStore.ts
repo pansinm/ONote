@@ -174,7 +174,7 @@ export class AgentStore {
 
       const summaryPrompt = `Please summarize the following conversation concisely in 2-3 sentences, focusing on the main topics and outcomes:\n\n${conversationText}`;
 
-      const response = await fetch(`${this.config.apiBase}/chat/completions`, {
+      const response = await fetch(this.config.apiBase, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
