@@ -1,4 +1,4 @@
-import type { Tool, ToolCall, AgentConfig, ExecutionStep } from './types';
+import type { ToolCall, AgentConfig, ExecutionStep } from './types';
 import ToolRegistry from './ToolRegistry';
 import { getLogger } from '../../shared/logger';
 import { uuid } from '../../common/tunnel/utils';
@@ -10,6 +10,7 @@ interface AgentOrchestratorOptions {
   toolRegistry: ToolRegistry;
   onStep: (step: ExecutionStep) => void;
   onStateChange: (state: 'idle' | 'thinking' | 'executing') => void;
+  onMessage?: (message: { role: 'assistant' | 'user' | 'system' | 'tool'; content: string }) => void;
 }
 
 export class AgentOrchestrator {
@@ -18,18 +19,22 @@ export class AgentOrchestrator {
   private abortController: AbortController | null = null;
   private onStep: (step: ExecutionStep) => void;
   private onStateChange: (state: 'idle' | 'thinking' | 'executing') => void;
+  private onMessage?: (message: { role: 'assistant' | 'user' | 'system' | 'tool'; content: string }) => void;
 
   constructor(options: AgentOrchestratorOptions) {
     this.config = options.config;
     this.toolRegistry = options.toolRegistry;
     this.onStep = options.onStep;
     this.onStateChange = options.onStateChange;
+    this.onMessage = options.onMessage;
   }
 
   /**
    * 运行 Agent
+   * @param prompt - 当前任务提示
+   * @param conversationHistory - 对话历史（可选）
    */
-  async run(prompt: string): Promise<void> {
+  async run(prompt: string, conversationHistory?: Array<{ role: string; content: string }>): Promise<void> {
     this.abortController = new AbortController();
 
     this.addStep({
@@ -38,33 +43,58 @@ export class AgentOrchestrator {
     });
 
     try {
-      // 构建初始消息
-      let messages = [
-        {
-          role: 'system',
-          content: this.buildSystemPrompt(),
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ];
+      const systemMessage = {
+        role: 'system',
+        content: this.buildSystemPrompt(),
+      };
 
-      // 主循环
+      const userMessage = {
+        role: 'user',
+        content: prompt,
+      };
+
+      let messages: Array<{ role: string; content: string }>;
+
+      if (conversationHistory && conversationHistory.length > 0) {
+        messages = [
+          systemMessage,
+          ...conversationHistory.filter(msg => msg.role !== 'tool'),
+          userMessage,
+        ];
+      } else {
+        messages = [
+          systemMessage,
+          userMessage,
+        ];
+      }
+
+      logger.debug('Agent starting with conversation history', {
+        historyLength: conversationHistory?.length || 0,
+        totalMessages: messages.length,
+      });
+
       let iteration = 0;
       const maxIterations = this.config.maxIterations || 10;
 
       while (iteration < maxIterations && !this.abortController.signal.aborted) {
         iteration++;
-        
+
         logger.info(`Agent iteration ${iteration}/${maxIterations}`);
 
         // 调用 LLM
         const llmResponse = await this.callLLM(messages);
-        
+
         // 解析响应
         const assistantMessage = llmResponse.choices[0].message;
         messages.push(assistantMessage);
+
+        // 通知回调添加消息
+        if (this.onMessage && assistantMessage.content) {
+          this.onMessage({
+            role: 'assistant' as const,
+            content: assistantMessage.content,
+          });
+        }
 
         // 显示思考过程
         if (this.config.showThinking !== false && assistantMessage.content) {

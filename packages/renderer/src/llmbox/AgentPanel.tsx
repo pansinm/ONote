@@ -27,6 +27,7 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
             <span className={styles.StatusDot} data-state={store.agentState}></span>
             <span className={styles.StatusText}>{store.agentState}</span>
             <span className={styles.TaskCount}>{store.executionLog.length} tasks</span>
+            <span className={styles.MessageCount}>{store.conversationHistory.length} messages</span>
           </div>
           {store.error && (
             <div className={styles.ErrorIndicator} title={store.error}>
@@ -36,6 +37,15 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
         </div>
 
         <div className={styles.ToolbarRight}>
+          <button
+            className={`${styles.ActionBtn} ${styles.IconOnly} ${styles.ClearHistoryBtn}`}
+            onClick={() => store.clearConversation()}
+            disabled={store.isRunning}
+            title="Clear History"
+          >
+            🔄
+          </button>
+
           <button
             className={`${styles.ActionBtn} ${styles.IconOnly} ${styles.ClearBtn}`}
             onClick={() => store.clearLog()}

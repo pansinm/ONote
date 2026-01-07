@@ -186,6 +186,8 @@ function LLMBoxFrame() {
       if (type === LLM_BOX_MESSAGE_TYPES.AGENT_FILE_WRITE) {
         try {
           const { uri, content } = data;
+          const model = await stores.fileStore.getOrCreateModel(uri);
+          model.setValue(content);
           await stores.fileStore.saveFile(uri, content);
           return { success: true };
         } catch (error) {
@@ -371,6 +373,8 @@ function LLMBoxFrame() {
           };
         }
       }
+
+      return undefined;
     });
 
     return () => {

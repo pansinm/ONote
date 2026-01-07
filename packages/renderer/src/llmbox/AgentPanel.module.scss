@@ -140,6 +140,11 @@
   font-weight: 500;
 }
 
+.MessageCount {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
 .ErrorIndicator {
   display: flex;
   align-items: center;
@@ -261,6 +266,12 @@
 .ClearBtn:hover:not(:disabled) {
   background: var(--bg-tertiary);
   border-color: var(--border-hover);
+}
+
+.ClearHistoryBtn:hover:not(:disabled) {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  color: white;
 }
 
 // ==================== 可折叠的面板 ====================

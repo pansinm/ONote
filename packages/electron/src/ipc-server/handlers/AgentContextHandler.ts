@@ -21,6 +21,7 @@ interface SaveAgentContextParams {
 interface AgentContext {
   fileUri: string;
   executionLog: any[];
+  conversationHistory: any[];
   error: string | null;
   content: string;
   selection: string;

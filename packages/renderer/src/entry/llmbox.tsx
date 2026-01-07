@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { observer } from 'mobx-react-lite';
 import { runInAction } from 'mobx';
@@ -25,8 +25,43 @@ const { send, receive } = createChannel('MAIN_FRAME-LLM_BOX');
 const LLMBoxApp = observer(() => {
   const settings = (window as any).__settings;
   const [mode, setMode] = useState<'chat' | 'agent'>('chat');
-  
-  // 初始化 Chat Store
+
+  const previousFileUriRef = useRef<string | null>(null);
+
+  const saveAgentContextHandler = useRef(async (fileUri: string) => {
+    try {
+      console.log('[llmbox.tsx] Saving agent context:', { fileUri, stepCount: agentStore.executionLog.length });
+      await agentStore.saveContext(fileUri);
+      console.log('[llmbox.tsx] Agent context saved');
+    } catch (error) {
+      console.error('[llmbox.tsx] Failed to save agent context:', error);
+    }
+  }).current;
+
+  const loadAgentContextHandler = useRef(async (fileUri: string) => {
+    try {
+      console.log('[llmbox.tsx] Loading agent context for:', fileUri);
+      const context = await agentStore.loadContext(fileUri);
+      if (context) {
+        console.log('[llmbox.tsx] Agent context loaded:', context);
+      }
+    } catch (error) {
+      console.error('[llmbox.tsx] Failed to load agent context:', error);
+    }
+  }).current;
+
+  const handleFileChange = useRef(async (fileUri: string) => {
+    if (previousFileUriRef.current && previousFileUriRef.current !== fileUri) {
+      console.log('[llmbox.tsx] File changed, saving agent context for:', previousFileUriRef.current);
+      await saveAgentContextHandler(previousFileUriRef.current);
+    }
+
+    console.log('[llmbox.tsx] Loading agent context for new file:', fileUri);
+    await loadAgentContextHandler(fileUri);
+
+    previousFileUriRef.current = fileUri;
+  }).current;
+
   const [chatStore] = useState(
     () =>
       new LLMChatStore({
@@ -36,7 +71,6 @@ const LLMBoxApp = observer(() => {
       }),
   );
 
-  // 初始化 Agent Store
   const [agentStore] = useState(() =>
     new AgentStore(
       {
@@ -91,29 +125,26 @@ const LLMBoxApp = observer(() => {
       }
     };
 
-    const loadAgentContext = async (fileUri: string) => {
-      try {
-        console.log('[llmbox.tsx] Loading agent context for:', fileUri);
-        const context = await agentStore.loadContext(fileUri);
-        if (context) {
-          console.log('[llmbox.tsx] Setting agent context:', context);
-          agentStore.executionLog = context.executionLog || [];
-          agentStore.error = context.error || null;
-        }
-      } catch (error) {
-        console.error('[llmbox.tsx] Failed to load agent context:', error);
-      }
-    };
-
     receive(async ({ type, data }: any) => {
       console.log('[llmbox.tsx] Received message:', { type, data });
 
+      if (type === LLM_BOX_MESSAGE_TYPES.GET_CURRENT_FILE_INFO) {
+        const { fileUri, rootUri } = data;
+        console.log('[llmbox.tsx] Got rootUri:', rootUri);
+        if (rootUri) {
+          agentStore.updateRootUri(rootUri);
+        }
+      }
+
       if (type === LLM_BOX_MESSAGE_TYPES.EDITOR_FILE_OPEN && data?.uri) {
         console.log('[llmbox.tsx] Handling EDITOR_FILE_OPEN:', data.uri);
-        chatStore.updateFileUri(data.uri);
-        agentStore.updateFileUri(data.uri);
+        const newFileUri = data.uri;
+        chatStore.updateFileUri(newFileUri);
+        agentStore.updateFileUri(newFileUri);
         chatStore.setLoadConversation(loadConversation);
-        await loadConversation(data.uri);
+
+        await loadConversation(newFileUri);
+        await handleFileChange(newFileUri);
       }
 
       if (
@@ -135,10 +166,13 @@ const LLMBoxApp = observer(() => {
         console.log('[llmbox.tsx] Got current file info:', response);
 
         if (response.fileUri) {
-          chatStore.updateFileUri(response.fileUri);
-          agentStore.updateFileUri(response.fileUri);
+          const newFileUri = response.fileUri;
+          chatStore.updateFileUri(newFileUri);
+          agentStore.updateFileUri(newFileUri);
           chatStore.setLoadConversation(loadConversation);
-          await loadConversation(response.fileUri);
+
+          await loadConversation(newFileUri);
+          await handleFileChange(newFileUri);
         }
       } catch (error) {
         console.error('[llmbox.tsx] Failed to get current file info:', error);
@@ -146,42 +180,21 @@ const LLMBoxApp = observer(() => {
     };
 
     setTimeout(getCurrentFileInfo, 500);
-  }, [chatStore, agentStore]);
+  }, [chatStore, agentStore, handleFileChange]);
 
   useEffect(() => {
     if (mode === 'agent' && agentStore.fileUri) {
       const fileUri = agentStore.fileUri;
-      const loadAgentContext = async () => {
-        try {
-          console.log('[llmbox.tsx] Loading agent context for:', fileUri);
-          const context = await agentStore.loadContext(fileUri);
-          if (context) {
-            console.log('[llmbox.tsx] Setting agent context:', context);
-            runInAction(() => {
-              agentStore.executionLog = context.executionLog || [];
-              agentStore.error = context.error || null;
-            });
-          }
-        } catch (error) {
-          console.error('[llmbox.tsx] Failed to load agent context:', error);
-        }
-      };
-      loadAgentContext();
+      loadAgentContextHandler(fileUri);
     }
-  }, [mode]);
+  }, [mode, agentStore.fileUri, loadAgentContextHandler]);
 
   const handleAgentRun = async (prompt: string) => {
     try {
       await agentStore.runAgent(prompt);
 
       if (agentStore.fileUri) {
-        await agentStore.saveContext({
-          fileUri: agentStore.fileUri,
-          executionLog: agentStore.executionLog,
-          error: agentStore.error,
-          content: agentStore.content,
-          selection: agentStore.selection,
-        });
+        await saveAgentContextHandler(agentStore.fileUri);
       }
     } catch (error) {
       console.error('[llmbox.tsx] Failed to run agent:', error);
