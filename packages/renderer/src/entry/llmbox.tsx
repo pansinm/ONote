@@ -213,7 +213,7 @@ const LLMBoxApp = observer(() => {
       const fileUri = agentStore.fileUri;
       loadAgentContextHandler(fileUri);
     }
-  }, [mode, agentStore.fileUri, loadAgentContextHandler]);
+  }, [mode, agentStore.fileUri]);
 
   const handleAgentRun = async (prompt: string) => {
     try {
