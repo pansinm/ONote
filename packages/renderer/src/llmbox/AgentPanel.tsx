@@ -19,25 +19,25 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
   };
 
   return (
-    <div className={styles.agentPanel}>
-      <div className={styles.agentToolbar}>
-        <div className={styles.toolbarLeft}>
-          <div className={styles.agentTitle}>🤖 AI Agent</div>
-          <div className={styles.statusIndicator}>
-            <span className={styles.statusDot} data-state={store.agentState}></span>
-            <span className={styles.statusText}>{store.agentState}</span>
-            <span className={styles.taskCount}>{store.executionLog.length} tasks</span>
+    <div className={styles.AgentPanel}>
+      <div className={styles.AgentToolbar}>
+        <div className={styles.ToolbarLeft}>
+          <div className={styles.AgentTitle}>🤖 AI Agent</div>
+          <div className={styles.StatusIndicator}>
+            <span className={styles.StatusDot} data-state={store.agentState}></span>
+            <span className={styles.StatusText}>{store.agentState}</span>
+            <span className={styles.TaskCount}>{store.executionLog.length} tasks</span>
           </div>
           {store.error && (
-            <div className={styles.errorIndicator} title={store.error}>
+            <div className={styles.ErrorIndicator} title={store.error}>
               ⚠️
             </div>
           )}
         </div>
 
-        <div className={styles.toolbarRight}>
+        <div className={styles.ToolbarRight}>
           <button
-            className={`${styles.actionBtn} ${styles.iconOnly} ${styles.clearBtn}`}
+            className={`${styles.ActionBtn} ${styles.IconOnly} ${styles.ClearBtn}`}
             onClick={() => store.clearLog()}
             disabled={store.isRunning}
             title="Clear"
@@ -47,7 +47,7 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
 
           {store.isRunning && (
             <button
-              className={`${styles.actionBtn} ${styles.iconOnly} ${styles.stopBtn}`}
+              className={`${styles.ActionBtn} ${styles.IconOnly} ${styles.StopBtn}`}
               onClick={() => store.stopAgent()}
               title="Stop"
             >
@@ -57,36 +57,36 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
         </div>
       </div>
 
-      <div className={styles.tabContent}>
-        <div className={`${styles.tabPane} ${activeTab === 'execution' ? styles.active : ''}`}>
+      <div className={styles.TabContent}>
+        <div className={`${styles.TabPane} ${activeTab === 'execution' ? styles.active : ''}`}>
           {store.executionLog.length === 0 ? (
-            <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>📝</div>
-              <div className={styles.emptyMessage}>No execution history yet</div>
-              <div className={styles.emptyHint}>
+            <div className={styles.EmptyState}>
+              <div className={styles.EmptyIcon}>📝</div>
+              <div className={styles.EmptyMessage}>No execution history yet</div>
+              <div className={styles.EmptyHint}>
                 Enter a task below to start the agent
               </div>
             </div>
           ) : (
-            <div className={styles.executionLog}>
-              <div className={styles.logList}>
+            <div className={styles.ExecutionLog}>
+              <div className={styles.LogList}>
                 {store.executionLog.map((step, index) => (
                   <div
                     key={step.id}
-                    className={`${styles.logItem} ${styles[`logItem${capitalize(step.type)}`]}`}
+                    className={`${styles.LogItem} ${styles[`logItem${capitalize(step.type)}`]}`}
                   >
-                    <div className={styles.logHeader}>
-                      <span className={styles.logIndex}>{index + 1}</span>
-                      <span className={styles.logType}>{step.type}</span>
-                      <span className={styles.logTime}>{formatTime(step.timestamp)}</span>
+                    <div className={styles.LogHeader}>
+                      <span className={styles.LogIndex}>{index + 1}</span>
+                      <span className={styles.LogType}>{step.type}</span>
+                      <span className={styles.LogTime}>{formatTime(step.timestamp)}</span>
                       {step.duration && (
-                        <span className={styles.logDuration}>{(step.duration / 1000).toFixed(2)}s</span>
+                        <span className={styles.LogDuration}>{(step.duration / 1000).toFixed(2)}s</span>
                       )}
                     </div>
 
-                    <div className={styles.logBody}>
+                    <div className={styles.LogBody}>
                       {step.content && (
-                        <div className={styles.logContent}>
+                        <div className={styles.LogContent}>
                           <div className="markdown-body">
                             <Markdown remarkPlugins={[remarkGfm]}>
                               {step.content}
@@ -96,29 +96,29 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
                       )}
 
                       {step.toolName && (
-                        <div className={styles.logTool}>
-                          <span className={styles.logToolLabel}>→</span>
-                          <span className={styles.logToolName}>{step.toolName}</span>
+                        <div className={styles.LogTool}>
+                          <span className={styles.LogToolLabel}>→</span>
+                          <span className={styles.LogToolName}>{step.toolName}</span>
                         </div>
                       )}
 
                       {step.toolParams && (
-                        <details className={styles.logDetails}>
-                          <summary className={styles.logDetailsToggle}>
+                        <details className={styles.LogDetails}>
+                          <summary className={styles.LogDetailsToggle}>
                             <span>📦 Parameters</span>
                           </summary>
-                          <pre className={styles.logDetailsContent}>
+                          <pre className={styles.LogDetailsContent}>
                             {JSON.stringify(step.toolParams, null, 2)}
                           </pre>
                         </details>
                       )}
 
                       {step.toolResult && (
-                        <details className={`${styles.logDetails} ${styles.logDetailsResult}`}>
-                          <summary className={styles.logDetailsToggle}>
+                        <details className={`${styles.LogDetails} ${styles.LogDetailsResult}`}>
+                          <summary className={styles.LogDetailsToggle}>
                             <span>✅ Result</span>
                           </summary>
-                          <div className={styles.logDetailsContent}>
+                          <div className={styles.LogDetailsContent}>
                             {typeof step.toolResult === 'string' ? (
                               <div className="markdown-body">
                                 <Markdown remarkPlugins={[remarkGfm]}>
@@ -133,9 +133,9 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
                       )}
 
                       {step.error && (
-                        <div className={styles.logError}>
-                          <span className={styles.logErrorIcon}>❌</span>
-                          <span className={styles.logErrorText}>
+                        <div className={styles.LogError}>
+                          <span className={styles.LogErrorIcon}>❌</span>
+                          <span className={styles.LogErrorText}>
                             <div className="markdown-body">
                               <Markdown remarkPlugins={[remarkGfm]}>
                                 {step.error}
@@ -152,30 +152,30 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
           )}
         </div>
 
-        <div className={`${styles.tabPane} ${activeTab === 'tools' ? styles.active : ''}`}>
-          <div className={styles.toolsContent}>
-            <div className={styles.toolsGrid}>
+        <div className={`${styles.TabPane} ${activeTab === 'tools' ? styles.active : ''}`}>
+          <div className={styles.ToolsContent}>
+            <div className={styles.ToolsGrid}>
               {store.tools.map(tool => (
                 <div
                   key={tool.name}
-                  className={`${styles.toolCard} ${selectedTool === tool.name ? styles.selected : ''}`}
+                  className={`${styles.ToolCard} ${selectedTool === tool.name ? styles.Selected : ''}`}
                   onClick={() => handleToolClick(tool.name)}
                   title={tool.description}
                 >
-                  <div className={styles.toolIcon}>
+                  <div className={styles.ToolIcon}>
                     {getToolIcon(tool.name)}
                   </div>
-                  <div className={styles.toolInfo}>
-                    <div className={styles.toolHeaderInfo}>
-                      <span className={styles.toolName}>{tool.name}</span>
+                  <div className={styles.ToolInfo}>
+                    <div className={styles.ToolHeaderInfo}>
+                      <span className={styles.ToolName}>{tool.name}</span>
                       {tool.metadata?.dangerous && (
-                        <span className={styles.toolBadge}>⚠️</span>
+                        <span className={styles.ToolBadge}>⚠️</span>
                       )}
-                      <span className={`${styles.toolBadge} ${styles.permission} ${styles[tool.metadata?.permission || 'read']}`}>
+                      <span className={`${styles.ToolBadge} ${styles.Permission} ${styles[tool.metadata?.permission || 'read']}`}>
                         {tool.metadata?.permission}
                       </span>
                     </div>
-                    <p className={styles.toolDesc}>{tool.description}</p>
+                    <p className={styles.ToolDesc}>{tool.description}</p>
                   </div>
                 </div>
               ))}
@@ -184,15 +184,15 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
         </div>
       </div>
 
-      <div className={styles.bottomTabs}>
+      <div className={styles.BottomTabs}>
         <button
-          className={`${styles.bottomTabItem} ${activeTab === 'execution' ? styles.active : ''}`}
+          className={`${styles.BottomTabItem} ${activeTab === 'execution' ? styles.active : ''}`}
           onClick={() => setActiveTab('execution')}
         >
           📋 Execution Log
         </button>
         <button
-          className={`${styles.bottomTabItem} ${activeTab === 'tools' ? styles.active : ''}`}
+          className={`${styles.BottomTabItem} ${activeTab === 'tools' ? styles.active : ''}`}
           onClick={() => setActiveTab('tools')}
         >
           🔧 Tools ({store.tools.length})
