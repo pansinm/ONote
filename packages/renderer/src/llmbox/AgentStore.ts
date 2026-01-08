@@ -369,9 +369,14 @@ export class AgentStore {
           executionLogCount: agentContext.executionLog?.length || 0,
           conversationCount: agentContext.conversationHistory?.length || 0,
         });
+
+        return agentContext;
+      } catch (error) {
+        logger.error('Failed to load agent context', error);
+        return null;
       }
 
-      return agentContext;
+    }
     } catch (error) {
       logger.error('Failed to load agent context', error);
       return null;
