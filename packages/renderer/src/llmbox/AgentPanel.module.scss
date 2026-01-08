@@ -7,28 +7,28 @@
   --warning-color: #f59e0b;
   --error-color: #ef4444;
   --info-color: #3b82f6;
-  
+
   --bg-primary: #ffffff;
   --bg-secondary: #f8f9fa;
   --bg-tertiary: #e9ecef;
   --bg-hover: #f0f0f0;
-  
+
   --text-primary: #1f2937;
   --text-secondary: #6c757d;
   --text-tertiary: #9ca3af;
-  
+
   --border-color: #e5e7eb;
   --border-hover: #cbd5e0;
   --border-focus: #3b82f6;
-  
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
-  
+
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
-  
+
   --transition-fast: 0.15s ease;
   --transition-normal: 0.2s ease;
   --transition-slow: 0.3s ease;
@@ -73,7 +73,8 @@
   flex-direction: column;
   height: 100%;
   background: var(--bg-secondary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto',
+    sans-serif;
   font-size: 14px;
   color: var(--text-primary);
   overflow: hidden;
@@ -172,22 +173,23 @@
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
   animation: pulse-dot 2s ease-in-out infinite;
 
-  &[data-state="thinking"] {
+  &[data-state='thinking'] {
     background: var(--info-color);
   }
 
-  &[data-state="executing"] {
+  &[data-state='executing'] {
     background: var(--warning-color);
     animation: none;
   }
 
-  &[data-state="idle"] {
+  &[data-state='idle'] {
     animation: none;
   }
 }
 
 @keyframes pulse-dot {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
   }
   50% {
@@ -477,7 +479,12 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, transparent 0%, var(--border-color) 50%, transparent 100%);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--border-color) 50%,
+      transparent 100%
+    );
     transform: scaleX(0);
     transition: transform var(--transition-normal);
   }
@@ -489,7 +496,12 @@
 
     &::before {
       transform: scaleX(1);
-      background: linear-gradient(90deg, transparent 0%, var(--primary-color) 50%, transparent 100%);
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--primary-color) 50%,
+        transparent 100%
+      );
     }
 
     .ToolDesc {
@@ -499,7 +511,11 @@
 
   &.selected {
     border-color: var(--primary-color);
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.1) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.05) 0%,
+      rgba(59, 130, 246, 0.1) 100%
+    );
   }
 
   .ToolIcon {
@@ -516,7 +532,11 @@
   }
 
   &:hover .ToolIcon {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.1) 0%,
+      rgba(59, 130, 246, 0.05) 100%
+    );
   }
 }
 
@@ -615,27 +635,47 @@
 
   &.LogItem-thinking {
     border-left-color: var(--info-color);
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(59, 130, 246, 0.08) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.03) 0%,
+      rgba(59, 130, 246, 0.08) 100%
+    );
   }
 
   &.LogItem-tool_call {
     border-left-color: var(--warning-color);
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.03) 0%, rgba(245, 158, 11, 0.08) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.03) 0%,
+      rgba(245, 158, 11, 0.08) 100%
+    );
   }
 
   &.LogItem-tool_result {
     border-left-color: var(--success-color);
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, rgba(16, 185, 129, 0.08) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.03) 0%,
+      rgba(16, 185, 129, 0.08) 100%
+    );
   }
 
   &.LogItem-final_answer {
     border-left-color: var(--primary-color);
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.1) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.05) 0%,
+      rgba(59, 130, 246, 0.1) 100%
+    );
   }
 
   &.LogItem-error {
     border-left-color: var(--error-color);
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.03) 0%, rgba(239, 68, 68, 0.08) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(239, 68, 68, 0.03) 0%,
+      rgba(239, 68, 68, 0.08) 100%
+    );
   }
 }
 
@@ -656,6 +696,79 @@
   gap: 8px;
   margin-bottom: 8px;
   flex-wrap: wrap;
+  position: relative;
+}
+
+.LogItemCollapseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  margin-left: auto;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+  }
+}
+
+.LogItemCollapseIcon {
+  font-size: 10px;
+  color: var(--text-secondary);
+  transition: transform var(--transition-normal);
+
+  &.collapsed {
+    transform: rotate(-90deg);
+  }
+}
+
+.LogItemLoading {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+
+.LoadingDot {
+  width: 6px;
+  height: 6px;
+  background: var(--info-color);
+  border-radius: 50%;
+  animation: loading-bounce 1.4s ease-in-out infinite both;
+
+  &:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+
+  &:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0s;
+  }
+}
+
+@keyframes loading-bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .LogIndex {
@@ -702,6 +815,19 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: all var(--transition-normal);
+
+  &.collapsed {
+    display: none;
+  }
+}
+
+.LogItem {
+  &.collapsed {
+    .LogBody {
+      display: none;
+    }
+  }
 }
 
 .LogContent {
@@ -933,9 +1059,23 @@
 }
 
 @keyframes shake-alert {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
-  20%, 40%, 60%, 80% { transform: translateX(3px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-3px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(3px);
+  }
 }
 
 .ErrorAlert-icon {
@@ -1112,20 +1252,20 @@
     --warning-color: #f59e0b;
     --error-color: #ef4444;
     --info-color: #60a5fa;
-    
+
     --bg-primary: #1e293b;
     --bg-secondary: #0f172a;
     --bg-tertiary: #334155;
     --bg-hover: #475569;
-    
+
     --text-primary: #f1f5f9;
     --text-secondary: #94a3b8;
     --text-tertiary: #64748b;
-    
+
     --border-color: #475569;
     --border-hover: #64748b;
     --border-focus: #60a5fa;
-    
+
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
@@ -1217,23 +1357,43 @@
     border-left-color: var(--border-color);
 
     &.LogItem-thinking {
-      background: linear-gradient(135deg, rgba(96, 165, 250, 0.08) 0%, rgba(96, 165, 250, 0.03) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba(96, 165, 250, 0.08) 0%,
+        rgba(96, 165, 250, 0.03) 100%
+      );
     }
 
     &.LogItem-tool_call {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.03) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba(245, 158, 11, 0.08) 0%,
+        rgba(245, 158, 11, 0.03) 100%
+      );
     }
 
     &.LogItem-tool_result {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.03) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba(16, 185, 129, 0.08) 0%,
+        rgba(16, 185, 129, 0.03) 100%
+      );
     }
 
     &.LogItem-final_answer {
-      background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba(96, 165, 250, 0.1) 0%,
+        rgba(96, 165, 250, 0.05) 100%
+      );
     }
 
     &.LogItem-error {
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.03) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba(239, 68, 68, 0.08) 0%,
+        rgba(239, 68, 68, 0.03) 100%
+      );
     }
   }
 
@@ -1272,6 +1432,20 @@
       background: var(--border-color);
       color: var(--text-primary);
     }
+  }
+
+  .LogItemCollapseBtn {
+    &:hover {
+      background: var(--border-color);
+    }
+  }
+
+  .LogItemLoading {
+    background: rgba(96, 165, 250, 0.15);
+  }
+
+  .LoadingDot {
+    background: var(--info-color);
   }
 }
 

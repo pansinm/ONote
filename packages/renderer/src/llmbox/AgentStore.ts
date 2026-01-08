@@ -172,7 +172,11 @@ export class AgentStore {
     return withoutProtocol.substring(0, lastSlashIndex);
   }
 
-  private buildContextPrompt(fileUri: string, userPrompt: string, hasContext: boolean): string {
+  private buildContextPrompt(
+    fileUri: string,
+    userPrompt: string,
+    hasContext: boolean,
+  ): string {
     const parts: string[] = [];
 
     parts.push('## Context');
@@ -195,7 +199,9 @@ export class AgentStore {
     parts.push(userPrompt);
 
     if (hasContext) {
-      parts.push(`\n## Previous Context\nTasks: ${this.executionLog.length}, Messages: ${this.conversationHistory.length}`);
+      parts.push(
+        `\n## Previous Context\nTasks: ${this.executionLog.length}, Messages: ${this.conversationHistory.length}`,
+      );
     }
 
     return `${parts.join('\n')}\n\n`;
@@ -214,11 +220,19 @@ export class AgentStore {
 
       await this.compressConversation();
 
-      const userPrompt = this.buildContextPrompt(this.fileUri || '', prompt, !!this.fileUri);
+      const userPrompt = this.buildContextPrompt(
+        this.fileUri || '',
+        prompt,
+        !!this.fileUri,
+      );
 
       const conversationHistory = this.conversationHistory
         .filter((msg: any) => {
-          return msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system';
+          return (
+            msg.role === 'user' ||
+            msg.role === 'assistant' ||
+            msg.role === 'system'
+          );
         })
         .map((msg: any) => ({
           ...msg,
@@ -244,17 +258,21 @@ export class AgentStore {
       return;
     }
 
-    const messagesToCompress = this.conversationHistory
-      .filter((msg: any) => {
-        return msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system';
-      });
+    const messagesToCompress = this.conversationHistory.filter((msg: any) => {
+      return (
+        msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system'
+      );
+    });
 
     if (messagesToCompress.length <= this.compressThreshold) {
       return;
     }
 
     const messagesToKeep = messagesToCompress.slice(-this.compressThreshold);
-    const messagesToCompressSummary = messagesToCompress.slice(0, messagesToCompress.length - this.compressThreshold);
+    const messagesToCompressSummary = messagesToCompress.slice(
+      0,
+      messagesToCompress.length - this.compressThreshold,
+    );
 
     if (messagesToCompressSummary.length === 0) {
       return;
@@ -271,7 +289,7 @@ export class AgentStore {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          Authorization: `Bearer ${this.config.apiKey}`,
         },
         body: JSON.stringify({
           model: this.config.model,
@@ -352,10 +370,10 @@ export class AgentStore {
 
   async loadContext(fileUri: string): Promise<any> {
     try {
-      const response = await this.channel.send({
+      const response = (await this.channel.send({
         type: 'AGENT_CONTEXT_LOAD',
         data: { fileUri },
-      }) as { error?: string; agentContext?: any };
+      })) as { error?: string; agentContext?: any };
 
       if (response.error) {
         logger.error('Failed to load agent context', response.error);
@@ -364,28 +382,26 @@ export class AgentStore {
 
       const agentContext = response.agentContext;
 
-      if (!agentContext) {
-        logger.debug('No agentContext found for file, resetting all data', { fileUri });
+      runInAction(() => {
+        // 设置当前文件的 fileUri（不从上下文中加载）
+        this.fileUri = fileUri;
 
-        runInAction(() => {
-          this.fileUri = null;
+        if (!agentContext) {
+          logger.debug(
+            'No agentContext found for file, resetting conversation and execution data',
+            { fileUri },
+          );
+
           this.error = null;
-          this.content = '';
           this.selection = '';
           this.executionLog = [];
           this.conversationHistory = [];
-        });
-
-        return null;
-      }
-
-      runInAction(() => {
-        this.fileUri = agentContext.fileUri || null;
-        this.error = agentContext.error || null;
-        this.content = agentContext.content || '';
-        this.selection = agentContext.selection || '';
-        this.executionLog = agentContext.executionLog || [];
-        this.conversationHistory = agentContext.conversationHistory || [];
+        } else {
+          this.error = agentContext.error || null;
+          this.selection = agentContext.selection || '';
+          this.executionLog = agentContext.executionLog || [];
+          this.conversationHistory = agentContext.conversationHistory || [];
+        }
       });
 
       logger.info('Agent context loaded', {

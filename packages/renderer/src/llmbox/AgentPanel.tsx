@@ -15,6 +15,9 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
   const [activeTab, setActiveTab] = useState<'execution' | 'tools'>(
     'execution',
   );
+  const [collapsedLogIds, setCollapsedLogIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   const logContainerRef = useRef<HTMLDivElement>(null);
 
@@ -30,8 +33,28 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
     }
   }, [store.executionLog, store.agentState, activeTab]);
 
+  useEffect(() => {
+    const thinkingSteps = store.executionLog.filter(
+      (step) => step.type === 'thinking',
+    );
+    const newCollapsedIds = new Set(thinkingSteps.map((step) => step.id));
+    setCollapsedLogIds(newCollapsedIds);
+  }, [store.executionLog]);
+
   const handleToolClick = (toolName: string) => {
     setSelectedTool(toolName === selectedTool ? null : toolName);
+  };
+
+  const toggleLogItemCollapse = (logId: string) => {
+    setCollapsedLogIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(logId)) {
+        newSet.delete(logId);
+      } else {
+        newSet.add(logId);
+      }
+      return newSet;
+    });
   };
 
   return (
@@ -109,95 +132,128 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
           ) : (
             <div className={styles.ExecutionLog} ref={logContainerRef}>
               <div className={styles.LogList}>
-                {store.executionLog.map((step, index) => (
-                  <div
-                    key={step.id}
-                    className={`${styles.LogItem} ${
-                      styles[`logItem${capitalize(step.type)}`]
-                    }`}
-                  >
-                    <div className={styles.LogHeader}>
-                      <span className={styles.LogIndex}>{index + 1}</span>
-                      <span className={styles.LogType}>{step.type}</span>
-                      <span className={styles.LogTime}>
-                        {formatTime(step.timestamp)}
-                      </span>
-                      {step.duration && (
-                        <span className={styles.LogDuration}>
-                          {(step.duration / 1000).toFixed(2)}s
+                {store.executionLog.map((step, index) => {
+                  const isThinking = step.type === 'thinking';
+                  const isCollapsed = collapsedLogIds.has(step.id);
+                  const isCurrentlyThinking =
+                    isThinking && store.agentState === 'thinking';
+
+                  return (
+                    <div
+                      key={step.id}
+                      className={`${styles.LogItem} ${
+                        styles[`logItem${capitalize(step.type)}`]
+                      } ${isCollapsed ? styles.collapsed : ''}`}
+                    >
+                      <div className={styles.LogHeader}>
+                        <span className={styles.LogIndex}>{index + 1}</span>
+                        <span className={styles.LogType}>{step.type}</span>
+                        <span className={styles.LogTime}>
+                          {formatTime(step.timestamp)}
                         </span>
-                      )}
-                    </div>
-
-                    <div className={styles.LogBody}>
-                      {step.content && (
-                        <div className={styles.LogContent}>
-                          <div className="markdown-body">
-                            <Markdown remarkPlugins={[remarkGfm]}>
-                              {step.content}
-                            </Markdown>
-                          </div>
-                        </div>
-                      )}
-
-                      {step.toolName && (
-                        <div className={styles.LogTool}>
-                          <span className={styles.LogToolLabel}>→</span>
-                          <span className={styles.LogToolName}>
-                            {step.toolName}
+                        {step.duration && (
+                          <span className={styles.LogDuration}>
+                            {(step.duration / 1000).toFixed(2)}s
                           </span>
+                        )}
+                        {isThinking && (
+                          <button
+                            className={styles.LogItemCollapseBtn}
+                            onClick={() => toggleLogItemCollapse(step.id)}
+                          >
+                            <span
+                              className={`${styles.LogItemCollapseIcon} ${
+                                isCollapsed ? styles.collapsed : ''
+                              }`}
+                            >
+                              {isCollapsed ? '▶' : '▼'}
+                            </span>
+                          </button>
+                        )}
+                      </div>
+
+                      {isCurrentlyThinking && (
+                        <div className={styles.LogItemLoading}>
+                          <span className={styles.LoadingDot}></span>
+                          <span className={styles.LoadingDot}></span>
+                          <span className={styles.LoadingDot}></span>
                         </div>
                       )}
 
-                      {step.toolParams && (
-                        <details className={styles.LogDetails}>
-                          <summary className={styles.LogDetailsToggle}>
-                            <span>📦 Parameters</span>
-                          </summary>
-                          <pre className={styles.LogDetailsContent}>
-                            {JSON.stringify(step.toolParams, null, 2)}
-                          </pre>
-                        </details>
-                      )}
-
-                      {step.toolResult && (
-                        <details
-                          className={`${styles.LogDetails} ${styles.LogDetailsResult}`}
-                        >
-                          <summary className={styles.LogDetailsToggle}>
-                            <span>✅ Result</span>
-                          </summary>
-                          <div className={styles.LogDetailsContent}>
-                            {typeof step.toolResult === 'string' ? (
-                              <div className="markdown-body">
-                                <Markdown remarkPlugins={[remarkGfm]}>
-                                  {step.toolResult}
-                                </Markdown>
-                              </div>
-                            ) : (
-                              <pre>
-                                {JSON.stringify(step.toolResult, null, 2)}
-                              </pre>
-                            )}
-                          </div>
-                        </details>
-                      )}
-
-                      {step.error && (
-                        <div className={styles.LogError}>
-                          <span className={styles.LogErrorIcon}>❌</span>
-                          <span className={styles.LogErrorText}>
+                      <div
+                        className={`${styles.LogBody} ${
+                          isCollapsed ? styles.collapsed : ''
+                        }`}
+                      >
+                        {step.content && (
+                          <div className={styles.LogContent}>
                             <div className="markdown-body">
                               <Markdown remarkPlugins={[remarkGfm]}>
-                                {step.error}
+                                {step.content}
                               </Markdown>
                             </div>
-                          </span>
-                        </div>
-                      )}
+                          </div>
+                        )}
+
+                        {step.toolName && (
+                          <div className={styles.LogTool}>
+                            <span className={styles.LogToolLabel}>→</span>
+                            <span className={styles.LogToolName}>
+                              {step.toolName}
+                            </span>
+                          </div>
+                        )}
+
+                        {step.toolParams && (
+                          <details className={styles.LogDetails}>
+                            <summary className={styles.LogDetailsToggle}>
+                              <span>📦 Parameters</span>
+                            </summary>
+                            <pre className={styles.LogDetailsContent}>
+                              {JSON.stringify(step.toolParams, null, 2)}
+                            </pre>
+                          </details>
+                        )}
+
+                        {step.toolResult && (
+                          <details
+                            className={`${styles.LogDetails} ${styles.LogDetailsResult}`}
+                          >
+                            <summary className={styles.LogDetailsToggle}>
+                              <span>✅ Result</span>
+                            </summary>
+                            <div className={styles.LogDetailsContent}>
+                              {typeof step.toolResult === 'string' ? (
+                                <div className="markdown-body">
+                                  <Markdown remarkPlugins={[remarkGfm]}>
+                                    {step.toolResult}
+                                  </Markdown>
+                                </div>
+                              ) : (
+                                <pre>
+                                  {JSON.stringify(step.toolResult, null, 2)}
+                                </pre>
+                              )}
+                            </div>
+                          </details>
+                        )}
+
+                        {step.error && (
+                          <div className={styles.LogError}>
+                            <span className={styles.LogErrorIcon}>❌</span>
+                            <span className={styles.LogErrorText}>
+                              <div className="markdown-body">
+                                <Markdown remarkPlugins={[remarkGfm]}>
+                                  {step.error}
+                                </Markdown>
+                              </div>
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
