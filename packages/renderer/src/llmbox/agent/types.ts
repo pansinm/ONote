@@ -2,6 +2,17 @@
  * Agent 功能类型定义
  */
 
+export type TodoStatus = 'pending' | 'in_progress' | 'completed' | 'failed';
+
+export interface TodoItem {
+  id: string;
+  description: string;
+  status: TodoStatus;
+  priority: 'high' | 'medium' | 'low';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 /**
  * 工具定义
  */
@@ -60,13 +71,14 @@ export interface ToolCall {
 export interface ExecutionStep {
   id: string;
   timestamp: Date;
-  type: 'thinking' | 'tool_call' | 'tool_result' | 'final_answer' | 'error';
+  type: 'thinking' | 'tool_call' | 'tool_result' | 'final_answer' | 'error' | 'todo_list' | 'todo_create' | 'todo_update';
   content: string;
   toolName?: string;
   toolParams?: any;
   toolResult?: any;
   error?: string;
   duration?: number;
+  todos?: TodoItem[];
 }
 
 /**

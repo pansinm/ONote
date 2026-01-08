@@ -1,7 +1,8 @@
 import { makeAutoObservable, runInAction, toJS } from 'mobx';
-import type { Tool, ExecutionStep, AgentConfig } from './agent/types';
+import type { Tool, ExecutionStep, AgentConfig, TodoItem } from './agent/types';
 import ToolRegistry from './agent/ToolRegistry';
 import { AgentOrchestrator } from './agent/AgentOrchestrator';
+import TodoManager from './agent/TodoManager';
 import { getLogger } from '../shared/logger';
 import { uuid } from '../common/tunnel/utils';
 
@@ -16,7 +17,7 @@ interface AgentMessage {
 }
 
 export class AgentStore {
-  // ========== 状态 ==========
+  todos: TodoItem[] = [];
 
   tools: Tool[] = [];
 
@@ -40,30 +41,38 @@ export class AgentStore {
 
   compressThreshold = 20;
 
-  // ========== 私有属性 ==========
-
   private config: AgentConfig;
   private channel: any;
+  private todoManager: TodoManager;
   private toolRegistry: ToolRegistry;
   private orchestrator: AgentOrchestrator;
 
   constructor(config: AgentConfig, channel: any) {
     this.config = config;
     this.channel = channel;
-    this.toolRegistry = new ToolRegistry(channel);
-    this.orchestrator = new AgentOrchestrator({
-      config,
-      toolRegistry: this.toolRegistry,
-      onStep: this.addStep.bind(this),
-      onStateChange: (state) => {
-        runInAction(() => {
-          this.agentState = state;
-        });
+    this.todoManager = new TodoManager();
+    this.toolRegistry = new ToolRegistry(channel, this.todoManager);
+    this.orchestrator = new AgentOrchestrator(
+      {
+        config,
+        toolRegistry: this.toolRegistry,
+        onStep: this.addStep.bind(this),
+        onStateChange: (state) => {
+          runInAction(() => {
+            this.agentState = state;
+          });
+        },
+        onMessage: (message) => {
+          this.addMessage(message);
+        },
+        onTodoChange: (todos) => {
+          runInAction(() => {
+            this.todos = todos;
+          });
+        },
       },
-      onMessage: (message) => {
-        this.addMessage(message);
-      },
-    });
+      this.todoManager,
+    );
 
     makeAutoObservable(this);
     this.loadTools();

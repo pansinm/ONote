@@ -1,7 +1,8 @@
-import type { ToolCall, AgentConfig, ExecutionStep } from './types';
+import type { ToolCall, AgentConfig, ExecutionStep, TodoItem } from './types';
 import ToolRegistry from './ToolRegistry';
 import { getLogger } from '../../shared/logger';
 import { uuid } from '../../common/tunnel/utils';
+import TodoManager from './TodoManager';
 
 const logger = getLogger('AgentOrchestrator');
 
@@ -11,6 +12,8 @@ interface AgentOrchestratorOptions {
   onStep: (step: ExecutionStep) => void;
   onStateChange: (state: 'idle' | 'thinking' | 'executing') => void;
   onMessage?: (message: { role: 'assistant' | 'user' | 'system' | 'tool'; content: string }) => void;
+  onTodoChange?: (todos: TodoItem[]) => void;
+  onTodoAction?: (action: 'create' | 'update', todo?: TodoItem) => void;
 }
 
 export class AgentOrchestrator {
@@ -20,13 +23,25 @@ export class AgentOrchestrator {
   private onStep: (step: ExecutionStep) => void;
   private onStateChange: (state: 'idle' | 'thinking' | 'executing') => void;
   private onMessage?: (message: { role: 'assistant' | 'user' | 'system' | 'tool'; content: string }) => void;
+  private onTodoChange?: (todos: TodoItem[]) => void;
+  private onTodoAction?: (action: 'create' | 'update', todo?: TodoItem) => void;
+  private todoManager: TodoManager;
 
-  constructor(options: AgentOrchestratorOptions) {
+  constructor(options: AgentOrchestratorOptions, todoManager: TodoManager) {
     this.config = options.config;
     this.toolRegistry = options.toolRegistry;
     this.onStep = options.onStep;
     this.onStateChange = options.onStateChange;
     this.onMessage = options.onMessage;
+    this.onTodoChange = options.onTodoChange;
+    this.onTodoAction = options.onTodoAction;
+    this.todoManager = todoManager;
+
+    this.todoManager.registerCallback((todos) => {
+      if (this.onTodoChange) {
+        this.onTodoChange(todos);
+      }
+    });
   }
 
   /**
@@ -37,10 +52,17 @@ export class AgentOrchestrator {
   async run(prompt: string, conversationHistory?: Array<{ role: string; content: string }>): Promise<void> {
     this.abortController = new AbortController();
 
+    this.todoManager.clear();
+
     this.onStateChange('thinking');
     this.addStep({
       type: 'thinking',
       content: `Starting task: ${prompt}`,
+    });
+    this.addStep({
+      type: 'todo_list',
+      content: '任务规划',
+      todos: this.todoManager.listTodos(),
     });
 
     try {
@@ -126,7 +148,16 @@ export class AgentOrchestrator {
             break;
           }
         } else {
-          // 没有工具调用，任务完成
+          const todos = this.todoManager.listTodos();
+
+          if (todos.length > 0 && !this.todoManager.isAllCompleted()) {
+            this.addStep({
+              type: 'thinking',
+              content: '还有未完成的任务，请继续执行直到所有任务完成',
+            });
+            continue;
+          }
+
           this.onStateChange('idle');
           this.addStep({
             type: 'final_answer',
@@ -138,10 +169,21 @@ export class AgentOrchestrator {
 
       if (iteration >= maxIterations) {
         this.onStateChange('idle');
-        this.addStep({
-          type: 'thinking',
-          content: `Maximum iterations (${maxIterations}) reached`,
-        });
+        const todos = this.todoManager.listTodos();
+        const incompleteTodos = todos.filter((t) => t.status !== 'completed');
+
+        if (incompleteTodos.length > 0) {
+          const incompleteList = incompleteTodos.map((t) => `- [${t.status}] ${t.description}`).join('\n');
+          this.addStep({
+            type: 'thinking',
+            content: `Maximum iterations (${maxIterations}) reached\n\n未完成的任务：\n${incompleteList}`,
+          });
+        } else {
+          this.addStep({
+            type: 'thinking',
+            content: `Maximum iterations (${maxIterations}) reached`,
+          });
+        }
       }
 
     } catch (error) {
@@ -260,6 +302,22 @@ export class AgentOrchestrator {
           duration,
         });
 
+        if (toolName === 'createTodo' && result) {
+          this.addStep({
+            type: 'todo_create',
+            content: `创建任务: ${result.description}`,
+            todos: this.todoManager.listTodos(),
+          });
+        }
+
+        if (toolName === 'updateTodo' && result) {
+          this.addStep({
+            type: 'todo_update',
+            content: `更新任务状态: ${result.description || result.id}`,
+            todos: this.todoManager.listTodos(),
+          });
+        }
+
         toolResults.push({
           toolCallId: toolCall.id,
           result,
@@ -299,6 +357,12 @@ export class AgentOrchestrator {
     if (iteration >= maxIterations) {
       return false;
     }
+
+    const todos = this.todoManager.listTodos();
+    if (todos.length > 0 && !this.todoManager.isAllCompleted()) {
+      return true;
+    }
+
     return true;
   }
 
@@ -337,6 +401,34 @@ ${toolDescriptions}
 4. **执行操作**：按逻辑顺序执行工具调用
 5. **总结结果**：向用户说明任务完成情况和关键发现
 
+## 任务规划
+
+**重要：** 对于复杂任务，请先创建 Todo 列表规划任务步骤：
+
+1. 使用 \`createTodo\` 创建任务清单，分解为可执行的子任务
+2. 执行每个任务前，使用 \`updateTodo(id, "in_progress")\` 标记为进行中
+3. 任务完成后，使用 \`updateTodo(id, "completed")\` 标记为已完成
+4. 使用 \`listTodos\` 随时查看任务进度
+
+**示例流程：**
+\`\`\`json
+// 1. 创建任务列表
+{ "name": "createTodo", "arguments": "{\\"description\\": \\"读取文件\\", \\"priority\\": \\"high\\"}" }
+{ "name": "createTodo", "arguments": "{\\"description\\": \\"修改内容\\", \\"priority\\": \\"medium\\"}" }
+{ "name": "createTodo", "arguments": "{\\"description\\": \\"保存文件\\", \\"priority\\": \\"medium\\"}" }
+
+// 2. 执行时更新状态
+{ "name": "updateTodo", "arguments": "{\\"id\\": \\"todo-xxx\\", \\"status\\": \\"in_progress\\"}" }
+
+// 3. 任务完成后
+{ "name": "updateTodo", "arguments": "{\\"id\\": \\"todo-xxx\\", \\"status\\": \\"completed\\"}" }
+\`\`\`
+
+**注意：** 
+- 如果创建了任务列表，必须完成所有任务才能结束
+- 简单任务可以不创建 Todo 列表，直接执行
+- 优先级：high > medium > low
+
 ## 工具使用示例
 
 当需要调用工具时，使用以下格式：
@@ -372,9 +464,11 @@ ${toolDescriptions}
   - 使用其他工具完成任务
   - 修改参数后重试
   - 或向用户说明无法完成的原因
-- **任务完成**：如果没有工具需要调用，直接给出最终答案
+- **任务完成**：
+  - 如果创建了任务列表，必须完成所有任务（状态为 completed）才能结束
+  - 如果没有创建任务列表，可以直接给出最终答案
 - **迭代限制**：最多迭代 50 次，如果未完成任务，给出中间结果和建议
- `.trim();
+  `.trim();
   }
 
   /**

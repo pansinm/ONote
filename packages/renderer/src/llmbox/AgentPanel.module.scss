@@ -146,6 +146,27 @@
   font-weight: 500;
 }
 
+.TodoProgress {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  font-size: 12px;
+}
+
+.TodoLabel {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.TodoCount {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
 .ErrorIndicator {
   display: flex;
   align-items: center;
@@ -677,6 +698,33 @@
       rgba(239, 68, 68, 0.08) 100%
     );
   }
+
+  &.LogItem-todo_list {
+    border-left-color: var(--info-color);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.03) 0%,
+      rgba(59, 130, 246, 0.08) 100%
+    );
+  }
+
+  &.LogItem-todo_create {
+    border-left-color: var(--primary-color);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.03) 0%,
+      rgba(59, 130, 246, 0.08) 100%
+    );
+  }
+
+  &.LogItem-todo_update {
+    border-left-color: var(--success-color);
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.03) 0%,
+      rgba(16, 185, 129, 0.08) 100%
+    );
+  }
 }
 
 @keyframes log-slide-in {
@@ -964,6 +1012,75 @@
   .markdown-body {
     font-size: 12px;
   }
+}
+
+.TodoList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.TodoItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  transition: all var(--transition-fast);
+
+  &.TodoPending {
+    border-left: 3px solid var(--text-tertiary);
+  }
+
+  &.TodoIn_progress {
+    border-left: 3px solid var(--info-color);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.03) 0%,
+      rgba(59, 130, 246, 0.08) 100%
+    );
+  }
+
+  &.TodoCompleted {
+    border-left: 3px solid var(--success-color);
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.03) 0%,
+      rgba(16, 185, 129, 0.08) 100%
+    );
+    opacity: 0.8;
+  }
+
+  &.TodoFailed {
+    border-left: 3px solid var(--error-color);
+    background: linear-gradient(
+      135deg,
+      rgba(239, 68, 68, 0.03) 0%,
+      rgba(239, 68, 68, 0.08) 100%
+    );
+  }
+}
+
+.TodoIcon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.TodoDescription {
+  flex: 1;
+  color: var(--text-primary);
+  line-height: 1.4;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .EmptyState {
@@ -1393,6 +1510,30 @@
         135deg,
         rgba(239, 68, 68, 0.08) 0%,
         rgba(239, 68, 68, 0.03) 100%
+      );
+    }
+
+    &.LogItem-todo_list {
+      background: linear-gradient(
+        135deg,
+        rgba(96, 165, 250, 0.08) 0%,
+        rgba(96, 165, 250, 0.03) 100%
+      );
+    }
+
+    &.LogItem-todo_create {
+      background: linear-gradient(
+        135deg,
+        rgba(96, 165, 250, 0.08) 0%,
+        rgba(96, 165, 250, 0.03) 100%
+      );
+    }
+
+    &.LogItem-todo_update {
+      background: linear-gradient(
+        135deg,
+        rgba(16, 185, 129, 0.08) 0%,
+        rgba(16, 185, 129, 0.03) 100%
       );
     }
   }

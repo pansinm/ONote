@@ -68,6 +68,15 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
               data-state={store.agentState}
             ></span>
             <span className={styles.StatusText}>{store.agentState}</span>
+            {store.todos.length > 0 && (
+              <span className={styles.TodoProgress}>
+                <span className={styles.TodoLabel}>Tasks:</span>
+                <span className={styles.TodoCount}>
+                  {store.todos.filter((t) => t.status === 'completed').length}/
+                  {store.todos.length}
+                </span>
+              </span>
+            )}
             <span className={styles.TaskCount}>
               {store.executionLog.length} tasks
             </span>
@@ -250,6 +259,26 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
                             </span>
                           </div>
                         )}
+
+                        {step.todos && step.todos.length > 0 && (
+                          <div className={styles.TodoList}>
+                            {step.todos.map((todo) => (
+                              <div
+                                key={todo.id}
+                                className={`${styles.TodoItem} ${
+                                  styles[`Todo${capitalize(todo.status)}`]
+                                }`}
+                              >
+                                <span className={styles.TodoIcon}>
+                                  {getTodoIcon(todo.status)}
+                                </span>
+                                <span className={styles.TodoDescription}>
+                                  {todo.description}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -338,6 +367,16 @@ function getToolIcon(toolName: string): string {
 
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function getTodoIcon(status: string): string {
+  const iconMap: Record<string, string> = {
+    pending: '⏳',
+    in_progress: '🔄',
+    completed: '✅',
+    failed: '❌',
+  };
+  return iconMap[status] || '⏳';
 }
 
 function formatTime(date: Date): string {

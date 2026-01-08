@@ -1,20 +1,18 @@
 import type { Tool } from './types';
 import { getLogger } from '../../shared/logger';
 import { LLM_BOX_MESSAGE_TYPES } from '../constants/LLMBoxConstants';
+import TodoManager from './TodoManager';
 
 const logger = getLogger('ToolRegistry');
 
-/**
- * 工具注册表
- * 
- * 管理所有可用工具，提供工具查询和执行功能
- */
 class ToolRegistry {
   private tools: Map<string, Tool> = new Map();
   private channel: any;
+  private todoManager?: TodoManager;
 
-  constructor(channel: any) {
+  constructor(channel: any, todoManager?: TodoManager) {
     this.channel = channel;
+    this.todoManager = todoManager;
     this.initializeBuiltInTools();
   }
 
@@ -295,7 +293,85 @@ class ToolRegistry {
       },
     });
 
+    if (this.todoManager) {
+      this.initializeTodoTools();
+    }
+
     logger.info('Built-in tools initialized', { count: this.tools.size });
+  }
+
+  private initializeTodoTools(): void {
+    this.register({
+      name: 'createTodo',
+      description: '创建新的任务项。用于分解复杂任务为可执行的子任务。',
+      parameters: {
+        type: 'object',
+        properties: {
+          description: {
+            type: 'string',
+            description: '任务描述',
+          },
+          priority: {
+            type: 'string',
+            enum: ['high', 'medium', 'low'],
+            description: '优先级',
+          },
+        },
+        required: ['description'],
+      },
+      metadata: { category: 'custom', permission: 'write' },
+      executor: async (params) => {
+        const todo = this.todoManager!.addTodo(
+          params.description,
+          params.priority || 'medium',
+        );
+        return todo;
+      },
+    });
+
+    this.register({
+      name: 'updateTodo',
+      description: '更新任务状态。将任务标记为进行中或已完成。',
+      parameters: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+            description: '任务 ID',
+          },
+          status: {
+            type: 'string',
+            enum: ['in_progress', 'completed', 'failed'],
+            description: '新状态',
+          },
+        },
+        required: ['id', 'status'],
+      },
+      metadata: { category: 'custom', permission: 'write' },
+      executor: async (params) => {
+        this.todoManager!.updateTodo(params.id, { status: params.status });
+        const todos = this.todoManager!.listTodos();
+        return todos.find((t) => t.id === params.id);
+      },
+    });
+
+    this.register({
+      name: 'listTodos',
+      description: '列出所有任务项及其状态。用于查看当前任务进度。',
+      parameters: {
+        type: 'object',
+        properties: {},
+      },
+      metadata: { category: 'custom', permission: 'read' },
+      executor: async () => {
+        const todos = this.todoManager!.listTodos();
+        const progress = this.todoManager!.getProgress();
+        return {
+          todos,
+          progress,
+        };
+      },
+    });
   }
 }
 
