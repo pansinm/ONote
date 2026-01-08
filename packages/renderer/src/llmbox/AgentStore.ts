@@ -283,11 +283,13 @@ export class AgentStore {
 
   async saveContext(fileUri: string): Promise<void> {
     try {
-      const agentContext = {
+      const contextToSave = {
         fileUri,
         executionLog: this.executionLog,
         conversationHistory: this.conversationHistory,
         error: this.error,
+        content: this.content,
+        selection: this.selection,
       };
 
       const response = await this.channel.send({
@@ -295,13 +297,23 @@ export class AgentStore {
         data: {
           fileUri,
           rootUri: this.config.rootUri,
-          context: agentContext,
+          context: contextToSave,
         },
       });
 
       if (response.error) {
         throw new Error(response.error);
       }
+
+      logger.info('Agent context saved', {
+        fileUri,
+        stepCount: this.executionLog.length,
+        messageCount: this.conversationHistory.length,
+      });
+    } catch (error) {
+      logger.error('Failed to save agent context', error);
+    }
+  }
 
       logger.info('Agent context saved', {
         fileUri,
