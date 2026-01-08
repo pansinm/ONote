@@ -163,16 +163,23 @@ export class AgentStore {
 
   // ========== 私有方法 ==========
 
+  private getDirectoryFromUri(fileUri: string): string {
+    const withoutProtocol = fileUri.replace('file://', '');
+    const lastSlashIndex = withoutProtocol.lastIndexOf('/');
+    if (lastSlashIndex === -1) {
+      return withoutProtocol;
+    }
+    return withoutProtocol.substring(0, lastSlashIndex);
+  }
+
   private buildContextPrompt(fileUri: string, userPrompt: string, hasContext: boolean): string {
     const parts: string[] = [];
 
     parts.push('## Context');
 
-    if (this.config.rootUri) {
-      parts.push(`Working Directory: ${this.config.rootUri}`);
-    }
-
     if (fileUri) {
+      const workingDir = this.getDirectoryFromUri(fileUri);
+      parts.push(`Working Directory: ${workingDir}`);
       parts.push(`Current File: ${fileUri}`);
     }
 

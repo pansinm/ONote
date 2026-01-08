@@ -316,7 +316,7 @@ ${toolDescriptions}
 ## 工作原则
 
 1. **优先使用当前文件**：用户请求中的"文件"、"这个文件"等指代当前打开的文件（Current File），优先使用 Current File 的 URI
-2. **默认目录**：listFiles 默认查询当前文件所在目录（Working Directory）
+2. **默认目录**：Working Directory 是当前文件所在的目录（非根目录），listFiles 默认查询 Working Directory
 3. **目标导向**：始终以完成任务为目标，合理规划工具使用顺序
 4. **安全第一**：谨慎使用 writeFile、deleteFile 等危险操作，必要时确认
 5. **高效执行**：避免重复调用相同工具，充分利用工具返回结果
