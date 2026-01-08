@@ -85,7 +85,7 @@ const LLMBoxApp = observer(() => {
           apiKey: settings[LLM_API_KEY],
           model: settings[LLM_MODEL_NAME],
           apiBase: `${settings[LLM_BASE_URL]}/chat/completions`,
-          maxIterations: 10,
+          maxIterations: 50,
           showThinking: true,
           timeout: 60000,
         },

@@ -36,7 +36,9 @@ export class AgentStore {
 
   selection = '';
 
-  maxConversationRounds = 10;
+  maxConversationRounds = 50;
+
+  compressThreshold = 20;
 
   // ========== 私有属性 ==========
 
@@ -56,7 +58,8 @@ export class AgentStore {
       onStateChange: (state) => {
         runInAction(() => {
           this.agentState = state;
-        }),
+        });
+      },
       onMessage: (message) => {
         this.addMessage(message);
       },
@@ -104,12 +107,21 @@ export class AgentStore {
   }
 
   addStep(step: Omit<ExecutionStep, 'id' | 'timestamp'>): void {
+    const stepId = uuid('agent-step-');
+    const stepWithId = {
+      ...step,
+      id: stepId,
+      timestamp: new Date(),
+    };
+
+    logger.debug('Adding step to execution log', {
+      id: stepId,
+      type: step.type,
+      currentCount: this.executionLog.length,
+    });
+
     runInAction(() => {
-      this.executionLog.push({
-        ...step,
-        id: uuid('agent-step-'),
-        timestamp: new Date(),
-      });
+      this.executionLog.push(stepWithId);
     });
   }
 
@@ -144,12 +156,9 @@ export class AgentStore {
   // ========== 公共方法 ==========
 
   stopAgent(): void {
+    logger.info('Stopping agent');
     this.orchestrator.stop();
     this.setRunning(false);
-  }
-
-  private runInAction(action: () => void): void {
-    action();
   }
 
   // ========== 私有方法 ==========
@@ -157,34 +166,46 @@ export class AgentStore {
   private buildContextPrompt(fileUri: string, userPrompt: string, hasContext: boolean): string {
     const parts: string[] = [];
 
+    parts.push('## Context');
+
+    if (this.config.rootUri) {
+      parts.push(`Working Directory: ${this.config.rootUri}`);
+    }
+
     if (fileUri) {
-      parts.push(`File: ${fileUri}`);
+      parts.push(`Current File: ${fileUri}`);
     }
 
     if (this.selection) {
-      parts.push(`Selected Content:\n${this.selection}`);
+      parts.push(`Selected Content:\n\`\`\`\n${this.selection}\n\`\`\``);
     }
 
     if (this.content) {
-      parts.push(`File Content:\n${this.content}`);
+      parts.push(`Current File Content:\n\`\`\`\n${this.content}\n\`\`\``);
     }
 
-    parts.push(`Task:\n${userPrompt}`);
+    parts.push('## Task');
+    parts.push(userPrompt);
 
     if (hasContext) {
-      parts.push(`\nContext History: ${this.executionLog.length} tasks, ${this.conversationHistory.length} messages`);
-    } else {
-      parts.push(`No context yet`);
+      parts.push(`\n## Previous Context\nTasks: ${this.executionLog.length}, Messages: ${this.conversationHistory.length}`);
     }
 
     return `${parts.join('\n')}\n\n`;
   }
 
   async runAgent(prompt: string): Promise<void> {
+    if (this.isRunning) {
+      logger.warn('Agent is already running, ignoring new request');
+      return;
+    }
+
     try {
       this.setRunning(true);
       this.clearError();
       this.clearLog();
+
+      await this.compressConversation();
 
       const userPrompt = this.buildContextPrompt(this.fileUri || '', prompt, !!this.fileUri);
 
@@ -219,14 +240,20 @@ export class AgentStore {
     const messagesToCompress = this.conversationHistory
       .filter((msg: any) => {
         return msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system';
-      })
-      .slice(0, this.maxConversationRounds * 2);
+      });
 
-    if (messagesToCompress.length <= this.maxConversationRounds * 2) {
+    if (messagesToCompress.length <= this.compressThreshold) {
       return;
     }
 
-    const conversationText = messagesToCompress
+    const messagesToKeep = messagesToCompress.slice(-this.compressThreshold);
+    const messagesToCompressSummary = messagesToCompress.slice(0, messagesToCompress.length - this.compressThreshold);
+
+    if (messagesToCompressSummary.length === 0) {
+      return;
+    }
+
+    const conversationText = messagesToCompressSummary
       .map((msg: any) => `${msg.role}: ${msg.content}`)
       .join('\n\n');
 
@@ -246,7 +273,7 @@ export class AgentStore {
               role: 'system',
               content: summaryPrompt,
             },
-            ...messagesToCompress,
+            ...messagesToCompressSummary,
             {
               role: 'user',
               content: `Please summarize these conversations in 2-3 sentences in Chinese:\n\n${conversationText}`,
@@ -270,11 +297,12 @@ export class AgentStore {
         timestamp: new Date(),
       };
 
-      this.conversationHistory = [summaryMessage];
+      this.conversationHistory = [summaryMessage, ...messagesToKeep];
 
       logger.info('Conversation compressed', {
         originalCount: messagesToCompress.length,
-        remainingCount: 1 + this.conversationHistory.length,
+        compressedCount: messagesToCompressSummary.length,
+        remainingCount: 1 + messagesToKeep.length,
       });
     } catch (error) {
       logger.error('Failed to compress conversation', error);
@@ -315,16 +343,6 @@ export class AgentStore {
     }
   }
 
-      logger.info('Agent context saved', {
-        fileUri,
-        stepCount: this.executionLog.length,
-        messageCount: this.conversationHistory.length,
-      });
-    } catch (error) {
-      logger.error('Failed to save agent context', error);
-    }
-  }
-
   async loadContext(fileUri: string): Promise<any> {
     try {
       const response = await this.channel.send({
@@ -349,10 +367,9 @@ export class AgentStore {
           this.selection = '';
           this.executionLog = [];
           this.conversationHistory = [];
-          
-          return;
-        }
+        });
 
+        return null;
       }
 
       runInAction(() => {
@@ -362,21 +379,16 @@ export class AgentStore {
         this.selection = agentContext.selection || '';
         this.executionLog = agentContext.executionLog || [];
         this.conversationHistory = agentContext.conversationHistory || [];
+      });
 
-        logger.info('Agent context loaded', {
-          fileUri: this.fileUri,
-          hasContext: !!agentContext,
-          executionLogCount: agentContext.executionLog?.length || 0,
-          conversationCount: agentContext.conversationHistory?.length || 0,
-        });
+      logger.info('Agent context loaded', {
+        fileUri: this.fileUri,
+        hasContext: !!agentContext,
+        executionLogCount: agentContext.executionLog?.length || 0,
+        conversationCount: agentContext.conversationHistory?.length || 0,
+      });
 
-        return agentContext;
-      } catch (error) {
-        logger.error('Failed to load agent context', error);
-        return null;
-      }
-
-    }
+      return agentContext;
     } catch (error) {
       logger.error('Failed to load agent context', error);
       return null;

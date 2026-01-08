@@ -63,13 +63,13 @@ class ToolRegistry {
     // 读取文件
     this.register({
       name: 'readFile',
-      description: '读取文件内容。用于查看和分析文件，支持所有文本文件格式（.md, .txt, .js, .ts 等）。',
+      description: '读取文件内容。默认读取当前文件（Current File），支持所有文本文件格式（.md, .txt, .js, .ts 等）。',
       parameters: {
         type: 'object',
         properties: {
           uri: {
             type: 'string',
-            description: '要读取的文件 URI，必须是完整路径，例如：file:///Users/username/notes/file.md',
+            description: '要读取的文件 URI，必须是完整路径。如果用户未指定，默认使用当前文件（Current File）的 URI，例如：file:///Users/username/notes/file.md',
           },
         },
         required: ['uri'],
@@ -92,13 +92,13 @@ class ToolRegistry {
     // 写入文件
     this.register({
       name: 'writeFile',
-      description: '写入文件内容。会覆盖文件的现有内容，用于更新或修改文件。',
+      description: '写入文件内容。会覆盖文件的现有内容，用于更新或修改文件。默认写入当前文件（Current File）。',
       parameters: {
         type: 'object',
         properties: {
           uri: {
             type: 'string',
-            description: '要写入的文件 URI，必须是完整路径',
+            description: '要写入的文件 URI，必须是完整路径。如果用户未指定，默认使用当前文件（Current File）的 URI',
           },
           content: {
             type: 'string',
@@ -107,8 +107,8 @@ class ToolRegistry {
         },
         required: ['uri', 'content'],
       },
-      metadata: { 
-        category: 'file', 
+      metadata: {
+        category: 'file',
         permission: 'write',
         dangerous: true,
       },
@@ -200,13 +200,13 @@ class ToolRegistry {
     // 列出目录
     this.register({
       name: 'listFiles',
-      description: '列出目录中的文件和子目录。用于浏览文件结构。',
+      description: '列出目录中的文件和子目录。默认列出当前文件所在目录（Working Directory），用于浏览文件结构。',
       parameters: {
         type: 'object',
         properties: {
           uri: {
             type: 'string',
-            description: '要列出的目录 URI，必须是完整路径',
+            description: '要列出的目录 URI，必须是完整路径。如果用户未指定，默认使用当前文件所在目录（Working Directory）',
           },
         },
         required: ['uri'],
@@ -262,13 +262,13 @@ class ToolRegistry {
     // 搜索文件内容
     this.register({
       name: 'searchInFile',
-      description: '在文件中搜索内容。使用正则表达式模式搜索文件内容，返回匹配的行号和内容。',
+      description: '在文件中搜索内容。使用正则表达式模式搜索文件内容，返回匹配的行号和内容。默认在当前文件（Current File）中搜索。',
       parameters: {
         type: 'object',
         properties: {
           uri: {
             type: 'string',
-            description: '要搜索的文件 URI，必须是完整路径',
+            description: '要搜索的文件 URI，必须是完整路径。如果用户未指定，默认使用当前文件（Current File）的 URI',
           },
           pattern: {
             type: 'string',
