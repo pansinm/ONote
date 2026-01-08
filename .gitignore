@@ -8,6 +8,7 @@ reports
 .turbo
 .eslintcache
 coverage
+.opencode
 
 # for OTS parsing error: invalid sfntVersion: 1702391919
 # @see https://stackoverflow.com/questions/34288778/failed-to-decode-downloaded-font-ots-parsing-error-invalid-version-tag-rails
