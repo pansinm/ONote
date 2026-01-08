@@ -37,6 +37,7 @@ export class AgentOrchestrator {
   async run(prompt: string, conversationHistory?: Array<{ role: string; content: string }>): Promise<void> {
     this.abortController = new AbortController();
 
+    this.onStateChange('thinking');
     this.addStep({
       type: 'thinking',
       content: `Starting task: ${prompt}`,
@@ -98,6 +99,7 @@ export class AgentOrchestrator {
 
         // 显示思考过程
         if (this.config.showThinking !== false && assistantMessage.content) {
+          this.onStateChange('thinking');
           this.addStep({
             type: 'thinking',
             content: assistantMessage.content,
@@ -125,6 +127,7 @@ export class AgentOrchestrator {
           }
         } else {
           // 没有工具调用，任务完成
+          this.onStateChange('idle');
           this.addStep({
             type: 'final_answer',
             content: assistantMessage.content || 'Task completed',
@@ -134,6 +137,7 @@ export class AgentOrchestrator {
       }
 
       if (iteration >= maxIterations) {
+        this.onStateChange('idle');
         this.addStep({
           type: 'thinking',
           content: `Maximum iterations (${maxIterations}) reached`,
@@ -142,6 +146,7 @@ export class AgentOrchestrator {
 
     } catch (error) {
       logger.error('Agent execution failed', error);
+      this.onStateChange('idle');
       this.addStep({
         type: 'error',
         content: error instanceof Error ? error.message : 'Unknown error',
