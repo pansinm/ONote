@@ -1,12 +1,17 @@
 import type { onote } from '../../../../electron/src/preload/main/onote';
+import type { simmer } from '../../../../electron/src/preload/main/simmer';
 
-interface globalThis {
-  onote: typeof onote;
-  simmer: any;
-  nodeCrypto: {
-    randomBytes: (size: number) => Buffer;
-  };
+declare global {
+  interface Window {
+    onote: typeof onote;
+    simmer: typeof simmer;
+    nodeCrypto: {
+      randomBytes: (size: number) => Buffer;
+    };
+  }
 }
+
+declare module 'github-markdown-css';
 
 declare module 'github-markdown-css/github-markdown.css';
 

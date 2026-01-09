@@ -406,7 +406,7 @@ export class AgentStore {
 
   async saveExecutionState(): Promise<void> {
     if (!this.fileUri || !this.config.rootUri) {
-      logger.warn('Cannot save execution state: missing fileUri or rootUri');
+      logger.debug('Cannot save execution state: missing fileUri or rootUri');
       return;
     }
 

@@ -215,6 +215,10 @@ const LLMBoxApp = observer(() => {
 
         console.log('[llmbox.tsx] Got current file info:', response);
 
+        if (response.rootUri) {
+          agentStore.updateRootUri(response.rootUri);
+        }
+
         if (response.fileUri) {
           const newFileUri = response.fileUri;
           chatStore.updateFileUri(newFileUri);
