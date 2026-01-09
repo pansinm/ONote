@@ -9,7 +9,6 @@ import ListHeader from './ListHeader';
 import ListItem from '/@/components/ListItem';
 import type { MenuItem, MenuProps } from '/@/components/Menu';
 import Menu from '/@/components/Menu';
-import { useContextMenu } from 'react-contexify';
 import FileTreeItem from '/@/components/FileTreeItem';
 import useFileOperation from '/@/hooks/useFileOperation';
 import Flex from '/@/components/Flex';
@@ -19,6 +18,8 @@ import { useLatest } from 'react-use';
 import { isEquals, resolveUri } from '../../../common/utils/uri';
 import { blobToBuffer } from '../../../common/utils/transform';
 import fileService from '../../services/fileService';
+import { FILE_CONTENT_CHANGED } from '../../eventbus/EventName';
+import eventbus from '../../eventbus/eventbus';
 import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('FileList');
@@ -136,8 +137,6 @@ const FileList: FC = observer(() => {
     event.preventDefault();
   };
   const handleDrop = (ev: React.DragEvent) => {
-    // Prevent default behavior (Prevent file from being opened)
-    ev.preventDefault();
     if (!activationStore.activeDirUri) {
       alert('未选中目录');
       return;
@@ -145,9 +144,7 @@ const FileList: FC = observer(() => {
     setBackground('transparent');
 
     if (ev.dataTransfer.items) {
-      // Use DataTransferItemList interface to access the file(s)
       [...ev.dataTransfer.items].forEach(async (item, i) => {
-        // If dropped items aren't files, reject them
         if (item.kind === 'file') {
           const file = item.getAsFile();
           if (file) {
@@ -165,12 +162,43 @@ const FileList: FC = observer(() => {
         }
       });
     } else {
-      // Use DataTransfer interface to access the file(s)
       [...ev.dataTransfer.files].forEach((file, i) => {
         logger.debug('Dropped file', { index: i, fileName: file.name });
       });
     }
   };
+
+  useEffect(() => {
+    const handleFileContentChanged = (data: any) => {
+      if (!data?.uri) {
+        logger.debug('No URI in FILE_CONTENT_CHANGED event', { data });
+        return;
+      }
+
+      if (!activationStore.activeDirUri) {
+        return;
+      }
+
+      const isInCurrentDir = data.uri.startsWith(
+        activationStore.activeDirUri + '/',
+      );
+
+      if (isInCurrentDir) {
+        logger.debug('File content changed in current directory, refreshing file list', {
+          fileUri: data.uri,
+          activeDirUri: activationStore.activeDirUri,
+        });
+
+        stores.fileListStore.refreshFiles();
+      }
+    };
+
+    const unsubscribe = eventbus.on(FILE_CONTENT_CHANGED, handleFileContentChanged);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [activationStore.activeDirUri]);
   return (
     <Flex flexDirection="column" className={styles.NoteList}>
       <ListHeader
