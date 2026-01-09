@@ -92,14 +92,11 @@ export class AgentOrchestrator {
       let messages: Array<{ role: string; content: string }>;
 
       if (conversationHistory && conversationHistory.length > 0) {
-        messages = await this.compressIfNeeded(
-          [
-            systemMessage,
-            ...conversationHistory.filter(msg => msg.role !== 'tool'),
-            userMessage,
-          ],
-          options?.startIteration || 0
-        );
+        messages = await this.compressIfNeeded([
+          systemMessage,
+          ...conversationHistory.filter(msg => msg.role !== 'tool'),
+          userMessage,
+        ]);
       } else {
         messages = [systemMessage, userMessage];
       }
@@ -126,7 +123,7 @@ export class AgentOrchestrator {
           });
 
           const previousLength = messages.length;
-          messages = await this.compressIfNeeded(messages, iteration);
+          messages = await this.compressIfNeeded(messages);
 
           if (messages.length < previousLength) {
             this.dynamicCompressCheckInterval = Math.max(
@@ -216,35 +213,6 @@ export class AgentOrchestrator {
           break;
         }
       }
-
-      if (iteration >= maxIterations) {
-        this.onStateChange('idle');
-
-        logger.info('Max iterations reached, compressing final state');
-        messages = await this.compressIfNeeded(messages, iteration);
-
-        this.addStep({
-          type: 'thinking',
-          content: `Reached maximum iterations (${maxIterations}). Compressed message count: ${messages.length}`,
-        });
-
-        const todos = this.todoManager.listTodos();
-        const incompleteTodos = todos.filter((t) => t.status !== 'completed');
-
-        if (incompleteTodos.length > 0) {
-          const incompleteList = incompleteTodos.map((t) => `- [${t.status}] ${t.description}`).join('\n');
-          this.addStep({
-            type: 'thinking',
-            content: `Maximum iterations (${maxIterations}) reached\n\n未完成的任务：\n${incompleteList}`,
-          });
-        } else {
-          this.addStep({
-            type: 'thinking',
-            content: `Maximum iterations (${maxIterations}) reached`,
-          });
-        }
-      }
-
     } catch (error) {
       logger.error('Agent execution failed', error);
       this.onStateChange('idle');
@@ -253,8 +221,8 @@ export class AgentOrchestrator {
         content: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
+      }
     }
-  }
 
   /**
    * 停止 Agent
@@ -304,7 +272,7 @@ export class AgentOrchestrator {
       if (this.isTokenLimitError(error)) {
         logger.warn('Token limit reached, compressing conversation', { error });
 
-        const compressedMessages = await this.compressIfNeeded(messages, 0);
+        const compressedMessages = await this.compressIfNeeded(messages);
 
         logger.info('Retrying with compressed messages', {
           originalCount: messages.length,
@@ -481,23 +449,19 @@ export class AgentOrchestrator {
    * 检查是否需要压缩并执行压缩
    */
   private async compressIfNeeded(
-    messages: Array<{ role: string; content: string }>,
-    currentIteration: number
+    messages: Array<{ role: string; content: string }>
   ): Promise<Array<{ role: string; content: string }>> {
     const contextWindowSize = this.config.contextWindowSize || 128000;
     const compressRatio = this.config.compressRatio || 0.3;
-    const compressMinMessages = this.config.compressMinMessages || 20;
 
     const messagesToConsider = messages.filter(msg =>
-      msg.role !== 'tool'
+      msg.role !== 'tool' && msg.role !== 'system'
     );
 
     const estimatedTokens = this.estimateTokens(messagesToConsider);
     const tokenThreshold = contextWindowSize * 0.8;
 
-    const needCompress =
-      estimatedTokens >= tokenThreshold ||
-      messagesToConsider.length >= compressMinMessages;
+    const needCompress = estimatedTokens >= tokenThreshold;
 
     if (!needCompress) {
       return messages;
@@ -527,16 +491,24 @@ export class AgentOrchestrator {
     try {
       const summary = await this.generateSummary(messagesToCompress);
 
+      const systemMessage = messages.find(msg => msg.role === 'system');
       const toolMessages = messages.filter(msg => msg.role === 'tool');
 
-      return [
-        {
-          role: 'system',
-          content: `[Summary of previous conversation]: ${summary}`
-        },
-        ...messagesToKeep,
-        ...toolMessages,
-      ];
+      const result: Array<{ role: string; content: string }> = [];
+
+      if (systemMessage) {
+        result.push(systemMessage);
+      }
+
+      result.push({
+        role: 'system',
+        content: `[Summary of previous conversation]: ${summary}`
+      });
+
+      result.push(...messagesToKeep);
+      result.push(...toolMessages);
+
+      return result;
     } catch (error) {
       logger.error('Failed to compress conversation', error);
       return messages;
@@ -553,7 +525,7 @@ export class AgentOrchestrator {
       .map(msg => `${msg.role}: ${msg.content}`)
       .join('\n\n');
 
-    const summaryPrompt = `请用中文简洁总结以下对话内容，2-3 句话即可：\n\n${conversationText}`;
+    const summaryPrompt = `请用中文简洁总结以下对话内容和工具调用结果，2-3 句话即可：\n\n${conversationText}`;
 
     const response = await fetch(this.config.apiBase, {
       method: 'POST',
