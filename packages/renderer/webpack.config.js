@@ -7,6 +7,9 @@ const webpack = require('webpack');
 const entryPath = path.resolve(__dirname, 'src/entry');
 
 const entry = fs.readdirSync(entryPath).reduce((pre, file) => {
+  if (file === '__tests__') {
+    return pre;
+  }
   const basename = file.split('.').slice(0, -1).join('.');
   pre[basename] = path.resolve(entryPath, file);
   return pre;
