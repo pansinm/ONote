@@ -2,6 +2,7 @@ import { BaseHandler } from './BaseHandler';
 import type {
   AgentFileReadResponse,
   AgentFileWriteResponse,
+  AgentFileReplaceResponse,
   AgentFileCreateResponse,
   AgentFileDeleteResponse,
   AgentFileListResponse,
@@ -10,8 +11,52 @@ import type {
 } from '../types';
 import fileService from '/@/main/services/fileService';
 
+interface Stores {
+  fileStore: {
+    getOrCreateModel: (
+      uri: string,
+    ) => Promise<{ setValue: (content: string) => void }>;
+    closeFile: (uri: string) => Promise<void>;
+    saveFile: (uri: string, content: string) => Promise<void>;
+  };
+}
+
+interface ReplaceOperation {
+  mode: 'string' | 'regex' | 'line_range' | 'line_number';
+  search: string;
+  replace: string;
+  replaceAll?: boolean;
+  caseSensitive?: boolean;
+  lineStart?: number;
+  lineEnd?: number;
+}
+
+interface OperationResult {
+  success: boolean;
+  matches: number;
+  changedLines: number[];
+  error?: string;
+}
+
+interface ReplaceOperation {
+  mode: 'string' | 'regex' | 'line_range' | 'line_number';
+  search: string;
+  replace: string;
+  replaceAll?: boolean;
+  caseSensitive?: boolean;
+  lineStart?: number;
+  lineEnd?: number;
+}
+
+interface OperationResult {
+  success: boolean;
+  matches: number;
+  changedLines: number[];
+  error?: string;
+}
+
 export class AgentFileReadHandler extends BaseHandler {
-  constructor(private stores: any) {
+  constructor(private stores: Stores) {
     super();
   }
 
@@ -33,7 +78,7 @@ export class AgentFileReadHandler extends BaseHandler {
 }
 
 export class AgentFileWriteHandler extends BaseHandler {
-  constructor(private stores: any) {
+  constructor(private stores: Stores) {
     super();
   }
 
@@ -58,8 +103,275 @@ export class AgentFileWriteHandler extends BaseHandler {
   }
 }
 
+export class AgentFileReplaceHandler extends BaseHandler {
+  constructor(private stores: Stores) {
+    super();
+  }
+
+  async handle(data: {
+    uri: string;
+    operations: ReplaceOperation[];
+    preview?: boolean;
+  }): Promise<AgentFileReplaceResponse> {
+    this.logger.debug('AgentFileReplaceHandler.handle called', {
+      uri: data.uri,
+      operationCount: data.operations.length,
+      preview: data.preview || false,
+    });
+
+    return this.wrapWithErrorHandling(async () => {
+      const originalContent = await fileService.readText(data.uri);
+
+      if (!originalContent) {
+        this.logger.warn('File is empty', { uri: data.uri });
+
+        const operationResults = data.operations.map(() => ({
+          success: false,
+          matches: 0,
+          changedLines: [],
+          error: 'File is empty',
+        } as OperationResult));
+
+        return {
+          success: true,
+          modifiedLines: [],
+          operations: operationResults,
+        };
+      }
+
+      const lines = originalContent.split('\n');
+      const allModifiedLines = new Set<number>();
+      const operationResults: OperationResult[] = [];
+
+      for (const operation of data.operations) {
+        const result = await this.executeOperation(lines, operation);
+        operationResults.push(result);
+
+        if (result.success) {
+          result.changedLines.forEach((line) => allModifiedLines.add(line));
+        }
+      }
+
+      const modifiedContent = lines.join('\n');
+
+      if (data.preview) {
+        this.logger.debug('Preview mode, not saving changes', {
+          uri: data.uri,
+          modifiedLinesCount: allModifiedLines.size,
+        });
+
+        return {
+          success: true,
+          preview: modifiedContent,
+          modifiedLines: Array.from(allModifiedLines).sort((a, b) => a - b),
+          operations: operationResults,
+        };
+      }
+
+      await fileService.writeText(data.uri, modifiedContent);
+      const model = await this.stores.fileStore.getOrCreateModel(data.uri);
+      model.setValue(modifiedContent);
+
+      this.logger.debug('File content replaced successfully', {
+        uri: data.uri,
+        modifiedLinesCount: allModifiedLines.size,
+      });
+
+      return {
+        success: true,
+        modifiedLines: Array.from(allModifiedLines).sort((a, b) => a - b),
+        operations: operationResults,
+      };
+    }, 'Failed to replace file content');
+  }
+
+  private async executeOperation(
+    lines: string[],
+    operation: ReplaceOperation,
+  ): Promise<OperationResult> {
+    try {
+      const { mode, search, replace } = operation;
+
+      if (mode === 'string') {
+        return this.executeStringReplace(lines, search, replace, operation);
+      } else if (mode === 'regex') {
+        return this.executeRegexReplace(lines, search, replace);
+      } else if (mode === 'line_range') {
+        return this.executeLineRangeReplace(lines, operation);
+      } else if (mode === 'line_number') {
+        return this.executeLineNumberReplace(lines, operation);
+      } else {
+        throw new Error(`Unknown mode: ${mode}`);
+      }
+    } catch (error) {
+      return {
+        success: false,
+        matches: 0,
+        changedLines: [],
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  private executeStringReplace(
+    lines: string[],
+    search: string,
+    replace: string,
+    operation: ReplaceOperation,
+  ): OperationResult {
+    if (!search) {
+      return {
+        success: false,
+        matches: 0,
+        changedLines: [],
+        error: 'Search string cannot be empty',
+      };
+    }
+
+    const { replaceAll = false, caseSensitive = false } = operation;
+    const flags = replaceAll
+      ? (caseSensitive ? 'g' : 'gi')
+      : (caseSensitive ? '' : 'i');
+    const searchRegex = new RegExp(
+      search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+      flags,
+    );
+
+    const changedLines = new Set<number>();
+    let matches = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const hasMatch = searchRegex.test(line);
+
+      if (!hasMatch) {
+        continue;
+      }
+
+      const newLine = line.replace(searchRegex, replace);
+
+      if (newLine !== line) {
+        matches++;
+        lines[i] = newLine;
+        changedLines.add(i + 1);
+      }
+
+      if (!replaceAll && matches > 0) {
+        break;
+      }
+    }
+
+    return {
+      success: matches > 0,
+      matches,
+      changedLines: Array.from(changedLines),
+    };
+  }
+
+  private executeRegexReplace(
+    lines: string[],
+    search: string,
+    replace: string,
+  ): OperationResult {
+    if (!search) {
+      return {
+        success: false,
+        matches: 0,
+        changedLines: [],
+        error: 'Search pattern cannot be empty',
+      };
+    }
+
+    try {
+      const searchRegex = new RegExp(search, 'g');
+      const changedLines = new Set<number>();
+      let matches = 0;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const hasMatch = searchRegex.test(line);
+
+        if (!hasMatch) {
+          continue;
+        }
+
+        const newLine = line.replace(searchRegex, replace);
+
+        if (newLine !== line) {
+          const matchCount = (line.match(searchRegex) || []).length;
+          matches += matchCount;
+          lines[i] = newLine;
+          changedLines.add(i + 1);
+        }
+      }
+
+      return {
+        success: matches > 0,
+        matches,
+        changedLines: Array.from(changedLines),
+      };
+    } catch (error) {
+      throw new Error(`Invalid regex pattern: ${error}`);
+    }
+  }
+
+  private executeLineRangeReplace(
+    lines: string[],
+    operation: ReplaceOperation,
+  ): OperationResult {
+    const { lineStart, lineEnd, replace } = operation;
+
+    if (lineStart === undefined || lineEnd === undefined) {
+      throw new Error('lineStart and lineEnd are required for line_range mode');
+    }
+
+    if (lineStart < 1 || lineEnd > lines.length) {
+      throw new Error(`Line range ${lineStart}-${lineEnd} is out of bounds`);
+    }
+
+    const startIndex = lineStart - 1;
+    const endIndex = lineEnd;
+
+    const originalLines = lines.slice(startIndex, endIndex);
+    const replacementLines = replace.split('\n');
+
+    lines.splice(startIndex, originalLines.length, ...replacementLines);
+
+    const changedLines: number[] = [];
+    for (let i = startIndex; i < startIndex + replacementLines.length; i++) {
+      changedLines.push(i + 1);
+    }
+
+    return {
+      success: true,
+      matches: replacementLines.length,
+      changedLines,
+    };
+  }
+
+  private executeLineNumberReplace(
+    lines: string[],
+    operation: ReplaceOperation,
+  ): OperationResult {
+    const { search, replace } = operation;
+    const lineNumber = parseInt(search, 10);
+
+    if (isNaN(lineNumber) || lineNumber < 1 || lineNumber > lines.length) {
+      throw new Error(`Invalid line number: ${search}`);
+    }
+
+    lines[lineNumber - 1] = replace;
+
+    return {
+      success: true,
+      matches: 1,
+      changedLines: [lineNumber],
+    };
+  }
+}
+
 export class AgentFileCreateHandler extends BaseHandler {
-  constructor(private stores: any) {
+  constructor(private stores: Stores) {
     super();
   }
 
@@ -84,7 +396,7 @@ export class AgentFileCreateHandler extends BaseHandler {
 }
 
 export class AgentFileDeleteHandler extends BaseHandler {
-  constructor(private stores: any) {
+  constructor(private stores: Stores) {
     super();
   }
 
@@ -105,7 +417,7 @@ export class AgentFileDeleteHandler extends BaseHandler {
 }
 
 export class AgentFileListHandler extends BaseHandler {
-  constructor(private stores: any) {
+  constructor(private stores: Stores) {
     super();
   }
 
@@ -140,7 +452,7 @@ export class AgentFileListHandler extends BaseHandler {
 }
 
 export class AgentFileSearchHandler extends BaseHandler {
-  constructor(private stores: any) {
+  constructor(private stores: Stores) {
     super();
   }
 
@@ -176,7 +488,7 @@ export class AgentFileSearchHandler extends BaseHandler {
 }
 
 export class AgentFileSearchInHandler extends BaseHandler {
-  constructor(private stores: any) {
+  constructor(private stores: Stores) {
     super();
   }
 

@@ -89,6 +89,36 @@ export interface AgentFileWriteResponse {
   success?: boolean;
 }
 
+export interface AgentFileReplaceMessage {
+  type: 'AGENT_FILE_REPLACE';
+  data: {
+    uri: string;
+    operations: Array<{
+      mode: 'string' | 'regex' | 'line_range' | 'line_number';
+      search: string;
+      replace: string;
+      replaceAll?: boolean;
+      caseSensitive?: boolean;
+      lineStart?: number;
+      lineEnd?: number;
+    }>;
+    preview?: boolean;
+  };
+}
+
+export interface AgentFileReplaceResponse {
+  error?: string;
+  success?: boolean;
+  preview?: string;
+  modifiedLines?: number[];
+  operations?: Array<{
+    success: boolean;
+    matches: number;
+    changedLines: number[];
+    error?: string;
+  }>;
+}
+
 export interface AgentFileCreateMessage {
   type: 'AGENT_FILE_CREATE';
   data: {
@@ -217,6 +247,7 @@ export type LLMBoxMessage =
   | LLMConversationSaveMessage
   | AgentFileReadMessage
   | AgentFileWriteMessage
+  | AgentFileReplaceMessage
   | AgentFileCreateMessage
   | AgentFileDeleteMessage
   | AgentFileListMessage
@@ -233,6 +264,7 @@ export type LLMBoxResponse =
   | LLMConversationSaveResponse
   | AgentFileReadResponse
   | AgentFileWriteResponse
+  | AgentFileReplaceResponse
   | AgentFileCreateResponse
   | AgentFileDeleteResponse
   | AgentFileListResponse

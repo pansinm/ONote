@@ -5,12 +5,16 @@ import type TodoManager from './TodoManager';
 
 const logger = getLogger('ToolRegistry');
 
+interface Channel {
+  send: (message: { type: string; data: unknown }) => Promise<Record<string, unknown>>;
+}
+
 class ToolRegistry {
   private tools: Map<string, Tool> = new Map();
-  private channel: any;
+  private channel: Channel;
   private todoManager?: TodoManager;
 
-  constructor(channel: any, todoManager?: TodoManager) {
+  constructor(channel: Channel, todoManager?: TodoManager) {
     this.channel = channel;
     this.todoManager = todoManager;
     this.initializeBuiltInTools();
@@ -56,12 +60,9 @@ class ToolRegistry {
    * 初始化内置工具
    */
   private initializeBuiltInTools(): void {
-    // ========== 文件工具 ==========
-    
-    // 读取文件
     this.register({
       name: 'readFile',
-      description: '读取文件内容。默认读取当前文件（Current File），支持所有文本文件格式（.md, .txt, .js, .ts 等）。',
+      description: '读取文件内容。支持所有文本文件格式（.md, .txt, .js, .ts 等）。注意：如果 Context 中已提供当前文件内容（Current File Content），优先使用 Context 中的内容，无需调用此工具。仅在需要读取其他文件时使用。',
       parameters: {
         type: 'object',
         properties: {
@@ -115,11 +116,90 @@ class ToolRegistry {
           type: LLM_BOX_MESSAGE_TYPES.AGENT_FILE_WRITE,
           data: params,
         });
-        
+
         if (response.error) {
           throw new Error(response.error);
         }
-        
+
+        return response;
+      },
+    });
+
+    // 替换文件内容
+    this.register({
+      name: 'replaceFileContent',
+      description: '替换文件中的部分内容。适用于局部修改、bug 修复、代码重构等场景，避免全量输出文件内容，节省 token。支持多种替换模式：string=字符串替换, regex=正则表达式替换, line_range=行范围替换, line_number=单行替换。可以执行多个替换操作。',
+      parameters: {
+        type: 'object',
+        properties: {
+          uri: {
+            type: 'string',
+            description: '要修改的文件 URI，必须是完整路径。如果用户未指定，默认使用当前文件（Current File）的 URI',
+          },
+          operations: {
+            type: 'array',
+            description: '替换操作列表，支持多个替换操作',
+            items: {
+              type: 'object',
+              properties: {
+                mode: {
+                  type: 'string',
+                  enum: ['string', 'regex', 'line_range', 'line_number'],
+                  description: '替换模式：string=字符串替换, regex=正则表达式替换, line_range=行范围替换, line_number=单行替换',
+                },
+                search: {
+                  type: 'string',
+                  description: '搜索内容（string/regex/line_number 模式）或行号（line_number 模式时为数字，但类型定义为 string）。注意：search 不能为空字符串',
+                },
+                replace: {
+                  type: 'string',
+                  description: '替换内容',
+                },
+                replaceAll: {
+                  type: 'boolean',
+                  description: '是否替换所有匹配项（仅 string 模式有效），默认 false',
+                  default: false,
+                },
+                caseSensitive: {
+                  type: 'boolean',
+                  description: '是否区分大小写（仅 string 模式有效），默认 false',
+                  default: false,
+                },
+                lineStart: {
+                  type: 'number',
+                  description: '起始行号（仅 line_range 模式有效）',
+                },
+                lineEnd: {
+                  type: 'number',
+                  description: '结束行号（仅 line_range 模式有效）',
+                },
+              },
+              required: ['mode', 'search', 'replace'],
+            },
+          },
+          preview: {
+            type: 'boolean',
+            description: '是否只预览修改结果而不实际写入，默认 false。预览模式下会返回修改后的内容，但不会保存到文件',
+            default: false,
+          },
+        },
+        required: ['uri', 'operations'],
+      },
+      metadata: {
+        category: 'file',
+        permission: 'write',
+        dangerous: true,
+      },
+      executor: async (params) => {
+        const response = await this.channel.send({
+          type: LLM_BOX_MESSAGE_TYPES.AGENT_FILE_REPLACE,
+          data: params,
+        });
+
+        if (response.error) {
+          throw new Error(response.error);
+        }
+
         return response;
       },
     });

@@ -15,6 +15,7 @@ import {
 import {
   AgentFileReadHandler,
   AgentFileWriteHandler,
+  AgentFileReplaceHandler,
   AgentFileCreateHandler,
   AgentFileDeleteHandler,
   AgentFileListHandler,
@@ -53,6 +54,9 @@ function LLMBoxFrame() {
         new ConversationSaveHandler(stores, onote),
       [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_READ]: new AgentFileReadHandler(stores),
       [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_WRITE]: new AgentFileWriteHandler(
+        stores,
+      ),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_REPLACE]: new AgentFileReplaceHandler(
         stores,
       ),
       [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_CREATE]: new AgentFileCreateHandler(
