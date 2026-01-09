@@ -98,7 +98,12 @@ export class AgentOrchestrator {
         content: prompt,
       };
 
-      let messages: Array<{ role: string; content: string }>;
+      let messages: Array<{
+        role: string;
+        content: string;
+        tool_calls?: ToolCall[];
+        tool_call_id?: string;
+      }>;
 
       if (conversationHistory && conversationHistory.length > 0) {
         messages = await this.compressIfNeeded([
@@ -171,6 +176,7 @@ export class AgentOrchestrator {
         messages.push({
           role: assistantMessage.role,
           content: assistantMessage.content || '',
+          tool_calls: assistantMessage.tool_calls,
         });
 
         // 通知回调添加消息（所有 assistant 消息都记录）
@@ -265,7 +271,12 @@ export class AgentOrchestrator {
    * 调用 LLM API
    */
   private async callLLM(
-    messages: Array<{ role: string; content: string }>,
+    messages: Array<{
+      role: string;
+      content: string;
+      tool_calls?: ToolCall[];
+      tool_call_id?: string;
+    }>,
   ): Promise<{
     choices: Array<{
       message: {
@@ -493,7 +504,12 @@ export class AgentOrchestrator {
    * 估算 Token 数量
    */
   private estimateTokens(
-    messages: Array<{ role: string; content: string }>,
+    messages: Array<{
+      role: string;
+      content: string;
+      tool_calls?: ToolCall[];
+      tool_call_id?: string;
+    }>,
   ): number {
     let totalChars = 0;
 
@@ -508,8 +524,20 @@ export class AgentOrchestrator {
    * 检查是否需要压缩并执行压缩
    */
   private async compressIfNeeded(
-    messages: Array<{ role: string; content: string }>,
-  ): Promise<Array<{ role: string; content: string }>> {
+    messages: Array<{
+      role: string;
+      content: string;
+      tool_calls?: ToolCall[];
+      tool_call_id?: string;
+    }>,
+  ): Promise<
+    Array<{
+      role: string;
+      content: string;
+      tool_calls?: ToolCall[];
+      tool_call_id?: string;
+    }>
+  > {
     const contextWindowSize = this.config.contextWindowSize || 128000;
     const compressRatio = this.config.compressRatio || 0.3;
 
@@ -553,7 +581,12 @@ export class AgentOrchestrator {
       const systemMessage = messages.find((msg) => msg.role === 'system');
       const toolMessages = messages.filter((msg) => msg.role === 'tool');
 
-      const result: Array<{ role: string; content: string }> = [];
+      const result: Array<{
+        role: string;
+        content: string;
+        tool_calls?: ToolCall[];
+        tool_call_id?: string;
+      }> = [];
 
       if (systemMessage) {
         result.push(systemMessage);
@@ -578,7 +611,12 @@ export class AgentOrchestrator {
    * 生成对话摘要
    */
   private async generateSummary(
-    messages: Array<{ role: string; content: string }>,
+    messages: Array<{
+      role: string;
+      content: string;
+      tool_calls?: ToolCall[];
+      tool_call_id?: string;
+    }>,
   ): Promise<string> {
     const conversationText = messages
       .map((msg) => `${msg.role}: ${msg.content}`)

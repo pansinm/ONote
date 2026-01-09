@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import type {
   Tool,
+  ToolCall,
   ExecutionStep,
   AgentConfig,
   TodoItem,
@@ -24,6 +25,7 @@ interface AgentMessage {
   content: string;
   timestamp: Date;
   toolCallId?: string;
+  tool_calls?: ToolCall[];
 }
 
 interface Channel {
@@ -549,15 +551,24 @@ export class AgentStore {
         this.selection = state.selection;
       });
 
-      const conversationHistory = this.conversationHistory.filter(
-        (msg: any) => {
+      const conversationHistory = this.conversationHistory
+        .filter((msg) => {
           return (
             msg.role === 'user' ||
             msg.role === 'assistant' ||
             msg.role === 'system'
           );
-        },
-      );
+        })
+        .map((msg) => {
+          // Remove tool_calls from assistant messages since we're not including tool results
+          // This prevents "Invalid tool_call_id" errors from the API
+          if (msg.role === 'assistant' && msg.tool_calls) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { tool_calls: _, ...rest } = msg;
+            return rest;
+          }
+          return msg;
+        });
 
       const hasFileContent = !!this.content;
 
