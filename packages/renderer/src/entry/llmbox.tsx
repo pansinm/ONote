@@ -150,15 +150,29 @@ const LLMBoxApp = observer(() => {
 
       if (type === LLM_BOX_MESSAGE_TYPES.GET_CURRENT_FILE_INFO) {
         const { fileUri, rootUri } = data;
-        console.log('[llmbox.tsx] Got rootUri:', rootUri);
+        console.log('[llmbox.tsx] Got file info:', { fileUri, rootUri });
         if (rootUri) {
           agentStore.updateRootUri(rootUri);
+        }
+        if (fileUri) {
+          chatStore.updateFileUri(fileUri);
+          agentStore.updateFileUri(fileUri);
+          chatStore.setLoadConversation(loadConversation);
+
+          await loadConversation(fileUri);
+          await handleFileChange(fileUri);
         }
       }
 
       if (type === LLM_BOX_MESSAGE_TYPES.EDITOR_FILE_OPEN && data?.uri) {
         console.log('[llmbox.tsx] Handling EDITOR_FILE_OPEN:', data.uri);
         const newFileUri = data.uri;
+        const newRootUri = stores?.activationStore?.rootUri;
+
+        if (newRootUri) {
+          agentStore.updateRootUri(newRootUri);
+        }
+
         chatStore.updateFileUri(newFileUri);
         agentStore.updateFileUri(newFileUri);
         chatStore.setLoadConversation(loadConversation);

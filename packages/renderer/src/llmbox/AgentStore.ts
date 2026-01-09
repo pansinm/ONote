@@ -17,6 +17,10 @@ interface AgentMessage {
   toolCallId?: string;
 }
 
+interface Channel {
+  send: (message: { type: string; data: unknown }) => Promise<Record<string, unknown>>;
+}
+
 export class AgentStore {
   todos: TodoItem[] = [];
 
@@ -47,41 +51,19 @@ export class AgentStore {
   compressThreshold = 20;
 
   private config: AgentConfig;
-  private channel: any;
+  private channel: Channel;
   private todoManager: TodoManager;
   private toolRegistry: ToolRegistry;
-  private orchestrator: AgentOrchestrator;
+  private orchestrator: AgentOrchestrator | null = null;
   private currentPrompt = '';
   private executionStartTime: Date | null = null;
   private currentIteration = 0;
 
-  constructor(config: AgentConfig, channel: any) {
+  constructor(config: AgentConfig, channel: Channel) {
     this.config = config;
     this.channel = channel;
     this.todoManager = new TodoManager();
     this.toolRegistry = new ToolRegistry(channel, this.todoManager);
-    this.orchestrator = new AgentOrchestrator(
-      {
-        config,
-        toolRegistry: this.toolRegistry,
-        onStep: this.addStep.bind(this),
-        onStateChange: (state) => {
-          runInAction(() => {
-            this.agentState = state;
-          });
-        },
-        onMessage: (message) => {
-          this.addMessage(message);
-        },
-        onTodoChange: (todos) => {
-          runInAction(() => {
-            this.todos = todos;
-          });
-        },
-        onSaveState: this.saveExecutionState.bind(this),
-      },
-      this.todoManager,
-    );
 
     makeAutoObservable(this);
     this.loadTools();
@@ -175,7 +157,9 @@ export class AgentStore {
 
   stopAgent(): void {
     logger.info('Stopping agent');
-    this.orchestrator.stop();
+    if (this.orchestrator) {
+      this.orchestrator.stop();
+    }
     this.setRunning(false);
   }
 
@@ -242,10 +226,12 @@ export class AgentStore {
         this.currentIteration = 0;
       });
 
+      const hasFileContent = !!this.content;
+
       const userPrompt = this.buildContextPrompt(
         this.fileUri || '',
         prompt,
-        !!this.fileUri,
+        hasFileContent,
       );
 
       const conversationHistory = this.conversationHistory
@@ -260,6 +246,30 @@ export class AgentStore {
           ...msg,
           timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
         }));
+
+      this.orchestrator = new AgentOrchestrator(
+        {
+          config: this.config,
+          toolRegistry: this.toolRegistry,
+          onStep: this.addStep.bind(this),
+          onStateChange: (state) => {
+            runInAction(() => {
+              this.agentState = state;
+            });
+          },
+          onMessage: (message) => {
+            this.addMessage(message);
+          },
+          onTodoChange: (todos) => {
+            runInAction(() => {
+              this.todos = todos;
+            });
+          },
+          onSaveState: this.saveExecutionState.bind(this),
+          hasFileContent,
+        },
+        this.todoManager,
+      );
 
       await this.orchestrator.run(userPrompt, conversationHistory);
       this.setRunning(false);
@@ -314,10 +324,15 @@ export class AgentStore {
   }
 
   async loadContext(fileUri: string): Promise<any> {
+    if (!this.config.rootUri) {
+      logger.warn('Cannot load agent context: missing rootUri');
+      return null;
+    }
+
     try {
       const response = (await this.channel.send({
         type: 'AGENT_CONTEXT_LOAD',
-        data: { fileUri },
+        data: { fileUri, rootUri: this.config.rootUri },
       })) as { error?: string; agentContext?: any };
 
       if (response.error) {
@@ -448,21 +463,22 @@ export class AgentStore {
 
       const state = response.state;
 
-      const parseDate = (value: any): Date => {
+      const parseDate = (value: unknown): Date => {
         if (value instanceof Date) return value;
-        if (typeof value === 'string' || typeof value === 'number') return new Date(value);
+        if (typeof value === 'string' || typeof value === 'number')
+          return new Date(value);
         return new Date();
       };
 
       const stateWithDates: AgentExecutionState = {
         ...state,
         startTime: parseDate(state.startTime),
-        todos: state.todos.map(todo => ({
+        todos: state.todos.map((todo) => ({
           ...todo,
           createdAt: parseDate(todo.createdAt),
           updatedAt: parseDate(todo.updatedAt),
         })),
-        executionLog: state.executionLog.map(step => ({
+        executionLog: state.executionLog.map((step) => ({
           ...step,
           timestamp: parseDate(step.timestamp),
         })),
@@ -503,7 +519,7 @@ export class AgentStore {
       runInAction(() => {
         this.todos = state.todos;
         this.executionLog = state.executionLog;
-        this.conversationHistory = state.conversationHistory.map(msg => ({
+        this.conversationHistory = state.conversationHistory.map((msg: any) => ({
           ...msg,
           id: uuid('agent-msg-'),
           timestamp: new Date(),
@@ -515,7 +531,7 @@ export class AgentStore {
         this.selection = state.selection;
       });
 
-      const conversationHistory = this.conversationHistory.filter(msg => {
+      const conversationHistory = this.conversationHistory.filter((msg: any) => {
         return msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system';
       });
 
