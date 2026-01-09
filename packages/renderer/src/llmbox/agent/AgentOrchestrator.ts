@@ -1,5 +1,5 @@
 import type { ToolCall, AgentConfig, ExecutionStep, TodoItem } from './types';
-import ToolRegistry from './ToolRegistry';
+import type ToolRegistry from './ToolRegistry';
 import { getLogger } from '../../shared/logger';
 import { uuid } from '../../common/tunnel/utils';
 import type TodoManager from './TodoManager';
@@ -11,10 +11,14 @@ interface AgentOrchestratorOptions {
   toolRegistry: ToolRegistry;
   onStep: (step: ExecutionStep) => void;
   onStateChange: (state: 'idle' | 'thinking' | 'executing') => void;
-  onMessage?: (message: { role: 'assistant' | 'user' | 'system' | 'tool'; content: string }) => void;
+  onMessage?: (message: {
+    role: 'assistant' | 'user' | 'system' | 'tool';
+    content: string;
+  }) => void;
   onTodoChange?: (todos: TodoItem[]) => void;
   onTodoAction?: (action: 'create' | 'update', todo?: TodoItem) => void;
   onSaveState?: () => Promise<void>;
+  hasFileContent?: boolean;
 }
 
 export class AgentOrchestrator {
@@ -23,12 +27,16 @@ export class AgentOrchestrator {
   private abortController: AbortController | null = null;
   private onStep: (step: ExecutionStep) => void;
   private onStateChange: (state: 'idle' | 'thinking' | 'executing') => void;
-  private onMessage?: (message: { role: 'assistant' | 'user' | 'system' | 'tool'; content: string }) => void;
+  private onMessage?: (message: {
+    role: 'assistant' | 'user' | 'system' | 'tool';
+    content: string;
+  }) => void;
   private onTodoChange?: (todos: TodoItem[]) => void;
   private onTodoAction?: (action: 'create' | 'update', todo?: TodoItem) => void;
   private onSaveState?: () => Promise<void>;
   private todoManager: TodoManager;
   private dynamicCompressCheckInterval?: number;
+  private hasFileContent: boolean;
 
   constructor(options: AgentOrchestratorOptions, todoManager: TodoManager) {
     this.config = options.config;
@@ -39,6 +47,7 @@ export class AgentOrchestrator {
     this.onTodoChange = options.onTodoChange;
     this.onTodoAction = options.onTodoAction;
     this.onSaveState = options.onSaveState;
+    this.hasFileContent = options.hasFileContent || false;
     this.todoManager = todoManager;
 
     this.todoManager.registerCallback((todos) => {
@@ -94,7 +103,7 @@ export class AgentOrchestrator {
       if (conversationHistory && conversationHistory.length > 0) {
         messages = await this.compressIfNeeded([
           systemMessage,
-          ...conversationHistory.filter(msg => msg.role !== 'tool'),
+          ...conversationHistory.filter((msg) => msg.role !== 'tool'),
           userMessage,
         ]);
       } else {
@@ -109,14 +118,21 @@ export class AgentOrchestrator {
 
       let iteration = options?.startIteration || 0;
       const maxIterations = this.config.maxIterations || 10;
-      const minCompressCheckInterval = this.config.minCompressCheckInterval || 5;
+      const minCompressCheckInterval =
+        this.config.minCompressCheckInterval || 5;
 
-      while (iteration < maxIterations && !this.abortController.signal.aborted) {
+      while (
+        iteration < maxIterations &&
+        !this.abortController.signal.aborted
+      ) {
         iteration++;
 
         logger.info(`Agent iteration ${iteration}/${maxIterations}`);
 
-        if (iteration % this.dynamicCompressCheckInterval === 0 && iteration > 0) {
+        if (
+          iteration % this.dynamicCompressCheckInterval === 0 &&
+          iteration > 0
+        ) {
           logger.info('Periodic compression check', {
             iteration,
             checkInterval: this.dynamicCompressCheckInterval,
@@ -128,7 +144,7 @@ export class AgentOrchestrator {
           if (messages.length < previousLength) {
             this.dynamicCompressCheckInterval = Math.max(
               Math.floor(this.dynamicCompressCheckInterval * 1.5),
-              minCompressCheckInterval
+              minCompressCheckInterval,
             );
 
             logger.info('Compress check interval adjusted', {
@@ -172,23 +188,27 @@ export class AgentOrchestrator {
         }
 
         // 检查是否有工具调用
-        if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
-          // 执行工具
-          const toolResults = await this.executeToolCalls(assistantMessage.tool_calls);
+      if (
+        assistantMessage.tool_calls &&
+        assistantMessage.tool_calls.length > 0
+      ) {
+        // 执行工具
+        const toolResults = await this.executeToolCalls(
+          assistantMessage.tool_calls,
+        );
 
-          if (this.onSaveState) {
-            await this.onSaveState();
-          }
+        if (this.onSaveState) {
+          await this.onSaveState();
+        }
 
-          // 将工具结果添加到消息
-          toolResults.forEach(result => {
-            messages.push({
-              role: 'tool',
-              // @ts-ignore - OpenAI API 支持 tool_call_id
-              tool_call_id: result.toolCallId,
-              content: JSON.stringify(result.result),
-            } as any);
-          });
+        // 将工具结果添加到消息
+        toolResults.forEach((result) => {
+          messages.push({
+            role: 'tool',
+            tool_call_id: result.toolCallId,
+            content: JSON.stringify(result.result),
+          } as { role: string; tool_call_id: string; content: string });
+        });
 
           // 检查是否应该继续
           if (!this.shouldContinue(iteration, maxIterations)) {
@@ -221,8 +241,8 @@ export class AgentOrchestrator {
         content: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
-      }
     }
+  }
 
   /**
    * 停止 Agent
@@ -241,7 +261,17 @@ export class AgentOrchestrator {
   /**
    * 调用 LLM API
    */
-  private async callLLM(messages: any[]): Promise<any> {
+  private async callLLM(
+    messages: Array<{ role: string; content: string }>,
+  ): Promise<{
+    choices: Array<{
+      message: {
+        role: string;
+        content?: string;
+        tool_calls?: ToolCall[];
+      };
+    }>;
+  }> {
     const tools = this.toolRegistry.getOpenAISchema();
 
     try {
@@ -261,14 +291,26 @@ export class AgentOrchestrator {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = (await response.json().catch(() => ({}))) as Record<
+          string,
+          unknown
+        >;
         throw new Error(
-          errorData.error?.message || `LLM API error: ${response.status}`
+          (errorData.error as { message?: string })?.message ||
+            `LLM API error: ${response.status}`,
         );
       }
 
-      return await response.json();
-    } catch (error: any) {
+      return (await response.json()) as {
+        choices: Array<{
+          message: {
+            role: string;
+            content?: string;
+            tool_calls?: ToolCall[];
+          };
+        }>;
+      };
+    } catch (error: unknown) {
       if (this.isTokenLimitError(error)) {
         logger.warn('Token limit reached, compressing conversation', { error });
 
@@ -295,13 +337,25 @@ export class AgentOrchestrator {
         });
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
+          const errorData = (await response.json().catch(() => ({}))) as Record<
+            string,
+            unknown
+          >;
           throw new Error(
-            errorData.error?.message || `LLM API error: ${response.status}`
+            (errorData.error as { message?: string })?.message ||
+              `LLM API error: ${response.status}`,
           );
         }
 
-        return await response.json();
+        return (await response.json()) as {
+          choices: Array<{
+            message: {
+              role: string;
+              content?: string;
+              tool_calls?: ToolCall[];
+            };
+          }>;
+        };
       }
 
       throw error;
@@ -312,7 +366,7 @@ export class AgentOrchestrator {
    * 执行工具调用
    */
   private async executeToolCalls(
-    toolCalls: ToolCall[]
+    toolCalls: ToolCall[],
   ): Promise<Array<{ toolCallId: string; result: any }>> {
     const toolResults: Array<{ toolCallId: string; result: any }> = [];
 
@@ -328,7 +382,7 @@ export class AgentOrchestrator {
         type: 'tool_call',
         content: `Calling tool: ${toolName}`,
         toolName,
-        toolParams,
+        toolParams: toolParams as Record<string, unknown>,
       });
 
       try {
@@ -371,7 +425,7 @@ export class AgentOrchestrator {
         if (toolName === 'createTodo' && result) {
           this.addStep({
             type: 'todo_create',
-            content: `创建任务: ${result.description}`,
+            content: `创建任务: ${(result as { description?: string }).description}`,
             todos: this.todoManager.listTodos(),
           });
         }
@@ -379,7 +433,7 @@ export class AgentOrchestrator {
         if (toolName === 'updateTodo' && result) {
           this.addStep({
             type: 'todo_update',
-            content: `更新任务状态: ${result.description || result.id}`,
+            content: `更新任务状态: ${(result as { description?: string; id?: string }).description || (result as { id?: string }).id}`,
             todos: this.todoManager.listTodos(),
           });
         }
@@ -388,10 +442,10 @@ export class AgentOrchestrator {
           toolCallId: toolCall.id,
           result,
         });
-
       } catch (error) {
         const duration = Date.now() - startTime;
-        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        const errorMsg =
+          error instanceof Error ? error.message : 'Unknown error';
 
         logger.error('Tool execution failed', error, { toolName });
 
@@ -435,7 +489,9 @@ export class AgentOrchestrator {
   /**
    * 估算 Token 数量
    */
-  private estimateTokens(messages: Array<{ role: string; content: string }>): number {
+  private estimateTokens(
+    messages: Array<{ role: string; content: string }>,
+  ): number {
     let totalChars = 0;
 
     for (const msg of messages) {
@@ -449,13 +505,13 @@ export class AgentOrchestrator {
    * 检查是否需要压缩并执行压缩
    */
   private async compressIfNeeded(
-    messages: Array<{ role: string; content: string }>
+    messages: Array<{ role: string; content: string }>,
   ): Promise<Array<{ role: string; content: string }>> {
     const contextWindowSize = this.config.contextWindowSize || 128000;
     const compressRatio = this.config.compressRatio || 0.3;
 
-    const messagesToConsider = messages.filter(msg =>
-      msg.role !== 'tool' && msg.role !== 'system'
+    const messagesToConsider = messages.filter(
+      (msg) => msg.role !== 'tool' && msg.role !== 'system',
     );
 
     const estimatedTokens = this.estimateTokens(messagesToConsider);
@@ -475,13 +531,13 @@ export class AgentOrchestrator {
 
     const keepCount = Math.max(
       Math.floor(messagesToConsider.length * compressRatio),
-      1
+      1,
     );
 
     const messagesToKeep = messagesToConsider.slice(-keepCount);
     const messagesToCompress = messagesToConsider.slice(
       0,
-      messagesToConsider.length - keepCount
+      messagesToConsider.length - keepCount,
     );
 
     if (messagesToCompress.length === 0) {
@@ -491,8 +547,8 @@ export class AgentOrchestrator {
     try {
       const summary = await this.generateSummary(messagesToCompress);
 
-      const systemMessage = messages.find(msg => msg.role === 'system');
-      const toolMessages = messages.filter(msg => msg.role === 'tool');
+      const systemMessage = messages.find((msg) => msg.role === 'system');
+      const toolMessages = messages.filter((msg) => msg.role === 'tool');
 
       const result: Array<{ role: string; content: string }> = [];
 
@@ -502,7 +558,7 @@ export class AgentOrchestrator {
 
       result.push({
         role: 'system',
-        content: `[Summary of previous conversation]: ${summary}`
+        content: `[Summary of previous conversation]: ${summary}`,
       });
 
       result.push(...messagesToKeep);
@@ -519,10 +575,10 @@ export class AgentOrchestrator {
    * 生成对话摘要
    */
   private async generateSummary(
-    messages: Array<{ role: string; content: string }>
+    messages: Array<{ role: string; content: string }>,
   ): Promise<string> {
     const conversationText = messages
-      .map(msg => `${msg.role}: ${msg.content}`)
+      .map((msg) => `${msg.role}: ${msg.content}`)
       .join('\n\n');
 
     const summaryPrompt = `请用中文简洁总结以下对话内容和工具调用结果，2-3 句话即可：\n\n${conversationText}`;
@@ -554,7 +610,11 @@ export class AgentOrchestrator {
   /**
    * 判断是否为 Token 限制错误
    */
-  private isTokenLimitError(error: any): boolean {
+  private isTokenLimitError(error: unknown): boolean {
+    if (!(error instanceof Error)) {
+      return false;
+    }
+
     const defaultErrorCodes = [
       'context_length_exceeded',
       'max_tokens_exceeded',
@@ -564,11 +624,12 @@ export class AgentOrchestrator {
       'maximum tokens exceeded',
     ];
 
-    const tokenLimitErrorCodes = this.config.tokenLimitErrorCodes || defaultErrorCodes;
-    const errorMessage = error?.message?.toLowerCase() || '';
+    const tokenLimitErrorCodes =
+      this.config.tokenLimitErrorCodes || defaultErrorCodes;
+    const errorMessage = error.message.toLowerCase() || '';
 
-    return tokenLimitErrorCodes.some(code =>
-      errorMessage.includes(code.toLowerCase())
+    return tokenLimitErrorCodes.some((code) =>
+      errorMessage.includes(code.toLowerCase()),
     );
   }
 
@@ -586,13 +647,24 @@ export class AgentOrchestrator {
 
     const tools = this.toolRegistry.getAll();
     const toolDescriptions = tools
-      .map(t => `  - ${t.name}: ${t.description}`)
+      .map((t) => `  - ${t.name}: ${t.description}`)
       .join('\n');
+
+    const fileContextHint = this.hasFileContent
+      ? `
+## 文件内容提示
+**重要：** 用户已提供当前文件内容（Current File Content）在 Context 中。
+- **必须优先使用 Context 中的文件内容**，绝对不要再次调用 readFile 工具读取当前文件
+- 只有当需要读取其他文件时，才使用 readFile 工具
+- 这可以大幅提高响应速度
+`
+      : '';
 
     return `
 当前时间：${currentTime}
 
 你是一名智能助手，帮助用户在 ONote 笔记应用中高效完成各种任务。
+${fileContextHint}
 
 ## 可用工具
 
@@ -600,26 +672,91 @@ ${toolDescriptions}
 
 ## 工作原则
 
-1. **优先使用当前文件**：用户请求中的"文件"、"这个文件"等指代当前打开的文件（Current File），优先使用 Current File 的 URI
-2. **默认目录**：Working Directory 是当前文件所在的目录（非根目录），listFiles 默认查询 Working Directory
-3. **目标导向**：始终以完成任务为目标，合理规划工具使用顺序
-4. **安全第一**：谨慎使用 writeFile、deleteFile 等危险操作，必要时确认
-5. **高效执行**：避免重复调用相同工具，充分利用工具返回结果
-6. **清晰解释**：在使用工具前说明意图，使用后解释结果
+1. **快速响应优先**：在回答前，先判断问题是否可以基于现有信息直接回答。如果可以，立即给出答案，不要调用任何工具。
+2. **优先使用当前文件**：如果 Context 中已提供当前文件内容（Current File Content），优先使用这些内容，不要调用 readFile 工具重复读取。
+3. **默认目录**：Working Directory 是当前文件所在的目录（非根目录），listFiles 默认查询 Working Directory。
+4. **目标导向**：始终以完成任务为目标，合理规划工具使用顺序。
+5. **安全第一**：谨慎使用 writeFile、deleteFile 等危险操作，必要时确认。
+6. **高效执行**：避免重复调用相同工具，充分利用工具返回结果，优先使用 Context 中的信息。
+7. **清晰解释**：在使用工具前说明意图，使用后解释结果。
+
+## 任务判断流程
+
+在开始任务前，先进行以下判断：
+
+### 第一步：检查能否直接回答
+**简单问题的特征：**
+- 问题基于现有信息（Context 中的文件内容、对话历史）
+- 不需要读取其他文件
+- 不需要执行文件操作
+- 不需要搜索或复杂分析
+
+**操作：** 如果符合以上特征，直接给出答案，不要创建 Todo，不要调用任何工具。
+
+### 第二步：判断是否需要规划
+**需要创建 Todo 的复杂任务：**
+- 涉及多个文件操作
+- 需要多个步骤，且步骤之间有依赖关系
+- 需要持续跟踪进度
+- 任务复杂度高（如：重构代码、批量处理文件）
+
+**不需要创建 Todo 的任务：**
+- 单次文件操作（读取/写入单个文件）
+- 简单的文件查询
+- 单次工具调用即可完成
+
+### 第三步：选择文件修改工具
+**重要：根据修改范围选择合适的工具**
+
+**使用 \`replaceFileContent\` 的场景（推荐）：**
+- 局部修改：修改函数的一部分、修复 bug、调整逻辑
+- 批量替换：修改所有变量名、更新重复的代码模式
+- 行范围操作：替换特定行的代码
+- 小幅度调整：调整配置值、修改导入语句
+- 可以通过搜索模式准确定位的内容
+
+**使用 \`writeFile\` 的场景：**
+- 全量重写：完全重写文件内容
+- 大范围重构：修改涉及整个文件结构
+- 生成新内容：从头生成新文件
+- 无法通过搜索定位的修改
+
+**示例：**
+\`\`\`json
+// 使用 replaceFileContent：局部修改
+{
+  "name": "replaceFileContent",
+  "arguments": "{\\"operations\\": [{\\"mode\\": \\"string\\", \\"search\\": \\"oldVar\\", \\"replace\\": \\"newVar\\", \\"replaceAll\\": true}]}"
+}
+
+// 使用 writeFile：全量重写
+{
+  "name": "writeFile",
+  "arguments": "{\\"content\\": \\"全新的文件内容\\n..."}"
+}
+\`\`\`
+
+### 第四步：选择工具和执行
+- 如果需要读取文件，优先使用 Context 中的内容（如果可用）
+- 优先使用 \`replaceFileContent\` 进行局部修改，节省 token
+- 只有在无法使用 \`replaceFileContent\` 时，才使用 \`writeFile\`
 
 ## 任务流程
 
 1. **分析需求**：理解用户想要完成什么任务
-2. **识别上下文**：
-   - 如果提到"文件"、"这个文件"等，使用 Current File
-   - 如果需要查看目录，使用 Working Directory（listFiles 默认路径）
-3. **选择工具**：根据任务需求选择合适的工具
-4. **执行操作**：按逻辑顺序执行工具调用
-5. **总结结果**：向用户说明任务完成情况和关键发现
+2. **检查上下文**：
+   - Context 中是否已提供当前文件内容（Current File Content）
+   - 对话历史中是否有相关信息
+3. **判断任务类型**：
+   - 能否直接回答？→ 直接给出答案
+   - 是否需要规划？→ 创建 Todo 列表或直接执行
+4. **选择工具**：根据任务需求选择合适的工具（优先使用 Context 中的信息）
+5. **执行操作**：按逻辑顺序执行工具调用
+6. **总结结果**：向用户说明任务完成情况和关键发现
 
-## 任务规划
+## 任务规划（仅复杂任务）
 
-**重要：** 对于复杂任务，请先创建 Todo 列表规划任务步骤：
+如果需要规划任务，请按以下步骤：
 
 1. 使用 \`createTodo\` 创建任务清单，分解为可执行的子任务
 2. 执行每个任务前，使用 \`updateTodo(id, "in_progress")\` 标记为进行中
@@ -640,9 +777,8 @@ ${toolDescriptions}
 { "name": "updateTodo", "arguments": "{\\"id\\": \\"todo-xxx\\", \\"status\\": \\"completed\\"}" }
 \`\`\`
 
-**注意：** 
+**注意：**
 - 如果创建了任务列表，必须完成所有任务才能结束
-- 简单任务可以不创建 Todo 列表，直接执行
 - 优先级：high > medium > low
 
 ## 工具使用示例
@@ -666,7 +802,8 @@ ${toolDescriptions}
 
 ## 重要提示
 
-- **当前文件优先**：用户未明确指定文件路径时，所有文件操作默认使用 Current File
+- **直接回答优先**：如果问题可以根据 Context 中的信息直接回答，立即给出答案，不要调用任何工具
+- **文件内容使用**：优先使用 Context 中的文件内容（如果已提供），不要重复调用 readFile
 - **目录查询优先**：用户请求列出文件时，默认使用 Working Directory
 - **文件 URI 格式**：必须是完整路径，例如 \`file:///Users/username/notes/file.md\`
 - **参数 JSON 格式**：arguments 字段必须是 JSON 字符串，确保转义正确
@@ -684,7 +821,7 @@ ${toolDescriptions}
   - 如果创建了任务列表，必须完成所有任务（状态为 completed）才能结束
   - 如果没有创建任务列表，可以直接给出最终答案
 - **迭代限制**：最多迭代 50 次，如果未完成任务，给出中间结果和建议
-  `.trim();
+`.trim();
   }
 
   /**

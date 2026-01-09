@@ -31,7 +31,7 @@ export interface Tool {
     required?: string[];
   };
   /** 工具执行器 */
-  executor: (params: any) => Promise<any>;
+  executor: (params: Record<string, unknown>) => Promise<unknown>;
   /** 工具元数据 */
   metadata?: {
     /** 工具分类 */
@@ -53,7 +53,7 @@ export interface ToolParameter {
   description: string;
   required?: boolean;
   enum?: string[];
-  default?: any;
+  default?: unknown;
 }
 
 /**
@@ -77,8 +77,8 @@ export interface ExecutionStep {
   type: 'thinking' | 'tool_call' | 'tool_result' | 'final_answer' | 'error' | 'todo_list' | 'todo_create' | 'todo_update';
   content: string;
   toolName?: string;
-  toolParams?: any;
-  toolResult?: any;
+  toolParams?: Record<string, unknown>;
+  toolResult?: unknown;
   error?: string;
   duration?: number;
   todos?: TodoItem[];
