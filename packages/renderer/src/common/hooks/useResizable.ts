@@ -61,7 +61,7 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
           containerWidth,
           RESIZE_CONFIG.editor.minPercent,
           RESIZE_CONFIG.editor.maxPercent,
-          false
+          false,
         );
       } else if (dragState.type === 'llmbox') {
         updateWidth(
@@ -70,7 +70,7 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
           containerWidth,
           RESIZE_CONFIG.llmbox.minPercent,
           RESIZE_CONFIG.llmbox.maxPercent,
-          true
+          true,
         );
       }
 

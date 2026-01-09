@@ -4,7 +4,8 @@
  * 提供通用的 handler 创建函数，消除重复代码
  */
 
-import React, { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import React from 'react';
 import { createLineClass } from './position';
 import type { Position } from 'unist';
 import type { Root } from 'mdast';
@@ -33,12 +34,12 @@ export interface MarkdownHandlerContext {
  */
 export function createInlineHandler(
   tagName: string,
-  additionalClasses: string[] = []
+  additionalClasses: string[] = [],
 ) {
   return function(node: Root, ctx: any): ReactNode {
     const classes = [
       createLineClass(node.position),
-      ...additionalClasses
+      ...additionalClasses,
     ].filter(Boolean).join(' ');
 
     const props = classes ? { className: classes } : {};
@@ -46,7 +47,7 @@ export function createInlineHandler(
     return React.createElement(
       tagName,
       props,
-      ctx.renderChildren(node, ctx)
+      ctx.renderChildren(node, ctx),
     );
   };
 }
@@ -65,7 +66,7 @@ export function createInlineHandler(
  */
 export function createBlockHandler(
   tagName: string,
-  additionalClasses: string[] = []
+  additionalClasses: string[] = [],
 ) {
   return createInlineHandler(tagName, additionalClasses);
 }
@@ -84,12 +85,12 @@ export function createBlockHandler(
  */
 export function createVoidElementHandler(
   tagName: string,
-  additionalClasses: string[] = []
+  additionalClasses: string[] = [],
 ) {
   return function(node: Root, ctx: any): ReactNode {
     const classes = [
       createLineClass(node.position),
-      ...additionalClasses
+      ...additionalClasses,
     ].filter(Boolean).join(' ');
 
     const props = classes ? { className: classes } : {};
@@ -116,12 +117,12 @@ export function createVoidElementHandler(
 export function createHandlerWithDefault(
   tagName: string,
   defaultContent: string,
-  additionalClasses: string[] = []
+  additionalClasses: string[] = [],
 ) {
   return function(node: Root, ctx: any): ReactNode {
     const classes = [
       createLineClass(node.position),
-      ...additionalClasses
+      ...additionalClasses,
     ].filter(Boolean).join(' ');
 
     const props = classes ? { className: classes } : {};

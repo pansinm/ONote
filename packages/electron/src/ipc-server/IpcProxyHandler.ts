@@ -46,7 +46,7 @@ export class IpcProxyHandler<T extends Record<string, any>> extends IpcHandler {
     targetName: string,
     sender: WebContents,
     namespace: string,
-    options?: IpcProxyHandlerOptions
+    options?: IpcProxyHandlerOptions,
   ) {
     super(sender, namespace);
     this.targetName = targetName;
@@ -106,7 +106,7 @@ export class IpcProxyHandler<T extends Record<string, any>> extends IpcHandler {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -144,7 +144,7 @@ export class IpcProxyHandler<T extends Record<string, any>> extends IpcHandler {
 export function createIpcProxyHandlerClass<T extends Record<string, any>>(
   target: T,
   targetName: string,
-  options?: IpcProxyHandlerOptions
+  options?: IpcProxyHandlerOptions,
 ): IpcHandlerClass<typeof IpcProxyHandler<T>> {
   return class extends IpcProxyHandler<T> {
     constructor(sender: WebContents, namespace: string) {

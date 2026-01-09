@@ -113,7 +113,7 @@ const validators = {
 function getEnv<T>(
   key: string,
   validator: Validator<T>,
-  defaultValue: T
+  defaultValue: T,
 ): T {
   const value = process.env[key];
   if (!value || value.trim() === '') {
@@ -147,12 +147,12 @@ export function loadConfig(): EnvConfig {
     NODE_ENV: getEnv(
       'NODE_ENV',
       validators.enum('development', 'production', 'test'),
-      'development'
+      'development',
     ),
     LOG_LEVEL: getEnv(
       'LOG_LEVEL',
       validators.enum('debug', 'info', 'warn', 'error'),
-      'info'
+      'info',
     ),
     PORT: getEnv('PORT', validators.number, 8080),
 
@@ -163,10 +163,10 @@ export function loadConfig(): EnvConfig {
 
     // 数据存储
     DEFAULT_NOTE_DIR: expandHomeDir(
-      getEnv('DEFAULT_NOTE_DIR', validators.string, '~/Documents/ONote')
+      getEnv('DEFAULT_NOTE_DIR', validators.string, '~/Documents/ONote'),
     ),
     BACKUP_DIR: expandHomeDir(
-      getEnv('BACKUP_DIR', validators.string, '~/Documents/ONoteBackup')
+      getEnv('BACKUP_DIR', validators.string, '~/Documents/ONoteBackup'),
     ),
     AUTOSAVE_INTERVAL: getEnv('AUTOSAVE_INTERVAL', validators.number, 5000),
 
@@ -191,7 +191,7 @@ export function loadConfig(): EnvConfig {
 
     // 插件
     PLUGIN_DIR: expandHomeDir(
-      getEnv('PLUGIN_DIR', validators.string, '~/.onote/plugins')
+      getEnv('PLUGIN_DIR', validators.string, '~/.onote/plugins'),
     ),
     ALLOW_THIRD_PARTY_PLUGINS: getEnv('ALLOW_THIRD_PARTY_PLUGINS', validators.boolean, true),
   };
