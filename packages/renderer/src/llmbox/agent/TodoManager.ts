@@ -128,8 +128,12 @@ class TodoManager {
 
     while (current) {
       if (visited.has(current.id)) {
-        logger.error('Circular reference detected in todo tree', { todoId: current.id });
-        throw new Error(`Circular reference detected in todo tree: ${current.id}`);
+        logger.error('Circular reference detected in todo tree', {
+          todoId: current.id,
+        });
+        throw new Error(
+          `Circular reference detected in todo tree: ${current.id}`,
+        );
       }
       visited.add(current.id);
 
@@ -137,7 +141,11 @@ class TodoManager {
       if (!current.parentId) {
         break;
       }
-      current = this.todos.find((t) => t.id === current.parentId);
+      const parent = this.todos.find((t) => t.id === current.parentId);
+      if (!parent) {
+        break;
+      }
+      current = parent;
     }
 
     return path;
