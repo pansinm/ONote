@@ -48,7 +48,7 @@ export function updateWidth(
   containerWidth: number,
   minPercent: number,
   maxPercent: number,
-  isReverse: boolean = false
+  isReverse = false,
 ): void {
   if (containerWidth <= 0) {
     console.warn('[updateWidth] Invalid container width:', containerWidth);
@@ -66,7 +66,7 @@ export function updateWidth(
 
   document.documentElement.style.setProperty(
     cssVarName,
-    `${Math.max(minPercent, Math.min(maxPercent, newWidth))}%`
+    `${Math.max(minPercent, Math.min(maxPercent, newWidth))}%`,
   );
 }
 
@@ -103,7 +103,7 @@ export function saveWidths(): void {
       .trim();
     localStorage.setItem(
       'onote-panel-widths',
-      JSON.stringify({ editor: editorWidth, llmbox: llmboxWidth })
+      JSON.stringify({ editor: editorWidth, llmbox: llmboxWidth }),
     );
   } catch (error) {
     console.error('[saveWidths] Failed to save widths:', error);
@@ -116,11 +116,11 @@ export function saveWidths(): void {
 export function resetWidths(): void {
   document.documentElement.style.setProperty(
     '--editor-width',
-    `${RESIZE_CONFIG.editor.defaultPercent}%`
+    `${RESIZE_CONFIG.editor.defaultPercent}%`,
   );
   document.documentElement.style.setProperty(
     '--llmbox-width',
-    `${RESIZE_CONFIG.llmbox.defaultPercent}%`
+    `${RESIZE_CONFIG.llmbox.defaultPercent}%`,
   );
   saveWidths();
 }
