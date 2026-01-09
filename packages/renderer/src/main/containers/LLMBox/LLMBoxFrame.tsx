@@ -52,25 +52,15 @@ function LLMBoxFrame() {
         new ConversationLoadHandler(stores, onote),
       [LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_SAVE]:
         new ConversationSaveHandler(stores, onote),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_READ]: new AgentFileReadHandler(stores),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_WRITE]: new AgentFileWriteHandler(
-        stores,
-      ),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_REPLACE]: new AgentFileReplaceHandler(
-        stores,
-      ),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_CREATE]: new AgentFileCreateHandler(
-        stores,
-      ),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_DELETE]: new AgentFileDeleteHandler(
-        stores,
-      ),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_LIST]: new AgentFileListHandler(stores),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH]: new AgentFileSearchHandler(
-        stores,
-      ),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_READ]: new AgentFileReadHandler(),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_WRITE]: new AgentFileWriteHandler(),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_REPLACE]: new AgentFileReplaceHandler(),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_CREATE]: new AgentFileCreateHandler(),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_DELETE]: new AgentFileDeleteHandler(),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_LIST]: new AgentFileListHandler(),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH]: new AgentFileSearchHandler(),
       [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH_IN]:
-        new AgentFileSearchInHandler(stores),
+        new AgentFileSearchInHandler(),
       [LLM_BOX_MESSAGE_TYPES.AGENT_CONTEXT_LOAD]: new AgentContextLoadHandler(
         stores,
         onote,

@@ -21,12 +21,11 @@
   },
 
   "include": [
+    "src/global.d.ts",
+    "types/**/*.d.ts",
     "src/**/*.vue",
     "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/types/global/global.d.ts",
-    "types/**/*.d.ts",
-    "../../types/**/*.d.ts"
+    "src/**/*.tsx"
   ],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

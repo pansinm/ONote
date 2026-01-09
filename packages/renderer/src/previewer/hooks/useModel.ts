@@ -15,9 +15,9 @@ export default function useModel() {
     // 第一次进来时，拉取一次
     editor.getCurrentModel().then(listener);
 
-    const dispose = editor.onModelChanged(listener);
+    const disposable = editor.onModelChanged(listener);
     return () => {
-      dispose();
+      disposable.dispose();
     };
   }, []);
   return model;

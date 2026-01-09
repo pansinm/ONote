@@ -23,7 +23,7 @@ async function getDefaultRepo(): Promise<Record<string, IPlugin>> {
     return fetch(url)
       .then((res) => res.json())
       .then((data) => data.content)
-      .then(decodeBase64)
+      .then((content: Buffer) => decodeBase64(content))
       .then((content) => JSON.parse(content))
       .then((repo) => repo.plugins);
   }
@@ -43,7 +43,7 @@ export default function PluginManager() {
   }, []);
 
   const marketPlugins = Object.values(marketState.value || {}).map((plugin) => {
-    const localPlugin = pluginState.value?.[plugin.name];
+    const localPlugin = pluginState.value?.[plugin.name as keyof typeof pluginState.value] as any;
     if (!localPlugin) {
       return plugin;
     }
@@ -70,7 +70,7 @@ export default function PluginManager() {
           onInstalled={refetch}
           onUninstalled={() => {
             logger.info('Plugin uninstalled');
-            refetch().then((plugins) => logger.debug('Plugins refetched', plugins));
+            refetch().then((plugins: any) => logger.debug('Plugins refetched', plugins));
           }}
         />
       )}

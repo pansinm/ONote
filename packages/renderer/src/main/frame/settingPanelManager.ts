@@ -4,3 +4,5 @@ class SettingPanelManager {
     // todo
   }
 }
+
+export {};

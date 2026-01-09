@@ -1,7 +1,7 @@
 import { first } from 'lodash';
 import * as monaco from 'monaco-editor';
 import fileService from '../../services/fileService';
-import manager from '../manager';
+// import manager from '../manager';
 import clipboardService from '/@/common/services/clipboardService';
 import { getLogger } from '/@/shared/logger';
 

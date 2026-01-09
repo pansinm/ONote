@@ -9,7 +9,7 @@ interface LocalDirSelectProps {
 
 const LocalDirSelect: FC<LocalDirSelectProps> = (props) => {
   const handleClick = () => {
-    window.simmer.openDirectory().then((ret) => {
+    window.simmer.openDirectory().then((ret: any) => {
       const dir = ret.filePaths?.[0];
       if (dir) {
         const uri = Uri.file(dir).toString();

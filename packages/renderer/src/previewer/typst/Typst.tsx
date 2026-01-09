@@ -26,7 +26,7 @@ export const Typst = ({ uri, content }: { uri: string; content: string }) => {
     }
     next.compiling = false;
     if (next.uri !== uri || next.content !== content) {
-      return compile(next.uri, next.content);
+      await compile(next.uri, next.content);
     }
   }, []);
 

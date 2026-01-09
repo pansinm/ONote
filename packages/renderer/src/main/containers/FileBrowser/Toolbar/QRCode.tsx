@@ -9,7 +9,7 @@ function QRCodeContent() {
   const [url, setUrl] = useState('');
 
   useEffect(() => {
-    window.simmer.localIpV4().then((ip) => {
+    window.simmer.localIpV4().then((ip: string) => {
       setUrl(
         `http://${ip}:${stores.settingStore.settings['server.port']}/mobile?file=${stores.activationStore.activeFileUri}`,
       );

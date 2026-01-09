@@ -31,10 +31,7 @@ const RadioWidget = ({
   const inline = Boolean(options && options.inline);
 
   return (
-    <RadioGroup
-      required={required}
-      orientation={inline ? 'horizontal' : 'vertical'}
-    >
+    <RadioGroup>
       {Array.isArray(enumOptions) &&
         enumOptions.map((option) => {
           const itemDisabled =

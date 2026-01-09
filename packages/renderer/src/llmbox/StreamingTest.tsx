@@ -84,11 +84,7 @@ export const StreamingTest: React.FC = observer(() => {
           borderRadius: '8px',
         }}
       >
-        <LLMBox
-          onSendMessage={store.sendMessage}
-          messages={store.messages}
-          isLoading={store.isLoading}
-        />
+        <LLMBox store={store} />
       </div>
 
       {store.error && (

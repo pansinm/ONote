@@ -42,11 +42,11 @@ export function createInlineHandler(
       ...additionalClasses,
     ].filter(Boolean).join(' ');
 
-    const props = classes ? { className: classes } : {};
+    const props: Record<string, string> = classes ? { className: classes } : {};
 
     return React.createElement(
       tagName,
-      props,
+      classes ? props : null,
       ctx.renderChildren(node, ctx),
     );
   };
@@ -93,9 +93,9 @@ export function createVoidElementHandler(
       ...additionalClasses,
     ].filter(Boolean).join(' ');
 
-    const props = classes ? { className: classes } : {};
+    const props: Record<string, string> = classes ? { className: classes } : {};
 
-    return React.createElement(tagName, props);
+    return React.createElement(tagName, classes ? props : null);
   };
 }
 
@@ -125,11 +125,11 @@ export function createHandlerWithDefault(
       ...additionalClasses,
     ].filter(Boolean).join(' ');
 
-    const props = classes ? { className: classes } : {};
+    const props: Record<string, string> = classes ? { className: classes } : {};
     const content = node.children && node.children.length > 0
       ? ctx.renderChildren(node, ctx)
       : defaultContent;
 
-    return React.createElement(tagName, props, content);
+    return React.createElement(tagName, classes ? props : null, content);
   };
 }

@@ -8,7 +8,7 @@ class SettingStore {
   settings: Record<string, unknown> = {};
 
   constructor() {
-    settingService.getAll().then((settings) => {
+    settingService.getAll().then((settings: Record<string, unknown>) => {
       this.settings = settings;
       logger.info('Settings loaded', { count: Object.keys(settings).length });
     });

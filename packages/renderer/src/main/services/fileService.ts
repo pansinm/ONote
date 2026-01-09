@@ -7,7 +7,7 @@ const dataSource = window.onote.dataSource;
 
 class FileService {
   constructor() {
-    dataSource.addListener(FILE_CONTENT_CHANGED, (...args) => {
+    dataSource.addListener(FILE_CONTENT_CHANGED, (...args: unknown[]) => {
       eventbus.emit(FILE_CONTENT_CHANGED, ...args);
     });
   }
