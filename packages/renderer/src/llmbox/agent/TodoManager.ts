@@ -1,6 +1,6 @@
 import { getLogger } from '../../shared/logger';
 import { uuid } from '../../common/tunnel/utils';
-import type { TodoItem, TodoStatus } from './types';
+import type { TodoItem } from './types';
 
 const logger = getLogger('TodoManager');
 
@@ -12,9 +12,10 @@ class TodoManager {
     this.onTodoChange = callback;
   }
 
-  addTodo(description: string, priority: 'high' | 'medium' | 'low' = 'medium'): TodoItem {
+  addTodo(description: string, priority: 'high' | 'medium' | 'low' = 'medium', parentId?: string): TodoItem {
     const todo: TodoItem = {
       id: uuid('todo-'),
+      parentId,
       description,
       status: 'pending',
       priority,
@@ -25,7 +26,7 @@ class TodoManager {
     this.todos.push(todo);
     this.notifyChange();
 
-    logger.info('Todo added', { id: todo.id, description, priority });
+    logger.info('Todo added', { id: todo.id, description, priority, parentId });
     return todo;
   }
 
@@ -66,6 +67,80 @@ class TodoManager {
     this.notifyChange();
 
     logger.info('Todos cleared');
+  }
+
+  addSubTodo(parentId: string, description: string, priority: 'high' | 'medium' | 'low' = 'medium'): TodoItem {
+    const parent = this.todos.find((t) => t.id === parentId);
+    if (!parent) {
+      logger.warn('Parent todo not found', { parentId });
+      throw new Error(`Parent todo not found: ${parentId}`);
+    }
+
+    return this.addTodo(description, priority, parentId);
+  }
+
+  getTodoTree(): TodoItem[] {
+    const flatTodos = this.listTodos();
+    const todoMap = new Map<string, TodoItem>();
+    const rootTodos: TodoItem[] = [];
+
+    flatTodos.forEach((todo) => {
+      todoMap.set(todo.id, { ...todo, children: [] });
+    });
+
+    const assignLevel = (todo: TodoItem, level: number): void => {
+      todo.level = level;
+      const children = flatTodos.filter((t) => t.parentId === todo.id);
+      children.forEach((child) => {
+        const childWithChildren = todoMap.get(child.id);
+        if (childWithChildren) {
+          assignLevel(childWithChildren, level + 1);
+        }
+      });
+    };
+
+    flatTodos.forEach((todo) => {
+      const todoWithChildren = todoMap.get(todo.id);
+      if (!todoWithChildren) return;
+
+      if (todo.parentId) {
+        const parent = todoMap.get(todo.parentId);
+        if (parent) {
+          if (!parent.children) {
+            parent.children = [];
+          }
+          parent.children.push(todoWithChildren);
+        }
+      } else {
+        todoWithChildren.level = 0;
+        rootTodos.push(todoWithChildren);
+        assignLevel(todoWithChildren, 0);
+      }
+    });
+
+    return rootTodos;
+  }
+
+  getTodoPath(todoId: string): TodoItem[] {
+    const path: TodoItem[] = [];
+    const visited = new Set<string>();
+    let current = this.todos.find((t) => t.id === todoId);
+
+    while (current) {
+      if (visited.has(current.id)) {
+        logger.error('Circular reference detected in todo tree', { todoId: current.id });
+        throw new Error(`Circular reference detected in todo tree: ${current.id}`);
+      }
+      visited.add(current.id);
+
+      path.unshift(current);
+      if (!current.parentId) {
+        break;
+      }
+      current = this.todos.find((t) => t.id === current.parentId);
+    }
+
+    return path;
   }
 
   private notifyChange(): void {

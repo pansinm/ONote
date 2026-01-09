@@ -1,7 +1,7 @@
 import type { Tool } from './types';
 import { getLogger } from '../../shared/logger';
 import { LLM_BOX_MESSAGE_TYPES } from '../constants/LLMBoxConstants';
-import TodoManager from './TodoManager';
+import type TodoManager from './TodoManager';
 
 const logger = getLogger('ToolRegistry');
 
@@ -303,7 +303,7 @@ class ToolRegistry {
   private initializeTodoTools(): void {
     this.register({
       name: 'createTodo',
-      description: '创建新的任务项。用于分解复杂任务为可执行的子任务。',
+      description: '创建新的任务项。用于分解复杂任务为可执行的子任务。可以指定父任务 ID 来创建子任务，实现层级结构。',
       parameters: {
         type: 'object',
         properties: {
@@ -316,6 +316,10 @@ class ToolRegistry {
             enum: ['high', 'medium', 'low'],
             description: '优先级',
           },
+          parentId: {
+            type: 'string',
+            description: '父任务 ID，可选。如果提供，将创建为子任务',
+          },
         },
         required: ['description'],
       },
@@ -324,6 +328,7 @@ class ToolRegistry {
         const todo = this.todoManager!.addTodo(
           params.description,
           params.priority || 'medium',
+          params.parentId,
         );
         return todo;
       },

@@ -18,6 +18,22 @@ interface SaveAgentContextParams {
   context: any;
 }
 
+interface LoadExecutionStateParams {
+  fileUri: string;
+  rootUri: string;
+}
+
+interface SaveExecutionStateParams {
+  fileUri: string;
+  rootUri: string;
+  state: any;
+}
+
+interface DeleteExecutionStateParams {
+  fileUri: string;
+  rootUri: string;
+}
+
 interface AgentContext {
   fileUri: string;
   executionLog: any[];
@@ -113,6 +129,90 @@ class AgentContextHandler extends IpcHandler {
         return;
       }
       logger.error('Failed to delete agent context', error, { fileUri, rootUri });
+      throw error;
+    }
+  }
+
+  private getExecutionStateFilePath(fileUri: string, rootUri: string): string {
+    const filePath = uriToPath(fileUri);
+    const relativePath = path.relative(uriToPath(rootUri), filePath);
+    const hash = crypto.createHash('md5').update(relativePath).digest('hex');
+    const baseDir = this.getBaseDir(rootUri);
+    return path.join(baseDir, hash, 'ai', 'execution-state.json');
+  }
+
+  async loadExecutionState(params: LoadExecutionStateParams): Promise<any | null> {
+    const { fileUri, rootUri } = params;
+    try {
+      const filePath = this.getExecutionStateFilePath(fileUri, rootUri);
+      logger.debug('Loading execution state from', { fileUri, rootUri, filePath });
+
+      const content = await fs.readFile(filePath, 'utf-8');
+      const state = JSON.parse(content);
+
+      logger.info('Execution state loaded successfully', {
+        fileUri,
+        rootUri,
+        filePath,
+        iteration: state.currentIteration,
+      });
+
+      return state;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        logger.debug('Execution state file not found', { fileUri, rootUri });
+        return null;
+      }
+      logger.error('Failed to load execution state', error, { fileUri, rootUri });
+      throw error;
+    }
+  }
+
+  async saveExecutionState(params: SaveExecutionStateParams): Promise<void> {
+    const { fileUri, rootUri, state } = params;
+    try {
+      const filePath = this.getExecutionStateFilePath(fileUri, rootUri);
+      const dir = path.dirname(filePath);
+
+      logger.debug('Saving execution state', {
+        fileUri,
+        rootUri,
+        filePath,
+        dir,
+        iteration: state.currentIteration,
+      });
+
+      await fs.mkdir(dir, { recursive: true });
+      await fs.writeFile(filePath, JSON.stringify(state, null, 2), 'utf-8');
+
+      logger.info('Execution state saved successfully', {
+        fileUri,
+        rootUri,
+        filePath,
+        iteration: state.currentIteration,
+      });
+    } catch (error) {
+      logger.error('Failed to save execution state', error, { fileUri, rootUri });
+      throw error;
+    }
+  }
+
+  async deleteExecutionState(params: DeleteExecutionStateParams): Promise<void> {
+    const { fileUri, rootUri } = params;
+    try {
+      const filePath = this.getExecutionStateFilePath(fileUri, rootUri);
+
+      logger.debug('Deleting execution state', { fileUri, rootUri, filePath });
+
+      await fs.unlink(filePath);
+
+      logger.info('Execution state deleted successfully', { fileUri, rootUri });
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        logger.debug('Execution state file not found', { fileUri, rootUri });
+        return;
+      }
+      logger.error('Failed to delete execution state', error, { fileUri, rootUri });
       throw error;
     }
   }

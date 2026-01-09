@@ -286,6 +286,39 @@
   }
 }
 
+.ResumeBtn {
+  background: var(--success-color) !important;
+  color: white !important;
+  border-color: var(--success-color) !important;
+
+  &:hover:not(:disabled) {
+    background: #059669 !important;
+    border-color: #059669 !important;
+  }
+}
+
+.ClearStateBtn {
+  position: relative;
+
+  &::after {
+    content: 'S';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--error-color);
+    background: var(--bg-primary);
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+  }
+}
+
 .ClearBtn:hover:not(:disabled) {
   background: var(--bg-tertiary);
   border-color: var(--border-hover);
@@ -1034,6 +1067,7 @@
   border-radius: var(--radius-sm);
   font-size: 13px;
   transition: all var(--transition-fast);
+  position: relative;
 
   &.TodoPending {
     border-left: 3px solid var(--text-tertiary);
@@ -1065,6 +1099,16 @@
       rgba(239, 68, 68, 0.03) 0%,
       rgba(239, 68, 68, 0.08) 100%
     );
+  }
+
+  &[style*='padding-left'] {
+    border-left-width: 1px;
+    border-left-color: var(--border-color);
+  }
+
+  &[style*='padding-left: 0px'],
+  &[style*='padding-left: 12px'] {
+    border-left-width: 3px;
   }
 }
 

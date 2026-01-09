@@ -110,6 +110,27 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
             🗑️
           </button>
 
+          {store.hasSavedState && !store.isRunning && (
+            <button
+              className={`${styles.ActionBtn} ${styles.IconOnly} ${styles.ResumeBtn}`}
+              onClick={() => store.resumeExecution()}
+              title="Resume from saved state"
+            >
+              ▶️
+            </button>
+          )}
+
+          {store.hasSavedState && (
+            <button
+              className={`${styles.ActionBtn} ${styles.IconOnly} ${styles.ClearStateBtn}`}
+              onClick={() => store.deleteExecutionState()}
+              disabled={store.isRunning}
+              title="Clear saved state"
+            >
+              🗑️
+            </button>
+          )}
+
           {store.isRunning && (
             <button
               className={`${styles.ActionBtn} ${styles.IconOnly} ${styles.StopBtn}`}
@@ -262,21 +283,7 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
 
                         {step.todos && step.todos.length > 0 && (
                           <div className={styles.TodoList}>
-                            {step.todos.map((todo) => (
-                              <div
-                                key={todo.id}
-                                className={`${styles.TodoItem} ${
-                                  styles[`Todo${capitalize(todo.status)}`]
-                                }`}
-                              >
-                                <span className={styles.TodoIcon}>
-                                  {getTodoIcon(todo.status)}
-                                </span>
-                                <span className={styles.TodoDescription}>
-                                  {todo.description}
-                                </span>
-                              </div>
-                            ))}
+                            <TodoTree todos={step.todos} />
                           </div>
                         )}
                       </div>
@@ -390,6 +397,66 @@ function formatTime(date: Date): string {
     return `${mins}m ago`;
   }
   return date.toLocaleTimeString();
+}
+
+interface TodoTreeProps {
+  todos: TodoItem[];
+}
+
+function TodoTree({ todos }: TodoTreeProps) {
+  const tree = buildTodoTree(todos);
+
+  const renderTodoNode = (todo: TodoItem, level: number) => (
+    <React.Fragment key={todo.id}>
+      <div
+        className={`${styles.TodoItem} ${
+          styles[`Todo${capitalize(todo.status)}`]
+        }`}
+        style={{ paddingLeft: `${level * 16 + 12}px` }}
+      >
+        <span className={styles.TodoIcon}>{getTodoIcon(todo.status)}</span>
+        <span className={styles.TodoDescription}>{todo.description}</span>
+      </div>
+      {todo.children && todo.children.length > 0 &&
+        todo.children.map((child) => renderTodoNode(child, level + 1))
+      }
+    </React.Fragment>
+  );
+
+  return <>{tree.map((todo) => renderTodoNode(todo, 0))}</>;
+}
+
+function buildTodoTree(flatTodos: TodoItem[]): TodoItem[] {
+  const todoMap = new Map<string, TodoItem>();
+  const rootTodos: TodoItem[] = [];
+
+  flatTodos.forEach((todo) => {
+    todoMap.set(todo.id, { ...todo, children: [] });
+  });
+
+  flatTodos.forEach((todo) => {
+    const todoWithChildren = todoMap.get(todo.id);
+    if (!todoWithChildren) return;
+
+    if (todo.parentId) {
+      const parent = todoMap.get(todo.parentId);
+      if (parent) {
+        if (!parent.children) {
+          parent.children = [];
+        }
+        parent.children.push(todoWithChildren);
+        todoWithChildren.level = (parent.level || 0) + 1;
+      } else {
+        rootTodos.push(todoWithChildren);
+        todoWithChildren.level = 0;
+      }
+    } else {
+      rootTodos.push(todoWithChildren);
+      todoWithChildren.level = 0;
+    }
+  });
+
+  return rootTodos;
 }
 
 export default AgentPanel;

@@ -6,11 +6,14 @@ export type TodoStatus = 'pending' | 'in_progress' | 'completed' | 'failed';
 
 export interface TodoItem {
   id: string;
+  parentId?: string;
   description: string;
   status: TodoStatus;
   priority: 'high' | 'medium' | 'low';
   createdAt: Date;
   updatedAt: Date;
+  children?: TodoItem[];
+  level?: number;
 }
 
 /**
@@ -96,4 +99,36 @@ export interface AgentConfig {
   showThinking?: boolean;
   /** 超时时间 (毫秒) */
   timeout?: number;
+  /** 上下文窗口大小（tokens，默认 128000） */
+  contextWindowSize?: number;
+  /** 压缩比例（默认 0.3，保留 30%） */
+  compressRatio?: number;
+  /** 最小压缩阈值（默认 20） */
+  compressMinMessages?: number;
+  /** 初始压缩检查间隔（默认 10） */
+  compressCheckInterval?: number;
+  /** 最小压缩检查间隔（默认 5） */
+  minCompressCheckInterval?: number;
+  /** Token 限制错误码 */
+  tokenLimitErrorCodes?: string[];
+}
+
+/**
+ * Agent 执行状态（用于中断恢复）
+ */
+export interface AgentExecutionState {
+  prompt: string;
+  startTime: Date;
+  isRunning: boolean;
+  agentState: 'idle' | 'thinking' | 'executing';
+  currentIteration: number;
+  maxIterations: number;
+  todos: TodoItem[];
+  executionLog: ExecutionStep[];
+  conversationHistory: Array<{ role: string; content: string }>;
+  fileUri: string | null;
+  rootUri: string | null;
+  content: string;
+  selection: string;
+  savedAt: Date;
 }

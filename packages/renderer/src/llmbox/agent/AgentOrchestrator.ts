@@ -2,7 +2,7 @@ import type { ToolCall, AgentConfig, ExecutionStep, TodoItem } from './types';
 import ToolRegistry from './ToolRegistry';
 import { getLogger } from '../../shared/logger';
 import { uuid } from '../../common/tunnel/utils';
-import TodoManager from './TodoManager';
+import type TodoManager from './TodoManager';
 
 const logger = getLogger('AgentOrchestrator');
 
@@ -14,6 +14,7 @@ interface AgentOrchestratorOptions {
   onMessage?: (message: { role: 'assistant' | 'user' | 'system' | 'tool'; content: string }) => void;
   onTodoChange?: (todos: TodoItem[]) => void;
   onTodoAction?: (action: 'create' | 'update', todo?: TodoItem) => void;
+  onSaveState?: () => Promise<void>;
 }
 
 export class AgentOrchestrator {
@@ -25,7 +26,9 @@ export class AgentOrchestrator {
   private onMessage?: (message: { role: 'assistant' | 'user' | 'system' | 'tool'; content: string }) => void;
   private onTodoChange?: (todos: TodoItem[]) => void;
   private onTodoAction?: (action: 'create' | 'update', todo?: TodoItem) => void;
+  private onSaveState?: () => Promise<void>;
   private todoManager: TodoManager;
+  private dynamicCompressCheckInterval?: number;
 
   constructor(options: AgentOrchestratorOptions, todoManager: TodoManager) {
     this.config = options.config;
@@ -35,6 +38,7 @@ export class AgentOrchestrator {
     this.onMessage = options.onMessage;
     this.onTodoChange = options.onTodoChange;
     this.onTodoAction = options.onTodoAction;
+    this.onSaveState = options.onSaveState;
     this.todoManager = todoManager;
 
     this.todoManager.registerCallback((todos) => {
@@ -48,11 +52,20 @@ export class AgentOrchestrator {
    * 运行 Agent
    * @param prompt - 当前任务提示
    * @param conversationHistory - 对话历史（可选）
+   * @param options - 运行选项
    */
-  async run(prompt: string, conversationHistory?: Array<{ role: string; content: string }>): Promise<void> {
+  async run(
+    prompt: string,
+    conversationHistory?: Array<{ role: string; content: string }>,
+    options?: { clearTodos?: boolean; startIteration?: number },
+  ): Promise<void> {
     this.abortController = new AbortController();
 
-    this.todoManager.clear();
+    this.dynamicCompressCheckInterval = this.config.compressCheckInterval || 10;
+
+    if (options?.clearTodos !== false) {
+      this.todoManager.clear();
+    }
 
     this.onStateChange('thinking');
     this.addStep({
@@ -79,30 +92,63 @@ export class AgentOrchestrator {
       let messages: Array<{ role: string; content: string }>;
 
       if (conversationHistory && conversationHistory.length > 0) {
-        messages = [
-          systemMessage,
-          ...conversationHistory.filter(msg => msg.role !== 'tool'),
-          userMessage,
-        ];
+        messages = await this.compressIfNeeded(
+          [
+            systemMessage,
+            ...conversationHistory.filter(msg => msg.role !== 'tool'),
+            userMessage,
+          ],
+          options?.startIteration || 0
+        );
       } else {
-        messages = [
-          systemMessage,
-          userMessage,
-        ];
+        messages = [systemMessage, userMessage];
       }
 
       logger.debug('Agent starting with conversation history', {
         historyLength: conversationHistory?.length || 0,
         totalMessages: messages.length,
+        startIteration: options?.startIteration || 0,
       });
 
-      let iteration = 0;
+      let iteration = options?.startIteration || 0;
       const maxIterations = this.config.maxIterations || 10;
+      const minCompressCheckInterval = this.config.minCompressCheckInterval || 5;
 
       while (iteration < maxIterations && !this.abortController.signal.aborted) {
         iteration++;
 
         logger.info(`Agent iteration ${iteration}/${maxIterations}`);
+
+        if (iteration % this.dynamicCompressCheckInterval === 0 && iteration > 0) {
+          logger.info('Periodic compression check', {
+            iteration,
+            checkInterval: this.dynamicCompressCheckInterval,
+          });
+
+          const previousLength = messages.length;
+          messages = await this.compressIfNeeded(messages, iteration);
+
+          if (messages.length < previousLength) {
+            this.dynamicCompressCheckInterval = Math.max(
+              Math.floor(this.dynamicCompressCheckInterval * 1.5),
+              minCompressCheckInterval
+            );
+
+            logger.info('Compress check interval adjusted', {
+              previousInterval: this.dynamicCompressCheckInterval / 1.5,
+              newInterval: this.dynamicCompressCheckInterval,
+            });
+
+            this.addStep({
+              type: 'thinking',
+              content: `Conversation compressed. Message count: ${messages.length}, Next check in ${this.dynamicCompressCheckInterval} iterations`,
+            });
+          }
+        }
+
+        if (this.onSaveState) {
+          await this.onSaveState();
+        }
 
         // 调用 LLM
         const llmResponse = await this.callLLM(messages);
@@ -132,6 +178,10 @@ export class AgentOrchestrator {
         if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
           // 执行工具
           const toolResults = await this.executeToolCalls(assistantMessage.tool_calls);
+
+          if (this.onSaveState) {
+            await this.onSaveState();
+          }
 
           // 将工具结果添加到消息
           toolResults.forEach(result => {
@@ -169,6 +219,15 @@ export class AgentOrchestrator {
 
       if (iteration >= maxIterations) {
         this.onStateChange('idle');
+
+        logger.info('Max iterations reached, compressing final state');
+        messages = await this.compressIfNeeded(messages, iteration);
+
+        this.addStep({
+          type: 'thinking',
+          content: `Reached maximum iterations (${maxIterations}). Compressed message count: ${messages.length}`,
+        });
+
         const todos = this.todoManager.listTodos();
         const incompleteTodos = todos.filter((t) => t.status !== 'completed');
 
@@ -217,29 +276,68 @@ export class AgentOrchestrator {
   private async callLLM(messages: any[]): Promise<any> {
     const tools = this.toolRegistry.getOpenAISchema();
 
-    const response = await fetch(this.config.apiBase, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.config.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: this.config.model,
-        messages,
-        tools,
-        tool_choice: 'auto',
-      }),
-      signal: this.abortController?.signal,
-    });
+    try {
+      const response = await fetch(this.config.apiBase, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.config.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: this.config.model,
+          messages,
+          tools,
+          tool_choice: 'auto',
+        }),
+        signal: this.abortController?.signal,
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.error?.message || `LLM API error: ${response.status}`
-      );
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error?.message || `LLM API error: ${response.status}`
+        );
+      }
+
+      return await response.json();
+    } catch (error: any) {
+      if (this.isTokenLimitError(error)) {
+        logger.warn('Token limit reached, compressing conversation', { error });
+
+        const compressedMessages = await this.compressIfNeeded(messages, 0);
+
+        logger.info('Retrying with compressed messages', {
+          originalCount: messages.length,
+          compressedCount: compressedMessages.length,
+        });
+
+        const response = await fetch(this.config.apiBase, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.config.apiKey}`,
+          },
+          body: JSON.stringify({
+            model: this.config.model,
+            messages: compressedMessages,
+            tools,
+            tool_choice: 'auto',
+          }),
+          signal: this.abortController?.signal,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.error?.message || `LLM API error: ${response.status}`
+          );
+        }
+
+        return await response.json();
+      }
+
+      throw error;
     }
-
-    return await response.json();
   }
 
   /**
@@ -367,15 +465,161 @@ export class AgentOrchestrator {
   }
 
   /**
+   * 估算 Token 数量
+   */
+  private estimateTokens(messages: Array<{ role: string; content: string }>): number {
+    let totalChars = 0;
+
+    for (const msg of messages) {
+      totalChars += msg.content.length;
+    }
+
+    return Math.ceil(totalChars / 3);
+  }
+
+  /**
+   * 检查是否需要压缩并执行压缩
+   */
+  private async compressIfNeeded(
+    messages: Array<{ role: string; content: string }>,
+    currentIteration: number
+  ): Promise<Array<{ role: string; content: string }>> {
+    const contextWindowSize = this.config.contextWindowSize || 128000;
+    const compressRatio = this.config.compressRatio || 0.3;
+    const compressMinMessages = this.config.compressMinMessages || 20;
+
+    const messagesToConsider = messages.filter(msg =>
+      msg.role !== 'tool'
+    );
+
+    const estimatedTokens = this.estimateTokens(messagesToConsider);
+    const tokenThreshold = contextWindowSize * 0.8;
+
+    const needCompress =
+      estimatedTokens >= tokenThreshold ||
+      messagesToConsider.length >= compressMinMessages;
+
+    if (!needCompress) {
+      return messages;
+    }
+
+    logger.info('Compressing conversation', {
+      estimatedTokens,
+      tokenThreshold,
+      messageCount: messagesToConsider.length,
+    });
+
+    const keepCount = Math.max(
+      Math.floor(messagesToConsider.length * compressRatio),
+      1
+    );
+
+    const messagesToKeep = messagesToConsider.slice(-keepCount);
+    const messagesToCompress = messagesToConsider.slice(
+      0,
+      messagesToConsider.length - keepCount
+    );
+
+    if (messagesToCompress.length === 0) {
+      return messages;
+    }
+
+    try {
+      const summary = await this.generateSummary(messagesToCompress);
+
+      const toolMessages = messages.filter(msg => msg.role === 'tool');
+
+      return [
+        {
+          role: 'system',
+          content: `[Summary of previous conversation]: ${summary}`
+        },
+        ...messagesToKeep,
+        ...toolMessages,
+      ];
+    } catch (error) {
+      logger.error('Failed to compress conversation', error);
+      return messages;
+    }
+  }
+
+  /**
+   * 生成对话摘要
+   */
+  private async generateSummary(
+    messages: Array<{ role: string; content: string }>
+  ): Promise<string> {
+    const conversationText = messages
+      .map(msg => `${msg.role}: ${msg.content}`)
+      .join('\n\n');
+
+    const summaryPrompt = `请用中文简洁总结以下对话内容，2-3 句话即可：\n\n${conversationText}`;
+
+    const response = await fetch(this.config.apiBase, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.config.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: this.config.model,
+        messages: [
+          { role: 'system', content: summaryPrompt },
+          { role: 'user', content: conversationText },
+        ],
+      }),
+      signal: this.abortController?.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0]?.message?.content || '';
+  }
+
+  /**
+   * 判断是否为 Token 限制错误
+   */
+  private isTokenLimitError(error: any): boolean {
+    const defaultErrorCodes = [
+      'context_length_exceeded',
+      'max_tokens_exceeded',
+      'token_limit',
+      'token_limit_exceeded',
+      'maximum context length exceeded',
+      'maximum tokens exceeded',
+    ];
+
+    const tokenLimitErrorCodes = this.config.tokenLimitErrorCodes || defaultErrorCodes;
+    const errorMessage = error?.message?.toLowerCase() || '';
+
+    return tokenLimitErrorCodes.some(code =>
+      errorMessage.includes(code.toLowerCase())
+    );
+  }
+
+  /**
    * 构建 System Prompt
    */
   private buildSystemPrompt(): string {
+    const currentTime = new Date().toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
     const tools = this.toolRegistry.getAll();
     const toolDescriptions = tools
       .map(t => `  - ${t.name}: ${t.description}`)
       .join('\n');
 
     return `
+当前时间：${currentTime}
+
 你是一名智能助手，帮助用户在 ONote 笔记应用中高效完成各种任务。
 
 ## 可用工具

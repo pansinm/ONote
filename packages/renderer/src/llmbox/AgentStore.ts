@@ -1,10 +1,11 @@
-import { makeAutoObservable, runInAction, toJS } from 'mobx';
-import type { Tool, ExecutionStep, AgentConfig, TodoItem } from './agent/types';
+import { makeAutoObservable, runInAction } from 'mobx';
+import type { Tool, ExecutionStep, AgentConfig, TodoItem, AgentExecutionState } from './agent/types';
 import ToolRegistry from './agent/ToolRegistry';
 import { AgentOrchestrator } from './agent/AgentOrchestrator';
 import TodoManager from './agent/TodoManager';
 import { getLogger } from '../shared/logger';
 import { uuid } from '../common/tunnel/utils';
+import { LLM_BOX_MESSAGE_TYPES } from './constants/LLMBoxConstants';
 
 const logger = getLogger('AgentStore');
 
@@ -31,6 +32,10 @@ export class AgentStore {
 
   isRunning = false;
 
+  hasSavedState = false;
+
+  lastStateSavedAt: Date | null = null;
+
   fileUri: string | null = null;
 
   content = '';
@@ -46,6 +51,9 @@ export class AgentStore {
   private todoManager: TodoManager;
   private toolRegistry: ToolRegistry;
   private orchestrator: AgentOrchestrator;
+  private currentPrompt = '';
+  private executionStartTime: Date | null = null;
+  private currentIteration = 0;
 
   constructor(config: AgentConfig, channel: any) {
     this.config = config;
@@ -70,6 +78,7 @@ export class AgentStore {
             this.todos = todos;
           });
         },
+        onSaveState: this.saveExecutionState.bind(this),
       },
       this.todoManager,
     );
@@ -227,7 +236,11 @@ export class AgentStore {
       this.clearError();
       this.clearLog();
 
-      await this.compressConversation();
+      runInAction(() => {
+        this.currentPrompt = prompt;
+        this.executionStartTime = new Date();
+        this.currentIteration = 0;
+      });
 
       const userPrompt = this.buildContextPrompt(
         this.fileUri || '',
@@ -263,84 +276,7 @@ export class AgentStore {
   }
 
   async compressConversation(): Promise<void> {
-    if (this.conversationHistory.length === 0) {
-      return;
-    }
-
-    const messagesToCompress = this.conversationHistory.filter((msg: any) => {
-      return (
-        msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system'
-      );
-    });
-
-    if (messagesToCompress.length <= this.compressThreshold) {
-      return;
-    }
-
-    const messagesToKeep = messagesToCompress.slice(-this.compressThreshold);
-    const messagesToCompressSummary = messagesToCompress.slice(
-      0,
-      messagesToCompress.length - this.compressThreshold,
-    );
-
-    if (messagesToCompressSummary.length === 0) {
-      return;
-    }
-
-    const conversationText = messagesToCompressSummary
-      .map((msg: any) => `${msg.role}: ${msg.content}`)
-      .join('\n\n');
-
-    const summaryPrompt = `请用中文简洁总结以下对话内容，2-3 句话即可：\n\n${conversationText}`;
-
-    try {
-      const response = await fetch(this.config.apiBase, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.config.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: this.config.model,
-          messages: [
-            {
-              role: 'system',
-              content: summaryPrompt,
-            },
-            ...messagesToCompressSummary,
-            {
-              role: 'user',
-              content: `Please summarize these conversations in 2-3 sentences in Chinese:\n\n${conversationText}`,
-            },
-          ],
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      const summary = data.choices[0]?.message?.content;
-
-      const summaryMessage: AgentMessage = {
-        id: uuid('agent-summary-'),
-        role: 'system',
-        content: `[Summary of previous conversation]: ${summary}`,
-        timestamp: new Date(),
-      };
-
-      this.conversationHistory = [summaryMessage, ...messagesToKeep];
-
-      logger.info('Conversation compressed', {
-        originalCount: messagesToCompress.length,
-        compressedCount: messagesToCompressSummary.length,
-        remainingCount: 1 + messagesToKeep.length,
-      });
-    } catch (error) {
-      logger.error('Failed to compress conversation', error);
-    }
+    logger.warn('compressConversation() is deprecated. Compression is now handled by AgentOrchestrator');
   }
 
   async saveContext(fileUri: string): Promise<void> {
@@ -433,6 +369,199 @@ export class AgentStore {
 
   isExecutionLogEmpty(): boolean {
     return this.executionLog.length === 0;
+  }
+
+  async saveExecutionState(): Promise<void> {
+    if (!this.fileUri || !this.config.rootUri) {
+      logger.warn('Cannot save execution state: missing fileUri or rootUri');
+      return;
+    }
+
+    const state: AgentExecutionState = {
+      prompt: this.currentPrompt,
+      startTime: this.executionStartTime || new Date(),
+      isRunning: this.isRunning,
+      agentState: this.agentState,
+      currentIteration: this.currentIteration,
+      maxIterations: this.config.maxIterations || 10,
+      todos: this.todos,
+      executionLog: this.executionLog.map(step => ({
+        ...step,
+        timestamp: step.timestamp,
+      })),
+      conversationHistory: this.conversationHistory.map(msg => ({
+        role: msg.role,
+        content: msg.content,
+      })),
+      fileUri: this.fileUri,
+      rootUri: this.config.rootUri || null,
+      content: this.content,
+      selection: this.selection,
+      savedAt: new Date(),
+    };
+
+    try {
+      await this.channel.send({
+        type: LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_SAVE,
+        data: {
+          fileUri: this.fileUri,
+          rootUri: this.config.rootUri,
+          state,
+        },
+      });
+
+      runInAction(() => {
+        this.hasSavedState = true;
+        this.lastStateSavedAt = new Date();
+      });
+
+      logger.info('Execution state saved successfully', {
+        fileUri: this.fileUri,
+        iteration: state.currentIteration,
+      });
+    } catch (error) {
+      logger.error('Failed to save execution state', error);
+    }
+  }
+
+  async loadExecutionState(): Promise<AgentExecutionState | null> {
+    if (!this.fileUri || !this.config.rootUri) {
+      logger.warn('Cannot load execution state: missing fileUri or rootUri');
+      return null;
+    }
+
+    try {
+      const response = await this.channel.send({
+        type: LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_LOAD,
+        data: {
+          fileUri: this.fileUri,
+          rootUri: this.config.rootUri,
+        },
+      }) as { state?: AgentExecutionState };
+
+      if (!response.state) {
+        runInAction(() => {
+          this.hasSavedState = false;
+        });
+        return null;
+      }
+
+      const state = response.state;
+
+      const parseDate = (value: any): Date => {
+        if (value instanceof Date) return value;
+        if (typeof value === 'string' || typeof value === 'number') return new Date(value);
+        return new Date();
+      };
+
+      const stateWithDates: AgentExecutionState = {
+        ...state,
+        startTime: parseDate(state.startTime),
+        todos: state.todos.map(todo => ({
+          ...todo,
+          createdAt: parseDate(todo.createdAt),
+          updatedAt: parseDate(todo.updatedAt),
+        })),
+        executionLog: state.executionLog.map(step => ({
+          ...step,
+          timestamp: parseDate(step.timestamp),
+        })),
+        savedAt: parseDate(state.savedAt),
+      };
+
+      runInAction(() => {
+        this.hasSavedState = true;
+      });
+
+      logger.info('Execution state loaded successfully', {
+        fileUri: this.fileUri,
+        iteration: stateWithDates.currentIteration,
+      });
+
+      return stateWithDates;
+    } catch (error) {
+      logger.error('Failed to load execution state', error);
+      return null;
+    }
+  }
+
+  async resumeExecution(): Promise<void> {
+    if (this.isRunning) {
+      logger.warn('Cannot resume execution: agent is already running');
+      return;
+    }
+
+    const state = await this.loadExecutionState();
+    if (!state) {
+      throw new Error('No saved execution state found');
+    }
+
+    try {
+      this.setRunning(true);
+      this.clearError();
+
+      runInAction(() => {
+        this.todos = state.todos;
+        this.executionLog = state.executionLog;
+        this.conversationHistory = state.conversationHistory.map(msg => ({
+          ...msg,
+          id: uuid('agent-msg-'),
+          timestamp: new Date(),
+        }));
+        this.currentIteration = state.currentIteration;
+        this.currentPrompt = state.prompt;
+        this.executionStartTime = state.startTime;
+        this.content = state.content;
+        this.selection = state.selection;
+      });
+
+      const conversationHistory = this.conversationHistory.filter(msg => {
+        return msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system';
+      });
+
+      await this.orchestrator.run(state.prompt, conversationHistory, {
+        clearTodos: false,
+        startIteration: state.currentIteration,
+      });
+      this.setRunning(false);
+      logger.info('Agent execution resumed successfully', {
+        steps: this.executionLog.length,
+        messages: this.conversationHistory.length,
+      });
+    } catch (error) {
+      this.setRunning(false);
+      this.setError(error instanceof Error ? error.message : 'Unknown error');
+      logger.error('Agent execution resumed failed', error);
+      throw error;
+    }
+  }
+
+  async deleteExecutionState(): Promise<void> {
+    if (!this.fileUri || !this.config.rootUri) {
+      logger.warn('Cannot delete execution state: missing fileUri or rootUri');
+      return;
+    }
+
+    try {
+      await this.channel.send({
+        type: LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_DELETE,
+        data: {
+          fileUri: this.fileUri,
+          rootUri: this.config.rootUri,
+        },
+      });
+
+      runInAction(() => {
+        this.hasSavedState = false;
+        this.lastStateSavedAt = null;
+      });
+
+      logger.info('Execution state deleted successfully', {
+        fileUri: this.fileUri,
+      });
+    } catch (error) {
+      logger.error('Failed to delete execution state', error);
+    }
   }
 }
 
