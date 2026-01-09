@@ -10,16 +10,7 @@ import type {
   AgentFileSearchInResponse,
 } from '../types';
 import fileService from '/@/main/services/fileService';
-
-interface Stores {
-  fileStore: {
-    getOrCreateModel: (
-      uri: string,
-    ) => Promise<{ setValue: (content: string) => void }>;
-    closeFile: (uri: string) => Promise<void>;
-    saveFile: (uri: string, content: string) => Promise<void>;
-  };
-}
+import stores from '/@/main/stores';
 
 interface ReplaceOperation {
   mode: 'string' | 'regex' | 'line_range' | 'line_number';
@@ -56,15 +47,11 @@ interface OperationResult {
 }
 
 export class AgentFileReadHandler extends BaseHandler {
-  constructor(private stores: Stores) {
-    super();
-  }
-
   async handle(data: { uri: string }): Promise<AgentFileReadResponse> {
     this.logger.debug('AgentFileReadHandler.handle called', { uri: data.uri });
 
     return this.wrapWithErrorHandling(async () => {
-      const model = await this.stores.fileStore.getOrCreateModel(data.uri);
+      const model = await stores.fileStore.getOrCreateModel(data.uri);
       const content = model.getValue();
 
       this.logger.debug('File read successfully', {
@@ -78,10 +65,6 @@ export class AgentFileReadHandler extends BaseHandler {
 }
 
 export class AgentFileWriteHandler extends BaseHandler {
-  constructor(private stores: Stores) {
-    super();
-  }
-
   async handle(data: {
     uri: string;
     content: string;
@@ -93,7 +76,7 @@ export class AgentFileWriteHandler extends BaseHandler {
 
     return this.wrapWithErrorHandling(async () => {
       await fileService.writeText(data.uri, data.content);
-      const model = await this.stores.fileStore.getOrCreateModel(data.uri);
+      const model = await stores.fileStore.getOrCreateModel(data.uri);
       model.setValue(data.content);
 
       this.logger.debug('File written successfully', { uri: data.uri });
@@ -104,10 +87,6 @@ export class AgentFileWriteHandler extends BaseHandler {
 }
 
 export class AgentFileReplaceHandler extends BaseHandler {
-  constructor(private stores: Stores) {
-    super();
-  }
-
   async handle(data: {
     uri: string;
     operations: ReplaceOperation[];
@@ -125,12 +104,15 @@ export class AgentFileReplaceHandler extends BaseHandler {
       if (!originalContent) {
         this.logger.warn('File is empty', { uri: data.uri });
 
-        const operationResults = data.operations.map(() => ({
-          success: false,
-          matches: 0,
-          changedLines: [],
-          error: 'File is empty',
-        } as OperationResult));
+        const operationResults = data.operations.map(
+          () =>
+            ({
+              success: false,
+              matches: 0,
+              changedLines: [],
+              error: 'File is empty',
+            } as OperationResult),
+        );
 
         return {
           success: true,
@@ -169,7 +151,7 @@ export class AgentFileReplaceHandler extends BaseHandler {
       }
 
       await fileService.writeText(data.uri, modifiedContent);
-      const model = await this.stores.fileStore.getOrCreateModel(data.uri);
+      const model = await stores.fileStore.getOrCreateModel(data.uri);
       model.setValue(modifiedContent);
 
       this.logger.debug('File content replaced successfully', {
@@ -230,8 +212,12 @@ export class AgentFileReplaceHandler extends BaseHandler {
 
     const { replaceAll = false, caseSensitive = false } = operation;
     const flags = replaceAll
-      ? (caseSensitive ? 'g' : 'gi')
-      : (caseSensitive ? '' : 'i');
+      ? caseSensitive
+        ? 'g'
+        : 'gi'
+      : caseSensitive
+      ? ''
+      : 'i';
     const searchRegex = new RegExp(
       search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
       flags,
@@ -371,10 +357,6 @@ export class AgentFileReplaceHandler extends BaseHandler {
 }
 
 export class AgentFileCreateHandler extends BaseHandler {
-  constructor(private stores: Stores) {
-    super();
-  }
-
   async handle(data: {
     uri: string;
     content?: string;
@@ -385,7 +367,7 @@ export class AgentFileCreateHandler extends BaseHandler {
     });
 
     return this.wrapWithErrorHandling(async () => {
-      await this.stores.fileStore.saveFile(data.uri, data.content || '');
+      await stores.fileStore.saveFile(data.uri, data.content || '');
       await fileService.writeText(data.uri, data.content || '');
 
       this.logger.debug('File created successfully', { uri: data.uri });
@@ -396,17 +378,13 @@ export class AgentFileCreateHandler extends BaseHandler {
 }
 
 export class AgentFileDeleteHandler extends BaseHandler {
-  constructor(private stores: Stores) {
-    super();
-  }
-
   async handle(data: { uri: string }): Promise<AgentFileDeleteResponse> {
     this.logger.debug('AgentFileDeleteHandler.handle called', {
       uri: data.uri,
     });
 
     return this.wrapWithErrorHandling(async () => {
-      await this.stores.fileStore.closeFile(data.uri);
+      stores.fileStore.closeFile(data.uri);
       await fileService.remove(data.uri);
 
       this.logger.debug('File deleted successfully', { uri: data.uri });
@@ -417,10 +395,6 @@ export class AgentFileDeleteHandler extends BaseHandler {
 }
 
 export class AgentFileListHandler extends BaseHandler {
-  constructor(private stores: Stores) {
-    super();
-  }
-
   async handle(data: { uri: string }): Promise<AgentFileListResponse> {
     this.logger.debug('AgentFileListHandler.handle called', { uri: data.uri });
 
@@ -452,10 +426,6 @@ export class AgentFileListHandler extends BaseHandler {
 }
 
 export class AgentFileSearchHandler extends BaseHandler {
-  constructor(private stores: Stores) {
-    super();
-  }
-
   async handle(data: {
     rootUri: string;
     keywords: string;
@@ -488,10 +458,6 @@ export class AgentFileSearchHandler extends BaseHandler {
 }
 
 export class AgentFileSearchInHandler extends BaseHandler {
-  constructor(private stores: Stores) {
-    super();
-  }
-
   async handle(data: {
     uri: string;
     pattern: string;

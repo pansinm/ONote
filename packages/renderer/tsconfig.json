@@ -24,7 +24,7 @@
     "src/**/*.vue",
     "src/**/*.ts",
     "src/**/*.tsx",
-    "global.d.ts",
+    "src/types/global/global.d.ts",
     "types/**/*.d.ts",
     "../../types/**/*.d.ts"
   ],

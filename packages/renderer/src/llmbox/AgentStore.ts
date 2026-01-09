@@ -1,11 +1,20 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import type { Tool, ExecutionStep, AgentConfig, TodoItem, AgentExecutionState } from './agent/types';
+import type {
+  Tool,
+  ExecutionStep,
+  AgentConfig,
+  TodoItem,
+  AgentExecutionState,
+} from './agent/types';
 import ToolRegistry from './agent/ToolRegistry';
 import { AgentOrchestrator } from './agent/AgentOrchestrator';
 import TodoManager from './agent/TodoManager';
 import { getLogger } from '../shared/logger';
 import { uuid } from '../common/tunnel/utils';
-import { LLM_BOX_MESSAGE_TYPES } from './constants/LLMBoxConstants';
+import {
+  LLM_BOX_MESSAGE_TYPES,
+  type LLMBoxMessageType,
+} from './constants/LLMBoxConstants';
 
 const logger = getLogger('AgentStore');
 
@@ -18,7 +27,10 @@ interface AgentMessage {
 }
 
 interface Channel {
-  send: (message: { type: string; data: unknown }) => Promise<Record<string, unknown>>;
+  send: (message: {
+    type: LLMBoxMessageType;
+    data: unknown;
+  }) => Promise<Record<string, unknown>>;
 }
 
 export class AgentStore {
@@ -286,7 +298,9 @@ export class AgentStore {
   }
 
   async compressConversation(): Promise<void> {
-    logger.warn('compressConversation() is deprecated. Compression is now handled by AgentOrchestrator');
+    logger.warn(
+      'compressConversation() is deprecated. Compression is now handled by AgentOrchestrator',
+    );
   }
 
   async saveContext(fileUri: string): Promise<void> {
@@ -335,6 +349,8 @@ export class AgentStore {
         data: { fileUri, rootUri: this.config.rootUri },
       })) as { error?: string; agentContext?: any };
 
+      logger.debug('Agent context load response', { response });
+
       if (response.error) {
         logger.error('Failed to load agent context', response.error);
         return null;
@@ -367,8 +383,8 @@ export class AgentStore {
       logger.info('Agent context loaded', {
         fileUri: this.fileUri,
         hasContext: !!agentContext,
-        executionLogCount: agentContext.executionLog?.length || 0,
-        conversationCount: agentContext.conversationHistory?.length || 0,
+        executionLogCount: agentContext?.executionLog?.length || 0,
+        conversationCount: agentContext?.conversationHistory?.length || 0,
       });
 
       return agentContext;
@@ -400,11 +416,11 @@ export class AgentStore {
       currentIteration: this.currentIteration,
       maxIterations: this.config.maxIterations || 10,
       todos: this.todos,
-      executionLog: this.executionLog.map(step => ({
+      executionLog: this.executionLog.map((step) => ({
         ...step,
         timestamp: step.timestamp,
       })),
-      conversationHistory: this.conversationHistory.map(msg => ({
+      conversationHistory: this.conversationHistory.map((msg) => ({
         role: msg.role,
         content: msg.content,
       })),
@@ -446,13 +462,13 @@ export class AgentStore {
     }
 
     try {
-      const response = await this.channel.send({
+      const response = (await this.channel.send({
         type: LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_LOAD,
         data: {
           fileUri: this.fileUri,
           rootUri: this.config.rootUri,
         },
-      }) as { state?: AgentExecutionState };
+      })) as { state?: AgentExecutionState };
 
       if (!response.state) {
         runInAction(() => {
@@ -519,11 +535,13 @@ export class AgentStore {
       runInAction(() => {
         this.todos = state.todos;
         this.executionLog = state.executionLog;
-        this.conversationHistory = state.conversationHistory.map((msg: any) => ({
-          ...msg,
-          id: uuid('agent-msg-'),
-          timestamp: new Date(),
-        }));
+        this.conversationHistory = state.conversationHistory.map(
+          (msg: any) => ({
+            ...msg,
+            id: uuid('agent-msg-'),
+            timestamp: new Date(),
+          }),
+        );
         this.currentIteration = state.currentIteration;
         this.currentPrompt = state.prompt;
         this.executionStartTime = state.startTime;
@@ -531,9 +549,41 @@ export class AgentStore {
         this.selection = state.selection;
       });
 
-      const conversationHistory = this.conversationHistory.filter((msg: any) => {
-        return msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system';
-      });
+      const conversationHistory = this.conversationHistory.filter(
+        (msg: any) => {
+          return (
+            msg.role === 'user' ||
+            msg.role === 'assistant' ||
+            msg.role === 'system'
+          );
+        },
+      );
+
+      const hasFileContent = !!this.content;
+
+      this.orchestrator = new AgentOrchestrator(
+        {
+          config: this.config,
+          toolRegistry: this.toolRegistry,
+          onStep: this.addStep.bind(this),
+          onStateChange: (state) => {
+            runInAction(() => {
+              this.agentState = state;
+            });
+          },
+          onMessage: (message) => {
+            this.addMessage(message);
+          },
+          onTodoChange: (todos) => {
+            runInAction(() => {
+              this.todos = todos;
+            });
+          },
+          onSaveState: this.saveExecutionState.bind(this),
+          hasFileContent,
+        },
+        this.todoManager,
+      );
 
       await this.orchestrator.run(state.prompt, conversationHistory, {
         clearTodos: false,

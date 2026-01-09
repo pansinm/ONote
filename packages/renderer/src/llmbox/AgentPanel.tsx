@@ -245,7 +245,7 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
                           </details>
                         )}
 
-                        {step.toolResult && (
+                        {step.toolResult ? (
                           <details
                             className={`${styles.LogDetails} ${styles.LogDetailsResult}`}
                           >
@@ -266,7 +266,7 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
                               )}
                             </div>
                           </details>
-                        )}
+                        ) : null}
 
                         {step.error && (
                           <div className={styles.LogError}>
@@ -417,9 +417,9 @@ function TodoTree({ todos }: TodoTreeProps) {
         <span className={styles.TodoIcon}>{getTodoIcon(todo.status)}</span>
         <span className={styles.TodoDescription}>{todo.description}</span>
       </div>
-      {todo.children && todo.children.length > 0 &&
-        todo.children.map((child) => renderTodoNode(child, level + 1))
-      }
+      {todo.children &&
+        todo.children.length > 0 &&
+        todo.children.map((child) => renderTodoNode(child, level + 1))}
     </React.Fragment>
   );
 

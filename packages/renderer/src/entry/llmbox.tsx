@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { observer } from 'mobx-react-lite';
-import { runInAction } from 'mobx';
 
 import { LLMBox } from '../llmbox';
 import { LLMChatStore } from '../llmbox/LLMChatStore';
@@ -13,10 +12,6 @@ import {
   LLM_MODEL_NAME,
 } from '../common/constants/SettingKey';
 import { createChannel } from 'bidc';
-import {
-  EDITOR_CONTENT_CHANGED,
-  EDITOR_SELECTION_CHANGED,
-} from '../main/eventbus/EventName';
 import { LLM_BOX_MESSAGE_TYPES } from '../llmbox/constants/LLMBoxConstants';
 import '../styles/index.scss';
 import('github-markdown-css/github-markdown.css');
@@ -28,46 +23,6 @@ const LLMBoxApp = observer(() => {
   const [mode, setMode] = useState<'chat' | 'agent'>('agent');
 
   const previousFileUriRef = useRef<string | null>(null);
-
-  const saveAgentContextHandler = useRef(async (fileUri: string) => {
-    try {
-      console.log('[llmbox.tsx] Saving agent context:', {
-        fileUri,
-        stepCount: agentStore.executionLog.length,
-      });
-      await agentStore.saveContext(fileUri);
-      console.log('[llmbox.tsx] Agent context saved');
-    } catch (error) {
-      console.error('[llmbox.tsx] Failed to save agent context:', error);
-    }
-  }).current;
-
-  const loadAgentContextHandler = useRef(async (fileUri: string) => {
-    try {
-      console.log('[llmbox.tsx] Loading agent context for:', fileUri);
-      const context = await agentStore.loadContext(fileUri);
-      if (context) {
-        console.log('[llmbox.tsx] Agent context loaded:', context);
-      }
-    } catch (error) {
-      console.error('[llmbox.tsx] Failed to load agent context:', error);
-    }
-  }).current;
-
-  const handleFileChange = useRef(async (fileUri: string) => {
-    if (previousFileUriRef.current && previousFileUriRef.current !== fileUri) {
-      console.log(
-        '[llmbox.tsx] File changed, saving agent context for:',
-        previousFileUriRef.current,
-      );
-      await saveAgentContextHandler(previousFileUriRef.current);
-    }
-
-    console.log('[llmbox.tsx] Loading agent context for new file:', fileUri);
-    await loadAgentContextHandler(fileUri);
-
-    previousFileUriRef.current = fileUri;
-  }).current;
 
   const [chatStore] = useState(
     () =>
@@ -91,6 +46,88 @@ const LLMBoxApp = observer(() => {
         },
         { send },
       ),
+  );
+
+  const saveAgentContextHandler = useCallback(
+    async (fileUri: string) => {
+      try {
+        console.log('[llmbox.tsx] Saving agent context:', {
+          fileUri,
+          stepCount: agentStore.executionLog.length,
+        });
+        await agentStore.saveContext(fileUri);
+        console.log('[llmbox.tsx] Agent context saved');
+      } catch (error) {
+        console.error('[llmbox.tsx] Failed to save agent context:', error);
+      }
+    },
+    [agentStore],
+  );
+
+  const loadAgentContextHandler = useCallback(
+    async (fileUri: string) => {
+      try {
+        console.log('[llmbox.tsx] Loading agent context for:', fileUri);
+        const context = await agentStore.loadContext(fileUri);
+        if (context) {
+          console.log('[llmbox.tsx] Agent context loaded:', context);
+        }
+      } catch (error) {
+        console.error('[llmbox.tsx] Failed to load agent context:', error);
+      }
+    },
+    [agentStore],
+  );
+
+  const loadConversation = useCallback(
+    async (fileUri: string) => {
+      try {
+        console.log('[llmbox.tsx] Loading conversation for:', fileUri);
+        const response = (await send({
+          type: LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_LOAD,
+          data: { fileUri },
+        })) as { error?: string; messages?: any[] };
+
+        console.log('[llmbox.tsx] LLM_CONVERSATION_LOAD response:', response);
+
+        if (response.error) {
+          console.error(
+            '[llmbox.tsx] Failed to load conversation:',
+            response.error,
+          );
+        } else {
+          console.log(
+            '[llmbox.tsx] Setting messages:',
+            response.messages?.length,
+          );
+          chatStore.setMessages(response.messages || []);
+        }
+      } catch (error) {
+        console.error('[llmbox.tsx] Failed to load conversation:', error);
+      }
+    },
+    [chatStore],
+  );
+
+  const handleFileChange = useCallback(
+    async (fileUri: string) => {
+      if (
+        previousFileUriRef.current &&
+        previousFileUriRef.current !== fileUri
+      ) {
+        console.log(
+          '[llmbox.tsx] File changed, saving agent context for:',
+          previousFileUriRef.current,
+        );
+        await saveAgentContextHandler(previousFileUriRef.current);
+      }
+
+      console.log('[llmbox.tsx] Loading agent context for new file:', fileUri);
+      await loadAgentContextHandler(fileUri);
+
+      previousFileUriRef.current = fileUri;
+    },
+    [saveAgentContextHandler, loadAgentContextHandler],
   );
 
   useEffect(() => {
@@ -118,33 +155,6 @@ const LLMBoxApp = observer(() => {
     console.log('[llmbox.tsx] Injecting saveConversationHandler');
     chatStore.setSaveConversation(saveConversationHandler);
 
-    const loadConversation = async (fileUri: string) => {
-      try {
-        console.log('[llmbox.tsx] Loading conversation for:', fileUri);
-        const response = (await send({
-          type: LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_LOAD,
-          data: { fileUri },
-        })) as { error?: string; messages?: any[] };
-
-        console.log('[llmbox.tsx] LLM_CONVERSATION_LOAD response:', response);
-
-        if (response.error) {
-          console.error(
-            '[llmbox.tsx] Failed to load conversation:',
-            response.error,
-          );
-        } else {
-          console.log(
-            '[llmbox.tsx] Setting messages:',
-            response.messages?.length,
-          );
-          chatStore.setMessages(response.messages || []);
-        }
-      } catch (error) {
-        console.error('[llmbox.tsx] Failed to load conversation:', error);
-      }
-    };
-
     receive(async ({ type, data }: any) => {
       console.log('[llmbox.tsx] Received message:', { type, data });
 
@@ -167,7 +177,7 @@ const LLMBoxApp = observer(() => {
       if (type === LLM_BOX_MESSAGE_TYPES.EDITOR_FILE_OPEN && data?.uri) {
         console.log('[llmbox.tsx] Handling EDITOR_FILE_OPEN:', data.uri);
         const newFileUri = data.uri;
-        const newRootUri = stores?.activationStore?.rootUri;
+        const newRootUri = data.rootUri;
 
         if (newRootUri) {
           agentStore.updateRootUri(newRootUri);
@@ -220,14 +230,14 @@ const LLMBoxApp = observer(() => {
     };
 
     setTimeout(getCurrentFileInfo, 500);
-  }, [chatStore, agentStore, handleFileChange]);
+  }, [chatStore, agentStore, handleFileChange, loadConversation]);
 
   useEffect(() => {
     if (mode === 'agent' && agentStore.fileUri) {
       const fileUri = agentStore.fileUri;
       loadAgentContextHandler(fileUri);
     }
-  }, [mode, agentStore.fileUri]);
+  }, [mode, agentStore.fileUri, loadAgentContextHandler]);
 
   const handleAgentRun = async (prompt: string) => {
     try {

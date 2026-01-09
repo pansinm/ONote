@@ -1,13 +1,10 @@
-import type { onote } from '../electron/src/preload/main/onote';
+import type { onote } from '../../../../electron/src/preload/main/onote';
 
 interface globalThis {
   onote: typeof onote;
 }
 
-declare module '*.module.scss' {
-  const classes: { readonly [key: string]: string };
-  export default classes;
-}
+declare module 'github-markdown-css/github-markdown.css';
 
 declare module 'react-markdown' {
   const ReactMarkdown: React.ComponentType<{

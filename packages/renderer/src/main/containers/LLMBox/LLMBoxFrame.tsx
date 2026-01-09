@@ -114,7 +114,7 @@ function LLMBoxFrame() {
         if (uri) {
           send({
             type: LLM_BOX_MESSAGE_TYPES.EDITOR_FILE_OPEN,
-            data: { uri },
+            data: { uri, rootUri: stores.activationStore.rootUri },
           });
         }
       },

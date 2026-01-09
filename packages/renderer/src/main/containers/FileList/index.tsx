@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import React from 'react';
+import { useContextMenu } from 'react-contexify';
 import styles from './index.module.scss';
 import stores from '../../stores';
 import ListHeader from './ListHeader';
@@ -184,19 +185,22 @@ const FileList: FC = observer(() => {
       );
 
       if (isInCurrentDir) {
-        logger.debug('File content changed in current directory, refreshing file list', {
-          fileUri: data.uri,
-          activeDirUri: activationStore.activeDirUri,
-        });
+        logger.debug(
+          'File content changed in current directory, refreshing file list',
+          {
+            fileUri: data.uri,
+            activeDirUri: activationStore.activeDirUri,
+          },
+        );
 
         stores.fileListStore.refreshFiles();
       }
     };
 
-    const unsubscribe = eventbus.on(FILE_CONTENT_CHANGED, handleFileContentChanged);
+    eventbus.on(FILE_CONTENT_CHANGED, handleFileContentChanged);
 
     return () => {
-      unsubscribe();
+      eventbus.off(FILE_CONTENT_CHANGED, handleFileContentChanged);
     };
   }, [activationStore.activeDirUri]);
   return (
