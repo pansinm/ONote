@@ -278,7 +278,7 @@ export class LLMChatStore implements ChatState {
    */
   private buildRequestMessages(
     content: string,
-    assistantMessageId: string
+    assistantMessageId: string,
   ): Array<{ role: string; content: string }> {
     const messages = [
       buildSystemMessage(this.note || '', this.selection || ''),
@@ -302,7 +302,7 @@ export class LLMChatStore implements ChatState {
    * @throws {Error} 当 HTTP 请求失败时抛出错误
    */
   private async callLLMAPI(
-    messages: Array<{ role: string; content: string }>
+    messages: Array<{ role: string; content: string }>,
   ): Promise<Response> {
     const response = await fetch(
       this.options.apiBase || 'https://api.openai.com/v1/chat/completions',
@@ -317,7 +317,7 @@ export class LLMChatStore implements ChatState {
           messages: messages,
           stream: true,
         }),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -362,7 +362,7 @@ export class LLMChatStore implements ChatState {
    */
   private async processStreamResponse(
     response: Response,
-    assistantMessageId: string
+    assistantMessageId: string,
   ): Promise<void> {
     const reader = response.body?.getReader();
     if (!reader) {

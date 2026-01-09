@@ -4,8 +4,10 @@
  * 捕获子组件树中的 JavaScript 错误，记录错误日志，并显示备用 UI
  */
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AppError, wrapError } from '/@/shared/errors';
+import type { ErrorInfo, ReactNode } from 'react';
+import React, { Component } from 'react';
+import type { AppError} from '/@/shared/errors';
+import { wrapError } from '/@/shared/errors';
 import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('ErrorBoundary');
