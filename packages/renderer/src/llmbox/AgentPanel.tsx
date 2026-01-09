@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import type { AgentStore } from './AgentStore';
+import type { TodoItem } from './agent/types';
 import { useState } from 'react';
 import styles from './AgentPanel.module.scss';
 import Markdown from 'react-markdown';

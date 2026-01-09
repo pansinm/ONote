@@ -51,9 +51,11 @@ export interface Tool {
 export interface ToolParameter {
   type: 'string' | 'number' | 'boolean' | 'array' | 'object';
   description: string;
-  required?: boolean;
+  required?: boolean | string[];
   enum?: string[];
   default?: unknown;
+  items?: ToolParameter;
+  properties?: Record<string, ToolParameter>;
 }
 
 /**

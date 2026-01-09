@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { RadioGroupField } from '@fluentui/react-components';
+import { RadioGroup } from '@fluentui/react-components';
 import type { WidgetProps } from '@rjsf/utils';
 import { Radio } from '@fluentui/react-components';
 
@@ -31,7 +31,7 @@ const RadioWidget = ({
   const inline = Boolean(options && options.inline);
 
   return (
-    <RadioGroupField
+    <RadioGroup
       required={required}
       orientation={inline ? 'horizontal' : 'vertical'}
     >
@@ -60,7 +60,7 @@ const RadioWidget = ({
           );
           return radio;
         })}
-    </RadioGroupField>
+    </RadioGroup>
   );
 };
 

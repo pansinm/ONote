@@ -168,7 +168,10 @@ export class AgentOrchestrator {
 
         // 解析响应
         const assistantMessage = llmResponse.choices[0].message;
-        messages.push(assistantMessage);
+        messages.push({
+          role: assistantMessage.role,
+          content: assistantMessage.content || '',
+        });
 
         // 通知回调添加消息（所有 assistant 消息都记录）
         if (this.onMessage) {

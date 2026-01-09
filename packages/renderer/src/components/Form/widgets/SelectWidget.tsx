@@ -1,9 +1,8 @@
 import React from 'react';
-import { SelectField } from '@fluentui/react-components';
+import { Dropdown } from '@fluentui/react-components';
 import type { WidgetProps } from '@rjsf/utils';
-import { processSelectValue } from '@rjsf/utils';
+import type { SelectProps } from '@fluentui/react-select';
 import _pick from 'lodash/pick';
-import type { SelectOnChangeData } from '@fluentui/react-select';
 
 // Keys of IDropdownProps from @fluentui/react
 const allowedProps = [
@@ -67,29 +66,26 @@ const SelectWidget = ({
 }: WidgetProps) => {
   const { enumOptions, enumDisabled } = options;
 
-  const _onChange = (
-    _ev?: React.FormEvent<HTMLElement>,
-    item?: SelectOnChangeData,
-  ) => {
-    if (!item) {
-      return;
-    }
+  const _onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const item = {
+      value: e.target.value,
+    };
     if (multiple) {
       const valueOrDefault = value || [];
-      if (item.value) {
-        onChange([...valueOrDefault, item.value]);
+      if (e.target.value) {
+        onChange([...valueOrDefault, e.target.value]);
       } else {
-        onChange(valueOrDefault.filter((key: any) => key !== item.value));
+        onChange(valueOrDefault.filter((key: any) => key !== e.target.value));
       }
     } else {
-      onChange(processSelectValue(schema, item.value, options));
+      onChange(item.value);
     }
   };
   const _onBlur = (e: any) =>
-    onBlur(id, processSelectValue(schema, e.target.value, options));
+    onBlur(id, e.target.value);
 
   const _onFocus = (e: any) =>
-    onFocus(id, processSelectValue(schema, e.target.value, options));
+    onFocus(id, e.target.value);
 
   const newOptions = (enumOptions as { value: any; label: any }[]).map(
     (option) => ({
@@ -101,10 +97,10 @@ const SelectWidget = ({
 
   const uiProps = _pick((options.props as object) || {}, allowedProps);
   return (
-    <SelectField
+    <select
       id={id}
       multiple={multiple}
-      defaultValue={multiple ? value : undefined}
+      defaultValue={multiple ? value as string[] : value as string}
       disabled={disabled}
       onChange={_onChange}
       onBlur={_onBlur}
@@ -116,7 +112,7 @@ const SelectWidget = ({
           {op.text}
         </option>
       ))}
-    </SelectField>
+    </select>
   );
 };
 

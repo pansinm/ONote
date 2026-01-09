@@ -2,6 +2,10 @@ import type { onote } from '../../../../electron/src/preload/main/onote';
 
 interface globalThis {
   onote: typeof onote;
+  simmer: any;
+  nodeCrypto: {
+    randomBytes: (size: number) => Buffer;
+  };
 }
 
 declare module 'github-markdown-css/github-markdown.css';

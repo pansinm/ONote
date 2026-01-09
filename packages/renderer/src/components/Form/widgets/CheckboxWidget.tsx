@@ -2,7 +2,7 @@ import type { ChangeEvent } from 'react';
 import React from 'react';
 
 import type { WidgetProps } from '@rjsf/utils';
-import { CheckboxField } from '@fluentui/react-components';
+import { Checkbox } from '@fluentui/react-components';
 import type { CheckboxOnChangeData } from '@fluentui/react-components';
 
 const CheckboxWidget = (props: WidgetProps) => {
@@ -33,18 +33,16 @@ const CheckboxWidget = (props: WidgetProps) => {
 
   const desc = label || schema.description;
   return (
-    <CheckboxField
+    <Checkbox
       id={id}
-      name={id}
       label={desc}
       checked={typeof value === 'undefined' ? false : value}
       required={required}
       disabled={disabled || readonly}
       autoFocus={autofocus}
-      onChange={_onChange}
-      type="checkbox"
-      onBlur={_onBlur}
-      onFocus={_onFocus}
+      onChange={_onChange as any}
+      onBlur={_onBlur as any}
+      onFocus={_onFocus as any}
     />
   );
 };

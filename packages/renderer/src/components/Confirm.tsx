@@ -12,6 +12,7 @@ type ConfirmProps = {
   showCancelButton?: boolean;
   onOk(): void;
   onCancel(): void;
+  children?: React.ReactNode;
 };
 
 const Confirm: FC<ConfirmProps> = ({

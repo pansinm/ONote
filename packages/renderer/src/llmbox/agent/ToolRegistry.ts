@@ -1,12 +1,15 @@
 import type { Tool } from './types';
 import { getLogger } from '../../shared/logger';
-import { LLM_BOX_MESSAGE_TYPES } from '../constants/LLMBoxConstants';
+import {
+  LLM_BOX_MESSAGE_TYPES,
+  type LLMBoxMessageType,
+} from '../constants/LLMBoxConstants';
 import type TodoManager from './TodoManager';
 
 const logger = getLogger('ToolRegistry');
 
 interface Channel {
-  send: (message: { type: string; data: unknown }) => Promise<Record<string, unknown>>;
+  send: (message: { type: LLMBoxMessageType; data: unknown }) => Promise<Record<string, unknown>>;
 }
 
 class ToolRegistry {
@@ -81,7 +84,7 @@ class ToolRegistry {
         });
         
         if (response.error) {
-          throw new Error(response.error);
+          throw new Error(String(response.error));
         }
         
         return response.content;
@@ -118,7 +121,7 @@ class ToolRegistry {
         });
 
         if (response.error) {
-          throw new Error(response.error);
+          throw new Error(String(response.error));
         }
 
         return response;
@@ -141,6 +144,7 @@ class ToolRegistry {
             description: '替换操作列表，支持多个替换操作',
             items: {
               type: 'object',
+              description: '单个替换操作的详细配置',
               properties: {
                 mode: {
                   type: 'string',
@@ -197,7 +201,7 @@ class ToolRegistry {
         });
 
         if (response.error) {
-          throw new Error(response.error);
+          throw new Error(String(response.error));
         }
 
         return response;
@@ -235,7 +239,7 @@ class ToolRegistry {
         });
         
         if (response.error) {
-          throw new Error(response.error);
+          throw new Error(String(response.error));
         }
         
         return response;
@@ -268,7 +272,7 @@ class ToolRegistry {
         });
         
         if (response.error) {
-          throw new Error(response.error);
+          throw new Error(String(response.error));
         }
         
         return response;
@@ -297,7 +301,7 @@ class ToolRegistry {
         });
         
         if (response.error) {
-          throw new Error(response.error);
+          throw new Error(String(response.error));
         }
         
         return response.files;
@@ -330,7 +334,7 @@ class ToolRegistry {
         });
         
         if (response.error) {
-          throw new Error(response.error);
+          throw new Error(String(response.error));
         }
         
         return response.results;
@@ -363,7 +367,7 @@ class ToolRegistry {
         });
         
         if (response.error) {
-          throw new Error(response.error);
+          throw new Error(String(response.error));
         }
         
         return {
@@ -405,10 +409,11 @@ class ToolRegistry {
       },
       metadata: { category: 'custom', permission: 'write' },
       executor: async (params) => {
+        const priority = params.priority || 'medium';
         const todo = this.todoManager!.addTodo(
-          params.description,
-          params.priority || 'medium',
-          params.parentId,
+          String(params.description),
+          priority as 'high' | 'medium' | 'low',
+          params.parentId ? String(params.parentId) : undefined,
         );
         return todo;
       },
@@ -434,9 +439,9 @@ class ToolRegistry {
       },
       metadata: { category: 'custom', permission: 'write' },
       executor: async (params) => {
-        this.todoManager!.updateTodo(params.id, { status: params.status });
+        this.todoManager!.updateTodo(String(params.id), { status: params.status as any });
         const todos = this.todoManager!.listTodos();
-        return todos.find((t) => t.id === params.id);
+        return todos.find((t) => t.id === String(params.id));
       },
     });
 

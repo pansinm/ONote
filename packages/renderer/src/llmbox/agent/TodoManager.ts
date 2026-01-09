@@ -141,7 +141,8 @@ class TodoManager {
       if (!current.parentId) {
         break;
       }
-      const parent = this.todos.find((t) => t.id === current.parentId);
+      const parentId = current.parentId;
+      const parent = this.todos.find((t) => t.id === parentId);
       if (!parent) {
         break;
       }

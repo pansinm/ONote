@@ -324,7 +324,7 @@ export class AgentStore {
       });
 
       if (response.error) {
-        throw new Error(response.error);
+        throw new Error(String(response.error));
       }
 
       logger.info('Agent context saved', {
