@@ -32,6 +32,8 @@ ONote 是基于 Electron + React + TypeScript 的跨平台桌面笔记应用。
 - 通过 IPC 与主进程通信
 - 不能直接访问 Node.js API（安全考虑）
 
+注意：各个自项目的`tsconfig.json`不一致，执行`tsc --noEmit`时，需要进入相关目录，如`cd packages/electron`。
+
 ### IPC 通信
 
 ```typescript
