@@ -1,41 +1,31 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import classNames from 'classnames';
 import styles from './Index.module.scss';
 import FileList from '../../containers/FileList';
 import ContentPanel from '../../containers/ContentPanel';
 import stores from '../../stores';
 import View from '/@/components/View';
-import DragBar from '/@/components/DragBar';
 import TodoPage from '../TodoPage/TodoPage';
 import { observer } from 'mobx-react-lite';
-import { getLogger } from '/@/shared/logger';
-
-const logger = getLogger('Page');
+import { DragIndicator, DragHandle } from '/@/components/DragBarNew';
+import { useResizable } from '/@/common/hooks/useResizable';
 
 const Page = () => {
-  function handleFileListDrag(delta: number) {
-    const sidebarEle = document.querySelector('.file-list')!;
-    const editorWidth = parseFloat(
-      getComputedStyle(sidebarEle).getPropertyValue('width'),
-    );
-
-    const root = document.documentElement;
-
-    const finalWidth = editorWidth + delta + 'px';
-    root.style.setProperty('--file-list-width', finalWidth);
-  }
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { dragState, startDrag } = useResizable({ containerRef });
 
   if (stores.activationStore.activatedPage === 'todo') {
     return <TodoPage />;
   }
 
   return (
-    <>
-      <div className="fill-height file-list">
+    <div ref={containerRef} style={{ display: 'flex', flex: 1, position: 'relative' }}>
+      <div className="fill-height file-list" style={{ position: 'relative' }}>
         <FileList />
-        <DragBar
-          onStart={() => logger.debug('Drag started')}
-          onStop={handleFileListDrag}
+        <DragHandle
+          type="file-list"
+          right="-2px"
+          onStartDrag={startDrag}
         />
       </div>
       <View
@@ -49,7 +39,12 @@ const Page = () => {
       >
         <ContentPanel />
       </View>
-    </>
+      <DragIndicator
+        visible={dragState.isDragging}
+        x={dragState.currentX}
+        height="100%"
+      />
+    </div>
   );
 };
 

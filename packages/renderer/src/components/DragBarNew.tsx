@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import React, { useState } from 'react';
 import { RESIZE_CONFIG } from '/@/common/constants/resize';
+import type { DragType } from '/@/common/hooks/useResizable';
 
 interface DragIndicatorProps {
   visible: boolean;
@@ -29,10 +30,10 @@ function DragIndicator({ visible, x, height }: DragIndicatorProps) {
 }
 
 interface DragHandleProps {
-  type: 'editor-preview' | 'llmbox';
+  type: DragType;
   left?: string;
   right?: string;
-  onStartDrag: (type: 'editor-preview' | 'llmbox', startX: number) => void;
+  onStartDrag: (type: DragType, startX: number) => void;
   onDoubleClick?: () => void;
 }
 

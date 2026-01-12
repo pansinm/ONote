@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { updateWidth, RESIZE_CONFIG, saveWidths } from '/@/common/constants/resize';
 
+export type DragType = 'editor-preview' | 'llmbox' | 'sidebar' | 'file-list';
+
 export interface DragState {
   isDragging: boolean;
-  type: 'editor-preview' | 'llmbox' | null;
+  type: DragType | null;
   startX: number;
   currentX: number;
 }
@@ -25,7 +27,7 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
   });
 
   // 开始拖拽
-  const startDrag = useCallback((type: 'editor-preview' | 'llmbox', startX: number) => {
+  const startDrag = useCallback((type: DragType, startX: number) => {
     setDragState({
       isDragging: true,
       type,
@@ -72,6 +74,18 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
           RESIZE_CONFIG.llmbox.maxPercent,
           true,
         );
+      } else if (dragState.type === 'sidebar') {
+        const root = document.documentElement;
+        const sidebarEle = document.querySelector('.sidebar')!;
+        const currentWidth = parseFloat(getComputedStyle(sidebarEle).width);
+        const newWidth = Math.max(150, Math.min(500, currentWidth + delta));
+        root.style.setProperty('--sidebar-width', `${newWidth}px`);
+      } else if (dragState.type === 'file-list') {
+        const root = document.documentElement;
+        const fileListEle = document.querySelector('.file-list')!;
+        const currentWidth = parseFloat(getComputedStyle(fileListEle).width);
+        const newWidth = Math.max(150, Math.min(500, currentWidth + delta));
+        root.style.setProperty('--file-list-width', `${newWidth}px`);
       }
 
       // 保存设置

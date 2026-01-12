@@ -13,7 +13,7 @@ import Toolbar from './Toolbar';
 import stores from '../../stores';
 import LLMBoxFrame from '../LLMBox/LLMBoxFrame';
 import { DragIndicator, DragHandle } from '/@/components/DragBarNew';
-import { useResizable } from '/@/common/hooks/useResizable';
+import { useResizable, DragType } from '/@/common/hooks/useResizable';
 import { resetWidths, loadSavedWidths } from '/@/common/constants/resize';
 import { RESIZE_CONFIG } from '/@/common/constants/resize';
 
