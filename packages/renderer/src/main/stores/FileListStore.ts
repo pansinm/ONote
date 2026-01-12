@@ -24,7 +24,7 @@ class FileListStore {
       case 'time-asc':
         return _.orderBy(this._files, 'mtime', 'asc');
       case 'time-desc':
-        return _.orderBy(this._files, 'mtime', 'asc');
+        return _.orderBy(this._files, 'mtime', 'desc');
       default:
         logger.warn('Unknown sorter', { sorter: this.sorter, fileCount: this._files.length });
         return this._files;

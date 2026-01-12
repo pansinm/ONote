@@ -65,7 +65,7 @@ class FileStateStore {
 
   get savedFiles() {
     return Object.keys(this.states).filter((file) => {
-      this.states[file] !== 'changed';
+      return this.states[file] !== 'changed';
     });
   }
 
