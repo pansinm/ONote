@@ -8,3 +8,5 @@ export function getHandlers(): Handlers {
 export function setHandlers(newHandlers: Handlers): void {
   Object.assign(handlers, newHandlers);
 }
+
+export default { getHandlers, setHandlers };
