@@ -6,9 +6,10 @@ import type {
   AgentExecutionStateSaveResponse,
   AgentExecutionStateDeleteResponse,
 } from '../types';
+import type { Stores, OnoteAPI } from '/@/main/stores/types';
 
 export class AgentContextLoadHandler extends BaseHandler {
-  constructor(private stores: any, private onote: any) {
+  constructor(private stores: Stores, private onote: OnoteAPI) {
     super();
   }
 
@@ -31,11 +32,11 @@ export class AgentContextLoadHandler extends BaseHandler {
 }
 
 export class AgentContextSaveHandler extends BaseHandler {
-  constructor(private stores: any, private onote: any) {
+  constructor(private stores: Stores, private onote: OnoteAPI) {
     super();
   }
 
-  async handle(data: { fileUri: string; context: any }): Promise<AgentContextSaveResponse> {
+  async handle(data: { fileUri: string; context: unknown }): Promise<AgentContextSaveResponse> {
     const rootUri = this.stores.activationStore.rootUri;
 
     return this.wrapWithErrorHandling(async () => {
@@ -55,7 +56,7 @@ export class AgentContextSaveHandler extends BaseHandler {
 }
 
 export class AgentExecutionStateLoadHandler extends BaseHandler {
-  constructor(private stores: any, private onote: any) {
+  constructor(private stores: Stores, private onote: OnoteAPI) {
     super();
   }
 
@@ -78,11 +79,11 @@ export class AgentExecutionStateLoadHandler extends BaseHandler {
 }
 
 export class AgentExecutionStateSaveHandler extends BaseHandler {
-  constructor(private stores: any, private onote: any) {
+  constructor(private stores: Stores, private onote: OnoteAPI) {
     super();
   }
 
-  async handle(data: { fileUri: string; state: any }): Promise<AgentExecutionStateSaveResponse> {
+  async handle(data: { fileUri: string; state: unknown }): Promise<AgentExecutionStateSaveResponse> {
     const rootUri = this.stores.activationStore.rootUri;
 
     return this.wrapWithErrorHandling(async () => {
@@ -102,7 +103,7 @@ export class AgentExecutionStateSaveHandler extends BaseHandler {
 }
 
 export class AgentExecutionStateDeleteHandler extends BaseHandler {
-  constructor(private stores: any, private onote: any) {
+  constructor(private stores: Stores, private onote: OnoteAPI) {
     super();
   }
 

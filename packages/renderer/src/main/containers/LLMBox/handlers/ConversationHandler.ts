@@ -1,8 +1,9 @@
 import { BaseHandler } from './BaseHandler';
 import type { LLMConversationLoadResponse, LLMConversationSaveResponse } from '../types';
+import type { Stores, OnoteAPI } from '/@/main/stores/types';
 
 export class ConversationLoadHandler extends BaseHandler {
-  constructor(private stores: any, private onote: any) {
+  constructor(private stores: Stores, private onote: OnoteAPI) {
     super();
   }
 
@@ -25,11 +26,11 @@ export class ConversationLoadHandler extends BaseHandler {
 }
 
 export class ConversationSaveHandler extends BaseHandler {
-  constructor(private stores: any, private onote: any) {
+  constructor(private stores: Stores, private onote: OnoteAPI) {
     super();
   }
 
-  async handle(data: { fileUri: string; messages: any[] }): Promise<LLMConversationSaveResponse> {
+  async handle(data: { fileUri: string; messages: unknown[] }): Promise<LLMConversationSaveResponse> {
     const rootUri = this.stores.activationStore.rootUri;
 
     return this.wrapWithErrorHandling(async () => {

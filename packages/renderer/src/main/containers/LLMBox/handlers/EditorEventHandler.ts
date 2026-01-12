@@ -4,9 +4,10 @@ import type {
   AgentGetRootUriResponse,
   AgentGetActiveFileUriResponse,
 } from '../types';
+import type { Stores } from '/@/main/stores/types';
 
 export class GetCurrentFileInfoHandler extends BaseHandler {
-  constructor(private stores: any) {
+  constructor(private stores: Stores) {
     super();
   }
 
@@ -20,7 +21,7 @@ export class GetCurrentFileInfoHandler extends BaseHandler {
 }
 
 export class AgentGetRootUriHandler extends BaseHandler {
-  constructor(private stores: any) {
+  constructor(private stores: Stores) {
     super();
   }
 
@@ -30,7 +31,7 @@ export class AgentGetRootUriHandler extends BaseHandler {
 }
 
 export class AgentGetActiveFileUriHandler extends BaseHandler {
-  constructor(private stores: any) {
+  constructor(private stores: Stores) {
     super();
   }
 
