@@ -115,6 +115,7 @@ class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
     const remotePath = uriToPath(uri);
     const files = await this.sftp.readdir(remotePath);
     const promises = files
+      .filter((entry) => entry.filename !== '.note' && entry.filename !== '.DS_Store')
       .map((entry) => entry.filename)
       .map((filename) => path.join(remotePath, filename))
       .map((filePath) => this.readFileAsTreeNode(filePath));

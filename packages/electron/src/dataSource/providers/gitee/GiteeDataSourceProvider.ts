@@ -205,13 +205,15 @@ class GiteeDataSourceProvider implements IDataSourceProvider<AuthForm> {
       type,
       mtime: Date.now(),
       children: Array.isArray(contents)
-        ? contents.map((content) => {
-            return {
-              uri: `file:///${namespace}/${repo}/${content.path}`,
-              name: content.name,
-              type: content.type === 'dir' ? 'directory' : 'file',
-            } as TreeNode;
-          })
+        ? contents
+            .filter((content) => content.name !== '.note' && content.name !== '.DS_Store')
+            .map((content) => {
+              return {
+                uri: `file:///${namespace}/${repo}/${content.path}`,
+                name: content.name,
+                type: content.type === 'dir' ? 'directory' : 'file',
+              } as TreeNode;
+            })
         : undefined,
       uri: `file:///${namespace}/${repo}${pathname ? `/${pathname}` : ''}`,
     } as TreeNode;

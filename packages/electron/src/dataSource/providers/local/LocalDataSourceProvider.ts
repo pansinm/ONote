@@ -83,7 +83,7 @@ class LocalDataSourceProvider implements IDataSourceProvider<null> {
     const localPath = url.fileURLToPath(uri);
     const files = await fs.readdir(localPath, { withFileTypes: true });
     const promises = files
-      .filter((file) => file.isDirectory() || file.isFile())
+      .filter((file) => (file.isDirectory() || file.isFile()) && file.name !== '.note' && file.name !== '.DS_Store')
       .map((file) => path.join(localPath, file.name))
       .map((filePath) => readFileAsTreeNode(filePath));
     return Promise.all(promises);
