@@ -25,6 +25,9 @@ import {
 import {
   AgentContextLoadHandler,
   AgentContextSaveHandler,
+  AgentExecutionStateLoadHandler,
+  AgentExecutionStateSaveHandler,
+  AgentExecutionStateDeleteHandler,
 } from './handlers/AgentContextHandler';
 import {
   GetCurrentFileInfoHandler,
@@ -69,6 +72,12 @@ function LLMBoxFrame() {
         stores,
         onote,
       ),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_LOAD]:
+        new AgentExecutionStateLoadHandler(stores, onote),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_SAVE]:
+        new AgentExecutionStateSaveHandler(stores, onote),
+      [LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_DELETE]:
+        new AgentExecutionStateDeleteHandler(stores, onote),
       [LLM_BOX_MESSAGE_TYPES.GET_CURRENT_FILE_INFO]:
         new GetCurrentFileInfoHandler(stores),
       [LLM_BOX_MESSAGE_TYPES.AGENT_GET_ROOT_URI]: new AgentGetRootUriHandler(

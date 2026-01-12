@@ -221,7 +221,7 @@ export interface AgentContextLoadMessage {
 
 export interface AgentContextLoadResponse {
   error?: string;
-  context?: any;
+  agentContext?: any;
 }
 
 export interface AgentContextSaveMessage {
@@ -234,6 +234,46 @@ export interface AgentContextSaveMessage {
 }
 
 export interface AgentContextSaveResponse {
+  error?: string;
+  success?: boolean;
+}
+
+export interface AgentExecutionStateLoadMessage {
+  type: 'AGENT_EXECUTION_STATE_LOAD';
+  data: {
+    fileUri: string;
+    rootUri: string;
+  };
+}
+
+export interface AgentExecutionStateLoadResponse {
+  error?: string;
+  state?: any;
+}
+
+export interface AgentExecutionStateSaveMessage {
+  type: 'AGENT_EXECUTION_STATE_SAVE';
+  data: {
+    fileUri: string;
+    rootUri: string;
+    state: any;
+  };
+}
+
+export interface AgentExecutionStateSaveResponse {
+  error?: string;
+  success?: boolean;
+}
+
+export interface AgentExecutionStateDeleteMessage {
+  type: 'AGENT_EXECUTION_STATE_DELETE';
+  data: {
+    fileUri: string;
+    rootUri: string;
+  };
+}
+
+export interface AgentExecutionStateDeleteResponse {
   error?: string;
   success?: boolean;
 }
@@ -273,4 +313,7 @@ export type LLMBoxResponse =
   | AgentGetRootUriResponse
   | AgentGetActiveFileUriResponse
   | AgentContextLoadResponse
-  | AgentContextSaveResponse;
+  | AgentContextSaveResponse
+  | AgentExecutionStateLoadResponse
+  | AgentExecutionStateSaveResponse
+  | AgentExecutionStateDeleteResponse;
