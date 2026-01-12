@@ -1,6 +1,6 @@
 import type React from 'react';
 import { CONTINUE } from '../markdown/createCtx';
-import handlersManager from '../markdown/handlers/manager';
+import * as handlersManager from '../markdown/handlers/manager';
 
 type Renderer = {
   [key: string]: (node: any, ctx: any) => React.ReactNode | symbol;
@@ -18,6 +18,5 @@ export function registerMarkdownRenderer(renderer: Renderer) {
       }
       return res;
     };
-    handlersManager.setHandlers(handlers);
   });
 }

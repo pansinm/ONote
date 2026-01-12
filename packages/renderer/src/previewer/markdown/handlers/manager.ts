@@ -1,15 +1,10 @@
 import type { Handlers } from './interface';
 import handlers from './index';
 
-class HandlersManager {
-  handlers: Handlers = {...handlers};
-  getHandlers() {
-    return this.handlers;
-  }
-
-  setHandlers(handlers: Handlers) {
-    this.handlers = handlers;
-  }
+export function getHandlers(): Handlers {
+  return handlers;
 }
 
-export default new HandlersManager();
+export function setHandlers(newHandlers: Handlers): void {
+  Object.assign(handlers, newHandlers);
+}
