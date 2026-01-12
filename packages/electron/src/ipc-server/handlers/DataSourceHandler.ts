@@ -22,7 +22,7 @@ class DataSourceHandler extends IpcHandler {
       .filter(name => name !== 'constructor' && typeof dataSource[name as keyof typeof dataSource] === 'function');
 
     methods.forEach(methodName => {
-      (this as any)[methodName] = (...args: unknown[]) => {
+      (DataSourceHandler.prototype as any)[methodName] = (...args: unknown[]) => {
         logger.debug(`Proxying method: ${methodName}`, { args: args.length });
         return (dataSource as any)[methodName](...args);
       };
