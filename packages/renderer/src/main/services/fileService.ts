@@ -1,6 +1,6 @@
 import type { TreeNode } from '@sinm/react-file-tree';
 import { sortTreeNodes } from '/@/common/utils/treeNode';
-import { FILE_CONTENT_CHANGED } from '../eventbus/EventName';
+import { FILE_CONTENT_CHANGED, FILE_CREATED, FILE_DELETED } from '../eventbus/EventName';
 import eventbus from '../eventbus/eventbus';
 
 const dataSource = window.onote.dataSource;
@@ -9,6 +9,12 @@ class FileService {
   constructor() {
     dataSource.addListener(FILE_CONTENT_CHANGED, (...args: unknown[]) => {
       eventbus.emit(FILE_CONTENT_CHANGED, ...args);
+    });
+    dataSource.addListener(FILE_CREATED, (...args: unknown[]) => {
+      eventbus.emit(FILE_CREATED, ...args);
+    });
+    dataSource.addListener(FILE_DELETED, (...args: unknown[]) => {
+      eventbus.emit(FILE_DELETED, ...args);
     });
   }
   async getProvider(): Promise<{

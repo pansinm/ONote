@@ -12,4 +12,6 @@ export const IPCNamespaces = {
 export const EventNames = {
   FileContentChanged: 'file.content.changed',
   SettingUpdated: 'setting.updated',
+  FileCreated: 'file.created',
+  FileDeleted: 'file.deleted',
 };

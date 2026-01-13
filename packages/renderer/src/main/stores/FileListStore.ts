@@ -5,6 +5,8 @@ import type ActivationStore from './ActivationStore';
 import { isEquals } from '/@/common/utils/uri';
 import _ from 'lodash';
 import { getLogger } from '/@/shared/logger';
+import { FILE_CREATED, FILE_DELETED } from '../eventbus/EventName';
+import eventbus from '../eventbus/eventbus';
 
 const logger = getLogger('FileListStore');
 
@@ -40,6 +42,9 @@ class FileListStore {
         this.refreshFiles();
       },
     );
+
+    eventbus.on(FILE_CREATED, () => this.refreshFiles());
+    eventbus.on(FILE_DELETED, () => this.refreshFiles());
   }
 
   setSorter(sorter: typeof this.sorter) {

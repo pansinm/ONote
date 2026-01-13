@@ -31,6 +31,18 @@ function startDataSource() {
     IPCNamespaces.DataSource,
     () => webContents.fromFrame(getMainFrame()!)!,
   );
+  delegateEvent(
+    dataSource,
+    EventNames.FileCreated,
+    IPCNamespaces.DataSource,
+    () => webContents.fromFrame(getMainFrame()!)!,
+  );
+  delegateEvent(
+    dataSource,
+    EventNames.FileDeleted,
+    IPCNamespaces.DataSource,
+    () => webContents.fromFrame(getMainFrame()!)!,
+  );
 }
 
 function startSetting() {

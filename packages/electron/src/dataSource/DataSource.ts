@@ -46,7 +46,9 @@ class DataSource extends EventEmitter implements IDataSourceProvider<unknown> {
     return this.provider.read(uri);
   }
   mkdir(uri: string) {
-    return this.provider.mkdir(uri);
+    return this.provider.mkdir(uri).then(() => {
+      this.emit(EventNames.FileCreated, uri);
+    });
   }
 
   async write(uri: string, data: Buffer) {
@@ -57,6 +59,7 @@ class DataSource extends EventEmitter implements IDataSourceProvider<unknown> {
   async writeText(uri: string, text: string) {
     await this.provider.write(uri, Buffer.from(text, 'utf-8'));
     this.emit(EventNames.FileContentChanged, uri);
+    this.emit(EventNames.FileCreated, uri);
   }
 
   readText(uri: string) {
@@ -64,7 +67,9 @@ class DataSource extends EventEmitter implements IDataSourceProvider<unknown> {
   }
 
   delete(uri: string) {
-    return this.provider.delete(uri);
+    return this.provider.delete(uri).then(() => {
+      this.emit(EventNames.FileDeleted, uri);
+    });
   }
 
   version(uri: string) {
