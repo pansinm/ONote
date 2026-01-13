@@ -5,19 +5,12 @@ import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('DataSourceHandler');
 
-/**
- * DataSource Handler
- *
- * 使用代理模式自动将 dataSource 对象的方法转换为 IPC handlers
- * 避免手动编写重复的代理方法
- */
 class DataSourceHandler extends IpcHandler {
   constructor(sender: WebContents, namespace: string) {
     super(sender, namespace);
-    this.proxyMethods();
   }
 
-  private proxyMethods(): void {
+  static {
     const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(dataSource))
       .filter(name => name !== 'constructor' && typeof dataSource[name as keyof typeof dataSource] === 'function');
 
