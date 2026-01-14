@@ -147,21 +147,6 @@ export function DefaultDirective({ node, ctx }: { node: any; ctx: ICtx }) {
   const renderChild = node.children?.length && !isVoidElement(Tag);
 
   const props = parseDirectiveProps(node);
-  if (Tag === 'mark') {
-    (props as any).onClick = (event: MouseEvent) => {
-      logger.debug('Mark directive clicked', { event, props });
-      const id = _.get(props, 'id');
-      if (!id) {
-        return;
-      }
-      event.stopPropagation();
-      document.dispatchEvent(
-        new CustomEvent('open-comment-box', {
-          detail: { id },
-        }),
-      );
-    };
-  }
   // eslint-disable-next-line react/no-children-prop
   return React.createElement(Tag, {
     ...props,

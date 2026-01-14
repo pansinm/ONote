@@ -3,7 +3,6 @@ import { ErrorBoundary } from 'react-error-boundary';
 import Render from '../markdown/Render';
 import useModel from '../hooks/useModel';
 import Fallback from './Fallback';
-import { Toolbar } from './SelectionToolbar';
 import { getLogger } from '/@/shared/logger';
 import('github-markdown-css/github-markdown.css');
 
@@ -26,7 +25,6 @@ export default function Previewer({ className }: { className: string }) {
           onError={(error) => logger.error('ErrorBoundary error', error)}
         >
           <Render {...resource}></Render>
-          <Toolbar />
         </ErrorBoundary>
       </div>
     </>

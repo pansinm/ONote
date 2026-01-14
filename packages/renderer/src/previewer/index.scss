@@ -83,16 +83,6 @@ blockquote {
   position: relative;
 }
 
-.onote-comment-item {
-  position: relative;
-  .onote-comment-item__close {
-    display: none !important;
-  }
-  &:hover .onote-comment-item__close {
-    display: inline-flex !important;
-  }
-}
-
 #app {
   padding-bottom: 100vh;
 }
