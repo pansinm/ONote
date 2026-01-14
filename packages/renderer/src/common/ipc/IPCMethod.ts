@@ -29,6 +29,11 @@ enum IPCMethod {
   PreviewerScrollChangedEvent = 'PreviewerScrollChangedEvent ',
 
   /**
+   * 预览页面文本选择变化
+   */
+  PreviewerSelectionChangedEvent = 'PreviewerSelectionChangedEvent',
+
+  /**
    * 渲染 PlantUML
    */
   RenderPlantUmlDiagram = 'RenderPlantUmlDiagram',

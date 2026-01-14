@@ -20,6 +20,8 @@ import { isEquals } from '/@/common/utils/uri';
 import stores from '../../stores';
 import state from './state';
 import { applyModelEdits } from '../../monaco/utils';
+import eventbus from '../../eventbus/eventbus';
+import { EDITOR_SELECTION_CHANGED } from '../../eventbus/EventName';
 
 mainFrame.onNewTunnel((tunnel) => {
   if (tunnel.groupId !== 'previewer') {
@@ -144,6 +146,14 @@ mainFrame.onNewTunnel((tunnel) => {
         .forEach((t) => {
           t.send(IPCMethod.EditorScrollChangedEvent, payload);
         });
+    },
+  );
+
+  // 监听 previewer 中的文本选择事件，并转发到事件总线
+  tunnel.on(
+    IPCMethod.PreviewerSelectionChangedEvent,
+    (payload: { content: string }) => {
+      eventbus.emit(EDITOR_SELECTION_CHANGED, payload);
     },
   );
 });
