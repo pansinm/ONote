@@ -194,7 +194,8 @@
     "webpack-cli": "4.10.0",
     "webpack-dev-server": "^4.15.1",
     "webpack-node-externals": "^3.0.0",
-    "yaml": "^1.10.2"
+    "yaml": "^1.10.2",
+    "zod": "^4.3.5"
   },
   "resolutions": {
     "monaco-editor": "0.45.0",

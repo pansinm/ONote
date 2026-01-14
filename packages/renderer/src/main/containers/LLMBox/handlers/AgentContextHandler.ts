@@ -7,6 +7,7 @@ import type {
   AgentExecutionStateDeleteResponse,
 } from '../types';
 import type { Stores, OnoteAPI } from '/@/main/stores/types';
+import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/constants/LLMBoxConstants';
 
 export class AgentContextLoadHandler extends BaseHandler {
   constructor(private stores: Stores, private onote: OnoteAPI) {
@@ -28,6 +29,10 @@ export class AgentContextLoadHandler extends BaseHandler {
 
       return { agentContext };
     }, 'Failed to load agent context');
+  }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_CONTEXT_LOAD;
   }
 }
 
@@ -53,6 +58,10 @@ export class AgentContextSaveHandler extends BaseHandler {
       return { success: true };
     }, 'Failed to save agent context');
   }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_CONTEXT_SAVE;
+  }
 }
 
 export class AgentExecutionStateLoadHandler extends BaseHandler {
@@ -75,6 +84,10 @@ export class AgentExecutionStateLoadHandler extends BaseHandler {
 
       return { state };
     }, 'Failed to load execution state');
+  }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_LOAD;
   }
 }
 
@@ -100,6 +113,10 @@ export class AgentExecutionStateSaveHandler extends BaseHandler {
       return { success: true };
     }, 'Failed to save execution state');
   }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_SAVE;
+  }
 }
 
 export class AgentExecutionStateDeleteHandler extends BaseHandler {
@@ -122,5 +139,9 @@ export class AgentExecutionStateDeleteHandler extends BaseHandler {
 
       return { success: true };
     }, 'Failed to delete execution state');
+  }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_DELETE;
   }
 }

@@ -2,6 +2,7 @@ import type { Tool } from '../../core/types';
 import type { LLMBoxMessageType } from '../../constants/LLMBoxConstants';
 import { createFileTools } from './file';
 import { createTodoTools, type TodoManager } from './todo';
+import { createValidatedFileTools } from '../../core/validation';
 
 interface Channel {
   send: (message: {
@@ -14,7 +15,7 @@ export class ToolRegistry {
   private tools: Map<string, Tool> = new Map();
 
   constructor(channel: Channel, todoManager?: TodoManager) {
-    const fileTools = createFileTools(channel);
+    const fileTools = createValidatedFileTools(createFileTools, channel);
     fileTools.forEach((tool) => this.tools.set(tool.name, tool));
 
     if (todoManager) {

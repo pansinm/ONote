@@ -12,6 +12,8 @@ import { uuid } from '../../common/tunnel/utils';
 import { ToolRegistry } from './tools/registry';
 import { TodoManager } from './tools/todo-manager';
 import { getLogger } from '/@/shared/logger';
+import { AgentStrategy, DefaultAgentStrategy } from './strategy';
+import type { SystemPromptContext } from './prompts';
 
 interface AgentDependencies {
   toolRegistry: ToolRegistry;
@@ -45,6 +47,7 @@ type AgentEventHandler<T extends AgentEventType> = (
 export class AgentOrchestrator {
   private config: AgentConfig;
   private deps: AgentDependencies;
+  private strategy: AgentStrategy;
   private abortController: AbortController | null = null;
   private listeners: Map<AgentEventType, Set<AgentEventHandler<AgentEventType>>> =
     new Map();
@@ -53,13 +56,18 @@ export class AgentOrchestrator {
   private thinkingContent: string = '';
   private logger = getLogger('AgentOrchestrator');
 
-  constructor(config: AgentConfig, deps: AgentDependencies) {
+  constructor(config: AgentConfig, deps: AgentDependencies, strategy?: AgentStrategy) {
     this.config = config;
     this.deps = deps;
+    this.strategy = strategy ?? new DefaultAgentStrategy();
 
     this.deps.todoManager.onChange((todos) => {
       this.emit('todoChange', todos);
     });
+  }
+
+  setStrategy(strategy: AgentStrategy): void {
+    this.strategy = strategy;
   }
 
   on<T extends AgentEventType>(
@@ -103,7 +111,11 @@ export class AgentOrchestrator {
     });
 
     try {
-      const messages = this.buildMessages(prompt, conversationHistory);
+      const context: SystemPromptContext = {
+        fileUri: this.config.fileUri,
+        rootUri: this.config.rootUri,
+      };
+      const messages = this.buildMessages(prompt, conversationHistory, context);
       const maxIterations = this.config.maxIterations || 50;
       const tools = this.deps.toolRegistry.getAll();
 
@@ -328,12 +340,18 @@ export class AgentOrchestrator {
 
   private buildMessages(
     prompt: string,
-    history?: Message[]
+    history?: Message[],
+    context?: SystemPromptContext
   ): Message[] {
+    const tools = this.deps.toolRegistry.getAll();
+    const toolDescriptions = tools
+      .filter((t) => t.name !== 'listTodos')
+      .map((t) => ({ name: t.name, description: t.description }));
+
     const systemMessage: Message = {
       id: uuid('sys-'),
       role: 'system',
-      content: this.buildSystemPrompt(),
+      content: this.strategy.buildSystemPrompt(this.config, toolDescriptions, context),
       timestamp: new Date(),
     };
 
@@ -351,65 +369,12 @@ export class AgentOrchestrator {
     return [systemMessage, userMessage];
   }
 
-  private buildSystemPrompt(): string {
-    const tools = this.deps.toolRegistry.getAll();
-    const toolDescriptions = tools
-      .filter((t) => t.name !== 'listTodos')
-      .map((t) => `  - ${t.name}: ${t.description}`)
-      .join('\n');
-
-    return `
-当前时间：${new Date().toLocaleString('zh-CN')}
-
-你是一名智能助手，帮助用户在 ONote 笔记应用中高效完成各种任务。
-
-## 可用工具
-
-${toolDescriptions}
-
-## 工作原则
-
-1. **快速响应优先**：在回答前，先判断问题是否可以基于现有信息直接回答。
-2. **优先使用当前文件**：如果 Context 中已提供当前文件内容，优先使用这些内容。
-3. **默认目录**：Working Directory 是当前文件所在的目录。
-4. **目标导向**：始终以完成任务为目标。
-5. **安全第一**：谨慎使用 writeFile、deleteFile 等危险操作，必要时确认。
-6. **高效执行**：避免重复调用相同工具。
-7. **清晰解释**：在使用工具前说明意图，使用后解释结果。
-
-## 任务流程
-
-1. 分析需求
-2. 检查上下文
-3. 判断任务类型
-4. 选择合适的工具
-5. 执行操作
-6. 总结结果
-
-## 重要提示
-
-- **直接回答优先**：如果问题可以根据 Context 中的信息直接回答，立即给出答案
-- **文件内容使用**：优先使用 Context 中的文件内容
-- **目录查询优先**：用户请求列出文件时，默认使用 Working Directory
-- **文件 URI 格式**：必须是完整路径
-- **参数 JSON 格式**：arguments 字段必须是 JSON 字符串
-- **任务完成**：如果创建了任务列表，必须完成所有任务才能结束
-- **迭代限制**：最多迭代 ${this.config.maxIterations || 50} 次
-    `.trim();
-  }
-
   private shouldCompress(messages: Message[]): boolean {
-    const config = DEFAULT_CONFIG;
-    const totalChars = messages.reduce((sum, m) => sum + m.content.length, 0);
-    const estimatedTokens = Math.ceil(totalChars / 3);
-    const threshold = config.agent.contextWindow * 0.8;
-
-    return estimatedTokens >= threshold;
+    return this.strategy.shouldCompress(messages, this.config.contextWindowSize ?? DEFAULT_CONFIG.agent.contextWindow);
   }
 
   private shouldContinue(): boolean {
-    const todos = this.deps.todoManager.listTodos();
-    return todos.length > 0 && !this.deps.todoManager.isAllCompleted();
+    return this.strategy.shouldContinue(this.deps.todoManager);
   }
 
   private addStep(step: Omit<ExecutionStep, 'id' | 'timestamp'>): void {

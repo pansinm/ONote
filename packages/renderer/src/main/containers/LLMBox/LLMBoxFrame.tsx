@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
+import { HandlerRegistry } from './handlers/HandlerRegistry';
 import { createChannel } from 'bidc';
 import stores from '../../stores';
 import { reaction } from 'mobx';
@@ -51,43 +52,28 @@ function LLMBoxFrame() {
 
     const onote = (window as any).onote;
 
-    const handlers: Record<string, any> = {
-      [LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_LOAD]:
-        new ConversationLoadHandler(stores, onote),
-      [LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_SAVE]:
-        new ConversationSaveHandler(stores, onote),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_READ]: new AgentFileReadHandler(),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_WRITE]: new AgentFileWriteHandler(),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_REPLACE]: new AgentFileReplaceHandler(),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_CREATE]: new AgentFileCreateHandler(),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_DELETE]: new AgentFileDeleteHandler(),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_LIST]: new AgentFileListHandler(),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH]: new AgentFileSearchHandler(),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH_IN]:
-        new AgentFileSearchInHandler(),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_CONTEXT_LOAD]: new AgentContextLoadHandler(
-        stores,
-        onote,
-      ),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_CONTEXT_SAVE]: new AgentContextSaveHandler(
-        stores,
-        onote,
-      ),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_LOAD]:
-        new AgentExecutionStateLoadHandler(stores, onote),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_SAVE]:
-        new AgentExecutionStateSaveHandler(stores, onote),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_EXECUTION_STATE_DELETE]:
-        new AgentExecutionStateDeleteHandler(stores, onote),
-      [LLM_BOX_MESSAGE_TYPES.GET_CURRENT_FILE_INFO]:
-        new GetCurrentFileInfoHandler(stores),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_GET_ROOT_URI]: new AgentGetRootUriHandler(
-        stores,
-      ),
-      [LLM_BOX_MESSAGE_TYPES.AGENT_GET_ACTIVE_FILE_URI]:
-        new AgentGetActiveFileUriHandler(stores),
-      [LLM_BOX_MESSAGE_TYPES.LLM_CONFIG_GET]: new LLMConfigGetHandler(),
-    };
+    const handlerRegistry = new HandlerRegistry();
+    handlerRegistry.register(ConversationLoadHandler, stores, onote);
+    handlerRegistry.register(ConversationSaveHandler, stores, onote);
+    handlerRegistry.register(AgentFileReadHandler);
+    handlerRegistry.register(AgentFileWriteHandler);
+    handlerRegistry.register(AgentFileReplaceHandler);
+    handlerRegistry.register(AgentFileCreateHandler);
+    handlerRegistry.register(AgentFileDeleteHandler);
+    handlerRegistry.register(AgentFileListHandler);
+    handlerRegistry.register(AgentFileSearchHandler);
+    handlerRegistry.register(AgentFileSearchInHandler);
+    handlerRegistry.register(AgentContextLoadHandler, stores, onote);
+    handlerRegistry.register(AgentContextSaveHandler, stores, onote);
+    handlerRegistry.register(AgentExecutionStateLoadHandler, stores, onote);
+    handlerRegistry.register(AgentExecutionStateSaveHandler, stores, onote);
+    handlerRegistry.register(AgentExecutionStateDeleteHandler, stores, onote);
+    handlerRegistry.register(GetCurrentFileInfoHandler, stores);
+    handlerRegistry.register(AgentGetRootUriHandler, stores);
+    handlerRegistry.register(AgentGetActiveFileUriHandler, stores);
+    handlerRegistry.register(LLMConfigGetHandler);
+
+    const handlers = handlerRegistry.getAllHandlers();
 
     const contentChanged = subscription.subscribe(
       EDITOR_CONTENT_CHANGED,
@@ -121,22 +107,9 @@ function LLMBoxFrame() {
       },
     );
 
-    receive(async ({ type, data }: any) => {
-      const handler = handlers[type];
-      if (!handler) {
-        console.warn(`[LLMBoxFrame] No handler for type: ${type}`);
-        return undefined;
-      }
-
-      try {
-        const result = await handler.handle(data);
-        return result;
-      } catch (error) {
-        console.error(`[LLMBoxFrame] Handler error for ${type}:`, error);
-        return {
-          error: error instanceof Error ? error.message : 'Unknown error',
-        };
-      }
+    receive(async (message) => {
+      const result = await handlerRegistry.handle(message);
+      return result;
     });
 
     return () => {

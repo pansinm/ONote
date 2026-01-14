@@ -1,6 +1,7 @@
 import { BaseHandler } from './BaseHandler';
 import type { LLMConversationLoadResponse, LLMConversationSaveResponse } from '../types';
 import type { Stores, OnoteAPI } from '/@/main/stores/types';
+import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/constants/LLMBoxConstants';
 
 export class ConversationLoadHandler extends BaseHandler {
   constructor(private stores: Stores, private onote: OnoteAPI) {
@@ -22,6 +23,10 @@ export class ConversationLoadHandler extends BaseHandler {
 
       return { messages } as LLMConversationLoadResponse;
     }, 'Failed to load conversation');
+  }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_LOAD;
   }
 }
 
@@ -46,5 +51,9 @@ export class ConversationSaveHandler extends BaseHandler {
 
       return { success: true };
     }, 'Failed to save conversation');
+  }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.LLM_CONVERSATION_SAVE;
   }
 }

@@ -9,6 +9,7 @@ import type {
   AgentFileSearchResponse,
   AgentFileSearchInResponse,
 } from '../types';
+import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/constants/LLMBoxConstants';
 import fileService from '/@/main/services/fileService';
 import stores from '/@/main/stores';
 
@@ -56,6 +57,10 @@ export class AgentFileReadHandler extends BaseHandler {
       return { content };
     }, 'Failed to read file');
   }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_FILE_READ;
+  }
 }
 
 export class AgentFileWriteHandler extends BaseHandler {
@@ -78,6 +83,10 @@ export class AgentFileWriteHandler extends BaseHandler {
 
       return { success: true };
     }, 'Failed to write file');
+  }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_FILE_WRITE;
   }
 }
 
@@ -161,6 +170,10 @@ export class AgentFileReplaceHandler extends BaseHandler {
         operations: operationResults,
       };
     }, 'Failed to replace file content');
+  }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_FILE_REPLACE;
   }
 
   private async executeOperation(
@@ -393,6 +406,10 @@ export class AgentFileCreateHandler extends BaseHandler {
       return { success: true };
     }, 'Failed to create file');
   }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_FILE_CREATE;
+  }
 }
 
 export class AgentFileDeleteHandler extends BaseHandler {
@@ -410,6 +427,10 @@ export class AgentFileDeleteHandler extends BaseHandler {
 
       return { success: true };
     }, 'Failed to delete file');
+  }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_FILE_DELETE;
   }
 }
 
@@ -443,6 +464,10 @@ export class AgentFileListHandler extends BaseHandler {
       return { files };
     }, 'Failed to list directory');
   }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_FILE_LIST;
+  }
 }
 
 export class AgentFileSearchHandler extends BaseHandler {
@@ -475,6 +500,10 @@ export class AgentFileSearchHandler extends BaseHandler {
 
       return { results };
     }, 'Failed to search files');
+  }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH;
   }
 }
 
@@ -510,5 +539,9 @@ export class AgentFileSearchInHandler extends BaseHandler {
 
       return { matches, count: matches.length };
     }, 'Failed to search in file');
+  }
+
+  static getMessageType(): string {
+    return LLM_BOX_MESSAGE_TYPES.AGENT_FILE_SEARCH_IN;
   }
 }
