@@ -1,7 +1,7 @@
-import { AgentConfig, ExecutionStep } from './core/types';
-import type { AgentMessage } from './AgentStore';
+import { AgentConfig, ExecutionStep } from '../core/types';
+import type { AgentMessage } from '../store/AgentStore';
 import { getLogger } from '/@/shared/logger';
-import { LLM_BOX_MESSAGE_TYPES } from './constants/LLMBoxConstants';
+import { LLM_BOX_MESSAGE_TYPES } from '../constants/LLMBoxConstants';
 
 interface Channel {
   send: (message: {
@@ -73,7 +73,12 @@ export class ContextManager {
           rootUri: this.config.rootUri,
           context: contextToSave,
         },
-      })) as ContextSaveResponse;
+      })) as ContextSaveResponse | undefined;
+
+      if (!response) {
+        logger.warn('No response from main process when saving context');
+        return;
+      }
 
       if (response.error) {
         throw new Error(String(response.error));
@@ -105,7 +110,12 @@ export class ContextManager {
       const response = (await this.channel.send({
         type: LLM_BOX_MESSAGE_TYPES.AGENT_CONTEXT_LOAD,
         data: { fileUri, rootUri: this.config.rootUri },
-      })) as ContextLoadResponse;
+      })) as ContextLoadResponse | undefined;
+
+      if (!response) {
+        logger.warn('No response from main process when loading context');
+        return null;
+      }
 
       if (response.error) {
         logger.error('Failed to load agent context', response.error);
@@ -198,7 +208,12 @@ export class ContextManager {
           fileUri,
           rootUri: this.config.rootUri,
         },
-      })) as { state?: any };
+      })) as { state?: any } | undefined;
+
+      if (!response) {
+        logger.warn('No response from main process when loading execution state');
+        return null;
+      }
 
       if (!response.state) {
         return null;

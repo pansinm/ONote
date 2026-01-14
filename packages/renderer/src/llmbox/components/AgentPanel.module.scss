@@ -1,0 +1,1798 @@
+// ==================== 全局变量和重置 ====================
+:root {
+  --primary-color: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-light: #60a5fa;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #3b82f6;
+
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --bg-hover: #f0f0f0;
+
+  --text-primary: #1f2937;
+  --text-secondary: #6c757d;
+  --text-tertiary: #9ca3af;
+
+  --border-color: #e5e7eb;
+  --border-hover: #cbd5e0;
+  --border-focus: #3b82f6;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// ==================== 自定义滚动条 ====================
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+
+  &:hover {
+    background: var(--border-hover);
+  }
+}
+
+// Firefox
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) var(--bg-tertiary);
+}
+
+// ==================== 主容器 ====================
+.AgentPanel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-secondary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto',
+    sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+// ==================== 顶部工具栏 ====================
+.AgentToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  min-height: 44px;
+}
+
+.ToolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ToolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.AgentTitle {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+  flex-shrink: 0;
+}
+
+.AgentStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.StatusIndicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--bg-tertiary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.StatusText {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.TaskCount {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.MessageCount {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.TodoProgress {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  font-size: 12px;
+}
+
+.TodoLabel {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.TodoCount {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.ErrorIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  font-size: 13px;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: scale(1.1);
+  }
+}
+
+.StatusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success-color);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+  animation: pulse-dot 2s ease-in-out infinite;
+
+  &[data-state='thinking'] {
+    background: var(--info-color);
+  }
+
+  &[data-state='executing'] {
+    background: var(--warning-color);
+    animation: none;
+  }
+
+  &[data-state='idle'] {
+    animation: none;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.6);
+  }
+}
+
+.StatusText {
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: capitalize;
+  font-size: 13px;
+}
+
+.AgentActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ActionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-size: 16px;
+
+  &.IconOnly {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--bg-tertiary);
+    border-color: var(--border-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.btn-icon {
+  font-size: 16px;
+}
+
+.btn-text {
+  font-size: 13px;
+}
+
+.StopBtn {
+  background: var(--error-color) !important;
+  color: white !important;
+  border-color: var(--error-color) !important;
+
+  &:hover:not(:disabled) {
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+  }
+}
+
+.ResumeBtn {
+  background: var(--success-color) !important;
+  color: white !important;
+  border-color: var(--success-color) !important;
+
+  &:hover:not(:disabled) {
+    background: #059669 !important;
+    border-color: #059669 !important;
+  }
+}
+
+.ClearStateBtn {
+  position: relative;
+
+  &::after {
+    content: 'S';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--error-color);
+    background: var(--bg-primary);
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+  }
+}
+
+.ClearBtn:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  border-color: var(--border-hover);
+}
+
+.ClearHistoryBtn:hover:not(:disabled) {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+// ==================== 可折叠的面板 ====================
+.ToolsSection,
+.ExecutionSection,
+.StatusSection {
+  border-bottom: 1px solid var(--border-color);
+  transition: all var(--transition-normal);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.collapsed {
+  .execution-list,
+  .StatusContent {
+    display: none;
+  }
+
+  .section-icon {
+    transform: rotate(-90deg);
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  user-select: none;
+
+  &:hover {
+    background: var(--bg-tertiary);
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .section-icon {
+    font-size: 18px;
+    transition: transform var(--transition-normal);
+  }
+
+  .section-count {
+    padding: 4px 10px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .collapse-icon {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-left: auto;
+    transition: transform var(--transition-normal);
+  }
+}
+
+// ==================== Tabs ====================
+.ToolbarTabs {
+  display: flex;
+  gap: 4px;
+}
+
+.TabItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+
+  &.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-dark);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+}
+
+// ==================== 底部 Tabs ====================
+.BottomTabs {
+  display: flex;
+  gap: 1px;
+  background: var(--border-color);
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.BottomTabItem {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+  }
+
+  &.active {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+}
+
+// ==================== Tab Content ====================
+.TabContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.TabPane {
+  flex: 1;
+  overflow-y: auto;
+  display: none;
+  scroll-behavior: smooth;
+
+  &.active {
+    display: block;
+  }
+}
+
+// ==================== 执行日志 ====================
+.ExecutionLog {
+  padding: 16px;
+  padding-bottom: 120px;
+  max-height: 100%;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+// ==================== 工具内容 ====================
+.ToolsContent {
+  padding: 16px;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+// ==================== 工具面板 ====================
+.ToolsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 16px;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+  scroll-behavior: smooth;
+}
+
+.ToolCard {
+  position: relative;
+  padding: 16px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--border-color) 50%,
+      transparent 100%
+    );
+    transform: scaleX(0);
+    transition: transform var(--transition-normal);
+  }
+
+  &:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+
+    &::before {
+      transform: scaleX(1);
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--primary-color) 50%,
+        transparent 100%
+      );
+    }
+
+    .ToolDesc {
+      color: var(--text-primary);
+    }
+  }
+
+  &.selected {
+    border-color: var(--primary-color);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.05) 0%,
+      rgba(59, 130, 246, 0.1) 100%
+    );
+  }
+
+  .ToolIcon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-normal);
+  }
+
+  &:hover .ToolIcon {
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.1) 0%,
+      rgba(59, 130, 246, 0.05) 100%
+    );
+  }
+}
+
+.ToolInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ToolHeaderInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ToolName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+
+.ToolBadges {
+  display: flex;
+  gap: 6px;
+}
+
+.ToolBadge {
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.permission {
+    &.read {
+      background: var(--success-color);
+      color: white;
+    }
+
+    &.write {
+      background: var(--warning-color);
+      color: white;
+    }
+  }
+
+  &.dangerous {
+    background: var(--error-color);
+    color: white;
+  }
+}
+
+.ToolDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  transition: color var(--transition-normal);
+}
+
+// ==================== 执行日志 ====================
+.ExecutionLog {
+  padding: 16px;
+  padding-bottom: 120px;
+  max-height: 100%;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+// ==================== 工具内容 ====================
+.ToolsContent {
+  padding: 16px;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.LogList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.LogItem {
+  border-left: 3px solid var(--border-color);
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  transition: all var(--transition-fast);
+  animation: log-slide-in 0.3s ease-out;
+
+  &:hover {
+    border-left-color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &.LogItem-thinking {
+    border-left-color: var(--info-color);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.03) 0%,
+      rgba(59, 130, 246, 0.08) 100%
+    );
+  }
+
+  &.LogItem-tool_call {
+    border-left-color: var(--warning-color);
+    background: linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.03) 0%,
+      rgba(245, 158, 11, 0.08) 100%
+    );
+  }
+
+  &.LogItem-tool_result {
+    border-left-color: var(--success-color);
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.03) 0%,
+      rgba(16, 185, 129, 0.08) 100%
+    );
+  }
+
+  &.LogItem-final_answer {
+    border-left-color: var(--primary-color);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.05) 0%,
+      rgba(59, 130, 246, 0.1) 100%
+    );
+  }
+
+  &.LogItem-error {
+    border-left-color: var(--error-color);
+    background: linear-gradient(
+      135deg,
+      rgba(239, 68, 68, 0.03) 0%,
+      rgba(239, 68, 68, 0.08) 100%
+    );
+  }
+
+  &.LogItem-todo_list {
+    border-left-color: var(--info-color);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.03) 0%,
+      rgba(59, 130, 246, 0.08) 100%
+    );
+  }
+
+  &.LogItem-todo_create {
+    border-left-color: var(--primary-color);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.03) 0%,
+      rgba(59, 130, 246, 0.08) 100%
+    );
+  }
+
+  &.LogItem-todo_update {
+    border-left-color: var(--success-color);
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.03) 0%,
+      rgba(16, 185, 129, 0.08) 100%
+    );
+  }
+}
+
+@keyframes log-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.LogHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.LogItemCollapseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  margin-left: auto;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+  }
+}
+
+.LogItemCollapseIcon {
+  font-size: 10px;
+  color: var(--text-secondary);
+  transition: transform var(--transition-normal);
+
+  &.collapsed {
+    transform: rotate(-90deg);
+  }
+}
+
+.LogItemLoading {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+
+.LoadingDot {
+  width: 6px;
+  height: 6px;
+  background: var(--info-color);
+  border-radius: 50%;
+  animation: loading-bounce 1.4s ease-in-out infinite both;
+
+  &:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+
+  &:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0s;
+  }
+}
+
+@keyframes loading-bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.LogIndex {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.LogType {
+  padding: 2px 8px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.LogTime {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-left: auto;
+}
+
+.LogDuration {
+  padding: 2px 6px;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--success-color);
+}
+
+.LogBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all var(--transition-normal);
+
+  &.collapsed {
+    display: none;
+  }
+}
+
+.LogItem {
+  &.collapsed {
+    .LogBody {
+      display: none;
+    }
+  }
+}
+
+.LogContent {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.6;
+
+  .markdown-body {
+    font-size: 13px;
+    line-height: 1.6;
+
+    p {
+      margin: 0 0 12px 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 600;
+      margin: 16px 0 8px 0;
+      line-height: 1.3;
+    }
+
+    h1 { font-size: 18px; }
+    h2 { font-size: 16px; }
+    h3 { font-size: 14px; }
+    h4, h5, h6 { font-size: 13px; }
+
+    ul, ol {
+      padding-left: 20px;
+      margin: 0 0 12px 0;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      background: var(--bg-tertiary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+      font-size: 12px;
+      color: var(--primary-color);
+    }
+
+    pre {
+      background: #1e1e1e;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+      margin: 0 0 12px 0;
+
+      code {
+        background: transparent;
+        padding: 0;
+        color: #e2e8f0;
+        font-size: 12px;
+      }
+    }
+
+    blockquote {
+      border-left: 3px solid var(--primary-color);
+      padding-left: 12px;
+      margin: 0 0 12px 0;
+      color: var(--text-secondary);
+    }
+
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border-color);
+      margin: 16px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 12px 0;
+
+      th, td {
+        border: 1px solid var(--border-color);
+        padding: 8px 12px;
+        text-align: left;
+      }
+
+      th {
+        background: var(--bg-tertiary);
+        font-weight: 600;
+      }
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: var(--radius-sm);
+    }
+
+    strong {
+      font-weight: 600;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    del, s {
+      text-decoration: line-through;
+      color: var(--text-tertiary);
+    }
+  }
+}
+
+.LogTool {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+
+.ToolParams {
+  margin-top: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #1e1e1e;
+}
+
+.ToolParamsLabel {
+  padding: 6px 10px;
+  background: var(--bg-tertiary);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ToolParamsContent {
+  margin: 0;
+  padding: 10px 12px;
+  background: transparent;
+  font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+  font-size: 12px;
+  color: #93c5fd;
+  overflow-x: auto;
+  max-height: 150px;
+}
+
+.LogTool-label {
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.LogTool-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.LogDetails {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+
+  &[open] {
+    .LogDetails-toggle {
+      background: var(--bg-tertiary);
+    }
+  }
+}
+
+.LogDetails-result[open] {
+  border-color: var(--success-color);
+}
+
+.LogDetails-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  user-select: none;
+
+  &:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+}
+
+.LogDetails-content {
+  margin: 0;
+  padding: 12px;
+  background: #1e1e1e;
+  font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+  font-size: 11px;
+  color: #e2e8f0;
+  overflow-x: auto;
+  max-height: 200px;
+  border-top: 1px solid var(--border-color);
+
+  .markdown-body {
+    font-size: 11px;
+    color: #e2e8f0;
+
+    p {
+      margin: 0 0 8px 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // 自定义滚动条
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #2d2d2d;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: var(--radius-sm);
+  }
+}
+
+.LogError {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--error-color);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+
+.LogError-icon {
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.LogError-text {
+  font-weight: 600;
+  color: var(--error-color);
+  line-height: 1.4;
+  flex: 1;
+
+  .markdown-body {
+    font-size: 12px;
+  }
+}
+
+.TodoList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.TodoItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  transition: all var(--transition-fast);
+  position: relative;
+
+  &.TodoPending {
+    border-left: 3px solid var(--text-tertiary);
+  }
+
+  &.TodoIn_progress {
+    border-left: 3px solid var(--info-color);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.03) 0%,
+      rgba(59, 130, 246, 0.08) 100%
+    );
+  }
+
+  &.TodoCompleted {
+    border-left: 3px solid var(--success-color);
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.03) 0%,
+      rgba(16, 185, 129, 0.08) 100%
+    );
+    opacity: 0.8;
+  }
+
+  &.TodoFailed {
+    border-left: 3px solid var(--error-color);
+    background: linear-gradient(
+      135deg,
+      rgba(239, 68, 68, 0.03) 0%,
+      rgba(239, 68, 68, 0.08) 100%
+    );
+  }
+
+  &[style*='padding-left'] {
+    border-left-width: 1px;
+    border-left-color: var(--border-color);
+  }
+
+  &[style*='padding-left: 0px'],
+  &[style*='padding-left: 12px'] {
+    border-left-width: 3px;
+  }
+}
+
+.TodoIcon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.TodoDescription {
+  flex: 1;
+  color: var(--text-primary);
+  line-height: 1.4;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.EmptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  min-height: 200px;
+}
+
+.EmptyIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.EmptyMessage {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.EmptyHint {
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+// ==================== 状态面板 ====================
+.StatusContent {
+  padding: 16px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.StatusGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.StatusItem {
+  background: var(--bg-primary);
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+
+  &:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.StatusLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.StatusValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.StateIdle {
+  color: var(--success-color);
+}
+
+.StateThinking {
+  color: var(--info-color);
+}
+
+.StateExecuting {
+  color: var(--warning-color);
+}
+
+.ErrorAlert {
+  padding: 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--error-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: shake-alert 0.5s ease-in-out;
+}
+
+@keyframes shake-alert {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-3px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+.ErrorAlert-icon {
+  font-size: 24px;
+}
+
+.ErrorAlert-content {
+  flex: 1;
+}
+
+.ErrorAlert-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--error-color);
+  margin-bottom: 4px;
+}
+
+.ErrorAlert-message {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.SuccessAlert {
+  padding: 16px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid var(--success-color);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  animation: success-appear 0.5s ease-out;
+}
+
+@keyframes success-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.SuccessIcon {
+  font-size: 24px;
+}
+
+.SuccessMessage {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--success-color);
+}
+
+// ==================== 响应式设计 ====================
+@media (max-width: 768px) {
+  .AgentToolbar {
+    padding: 8px 10px;
+  }
+
+  .AgentTitle {
+    font-size: 13px;
+  }
+
+  .StatusIndicator {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  .ToolbarRight {
+    gap: 2px;
+  }
+
+  .BottomTabItem {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .ToolsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+  }
+
+  .ToolCard {
+    padding: 12px;
+  }
+
+  .ToolIcon {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .StatusGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .AgentToolbar {
+    padding: 6px 8px;
+  }
+
+  .ToolbarLeft {
+    gap: 8px;
+  }
+
+  .StatusIndicator {
+    .TaskCount {
+      display: none;
+    }
+  }
+
+  .BottomTabItem {
+    font-size: 10px;
+    padding: 6px;
+    gap: 4px;
+  }
+
+  .ToolsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ToolCard {
+    flex-direction: row;
+    padding: 12px;
+  }
+
+  .ToolIcon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    margin-bottom: 0;
+    margin-right: 12px;
+  }
+
+  .step-content {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .ToolsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ToolCard {
+    flex-direction: row;
+    padding: 12px;
+  }
+
+  .ToolIcon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    margin-bottom: 0;
+    margin-right: 12px;
+  }
+
+  .step-content {
+    flex-direction: column;
+  }
+}
+
+// ==================== 深色模式 ====================
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #60a5fa;
+    --primary-dark: #3b82f6;
+    --primary-light: #93c5fd;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --info-color: #60a5fa;
+
+    --bg-primary: #1e293b;
+    --bg-secondary: #0f172a;
+    --bg-tertiary: #334155;
+    --bg-hover: #475569;
+
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+
+    --border-color: #475569;
+    --border-hover: #64748b;
+    --border-focus: #60a5fa;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+  }
+
+  .AgentToolbar {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+  }
+
+  .StatusIndicator {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+  }
+
+  .ErrorIndicator {
+    background: rgba(239, 68, 68, 0.2);
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.3);
+    }
+  }
+
+  .TabItem {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+
+    &:hover {
+      background: var(--border-color);
+      color: var(--text-primary);
+    }
+
+    &.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-dark);
+    }
+  }
+
+  .BottomTabItem {
+    background: var(--bg-secondary);
+    color: var(--text-tertiary);
+
+    &:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+    }
+
+    &.active {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+  }
+
+  .TabContent {
+    background: var(--bg-secondary);
+  }
+
+  .section-header {
+    background: var(--bg-secondary);
+
+    &:hover {
+      background: var(--bg-tertiary);
+    }
+  }
+
+  .ToolsSection,
+  .ExecutionSection,
+  .StatusSection {
+    border-color: var(--border-color);
+  }
+
+  .ToolCard {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+
+    &:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--border-hover);
+    }
+  }
+
+  .ToolIcon {
+    background: var(--bg-tertiary);
+  }
+
+  .LogItem {
+    background: var(--bg-secondary);
+    border-left-color: var(--border-color);
+
+    &.LogItem-thinking {
+      background: linear-gradient(
+        135deg,
+        rgba(96, 165, 250, 0.08) 0%,
+        rgba(96, 165, 250, 0.03) 100%
+      );
+    }
+
+    &.LogItem-tool_call {
+      background: linear-gradient(
+        135deg,
+        rgba(245, 158, 11, 0.08) 0%,
+        rgba(245, 158, 11, 0.03) 100%
+      );
+    }
+
+    &.LogItem-tool_result {
+      background: linear-gradient(
+        135deg,
+        rgba(16, 185, 129, 0.08) 0%,
+        rgba(16, 185, 129, 0.03) 100%
+      );
+    }
+
+    &.LogItem-final_answer {
+      background: linear-gradient(
+        135deg,
+        rgba(96, 165, 250, 0.1) 0%,
+        rgba(96, 165, 250, 0.05) 100%
+      );
+    }
+
+    &.LogItem-error {
+      background: linear-gradient(
+        135deg,
+        rgba(239, 68, 68, 0.08) 0%,
+        rgba(239, 68, 68, 0.03) 100%
+      );
+    }
+
+    &.LogItem-todo_list {
+      background: linear-gradient(
+        135deg,
+        rgba(96, 165, 250, 0.08) 0%,
+        rgba(96, 165, 250, 0.03) 100%
+      );
+    }
+
+    &.LogItem-todo_create {
+      background: linear-gradient(
+        135deg,
+        rgba(96, 165, 250, 0.08) 0%,
+        rgba(96, 165, 250, 0.03) 100%
+      );
+    }
+
+    &.LogItem-todo_update {
+      background: linear-gradient(
+        135deg,
+        rgba(16, 185, 129, 0.08) 0%,
+        rgba(16, 185, 129, 0.03) 100%
+      );
+    }
+  }
+
+  .LogIndex {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+  }
+
+  .LogType {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+  }
+
+  .StatusItem {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+
+    &:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--border-hover);
+    }
+  }
+
+  .LogDetails-content {
+    background: #0d1117;
+    color: #93c5fd;
+    border-color: #333;
+  }
+
+  .LogDetails-toggle {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+
+    &:hover {
+      background: var(--border-color);
+      color: var(--text-primary);
+    }
+  }
+
+  .LogItemCollapseBtn {
+    &:hover {
+      background: var(--border-color);
+    }
+  }
+
+  .LogItemLoading {
+    background: rgba(96, 165, 250, 0.15);
+  }
+
+  .LoadingDot {
+    background: var(--info-color);
+  }
+}
+
+// ==================== 动画增强 ====================
+.AgentPanel {
+  animation: panel-appear 0.3s ease-out;
+}
+
+@keyframes panel-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

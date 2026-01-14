@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ExecutionStep } from './core/types';
+import type { ExecutionStep } from '../core/types';
 import InputArea from './InputArea';
 import styles from './LLMBox.module.scss';
 import { observer } from 'mobx-react-lite';

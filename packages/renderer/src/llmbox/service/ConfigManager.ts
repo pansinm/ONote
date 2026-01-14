@@ -1,6 +1,6 @@
-import { AgentConfig } from './core/types';
+import { AgentConfig } from '../core/types';
 import { getLogger } from '/@/shared/logger';
-import { LLM_BOX_MESSAGE_TYPES } from './constants/LLMBoxConstants';
+import { LLM_BOX_MESSAGE_TYPES } from '../constants/LLMBoxConstants';
 
 interface Channel {
   send: (message: {
@@ -52,7 +52,16 @@ export class ConfigManager {
       const response = (await this.channel.send({
         type: LLM_BOX_MESSAGE_TYPES.LLM_CONFIG_GET,
         data: {},
-      })) as LLMConfigResponse;
+      })) as LLMConfigResponse | undefined;
+
+      if (!response) {
+        logger.warn('No response from main process for LLM config');
+        return {
+          apiKey: this.config.apiKey,
+          model: this.config.model,
+          apiBase: this.config.apiBase,
+        };
+      }
 
       if (response.error) {
         logger.warn('Failed to fetch LLM config from main process', { error: response.error });

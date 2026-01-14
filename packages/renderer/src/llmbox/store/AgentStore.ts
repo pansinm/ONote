@@ -6,20 +6,20 @@ import {
   AgentExecutionState,
   Tool,
   ToolCall,
-} from './core/types';
-import { LLMClient } from './core/api/client';
-import { ToolRegistry, AgentOrchestrator } from './agent';
-import { TodoManager as TodoManagerImpl } from './agent/tools/todo-manager';
-import type { TodoManager as TodoManagerType } from './agent/tools/todo';
-import { getLogger } from '../shared/logger';
-import { uuid } from '../common/tunnel/utils';
+} from '../core/types';
+import { LLMClient } from '../core/api/client';
+import { ToolRegistry, AgentOrchestrator } from '../agent';
+import { TodoManager as TodoManagerImpl } from '../agent/tools/todo-manager';
+import type { TodoManager as TodoManagerType } from '../agent/tools/todo';
+import { getLogger } from '/@/shared/logger';
+import { uuid } from '/@/common/tunnel/utils';
 import {
   LLM_BOX_MESSAGE_TYPES,
-} from './constants/LLMBoxConstants';
+} from '../constants/LLMBoxConstants';
 import { AgentState } from './AgentState';
-import { ConfigManager } from './ConfigManager';
-import { ContextManager } from './ContextManager';
-import { AgentExecutor } from './AgentExecutor';
+import { ConfigManager } from '../service/ConfigManager';
+import { ContextManager } from '../service/ContextManager';
+import { AgentExecutor } from '../agent/AgentExecutor';
 
 const logger = getLogger('AgentStore');
 

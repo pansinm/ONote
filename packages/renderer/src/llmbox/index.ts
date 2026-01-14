@@ -1,9 +1,9 @@
 export * from './core/types';
-export { AgentStore } from './AgentStore';
-export { AgentState } from './AgentState';
-export { AgentExecutor } from './AgentExecutor';
-export { ConfigManager } from './ConfigManager';
-export { ContextManager } from './ContextManager';
-export { LLMBox } from './LLMBox';
-export { useAgent } from './ui/hooks/useAgent';
+export { AgentStore } from './store/AgentStore';
+export { AgentState } from './store/AgentState';
+export { AgentExecutor } from './agent/AgentExecutor';
+export { ConfigManager } from './service/ConfigManager';
+export { ContextManager } from './service/ContextManager';
+export { LLMBox } from './components/LLMBox';
+export { useAgent } from './components/hooks/useAgent';
 export * from './agent';

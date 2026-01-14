@@ -1,15 +1,15 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { throttle } from 'lodash';
-import { AgentConfig, ExecutionStep } from './core/types';
-import { AgentOrchestrator } from './agent/orchestrator';
-import { ToolRegistry } from './agent/tools/registry';
-import { TodoManager as TodoManagerImpl } from './agent/tools/todo-manager';
-import { LLMClient } from './core/api/client';
-import { AgentState } from './AgentState';
-import { ConfigManager } from './ConfigManager';
-import { ContextManager } from './ContextManager';
+import { AgentConfig, ExecutionStep } from '../core/types';
+import { AgentOrchestrator } from './orchestrator';
+import { ToolRegistry } from './tools/registry';
+import { TodoManager as TodoManagerImpl } from './tools/todo-manager';
+import { LLMClient } from '../core/api/client';
+import { AgentState } from '../store/AgentState';
+import { ConfigManager } from '../service/ConfigManager';
+import { ContextManager } from '../service/ContextManager';
 import { getLogger } from '/@/shared/logger';
-import { uuid } from '../common/tunnel/utils';
+import { uuid } from '/@/common/tunnel/utils';
 
 const logger = getLogger('AgentExecutor');
 

@@ -5,7 +5,7 @@ import {
   Tool,
   AgentConfig,
   AgentExecutionState,
-} from './core/types';
+} from '../core/types';
 import type { AgentMessage } from './AgentStore';
 
 export class AgentState {

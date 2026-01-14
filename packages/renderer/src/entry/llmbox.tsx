@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { observer } from 'mobx-react-lite';
 
-import AgentPanel from '../llmbox/AgentPanel';
-import InputArea from '../llmbox/InputArea';
-import { AgentStore } from '../llmbox/AgentStore';
+import AgentPanel from '../llmbox/components/AgentPanel';
+import InputArea from '../llmbox/components/InputArea';
+import { AgentStore } from '../llmbox/store/AgentStore';
 import {
   LLM_API_KEY,
   LLM_BASE_URL,
