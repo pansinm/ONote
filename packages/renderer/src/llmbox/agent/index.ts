@@ -1,3 +1,4 @@
-import ToolRegistry from './ToolRegistry';
-export * from './types';
-export { default } from './ToolRegistry';
+export { ToolRegistry } from './tools/registry';
+export { TodoManager } from './tools/todo-manager';
+export * from './tools/todo';
+export { AgentOrchestrator } from './orchestrator';

@@ -1,78 +1,67 @@
-/**
- * Agent 功能类型定义
- */
-
-export type TodoStatus = 'pending' | 'in_progress' | 'completed' | 'failed';
-
-export interface TodoItem {
+export interface Message {
   id: string;
-  parentId?: string;
-  description: string;
-  status: TodoStatus;
-  priority: 'high' | 'medium' | 'low';
-  createdAt: Date;
-  updatedAt: Date;
-  children?: TodoItem[];
-  level?: number;
+  role: 'user' | 'assistant' | 'system' | 'tool';
+  content: string;
+  timestamp: Date;
+  toolCallId?: string;
+  tool_calls?: ToolCall[];
 }
 
-/**
- * 工具定义
- */
+export interface ToolCall {
+  id: string;
+  type: 'function';
+  function: {
+    name: string;
+    arguments: string;
+  };
+}
+
+export type ToolCallArray = ToolCall[];
+
 export interface Tool {
-  /** 工具名称 (唯一标识符) */
   name: string;
-  /** 工具描述 (用于 LLM 理解工具用途) */
   description: string;
-  /** 参数定义 (JSON Schema 格式) */
-  parameters: {
-    type: 'object';
-    properties: Record<string, ToolParameter>;
-    required?: string[];
-  };
-  /** 工具执行器 */
+  parameters: ToolParameters;
   executor: (params: Record<string, unknown>) => Promise<unknown>;
-  /** 工具元数据 */
   metadata?: {
-    /** 工具分类 */
     category: 'file' | 'search' | 'custom';
-    /** 权限级别 */
     permission: 'read' | 'write';
-    /** 是否危险操作 */
     dangerous?: boolean;
-    /** 超时时间 (毫秒) */
-    timeout?: number;
   };
 }
 
-/**
- * 工具参数定义
- */
 export interface ToolParameter {
   type: 'string' | 'number' | 'boolean' | 'array' | 'object';
   description: string;
-  required?: boolean | string[];
+  required?: boolean;
   enum?: string[];
   default?: unknown;
   items?: ToolParameter;
   properties?: Record<string, ToolParameter>;
 }
 
-/**
- * 工具调用 (OpenAI 格式)
- */
-export interface ToolCall {
-  id: string;
-  type: 'function';
-  function: {
-    name: string;
-    arguments: string; // JSON string
-  };
+export interface ToolParameters {
+  type: 'object';
+  properties: Record<string, ToolParameter>;
+  required?: string[];
+  [key: string]: unknown;
 }
 
-/**
- * 执行步骤 (用于 UI 显示)
- */
+export interface ToolArrayItemSchema {
+  type: 'object';
+  description?: string;
+  properties: Record<string, ToolParameter>;
+  required?: string[];
+  [key: string]: unknown;
+}
+
+export interface ToolArrayParameter {
+  type: 'array';
+  description: string;
+  items: ToolArrayItemSchema;
+  [key: string]: unknown;
+}
+
 export interface ExecutionStep {
   id: string;
   timestamp: Date;
@@ -86,38 +75,33 @@ export interface ExecutionStep {
   todos?: TodoItem[];
 }
 
-/**
- * Agent 配置
- */
+export interface TodoItem {
+  id: string;
+  parentId?: string;
+  description: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  priority: 'high' | 'medium' | 'low';
+  createdAt: Date;
+  updatedAt: Date;
+  children?: TodoItem[];
+  level?: number;
+}
+
 export interface AgentConfig {
   apiKey: string;
   model: string;
   apiBase: string;
   fileUri?: string;
   rootUri?: string;
-  /** 最大迭代次数 */
   maxIterations?: number;
-  /** 是否启用思考显示 */
   showThinking?: boolean;
-  /** 超时时间 (毫秒) */
-  timeout?: number;
-  /** 上下文窗口大小（tokens，默认 128000） */
   contextWindowSize?: number;
-  /** 压缩比例（默认 0.3，保留 30%） */
   compressRatio?: number;
-  /** 最小压缩阈值（默认 20） */
-  compressMinMessages?: number;
-  /** 初始压缩检查间隔（默认 10） */
   compressCheckInterval?: number;
-  /** 最小压缩检查间隔（默认 5） */
   minCompressCheckInterval?: number;
-  /** Token 限制错误码 */
   tokenLimitErrorCodes?: string[];
 }
 
-/**
- * Agent 执行状态（用于中断恢复）
- */
 export interface AgentExecutionState {
   prompt: string;
   startTime: Date;
@@ -134,3 +118,12 @@ export interface AgentExecutionState {
   selection: string;
   savedAt: Date;
 }
+
+export type AgentState = 'idle' | 'thinking' | 'executing';
+
+export type {
+  LLMApiError,
+  isLLMApiError,
+  ToolCallResult,
+} from '../api/client';
+export { DEFAULT_CONFIG, type Config } from '../config';

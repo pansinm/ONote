@@ -29,21 +29,14 @@ interface OperationResult {
   error?: string;
 }
 
-interface ReplaceOperation {
-  mode: 'string' | 'regex' | 'line_range' | 'line_number';
-  search: string;
-  replace: string;
-  replaceAll?: boolean;
-  caseSensitive?: boolean;
-  lineStart?: number;
-  lineEnd?: number;
-}
-
-interface OperationResult {
-  success: boolean;
-  matches: number;
-  changedLines: number[];
-  error?: string;
+function normalizeUri(uri: string): string {
+  if (!uri || typeof uri !== 'string') {
+    throw new Error('Invalid URI: URI is empty or not a string');
+  }
+  if (uri.startsWith('file://')) {
+    return uri;
+  }
+  return `file://${uri}`;
 }
 
 export class AgentFileReadHandler extends BaseHandler {
@@ -51,11 +44,12 @@ export class AgentFileReadHandler extends BaseHandler {
     this.logger.debug('AgentFileReadHandler.handle called', { uri: data.uri });
 
     return this.wrapWithErrorHandling(async () => {
-      const model = await stores.fileStore.getOrCreateModel(data.uri);
+      const normalizedUri = normalizeUri(data.uri);
+      const model = await stores.fileStore.getOrCreateModel(normalizedUri);
       const content = model.getValue();
 
       this.logger.debug('File read successfully', {
-        uri: data.uri,
+        uri: normalizedUri,
         contentLength: content.length,
       });
 
@@ -75,11 +69,12 @@ export class AgentFileWriteHandler extends BaseHandler {
     });
 
     return this.wrapWithErrorHandling(async () => {
-      await fileService.writeText(data.uri, data.content);
-      const model = await stores.fileStore.getOrCreateModel(data.uri);
+      const normalizedUri = normalizeUri(data.uri);
+      await fileService.writeText(normalizedUri, data.content);
+      const model = await stores.fileStore.getOrCreateModel(normalizedUri);
       model.setValue(data.content);
 
-      this.logger.debug('File written successfully', { uri: data.uri });
+      this.logger.debug('File written successfully', { uri: normalizedUri });
 
       return { success: true };
     }, 'Failed to write file');
@@ -99,10 +94,11 @@ export class AgentFileReplaceHandler extends BaseHandler {
     });
 
     return this.wrapWithErrorHandling(async () => {
-      const originalContent = await fileService.readText(data.uri);
+      const normalizedUri = normalizeUri(data.uri);
+      const originalContent = await fileService.readText(normalizedUri);
 
       if (!originalContent) {
-        this.logger.warn('File is empty', { uri: data.uri });
+        this.logger.warn('File is empty', { uri: normalizedUri });
 
         const operationResults = data.operations.map(
           () =>
@@ -138,7 +134,7 @@ export class AgentFileReplaceHandler extends BaseHandler {
 
       if (data.preview) {
         this.logger.debug('Preview mode, not saving changes', {
-          uri: data.uri,
+          uri: normalizedUri,
           modifiedLinesCount: allModifiedLines.size,
         });
 
@@ -150,12 +146,12 @@ export class AgentFileReplaceHandler extends BaseHandler {
         };
       }
 
-      await fileService.writeText(data.uri, modifiedContent);
-      const model = await stores.fileStore.getOrCreateModel(data.uri);
+      await fileService.writeText(normalizedUri, modifiedContent);
+      const model = await stores.fileStore.getOrCreateModel(normalizedUri);
       model.setValue(modifiedContent);
 
       this.logger.debug('File content replaced successfully', {
-        uri: data.uri,
+        uri: normalizedUri,
         modifiedLinesCount: allModifiedLines.size,
       });
 
@@ -183,7 +179,12 @@ export class AgentFileReplaceHandler extends BaseHandler {
       } else if (mode === 'line_number') {
         return this.executeLineNumberReplace(lines, operation);
       } else {
-        throw new Error(`Unknown mode: ${mode}`);
+        return {
+          success: false,
+          matches: 0,
+          changedLines: [],
+          error: `Unknown mode: ${mode}`,
+        };
       }
     } catch (error) {
       return {
@@ -275,11 +276,11 @@ export class AgentFileReplaceHandler extends BaseHandler {
 
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        const hasMatch = searchRegex.test(line);
-
-        if (!hasMatch) {
+        if (!searchRegex.test(line)) {
+          searchRegex.lastIndex = 0;
           continue;
         }
+        searchRegex.lastIndex = 0;
 
         const newLine = line.replace(searchRegex, replace);
 
@@ -289,6 +290,7 @@ export class AgentFileReplaceHandler extends BaseHandler {
           lines[i] = newLine;
           changedLines.add(i + 1);
         }
+        searchRegex.lastIndex = 0;
       }
 
       return {
@@ -308,11 +310,21 @@ export class AgentFileReplaceHandler extends BaseHandler {
     const { lineStart, lineEnd, replace } = operation;
 
     if (lineStart === undefined || lineEnd === undefined) {
-      throw new Error('lineStart and lineEnd are required for line_range mode');
+      return {
+        success: false,
+        matches: 0,
+        changedLines: [],
+        error: 'lineStart and lineEnd are required for line_range mode',
+      };
     }
 
     if (lineStart < 1 || lineEnd > lines.length) {
-      throw new Error(`Line range ${lineStart}-${lineEnd} is out of bounds`);
+      return {
+        success: false,
+        matches: 0,
+        changedLines: [],
+        error: `Line range ${lineStart}-${lineEnd} is out of bounds (file has ${lines.length} lines)`,
+      };
     }
 
     const startIndex = lineStart - 1;
@@ -343,7 +355,12 @@ export class AgentFileReplaceHandler extends BaseHandler {
     const lineNumber = parseInt(search, 10);
 
     if (isNaN(lineNumber) || lineNumber < 1 || lineNumber > lines.length) {
-      throw new Error(`Invalid line number: ${search}`);
+      return {
+        success: false,
+        matches: 0,
+        changedLines: [],
+        error: `Invalid line number: ${search} (file has ${lines.length} lines)`,
+      };
     }
 
     lines[lineNumber - 1] = replace;
@@ -367,10 +384,11 @@ export class AgentFileCreateHandler extends BaseHandler {
     });
 
     return this.wrapWithErrorHandling(async () => {
-      await stores.fileStore.saveFile(data.uri, data.content || '');
-      await fileService.writeText(data.uri, data.content || '');
+      const normalizedUri = normalizeUri(data.uri);
+      await stores.fileStore.saveFile(normalizedUri, data.content || '');
+      await fileService.writeText(normalizedUri, data.content || '');
 
-      this.logger.debug('File created successfully', { uri: data.uri });
+      this.logger.debug('File created successfully', { uri: normalizedUri });
 
       return { success: true };
     }, 'Failed to create file');
@@ -384,10 +402,11 @@ export class AgentFileDeleteHandler extends BaseHandler {
     });
 
     return this.wrapWithErrorHandling(async () => {
-      stores.fileStore.closeFile(data.uri);
-      await fileService.remove(data.uri);
+      const normalizedUri = normalizeUri(data.uri);
+      stores.fileStore.closeFile(normalizedUri);
+      await fileService.remove(normalizedUri);
 
-      this.logger.debug('File deleted successfully', { uri: data.uri });
+      this.logger.debug('File deleted successfully', { uri: normalizedUri });
 
       return { success: true };
     }, 'Failed to delete file');
@@ -399,16 +418,17 @@ export class AgentFileListHandler extends BaseHandler {
     this.logger.debug('AgentFileListHandler.handle called', { uri: data.uri });
 
     return this.wrapWithErrorHandling(async () => {
-      const treeNode = await fileService.getTreeNode(data.uri);
+      const normalizedUri = normalizeUri(data.uri);
+      const treeNode = await fileService.getTreeNode(normalizedUri);
       if (treeNode.type === 'file') {
         this.logger.warn('Cannot list files in a file', {
-          uri: data.uri,
+          uri: normalizedUri,
           type: treeNode.type,
         });
         throw new Error('Cannot list files in a file');
       }
 
-      const treeNodes = await fileService.listDir(data.uri);
+      const treeNodes = await fileService.listDir(normalizedUri);
       const files = treeNodes.map((node: any) => ({
         name: node.name,
         uri: node.uri,
@@ -416,7 +436,7 @@ export class AgentFileListHandler extends BaseHandler {
       }));
 
       this.logger.debug('Directory listed successfully', {
-        uri: data.uri,
+        uri: normalizedUri,
         fileCount: files.length,
       });
 
@@ -436,8 +456,9 @@ export class AgentFileSearchHandler extends BaseHandler {
     });
 
     return this.wrapWithErrorHandling(async () => {
+      const normalizedRootUri = normalizeUri(data.rootUri);
       const treeNodes = await fileService.searchFiles(
-        data.rootUri,
+        normalizedRootUri,
         data.keywords,
       );
       const results = treeNodes.map((node: any) => ({
@@ -468,7 +489,8 @@ export class AgentFileSearchInHandler extends BaseHandler {
     });
 
     return this.wrapWithErrorHandling(async () => {
-      const content = await fileService.readText(data.uri);
+      const normalizedUri = normalizeUri(data.uri);
+      const content = await fileService.readText(normalizedUri);
 
       const regex = new RegExp(data.pattern, 'gi');
       const matches: Array<{ line: number; text: string }> = [];
@@ -481,7 +503,7 @@ export class AgentFileSearchInHandler extends BaseHandler {
       });
 
       this.logger.debug('Content searched successfully', {
-        uri: data.uri,
+        uri: normalizedUri,
         pattern: data.pattern,
         matchCount: matches.length,
       });

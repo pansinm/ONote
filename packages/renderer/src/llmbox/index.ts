@@ -1,5 +1,5 @@
-export { default as LLMBox } from './LLMBox';
-export type { Message, ChatState, LLMBoxProps } from './types';
+export * from './core/types';
 export { AgentStore } from './AgentStore';
-export { default as AgentPanel } from './AgentPanel';
-export * from './agent/types';
+export { LLMBox } from './LLMBox';
+export { useAgent } from './ui/hooks/useAgent';
+export * from './agent';

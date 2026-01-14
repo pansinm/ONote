@@ -34,6 +34,7 @@ import {
   AgentGetRootUriHandler,
   AgentGetActiveFileUriHandler,
 } from './handlers/EditorEventHandler';
+import { LLMConfigGetHandler } from './handlers/LLMConfigHandler';
 
 function LLMBoxFrame() {
   const ref = useRef<HTMLIFrameElement>(null);
@@ -85,6 +86,7 @@ function LLMBoxFrame() {
       ),
       [LLM_BOX_MESSAGE_TYPES.AGENT_GET_ACTIVE_FILE_URI]:
         new AgentGetActiveFileUriHandler(stores),
+      [LLM_BOX_MESSAGE_TYPES.LLM_CONFIG_GET]: new LLMConfigGetHandler(),
     };
 
     const contentChanged = subscription.subscribe(
@@ -123,7 +125,7 @@ function LLMBoxFrame() {
       const handler = handlers[type];
       if (!handler) {
         console.warn(`[LLMBoxFrame] No handler for type: ${type}`);
-        return;
+        return undefined;
       }
 
       try {

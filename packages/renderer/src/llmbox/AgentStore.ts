@@ -1,23 +1,30 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import type {
-  Tool,
-  ToolCall,
+import {
   ExecutionStep,
   AgentConfig,
   TodoItem,
   AgentExecutionState,
-} from './agent/types';
-import ToolRegistry from './agent/ToolRegistry';
-import { AgentOrchestrator } from './agent/AgentOrchestrator';
-import TodoManager from './agent/TodoManager';
+  Tool,
+  ToolCall,
+} from './core/types';
+import { LLMClient } from './core/api/client';
+import { ToolRegistry, AgentOrchestrator } from './agent';
+import { TodoManager as TodoManagerImpl } from './agent/tools/todo-manager';
+import type { TodoManager as TodoManagerType } from './agent/tools/todo';
 import { getLogger } from '../shared/logger';
 import { uuid } from '../common/tunnel/utils';
 import {
   LLM_BOX_MESSAGE_TYPES,
-  type LLMBoxMessageType,
 } from './constants/LLMBoxConstants';
 
 const logger = getLogger('AgentStore');
+
+interface Channel {
+  send: (message: {
+    type: string;
+    data: unknown;
+  }) => Promise<Record<string, unknown>>;
+}
 
 interface AgentMessage {
   id: string;
@@ -28,59 +35,42 @@ interface AgentMessage {
   tool_calls?: ToolCall[];
 }
 
-interface Channel {
-  send: (message: {
-    type: LLMBoxMessageType;
-    data: unknown;
-  }) => Promise<Record<string, unknown>>;
-}
-
 export class AgentStore {
   todos: TodoItem[] = [];
-
   tools: Tool[] = [];
-
   executionLog: ExecutionStep[] = [];
-
   conversationHistory: AgentMessage[] = [];
-
   agentState: 'idle' | 'thinking' | 'executing' = 'idle';
-
   error: string | null = null;
-
   isRunning = false;
-
   hasSavedState = false;
-
   lastStateSavedAt: Date | null = null;
-
   fileUri: string | null = null;
-
   content = '';
-
   selection = '';
-
-  maxConversationRounds = 50;
-
-  compressThreshold = 20;
 
   private config: AgentConfig;
   private channel: Channel;
-  private todoManager: TodoManager;
+  private todoManager: TodoManagerImpl;
   private toolRegistry: ToolRegistry;
+  private llmClient: LLMClient;
   private orchestrator: AgentOrchestrator | null = null;
   private currentPrompt = '';
   private executionStartTime: Date | null = null;
-  private currentIteration = 0;
+  private disposer: (() => void) | null = null;
 
   constructor(config: AgentConfig, channel: Channel) {
     this.config = config;
     this.channel = channel;
-    this.todoManager = new TodoManager();
+    this.todoManager = new TodoManagerImpl();
+    this.llmClient = new LLMClient({
+      apiKey: config.apiKey,
+      model: config.model,
+      apiBase: config.apiBase,
+    });
     this.toolRegistry = new ToolRegistry(channel, this.todoManager);
 
     makeAutoObservable(this);
-    this.loadTools();
   }
 
   loadTools(): void {
@@ -99,7 +89,7 @@ export class AgentStore {
 
   updateRootUri(rootUri: string): void {
     runInAction(() => {
-      this.config.rootUri = rootUri;
+      this.config = { ...this.config, rootUri };
     });
   }
 
@@ -110,32 +100,65 @@ export class AgentStore {
     });
   }
 
-  addMessage(message: Omit<AgentMessage, 'id' | 'timestamp'>): void {
+  async fetchLLMConfig(): Promise<{ apiKey: string; model: string; apiBase: string } | null> {
+    try {
+      const response = (await this.channel.send({
+        type: LLM_BOX_MESSAGE_TYPES.LLM_CONFIG_GET,
+        data: {},
+      })) as { apiKey?: string; model?: string; apiBase?: string; error?: string };
+
+      if (response.error) {
+        logger.warn('Failed to fetch LLM config from main process', { error: response.error });
+        return null;
+      }
+
+      const result = {
+        apiKey: response.apiKey ?? this.config.apiKey,
+        model: response.model ?? this.config.model,
+        apiBase: response.apiBase ?? this.config.apiBase,
+      };
+
+      logger.debug('LLM config fetched', {
+        apiBase: result.apiBase,
+        model: result.model,
+        hasApiKey: !!result.apiKey,
+      });
+
+      return result;
+    } catch (error) {
+      logger.error('Error fetching LLM config', error);
+      return null;
+    }
+  }
+
+  addMessage(message: { role: string; content: string; toolCallId?: string; tool_calls?: unknown[] }): void {
     runInAction(() => {
       this.conversationHistory.push({
         ...message,
         id: uuid('agent-msg-'),
         timestamp: new Date(),
-      });
+      } as AgentMessage);
     });
   }
 
-  addStep(step: Omit<ExecutionStep, 'id' | 'timestamp'>): void {
+  addStep(step: Omit<ExecutionStep, 'id' | 'timestamp'>): string {
     const stepId = uuid('agent-step-');
-    const stepWithId = {
-      ...step,
-      id: stepId,
-      timestamp: new Date(),
-    };
-
-    logger.debug('Adding step to execution log', {
-      id: stepId,
-      type: step.type,
-      currentCount: this.executionLog.length,
-    });
-
     runInAction(() => {
-      this.executionLog.push(stepWithId);
+      this.executionLog.push({
+        ...step,
+        id: stepId,
+        timestamp: new Date(),
+      });
+    });
+    return stepId;
+  }
+
+  updateThinkingStepContent(stepId: string, content: string): void {
+    runInAction(() => {
+      const step = this.executionLog.find((s) => s.id === stepId);
+      if (step && step.type === 'thinking') {
+        step.content = content;
+      }
     });
   }
 
@@ -167,60 +190,16 @@ export class AgentStore {
     this.setError(null);
   }
 
-  // ========== 公共方法 ==========
-
   stopAgent(): void {
     logger.info('Stopping agent');
+    if (this.disposer) {
+      this.disposer();
+      this.disposer = null;
+    }
     if (this.orchestrator) {
       this.orchestrator.stop();
     }
     this.setRunning(false);
-  }
-
-  // ========== 私有方法 ==========
-
-  private getDirectoryFromUri(fileUri: string): string {
-    const withoutProtocol = fileUri.replace('file://', '');
-    const lastSlashIndex = withoutProtocol.lastIndexOf('/');
-    if (lastSlashIndex === -1) {
-      return withoutProtocol;
-    }
-    return withoutProtocol.substring(0, lastSlashIndex);
-  }
-
-  private buildContextPrompt(
-    fileUri: string,
-    userPrompt: string,
-    hasContext: boolean,
-  ): string {
-    const parts: string[] = [];
-
-    parts.push('## Context');
-
-    if (fileUri) {
-      const workingDir = this.getDirectoryFromUri(fileUri);
-      parts.push(`Working Directory: ${workingDir}`);
-      parts.push(`Current File: ${fileUri}`);
-    }
-
-    if (this.selection) {
-      parts.push(`Selected Content:\n\`\`\`\n${this.selection}\n\`\`\``);
-    }
-
-    if (this.content) {
-      parts.push(`Current File Content:\n\`\`\`\n${this.content}\n\`\`\``);
-    }
-
-    parts.push('## Task');
-    parts.push(userPrompt);
-
-    if (hasContext) {
-      parts.push(
-        `\n## Previous Context\nTasks: ${this.executionLog.length}, Messages: ${this.conversationHistory.length}`,
-      );
-    }
-
-    return `${parts.join('\n')}\n\n`;
   }
 
   async runAgent(prompt: string): Promise<void> {
@@ -234,58 +213,75 @@ export class AgentStore {
       this.clearError();
       this.clearLog();
 
+      if (this.disposer) {
+        this.disposer();
+        this.disposer = null;
+      }
+
       runInAction(() => {
         this.currentPrompt = prompt;
         this.executionStartTime = new Date();
-        this.currentIteration = 0;
+        this.conversationHistory.push({
+          id: uuid('agent-msg-'),
+          role: 'user',
+          content: prompt,
+          timestamp: new Date(),
+        });
       });
+
+      const llmConfig = await this.fetchLLMConfig();
+      if (llmConfig) {
+        this.llmClient = new LLMClient({
+          apiKey: llmConfig.apiKey,
+          model: llmConfig.model,
+          apiBase: llmConfig.apiBase,
+        });
+      }
 
       const hasFileContent = !!this.content;
 
-      const userPrompt = this.buildContextPrompt(
-        this.fileUri || '',
-        prompt,
-        hasFileContent,
-      );
+      const conversationHistory = this.conversationHistory.map((msg) => ({
+        ...msg,
+        timestamp: msg.timestamp instanceof Date ? msg.timestamp : new Date(msg.timestamp as unknown as string),
+      }));
 
-      const conversationHistory = this.conversationHistory
-        .filter((msg: any) => {
-          return (
-            msg.role === 'user' ||
-            msg.role === 'assistant' ||
-            msg.role === 'system'
-          );
-        })
-        .map((msg: any) => ({
-          ...msg,
-          timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
-        }));
+      this.orchestrator = new AgentOrchestrator(this.config, {
+        toolRegistry: this.toolRegistry,
+        llmClient: this.llmClient,
+        todoManager: this.todoManager,
+      });
 
-      this.orchestrator = new AgentOrchestrator(
-        {
-          config: this.config,
-          toolRegistry: this.toolRegistry,
-          onStep: this.addStep.bind(this),
-          onStateChange: (state) => {
-            runInAction(() => {
-              this.agentState = state;
-            });
-          },
-          onMessage: (message) => {
-            this.addMessage(message);
-          },
-          onTodoChange: (todos) => {
-            runInAction(() => {
-              this.todos = todos;
-            });
-          },
-          onSaveState: this.saveExecutionState.bind(this),
-          hasFileContent,
-        },
-        this.todoManager,
-      );
+      const disposerStep = this.orchestrator.on('step', (step) => this.addStep(step));
+      const disposerThinkingChunk = this.orchestrator.on('thinkingChunk', ({ stepId, content }) => {
+        this.updateThinkingStepContent(stepId, content);
+      });
+      const disposerStateChange = this.orchestrator.on('stateChange', (state) => {
+        runInAction(() => {
+          this.agentState = state;
+        });
+      });
+      const disposerMessage = this.orchestrator.on('message', (message) => {
+        this.addMessage(message);
+      });
+      const disposerTodoChange = this.orchestrator.on('todoChange', (todos) => {
+        runInAction(() => {
+          this.todos = todos;
+        });
+      });
 
-      await this.orchestrator.run(userPrompt, conversationHistory);
+      this.disposer = () => {
+        disposerStep();
+        disposerThinkingChunk();
+        disposerStateChange();
+        disposerMessage();
+        disposerTodoChange();
+      };
+
+      await this.orchestrator.run(prompt, conversationHistory, {
+        clearTodos: true,
+        startIteration: 0,
+      });
+
       this.setRunning(false);
       logger.info('Agent execution completed', {
         steps: this.executionLog.length,
@@ -297,12 +293,6 @@ export class AgentStore {
       logger.error('Agent execution failed', error);
       throw error;
     }
-  }
-
-  async compressConversation(): Promise<void> {
-    logger.warn(
-      'compressConversation() is deprecated. Compression is now handled by AgentOrchestrator',
-    );
   }
 
   async saveContext(fileUri: string): Promise<void> {
@@ -339,7 +329,7 @@ export class AgentStore {
     }
   }
 
-  async loadContext(fileUri: string): Promise<any> {
+  async loadContext(fileUri: string): Promise<unknown> {
     if (!this.config.rootUri) {
       logger.warn('Cannot load agent context: missing rootUri');
       return null;
@@ -349,9 +339,7 @@ export class AgentStore {
       const response = (await this.channel.send({
         type: 'AGENT_CONTEXT_LOAD',
         data: { fileUri, rootUri: this.config.rootUri },
-      })) as { error?: string; agentContext?: any };
-
-      logger.debug('Agent context load response', { response });
+      })) as { error?: string; agentContext?: unknown };
 
       if (response.error) {
         logger.error('Failed to load agent context', response.error);
@@ -361,32 +349,27 @@ export class AgentStore {
       const agentContext = response.agentContext;
 
       runInAction(() => {
-        // 设置当前文件的 fileUri（不从上下文中加载）
         this.fileUri = fileUri;
 
         if (!agentContext) {
-          logger.debug(
-            'No agentContext found for file, resetting conversation and execution data',
-            { fileUri },
-          );
-
           this.error = null;
           this.selection = '';
           this.executionLog = [];
           this.conversationHistory = [];
         } else {
-          this.error = agentContext.error || null;
-          this.selection = agentContext.selection || '';
-          this.executionLog = agentContext.executionLog || [];
-          this.conversationHistory = agentContext.conversationHistory || [];
+          const ctx = agentContext as Record<string, unknown>;
+          this.error = (ctx.error as string) || null;
+          this.selection = (ctx.selection as string) || '';
+          this.executionLog = (ctx.executionLog as ExecutionStep[]) || [];
+          this.conversationHistory = (ctx.conversationHistory as AgentMessage[]) || [];
         }
       });
 
       logger.info('Agent context loaded', {
         fileUri: this.fileUri,
         hasContext: !!agentContext,
-        executionLogCount: agentContext?.executionLog?.length || 0,
-        conversationCount: agentContext?.conversationHistory?.length || 0,
+        executionLogCount: this.executionLog.length,
+        conversationCount: this.conversationHistory.length,
       });
 
       return agentContext;
@@ -415,13 +398,10 @@ export class AgentStore {
       startTime: this.executionStartTime || new Date(),
       isRunning: this.isRunning,
       agentState: this.agentState,
-      currentIteration: this.currentIteration,
-      maxIterations: this.config.maxIterations || 10,
+      currentIteration: 0,
+      maxIterations: this.config.maxIterations || 50,
       todos: this.todos,
-      executionLog: this.executionLog.map((step) => ({
-        ...step,
-        timestamp: step.timestamp,
-      })),
+      executionLog: this.executionLog,
       conversationHistory: this.conversationHistory.map((msg) => ({
         role: msg.role,
         content: msg.content,
@@ -450,7 +430,6 @@ export class AgentStore {
 
       logger.info('Execution state saved successfully', {
         fileUri: this.fileUri,
-        iteration: state.currentIteration,
       });
     } catch (error) {
       logger.error('Failed to save execution state', error);
@@ -479,40 +458,15 @@ export class AgentStore {
         return null;
       }
 
-      const state = response.state;
-
-      const parseDate = (value: unknown): Date => {
-        if (value instanceof Date) return value;
-        if (typeof value === 'string' || typeof value === 'number')
-          return new Date(value);
-        return new Date();
-      };
-
-      const stateWithDates: AgentExecutionState = {
-        ...state,
-        startTime: parseDate(state.startTime),
-        todos: state.todos.map((todo) => ({
-          ...todo,
-          createdAt: parseDate(todo.createdAt),
-          updatedAt: parseDate(todo.updatedAt),
-        })),
-        executionLog: state.executionLog.map((step) => ({
-          ...step,
-          timestamp: parseDate(step.timestamp),
-        })),
-        savedAt: parseDate(state.savedAt),
-      };
-
       runInAction(() => {
         this.hasSavedState = true;
       });
 
       logger.info('Execution state loaded successfully', {
         fileUri: this.fileUri,
-        iteration: stateWithDates.currentIteration,
       });
 
-      return stateWithDates;
+      return response.state;
     } catch (error) {
       logger.error('Failed to load execution state', error);
       return null;
@@ -530,76 +484,72 @@ export class AgentStore {
       throw new Error('No saved execution state found');
     }
 
-    try {
-      this.setRunning(true);
-      this.clearError();
+      try {
+        this.setRunning(true);
+        this.clearError();
 
-      runInAction(() => {
+        if (this.disposer) {
+          this.disposer();
+          this.disposer = null;
+        }
+
+        runInAction(() => {
         this.todos = state.todos;
         this.executionLog = state.executionLog;
         this.conversationHistory = state.conversationHistory.map(
-          (msg: any) => ({
-            ...msg,
+          (msg) => ({
             id: uuid('agent-msg-'),
+            role: msg.role as 'user' | 'assistant' | 'system' | 'tool',
+            content: msg.content,
             timestamp: new Date(),
-          }),
+          })
         );
-        this.currentIteration = state.currentIteration;
         this.currentPrompt = state.prompt;
         this.executionStartTime = state.startTime;
         this.content = state.content;
         this.selection = state.selection;
       });
 
-      const conversationHistory = this.conversationHistory
-        .filter((msg) => {
-          return (
-            msg.role === 'user' ||
-            msg.role === 'assistant' ||
-            msg.role === 'system'
-          );
-        })
-        .map((msg) => {
-          // Remove tool_calls from assistant messages since we're not including tool results
-          // This prevents "Invalid tool_call_id" errors from the API
-          if (msg.role === 'assistant' && msg.tool_calls) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { tool_calls: _, ...rest } = msg;
-            return rest;
-          }
-          return msg;
+      this.orchestrator = new AgentOrchestrator(this.config, {
+        toolRegistry: this.toolRegistry,
+        llmClient: this.llmClient,
+        todoManager: this.todoManager,
+      });
+
+      const disposerStep = this.orchestrator.on('step', (step) => this.addStep(step));
+      const disposerStateChange = this.orchestrator.on('stateChange', (state) => {
+        runInAction(() => {
+          this.agentState = state;
         });
+      });
+      const disposerMessage = this.orchestrator.on('message', (message) => {
+        this.addMessage(message);
+      });
+      const disposerTodoChange = this.orchestrator.on('todoChange', (todos) => {
+        runInAction(() => {
+          this.todos = todos;
+        });
+      });
 
-      const hasFileContent = !!this.content;
+      this.disposer = () => {
+        disposerStep();
+        disposerStateChange();
+        disposerMessage();
+        disposerTodoChange();
+      };
 
-      this.orchestrator = new AgentOrchestrator(
-        {
-          config: this.config,
-          toolRegistry: this.toolRegistry,
-          onStep: this.addStep.bind(this),
-          onStateChange: (state) => {
-            runInAction(() => {
-              this.agentState = state;
-            });
-          },
-          onMessage: (message) => {
-            this.addMessage(message);
-          },
-          onTodoChange: (todos) => {
-            runInAction(() => {
-              this.todos = todos;
-            });
-          },
-          onSaveState: this.saveExecutionState.bind(this),
-          hasFileContent,
-        },
-        this.todoManager,
-      );
+      const historyMessages = state.conversationHistory.map((msg) => ({
+        id: uuid('hist-'),
+        role: msg.role as 'user' | 'assistant' | 'system' | 'tool',
+        content: msg.content,
+        timestamp: new Date(),
+      }));
 
-      await this.orchestrator.run(state.prompt, conversationHistory, {
+      await this.orchestrator.run(state.prompt, historyMessages, {
         clearTodos: false,
         startIteration: state.currentIteration,
       });
+
       this.setRunning(false);
       logger.info('Agent execution resumed successfully', {
         steps: this.executionLog.length,

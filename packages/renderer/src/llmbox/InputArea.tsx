@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './InputArea.module.scss';
 import { observer } from 'mobx-react-lite';
 import { getLogger } from '/@/shared/logger';
@@ -92,6 +92,12 @@ const InputArea: React.FC<InputAreaProps> = ({
       newUrls.splice(index, 1);
       return newUrls;
     });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      imageUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
   }, []);
 
   return (
