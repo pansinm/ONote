@@ -21,7 +21,7 @@ export function usePreviewerSelection() {
         return;
       }
 
-      logger.debug('Text selected in previewer', { selectedText });
+      logger.info('Text selected in previewer', { selectedText, length: selectedText.length });
 
       // 通过 tunnel 发送选择内容到主应用
       tunnel.send(IPCMethod.PreviewerSelectionChangedEvent, {

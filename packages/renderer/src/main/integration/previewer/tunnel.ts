@@ -22,6 +22,9 @@ import state from './state';
 import { applyModelEdits } from '../../monaco/utils';
 import eventbus from '../../eventbus/eventbus';
 import { EDITOR_SELECTION_CHANGED } from '../../eventbus/EventName';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('PreviewerTunnel');
 
 mainFrame.onNewTunnel((tunnel) => {
   if (tunnel.groupId !== 'previewer') {
@@ -153,7 +156,20 @@ mainFrame.onNewTunnel((tunnel) => {
   tunnel.on(
     IPCMethod.PreviewerSelectionChangedEvent,
     (payload: { content: string }) => {
-      eventbus.emit(EDITOR_SELECTION_CHANGED, payload);
+      const uri = stores.activationStore.activeFileUri;
+      const editor = monaco.editor.getEditors()[0];
+      const fileContent = editor?.getValue() || '';
+
+      logger.info('Received selection from previewer', {
+        selectionLength: payload.content.length,
+        uri,
+      });
+
+      eventbus.emit(EDITOR_SELECTION_CHANGED, {
+        uri,
+        content: fileContent,
+        selection: payload.content,
+      });
     },
   );
 });
