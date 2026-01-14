@@ -1,5 +1,5 @@
+import OpenAI from 'openai';
 import type { Message, Tool } from '../types';
-import { parseStream, type StreamingChunk } from './sse';
 
 export interface LLMConfig {
   apiKey: string;
@@ -26,87 +26,82 @@ export interface StreamingCallbacks {
 }
 
 export class LLMClient {
-  private config: LLMConfig;
+  private client: OpenAI;
+  private model: string;
 
   constructor(config: LLMConfig) {
-    let apiBase = config.apiBase?.trim() || '';
-    if (!apiBase) {
-      apiBase = 'https://api.openai.com/v1';
+    let baseURL = config.apiBase?.trim() || '';
+    if (!baseURL) {
+      baseURL = 'https://api.openai.com/v1';
     }
-    if (!apiBase.startsWith('http://') && !apiBase.startsWith('https://')) {
-      apiBase = 'https://' + apiBase;
+    if (!baseURL.startsWith('http://') && !baseURL.startsWith('https://')) {
+      baseURL = 'https://' + baseURL;
     }
-    if (!apiBase.endsWith('/chat/completions')) {
-      apiBase = apiBase.replace(/\/$/, '') + '/chat/completions';
+    if (baseURL.endsWith('/chat/completions')) {
+      baseURL = baseURL.replace(/\/chat\/completions$/, '');
     }
-    this.config = {
-      ...config,
-      apiBase,
-    };
-  }
+    if (baseURL.endsWith('/')) {
+      baseURL = baseURL.slice(0, -1);
+    }
 
-  private buildHeaders(): HeadersInit {
-    return {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.config.apiKey}`,
-    };
-  }
-
-  private buildBody(
-    messages: Message[],
-    tools?: Tool[]
-  ): Record<string, unknown> {
-    return {
-      model: this.config.model,
-      messages: messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-        tool_calls: m.tool_calls,
-      })),
-      tools: tools?.map((t) => this.toolToSchema(t)),
-      tool_choice: 'auto',
-      stream: true,
-    };
-  }
-
-  private toolToSchema(tool: Tool): Record<string, unknown> {
-    return {
-      type: 'function',
-      function: {
-        name: tool.name,
-        description: tool.description,
-        parameters: tool.parameters,
-      },
-    };
+    this.client = new OpenAI({
+      apiKey: config.apiKey,
+      baseURL,
+      dangerouslyAllowBrowser: true,
+    });
+    this.model = config.model;
   }
 
   async *stream(
     messages: Message[],
     options?: { signal?: AbortSignal; tools?: Tool | Tool[] }
-  ): AsyncGenerator<StreamingChunk> {
+  ): AsyncGenerator<{
+    content: string;
+    toolCalls: { id: string; name: string; arguments: string }[];
+  }> {
     const tools = options?.tools
       ? (Array.isArray(options.tools) ? options.tools : [options.tools])
       : undefined;
-    const body = this.buildBody(messages, tools);
 
-    const response = await fetch(this.config.apiBase, {
-      method: 'POST',
-      headers: this.buildHeaders(),
-      body: JSON.stringify(body),
-      signal: options?.signal,
+    const stream = await this.client.chat.completions.create({
+      model: this.model,
+      messages: messages.map((m) => ({
+        role: m.role as 'user' | 'assistant' | 'system' | 'tool',
+        content: m.content,
+        tool_calls: m.tool_calls as
+          | Array<{
+              id: string;
+              type: 'function';
+              function: { name: string; arguments: string };
+            }>
+          | undefined,
+      })),
+      tools: tools?.map((t) => ({
+        type: 'function' as const,
+        function: {
+          name: t.name,
+          description: t.description,
+          parameters: t.parameters as Record<string, unknown>,
+        },
+      })),
+      tool_choice: 'auto',
+      stream: true,
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new LLMApiError(response.status, errorText);
-    }
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta;
+      const content = delta?.content || '';
+      const toolCalls = delta?.tool_calls || [];
 
-    const stream = response.body;
-    if (!stream) {
-      throw new Error('No response body stream');
+      yield {
+        content,
+        toolCalls: toolCalls.map((tc) => ({
+          id: tc.id,
+          name: tc.function?.name || '',
+          arguments: tc.function?.arguments || '',
+        })),
+      };
     }
-
-    yield* parseStream(stream, options?.signal);
   }
 
   async complete(
