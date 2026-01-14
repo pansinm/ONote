@@ -97,17 +97,29 @@ export class AgentExecutor {
 
   updateFileUri(fileUri: string): void {
     this.state.updateFileUri(fileUri);
+    this.config = { ...this.config, fileUri };
+    if (this.orchestrator) {
+      this.orchestrator.updateConfig({ fileUri });
+    }
   }
 
   updateRootUri(rootUri: string): void {
     this.configManager.updateRootUri(rootUri);
+    this.config = { ...this.config, rootUri };
+    if (this.orchestrator) {
+      this.orchestrator.updateConfig({ rootUri });
+    }
   }
 
   updateEditorContent(content: string, selection: string): void {
     this.state.updateEditorContent(content, selection);
   }
 
-  async runAgent(prompt: string): Promise<void> {
+  updateConfig(updates: Partial<typeof this.config>): void {
+    this.config = { ...this.config, ...updates };
+  }
+
+  async runAgent(prompt: string, options?: { clearTodos?: boolean; clearLog?: boolean }): Promise<void> {
     if (this.state.isRunning) {
       logger.warn('Agent is already running, ignoring new request');
       return;
@@ -116,7 +128,9 @@ export class AgentExecutor {
     try {
       this.state.setRunning(true);
       this.state.setError(null);
-      this.state.clearLog();
+      if (options?.clearLog !== false) {
+        this.state.clearLog();
+      }
 
       if (this.disposer) {
         this.disposer();

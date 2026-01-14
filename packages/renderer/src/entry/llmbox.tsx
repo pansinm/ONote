@@ -35,9 +35,9 @@ const LLMBoxApp = observer(() => {
   );
 
   useEffect(() => {
-    receive(async ({ type, data }: any) => {
+    const handleMessage = async ({ type, data }: any) => {
       if (type === LLM_BOX_MESSAGE_TYPES.GET_CURRENT_FILE_INFO) {
-        const { fileUri, rootUri } = data;
+        const { fileUri, rootUri } = data || {};
         if (rootUri) {
           agentStore.updateRootUri(rootUri);
         }
@@ -72,7 +72,11 @@ const LLMBoxApp = observer(() => {
           data?.selection || '',
         );
       }
-    });
+    };
+
+    receive(handleMessage);
+
+    send({ type: LLM_BOX_MESSAGE_TYPES.GET_CURRENT_FILE_INFO, data: undefined });
   }, [agentStore]);
 
   const handleAgentRun = async (prompt: string) => {

@@ -70,6 +70,10 @@ export class AgentOrchestrator {
     this.strategy = strategy;
   }
 
+  updateConfig(updates: Partial<AgentConfig>): void {
+    this.config = { ...this.config, ...updates };
+  }
+
   on<T extends AgentEventType>(
     event: T,
     handler: AgentEventHandler<T>
@@ -215,6 +219,18 @@ export class AgentOrchestrator {
     const startTime = Date.now();
 
     this.emit('stateChange', 'executing');
+
+    if (!toolCall.name) {
+      this.logger.warn('Tool call received without name', { toolCall });
+      messages.push({
+        id: uuid('tool-'),
+        role: 'tool',
+        content: `Error: Invalid tool call - no tool name provided`,
+        toolCallId: toolCall.id,
+        timestamp: new Date(),
+      });
+      return;
+    }
 
     const tool = this.deps.toolRegistry.get(toolCall.name);
     if (!tool) {

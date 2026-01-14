@@ -107,9 +107,10 @@ function LLMBoxFrame() {
       },
     );
 
-    receive(async (message) => {
-      const result = await handlerRegistry.handle(message);
-      return result;
+    receive((message: any) => {
+      handlerRegistry.handle(message).then((result) => {
+        return result;
+      });
     });
 
     return () => {

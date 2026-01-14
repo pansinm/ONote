@@ -166,8 +166,8 @@ export class AgentStore {
     this.executor.stopAgent();
   }
 
-  async runAgent(prompt: string): Promise<void> {
-    await this.executor.runAgent(prompt);
+  async runAgent(prompt: string, options?: { clearTodos?: boolean; clearLog?: boolean }): Promise<void> {
+    await this.executor.runAgent(prompt, options);
   }
 
   async saveContext(fileUri: string): Promise<void> {

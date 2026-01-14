@@ -12,22 +12,22 @@ export function createTodoTools(todoManager: TodoManager): Tool[] {
   return [
     {
       name: 'createTodo',
-      description: '创建新的任务项。用于分解复杂任务为可执行的子任务。可以指定父任务 ID 来创建子任务，实现层级结构。',
+      description: '创建新的任务项。用于分解复杂任务为可执行的子任务。参数 description 是必需的，必须提供任务的具体描述。可以指定父任务 ID 来创建子任务。',
       parameters: {
         type: 'object',
         properties: {
           description: {
             type: 'string',
-            description: '任务描述',
+            description: '任务描述（必需）：具体要完成的任务内容',
           },
           priority: {
             type: 'string',
             enum: ['high', 'medium', 'low'],
-            description: '优先级',
+            description: '优先级：high(高)、medium(中)、low(低)，默认为 medium',
           },
           parentId: {
             type: 'string',
-            description: '父任务 ID，可选。如果提供，将创建为子任务',
+            description: '父任务 ID（可选）：如果提供，将创建为该任务的子任务',
           },
         },
         required: ['description'],
@@ -45,18 +45,22 @@ export function createTodoTools(todoManager: TodoManager): Tool[] {
     },
     {
       name: 'updateTodo',
-      description: '更新任务状态。将任务标记为进行中或已完成。',
+      description: '更新任务状态或描述。id 和 status 是必需参数。',
       parameters: {
         type: 'object',
         properties: {
           id: {
             type: 'string',
-            description: '任务 ID',
+            description: '任务 ID（必需）：要更新的任务标识符',
           },
           status: {
             type: 'string',
             enum: ['in_progress', 'completed', 'failed'],
-            description: '新状态',
+            description: '新状态（必需）：in_progress(进行中)、completed(已完成)、failed(失败)',
+          },
+          description: {
+            type: 'string',
+            description: '新描述（可选）：更新后的任务描述',
           },
         },
         required: ['id', 'status'],

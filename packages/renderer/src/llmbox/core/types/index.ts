@@ -34,7 +34,7 @@ export interface ToolParameter {
   type: 'string' | 'number' | 'boolean' | 'array' | 'object';
   description: string;
   required?: boolean;
-  enum?: string[];
+  enum?: string[];  // 添加 enum 字段
   default?: unknown;
   items?: ToolParameter;
   properties?: Record<string, ToolParameter>;

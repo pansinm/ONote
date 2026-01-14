@@ -1,4 +1,4 @@
-import type { LLMBoxMessage, LLMBoxResponse } from '../types';
+import type { LLMBoxMessage, LLMBoxResponse, LLMConfigMessage, LLMConfigResponse } from '../types';
 import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/constants/LLMBoxConstants';
 import { BaseHandler } from './BaseHandler';
 
@@ -8,17 +8,14 @@ interface LLMConfigData {
   apiBase?: string;
 }
 
-interface LLMConfigResponse {
-  apiKey: string;
-  model: string;
-  apiBase: string;
-}
-
 export class LLMConfigGetHandler extends BaseHandler {
-  async handle(data: LLMConfigData): Promise<LLMBoxResponse> {
+  async handle(data: LLMConfigData): Promise<LLMConfigResponse> {
     const onote = (window as any).onote;
     if (!onote || !onote.setting) {
       return {
+        apiKey: '',
+        model: '',
+        apiBase: '',
         error: 'Setting API not available',
       };
     }
@@ -34,6 +31,9 @@ export class LLMConfigGetHandler extends BaseHandler {
       return llmConfig;
     } catch (error) {
       return {
+        apiKey: '',
+        model: '',
+        apiBase: '',
         error: error instanceof Error ? error.message : 'Failed to get LLM config',
       };
     }

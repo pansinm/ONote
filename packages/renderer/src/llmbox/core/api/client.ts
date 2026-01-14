@@ -63,19 +63,31 @@ export class LLMClient {
       ? (Array.isArray(options.tools) ? options.tools : [options.tools])
       : undefined;
 
-    const stream = await this.client.chat.completions.create({
-      model: this.model,
-      messages: messages.map((m) => ({
+    const openaiMessages: any[] = messages.map((m) => {
+      if (m.role === 'tool') {
+        return {
+          role: 'tool' as const,
+          content: m.content,
+          tool_call_id: m.toolCallId,
+        };
+      }
+      return {
         role: m.role as 'user' | 'assistant' | 'system' | 'tool',
         content: m.content,
-        tool_calls: m.tool_calls as
-          | Array<{
-              id: string;
-              type: 'function';
-              function: { name: string; arguments: string };
-            }>
-          | undefined,
-      })),
+        tool_calls: m.tool_calls?.map((tc: any) => ({
+          id: tc.id,
+          type: 'function' as const,
+          function: {
+            name: tc.function.name,
+            arguments: tc.function.arguments,
+          },
+        })),
+      };
+    });
+
+    const stream = await this.client.chat.completions.create({
+      model: this.model,
+      messages: openaiMessages,
       tools: tools?.map((t) => ({
         type: 'function' as const,
         function: {
@@ -96,7 +108,7 @@ export class LLMClient {
       yield {
         content,
         toolCalls: toolCalls.map((tc) => ({
-          id: tc.id,
+          id: tc.id || '',
           name: tc.function?.name || '',
           arguments: tc.function?.arguments || '',
         })),
@@ -117,6 +129,8 @@ export class LLMClient {
       }
 
       for (const tc of chunk.toolCalls) {
+        if (!tc.name) continue; // 跳过没有名称的工具调用
+
         if (!toolCalls.has(tc.id)) {
           toolCalls.set(tc.id, {
             id: tc.id,
@@ -124,15 +138,19 @@ export class LLMClient {
             arguments: '',
             content: '',
           });
+        } else {
+          const existing = toolCalls.get(tc.id)!;
+          if (!existing.name && tc.name) {
+            existing.name = tc.name;
+          }
+          existing.arguments += tc.arguments;
         }
-        const existing = toolCalls.get(tc.id)!;
-        existing.arguments += tc.arguments;
       }
     }
 
     return {
       content,
-      toolCalls: Array.from(toolCalls.values()),
+      toolCalls: Array.from(toolCalls.values()).filter((tc) => tc.name),
     };
   }
 
@@ -155,6 +173,8 @@ export class LLMClient {
       }
 
       for (const tc of chunk.toolCalls) {
+        if (!tc.name) continue; // 跳过没有名称的工具调用
+
         if (!toolCalls.has(tc.id)) {
           toolCalls.set(tc.id, {
             id: tc.id,
@@ -162,6 +182,11 @@ export class LLMClient {
             arguments: '',
             content: '',
           });
+        } else {
+          const existing = toolCalls.get(tc.id)!;
+          if (!existing.name && tc.name) {
+            existing.name = tc.name;
+          }
         }
         const existing = toolCalls.get(tc.id)!;
         existing.arguments += tc.arguments;
@@ -170,7 +195,7 @@ export class LLMClient {
 
     const result = {
       content,
-      toolCalls: Array.from(toolCalls.values()),
+      toolCalls: Array.from(toolCalls.values()).filter((tc) => tc.name),
     };
 
     if (callbacks?.onComplete) {

@@ -39,6 +39,22 @@ export interface GetCurrentFileInfoResponse {
   rootUri?: string;
 }
 
+export interface LLMConfigMessage {
+  type: 'LLM_CONFIG_GET';
+  data?: {
+    apiKey?: string;
+    model?: string;
+    apiBase?: string;
+  };
+}
+
+export interface LLMConfigResponse {
+  apiKey: string;
+  model: string;
+  apiBase: string;
+  error?: string;
+}
+
 export interface LLMConversationLoadMessage {
   type: 'LLM_CONVERSATION_LOAD';
   data: {
@@ -283,6 +299,7 @@ export type LLMBoxMessage =
   | EditorSelectionChangedMessage
   | EditorFileOpenMessage
   | GetCurrentFileInfoMessage
+  | LLMConfigMessage
   | LLMConversationLoadMessage
   | LLMConversationSaveMessage
   | AgentFileReadMessage
@@ -300,6 +317,7 @@ export type LLMBoxMessage =
 
 export type LLMBoxResponse =
   | GetCurrentFileInfoResponse
+  | LLMConfigResponse
   | LLMConversationLoadResponse
   | LLMConversationSaveResponse
   | AgentFileReadResponse

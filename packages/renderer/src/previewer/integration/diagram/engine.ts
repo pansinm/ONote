@@ -94,15 +94,14 @@ class DiagramEngine {
     const root = document.querySelector('.markdown-body') as HTMLDivElement;
     root.appendChild(container);
     try {
-      const graph = mermaid.render(
+      const graph = await mermaid.render(
         _.uniqueId('mermaid-'),
         code,
-        undefined as any,
-        container as any,
+        container,
       );
       return {
         type: 'svg',
-        content: graph,
+        content: graph.svg,
       };
     } finally {
       container.remove();
