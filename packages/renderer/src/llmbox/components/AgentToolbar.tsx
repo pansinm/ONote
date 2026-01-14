@@ -3,6 +3,8 @@ import { observer } from 'mobx-react-lite';
 import type { AgentStore } from '../AgentStore';
 import { AgentStatus } from './AgentStatus';
 import { AgentActionButtons } from './AgentActionButtons';
+import Icon from '/@/components/Icon';
+import styles from '../AgentPanel.module.scss';
 
 interface AgentToolbarProps {
   store: AgentStore;
@@ -10,9 +12,12 @@ interface AgentToolbarProps {
 
 export const AgentToolbar = observer(({ store }: AgentToolbarProps) => {
   return (
-    <div className="agent-toolbar">
-      <div className="toolbar-left">
-        <div className="agent-title">🤖 AI Agent</div>
+    <div className={styles.AgentToolbar}>
+      <div className={styles.ToolbarLeft}>
+        <div className={styles.AgentTitle}>
+          <Icon type="robot" size={18} />
+          <span>AI Agent</span>
+        </div>
         <AgentStatus store={store} />
       </div>
       <AgentActionButtons store={store} />

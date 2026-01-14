@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from '../AgentPanel.module.scss';
+import Icon from '/@/components/Icon';
 
 interface BottomTabsProps {
   activeTab: 'execution' | 'tools';
@@ -20,7 +21,8 @@ export const BottomTabs: React.FC<BottomTabsProps> = ({
         }`}
         onClick={() => onTabChange('execution')}
       >
-        📋 Execution Log
+        <Icon type="list-check" size={16} />
+        <span>Execution Log</span>
       </button>
       <button
         className={`${styles.BottomTabItem} ${
@@ -28,7 +30,8 @@ export const BottomTabs: React.FC<BottomTabsProps> = ({
         }`}
         onClick={() => onTabChange('tools')}
       >
-        🔧 Tools ({toolCount})
+        <Icon type="tools" size={16} />
+        <span>Tools ({toolCount})</span>
       </button>
     </div>
   );

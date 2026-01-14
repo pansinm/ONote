@@ -1,6 +1,8 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import type { AgentStore } from '../AgentStore';
+import styles from '../AgentPanel.module.scss';
+import Icon, { type IconType } from '/@/components/Icon';
 
 interface ToolsPanelProps {
   store: AgentStore;
@@ -8,30 +10,49 @@ interface ToolsPanelProps {
   selectedTool: string | null;
 }
 
+const TOOL_ICONS: Record<string, IconType> = {
+  readFile: 'file-earmark-text',
+  writeFile: 'pencil',
+  createFile: 'file-earmark-plus',
+  deleteFile: 'trash',
+  listFiles: 'folder2-open',
+  searchFiles: 'search',
+  searchInFile: 'file-text',
+  createTodo: 'list-check',
+  updateTodo: 'pencil-square',
+  listTodos: 'list-check',
+  markTodoCompleted: 'check-circle',
+  deleteTodo: 'trash2',
+};
+
 export const ToolsPanel = observer(
   ({ store, onToolSelect, selectedTool }: ToolsPanelProps) => {
     return (
-      <div className="tools-content">
-        <div className="tools-grid">
+      <div className={styles.ToolsContent}>
+        <div className={styles.ToolsGrid}>
           {store.tools.map((tool) => (
             <div
               key={tool.name}
-              className={`tool-card ${selectedTool === tool.name ? 'selected' : ''}`}
+              className={`${styles.ToolCard} ${selectedTool === tool.name ? styles.selected : ''}`}
               onClick={() => onToolSelect(tool.name)}
               title={tool.description}
             >
-              <div className="tool-icon">{getToolIcon(tool.name)}</div>
-              <div className="tool-info">
-                <div className="tool-header-info">
-                  <span className="tool-name">{tool.name}</span>
+              <div className={styles.ToolIcon}>
+                <Icon type={TOOL_ICONS[tool.name] || 'gear'} size={28} />
+              </div>
+              <div className={styles.ToolInfo}>
+                <div className={styles.ToolHeaderInfo}>
+                  <span className={styles.ToolName}>{tool.name}</span>
                   {tool.metadata?.dangerous && (
-                    <span className="tool-badge">⚠️</span>
+                    <span className={`${styles.ToolBadge} ${styles.dangerous}`}>
+                      <Icon type="exclamation-triangle" size={12} />
+                    </span>
                   )}
-                  <span className="tool-badge permission">
+                  <span className={`${styles.ToolBadge} ${styles.permission} ${styles[tool.metadata?.permission || 'read']}`}>
                     {tool.metadata?.permission}
                   </span>
                 </div>
-                <p className="tool-desc">{tool.description}</p>
+                <p className={styles.ToolDesc}>{tool.description}</p>
               </div>
             </div>
           ))}
@@ -40,23 +61,5 @@ export const ToolsPanel = observer(
     );
   }
 );
-
-function getToolIcon(toolName: string): string {
-  const iconMap: Record<string, string> = {
-    readFile: '📄',
-    writeFile: '✏️',
-    createFile: '📝',
-    deleteFile: '🗑️',
-    listFiles: '📂',
-    searchFiles: '🔍',
-    searchInFile: '🔎',
-    createTodo: '📋',
-    updateTodo: '✏️',
-    listTodos: '📋',
-    markTodoCompleted: '✅',
-    deleteTodo: '🗑️',
-  };
-  return iconMap[toolName] || '🔧';
-}
 
 export default ToolsPanel;

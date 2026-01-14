@@ -5,6 +5,7 @@ import type { TodoItem } from '../core/types';
 import styles from '../AgentPanel.module.scss';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Icon from '/@/components/Icon';
 
 interface ExecutionLogPanelProps {
   store: AgentStore;
@@ -39,7 +40,7 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
             <div
               key={step.id}
               className={`${styles.LogItem} ${
-                styles[`logItem${capitalize(step.type)}`]
+                styles[`LogItem${capitalize(step.type)}`]
               } ${isCollapsed ? styles.collapsed : ''}`}
             >
               <div className={styles.LogHeader}>
@@ -58,13 +59,11 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
                     className={styles.LogItemCollapseBtn}
                     onClick={() => toggleLogItemCollapse(step.id)}
                   >
-                    <span
-                      className={`${styles.LogItemCollapseIcon} ${
-                        isCollapsed ? styles.collapsed : ''
-                      }`}
-                    >
-                      {isCollapsed ? '▶' : '▼'}
-                    </span>
+                    <Icon
+                      type={isCollapsed ? 'caret-right' : 'caret-down'}
+                      size={12}
+                      className={styles.LogItemCollapseIcon}
+                    />
                   </button>
                 )}
               </div>
@@ -94,7 +93,7 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
 
                 {step.toolName && (
                   <div className={styles.LogTool}>
-                    <span className={styles.LogToolLabel}>→</span>
+                    <Icon type="arrow-right" size={12} className={styles.LogToolLabel} />
                     <span className={styles.LogToolName}>
                       {step.toolName}
                     </span>
@@ -115,7 +114,8 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
                     className={`${styles.LogDetails} ${styles.LogDetailsResult}`}
                   >
                     <summary className={styles.LogDetailsToggle}>
-                      <span>✅ Result</span>
+                      <Icon type="check-circle" size={14} />
+                      <span>Result</span>
                     </summary>
                     <div className={styles.LogDetailsContent}>
                       {typeof step.toolResult === 'string' ? (
@@ -135,7 +135,7 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
 
                 {step.error && (
                   <div className={styles.LogError}>
-                    <span className={styles.LogErrorIcon}>❌</span>
+                    <Icon type="x-circle" size={14} className={styles.LogErrorIcon} />
                     <span className={styles.LogErrorText}>
                       <div className="markdown-body">
                         <Markdown remarkPlugins={[remarkGfm]}>
@@ -192,7 +192,17 @@ function TodoTree({ todos }: TodoTreeProps) {
         }`}
         style={{ paddingLeft: `${level * 16 + 12}px` }}
       >
-        <span className={styles.TodoIcon}>{getTodoIcon(todo.status)}</span>
+        <span className={styles.TodoIcon}>
+          {todo.status === 'completed' ? (
+            <Icon type="check-circle-fill" size={14} />
+          ) : todo.status === 'in_progress' ? (
+            <Icon type="arrow-repeat" size={14} />
+          ) : todo.status === 'failed' ? (
+            <Icon type="x-circle-fill" size={14} />
+          ) : (
+            <Icon type="clock-history" size={14} />
+          )}
+        </span>
         <span className={styles.TodoDescription}>{todo.description}</span>
       </div>
       {todo.children &&
@@ -235,16 +245,6 @@ function buildTodoTree(flatTodos: TodoItem[]): TodoItem[] {
   });
 
   return rootTodos;
-}
-
-function getTodoIcon(status: string): string {
-  const iconMap: Record<string, string> = {
-    pending: '⏳',
-    in_progress: '🔄',
-    completed: '✅',
-    failed: '❌',
-  };
-  return iconMap[status] || '⏳';
 }
 
 export default ExecutionLogPanel;

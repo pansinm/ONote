@@ -1,6 +1,8 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import type { AgentStore } from '../AgentStore';
+import styles from '../AgentPanel.module.scss';
+import Icon from '/@/components/Icon';
 
 interface AgentActionButtonsProps {
   store: AgentStore;
@@ -8,53 +10,53 @@ interface AgentActionButtonsProps {
 
 export const AgentActionButtons = observer(({ store }: AgentActionButtonsProps) => {
   return (
-    <div className="agent-actions">
+    <div className={styles.AgentActions}>
       <button
-        className="action-btn icon-only clear-history-btn"
+        className={styles.ActionBtn}
         onClick={() => store.clearConversation()}
         disabled={store.isRunning}
         title="Clear History"
       >
-        🔄
+        <Icon type="arrow-clockwise" size={16} />
       </button>
 
       <button
-        className="action-btn icon-only clear-btn"
+        className={styles.ActionBtn}
         onClick={() => store.clearLog()}
         disabled={store.isRunning}
         title="Clear"
       >
-        🗑️
+        <Icon type="trash" size={16} />
       </button>
 
       {store.hasSavedState && !store.isRunning && (
         <button
-          className="action-btn icon-only resume-btn"
+          className={styles.ActionBtn}
           onClick={() => store.resumeExecution()}
           title="Resume from saved state"
         >
-          ▶️
+          <Icon type="play-fill" size={16} />
         </button>
       )}
 
       {store.hasSavedState && (
         <button
-          className="action-btn icon-only clear-state-btn"
+          className={styles.ActionBtn}
           onClick={() => store.deleteExecutionState()}
           disabled={store.isRunning}
           title="Clear saved state"
         >
-          🗑️
+          <Icon type="trash-fill" size={16} />
         </button>
       )}
 
       {store.isRunning && (
         <button
-          className="action-btn icon-only stop-btn"
+          className={styles.ActionBtn}
           onClick={() => store.stopAgent()}
           title="Stop"
         >
-          ⏹️
+          <Icon type="stop-fill" size={16} />
         </button>
       )}
     </div>
