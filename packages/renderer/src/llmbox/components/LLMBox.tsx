@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ExecutionStep } from '../core/types';
+import type { ExecutionStep } from '../types';
 import InputArea from './InputArea';
 import styles from './LLMBox.module.scss';
 import { observer } from 'mobx-react-lite';
@@ -23,7 +23,7 @@ export const LLMBox: React.FC<LLMBoxProps> = ({
         {executionLog.map((step) => (
           <div key={step.id} className={styles.step}>
             <span className={styles.stepType}>{step.type}</span>
-            <pre className={styles.stepContent}>{step.content}</pre>
+            {'content' in step && <pre className={styles.stepContent}>{(step as any).content}</pre>}
           </div>
         ))}
         {isRunning && <div className={styles.loading}>Running...</div>}

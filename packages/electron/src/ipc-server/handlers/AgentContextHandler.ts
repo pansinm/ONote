@@ -15,7 +15,12 @@ interface LoadAgentContextParams {
 interface SaveAgentContextParams {
   fileUri: string;
   rootUri: string;
-  context: any;
+  context: {
+    version: number;
+    savedAt: number;
+    fileUri: string;
+    messages: Array<{ role: string; content: string }>;
+  };
 }
 
 interface LoadExecutionStateParams {
@@ -26,21 +31,22 @@ interface LoadExecutionStateParams {
 interface SaveExecutionStateParams {
   fileUri: string;
   rootUri: string;
-  state: any;
+  state: {
+    version: number;
+    savedAt: number;
+    fileUri: string;
+    prompt: string;
+    startTime: number;
+    iteration: number;
+    agentState: 'idle' | 'thinking' | 'executing';
+    todos: any[];
+    steps: any[];
+  };
 }
 
 interface DeleteExecutionStateParams {
   fileUri: string;
   rootUri: string;
-}
-
-interface AgentContext {
-  fileUri: string;
-  executionLog: any[];
-  conversationHistory: any[];
-  error: string | null;
-  content: string;
-  selection: string;
 }
 
 class AgentContextHandler extends IpcHandler {
@@ -57,20 +63,20 @@ class AgentContextHandler extends IpcHandler {
     return path.join(baseDir, hash, 'ai', 'agent.json');
   }
 
-  async loadAgentContext(params: LoadAgentContextParams): Promise<AgentContext | null> {
+  async loadAgentContext(params: LoadAgentContextParams): Promise<{ version: number; savedAt: number; fileUri: string; messages: Array<{ role: string; content: string }> } | null> {
     const { fileUri, rootUri } = params;
     try {
       const filePath = this.getFilePath(fileUri, rootUri);
       logger.debug('Loading agent context from', { fileUri, rootUri, filePath });
 
       const content = await fs.readFile(filePath, 'utf-8');
-      const context = JSON.parse(content) as AgentContext;
+      const context = JSON.parse(content);
 
       logger.info('Agent context loaded successfully', {
         fileUri,
         rootUri,
         filePath,
-        stepCount: context.executionLog?.length || 0,
+        messageCount: context.messages?.length || 0,
       });
 
       return context;
@@ -95,7 +101,7 @@ class AgentContextHandler extends IpcHandler {
         rootUri,
         filePath,
         dir,
-        stepCount: context.executionLog?.length || 0,
+        messageCount: context.messages?.length || 0,
       });
 
       await fs.mkdir(dir, { recursive: true });
@@ -105,7 +111,7 @@ class AgentContextHandler extends IpcHandler {
         fileUri,
         rootUri,
         filePath,
-        stepCount: context.executionLog?.length || 0,
+        messageCount: context.messages?.length || 0,
       });
     } catch (error) {
       logger.error('Failed to save agent context', error, { fileUri, rootUri });
@@ -154,7 +160,7 @@ class AgentContextHandler extends IpcHandler {
         fileUri,
         rootUri,
         filePath,
-        iteration: state.currentIteration,
+        iteration: state.iteration,
       });
 
       return state;
@@ -179,7 +185,7 @@ class AgentContextHandler extends IpcHandler {
         rootUri,
         filePath,
         dir,
-        iteration: state.currentIteration,
+        iteration: state.iteration,
       });
 
       await fs.mkdir(dir, { recursive: true });
@@ -189,7 +195,7 @@ class AgentContextHandler extends IpcHandler {
         fileUri,
         rootUri,
         filePath,
-        iteration: state.currentIteration,
+        iteration: state.iteration,
       });
     } catch (error) {
       logger.error('Failed to save execution state', error, { fileUri, rootUri });

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import type { AgentStore } from '../store/AgentStore';
-import type { TodoItem } from '../core/types';
+import type { AgentStore } from '../store';
+import type { TodoItem } from '../types';
 import styles from './AgentPanel.module.scss';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';

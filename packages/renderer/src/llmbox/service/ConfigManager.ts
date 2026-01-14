@@ -1,33 +1,15 @@
-import { AgentConfig } from '../core/types';
+import { AgentConfig } from '../types';
 import { getLogger } from '/@/shared/logger';
-import { LLM_BOX_MESSAGE_TYPES } from '../constants/LLMBoxConstants';
-
-interface Channel {
-  send: (message: {
-    type: string;
-    data: unknown;
-  }) => Promise<Record<string, unknown>>;
-}
-
-interface LLMConfigResponse {
-  apiKey?: string;
-  model?: string;
-  apiBase?: string;
-  error?: string;
-}
 
 const logger = getLogger('ConfigManager');
 
 export class ConfigManager {
   private config: AgentConfig;
-  private channel: Channel | null = null;
+  private onote: any;
 
   constructor(config: AgentConfig) {
     this.config = config;
-  }
-
-  setChannel(channel: Channel): void {
-    this.channel = channel;
+    this.onote = (window as any).__settings;
   }
 
   getConfig(): AgentConfig {
@@ -39,20 +21,8 @@ export class ConfigManager {
   }
 
   async fetchLLMConfig(): Promise<{ apiKey: string; model: string; apiBase: string } | null> {
-    if (!this.channel) {
-      logger.warn('Channel not set, using default config');
-      return {
-        apiKey: this.config.apiKey,
-        model: this.config.model,
-        apiBase: this.config.apiBase,
-      };
-    }
-
     try {
-      const response = (await this.channel.send({
-        type: LLM_BOX_MESSAGE_TYPES.LLM_CONFIG_GET,
-        data: {},
-      })) as LLMConfigResponse | undefined;
+      const response = await this.onote.setting.invoke('getAll');
 
       if (!response) {
         logger.warn('No response from main process for LLM config');
@@ -63,13 +33,13 @@ export class ConfigManager {
         };
       }
 
-      if (response.error) {
-        logger.warn('Failed to fetch LLM config from main process', { error: response.error });
+      if (!response.apiKey) {
+        logger.warn('No API key in response from main process');
         return null;
       }
 
       const result = {
-        apiKey: response.apiKey ?? this.config.apiKey,
+        apiKey: response.apiKey,
         model: response.model ?? this.config.model,
         apiBase: response.apiBase ?? this.config.apiBase,
       };

@@ -1,5 +1,5 @@
-import type { Tool } from '../../core/types';
-import type { TodoItem } from '../../core/types';
+import type { Tool } from '../../types';
+import type { TodoItem } from '../../types';
 
 export interface TodoManager {
   addTodo: (description: string, priority: 'high' | 'medium' | 'low', parentId?: string) => TodoItem;

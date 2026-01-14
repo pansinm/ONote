@@ -1,11 +1,11 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { throttle } from 'lodash';
-import { AgentConfig, ExecutionStep } from '../core/types';
+import type { AgentConfig, ExecutionStep, Message } from '../types';
 import { AgentOrchestrator } from './orchestrator';
 import { ToolRegistry } from './tools/registry';
 import { TodoManager as TodoManagerImpl } from './tools/todo-manager';
 import { LLMClient } from '../core/api/client';
-import { AgentState } from '../store/AgentState';
+import type { AgentState } from '../store/AgentState';
 import { ConfigManager } from '../service/ConfigManager';
 import { ContextManager } from '../service/ContextManager';
 import { getLogger } from '/@/shared/logger';
@@ -19,14 +19,12 @@ export interface AgentDependencies {
   todoManager?: TodoManagerImpl;
 }
 
-interface AgentMessage {
-  id: string;
-  role: 'user' | 'assistant' | 'system' | 'tool';
-  content: string;
-  timestamp: Date;
-  toolCallId?: string;
-  tool_calls?: any[];
-}
+const generateId = (): string => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return uuid('gen-');
+};
 
 const THROTTLE_DELAY = 50;
 
@@ -35,12 +33,18 @@ export class AgentExecutor {
   private state: AgentState;
   private configManager: ConfigManager;
   private contextManager: ContextManager;
-  private deps: { toolRegistry: ToolRegistry; llmClient: LLMClient; todoManager: TodoManagerImpl };
+  private deps: {
+    toolRegistry: ToolRegistry;
+    llmClient: LLMClient;
+    todoManager: TodoManagerImpl;
+  };
   private orchestrator: AgentOrchestrator | null = null;
   private currentPrompt = '';
   private executionStartTime: Date | null = null;
   private disposer: (() => void) | null = null;
-  private throttledUpdateThinking: ((stepId: string, content: string) => void) & { cancel?: () => void } | null = null;
+  private throttledUpdateThinking:
+    | (((stepId: string, content: string) => void) & { cancel?: () => void })
+    | null = null;
 
   constructor(
     config: AgentConfig,
@@ -48,22 +52,23 @@ export class AgentExecutor {
     state: AgentState,
     configManager?: ConfigManager,
     contextManager?: ContextManager,
-    dependencies?: AgentDependencies
+    dependencies?: AgentDependencies,
   ) {
     this.config = config;
     this.state = state;
     this.configManager = configManager ?? new ConfigManager(config);
     this.contextManager = contextManager ?? new ContextManager(config);
-    this.configManager.setChannel(channel);
-    this.contextManager.setChannel(channel);
 
     const todoManager = dependencies?.todoManager ?? new TodoManagerImpl();
-    const llmClient = dependencies?.llmClient ?? new LLMClient({
-      apiKey: config.apiKey,
-      model: config.model,
-      apiBase: config.apiBase,
-    });
-    const toolRegistry = dependencies?.toolRegistry ?? new ToolRegistry(channel, todoManager);
+    const llmClient =
+      dependencies?.llmClient ??
+      new LLMClient({
+        apiKey: config.apiKey,
+        model: config.model,
+        apiBase: config.apiBase,
+      });
+    const toolRegistry =
+      dependencies?.toolRegistry ?? new ToolRegistry(channel, todoManager);
 
     this.deps = {
       toolRegistry,
@@ -73,15 +78,21 @@ export class AgentExecutor {
 
     this.state.setTools(this.deps.toolRegistry.getAll());
 
-    this.throttledUpdateThinking = throttle((stepId: string, content: string) => {
-      this.state.updateThinkingStepContent(stepId, content);
-    }, THROTTLE_DELAY);
+    this.throttledUpdateThinking = throttle(
+      (stepId: string, content: string) => {
+        this.state.updateThinkingStepContent(stepId, content);
+      },
+      THROTTLE_DELAY,
+    );
 
     makeAutoObservable(this);
   }
 
   dispose(): void {
-    if (this.throttledUpdateThinking && 'cancel' in this.throttledUpdateThinking) {
+    if (
+      this.throttledUpdateThinking &&
+      'cancel' in this.throttledUpdateThinking
+    ) {
       (this.throttledUpdateThinking as any).cancel();
     }
     this.throttledUpdateThinking = null;
@@ -119,7 +130,10 @@ export class AgentExecutor {
     this.config = { ...this.config, ...updates };
   }
 
-  async runAgent(prompt: string, options?: { clearTodos?: boolean; clearLog?: boolean }): Promise<void> {
+  async runAgent(
+    prompt: string,
+    options?: { clearTodos?: boolean; clearLog?: boolean },
+  ): Promise<void> {
     if (this.state.isRunning) {
       logger.warn('Agent is already running, ignoring new request');
       return;
@@ -157,18 +171,27 @@ export class AgentExecutor {
 
       const conversationHistory = this.state.conversationHistory.map((msg) => ({
         ...msg,
-        timestamp: msg.timestamp instanceof Date ? msg.timestamp : new Date(String(msg.timestamp)),
+        timestamp:
+          typeof msg.timestamp === 'number' ? msg.timestamp : Date.now(),
       }));
 
       this.orchestrator = new AgentOrchestrator(this.config, this.deps);
 
-      const disposerStep = this.orchestrator.on('step', (step) => this.state.addStep(step));
-      const disposerThinkingChunk = this.orchestrator.on('thinkingChunk', ({ stepId, content }) => {
-        this.throttledUpdateThinking?.(stepId, content);
-      });
-      const disposerStateChange = this.orchestrator.on('stateChange', (state) => {
-        this.state.setAgentState(state);
-      });
+      const disposerStep = this.orchestrator.on('step', (step) =>
+        this.state.addStep(step),
+      );
+      const disposerThinkingChunk = this.orchestrator.on(
+        'thinkingChunk',
+        ({ stepId, content }) => {
+          this.throttledUpdateThinking?.(stepId, content);
+        },
+      );
+      const disposerStateChange = this.orchestrator.on(
+        'stateChange',
+        (state) => {
+          this.state.setAgentState(state);
+        },
+      );
       const disposerMessage = this.orchestrator.on('message', (message) => {
         this.state.addMessage(message);
       });
@@ -196,7 +219,8 @@ export class AgentExecutor {
       });
     } catch (error) {
       this.state.setRunning(false);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       this.state.setError(errorMessage);
       logger.error('Agent execution failed', error);
       throw error;
@@ -213,14 +237,14 @@ export class AgentExecutor {
   }
 
   async saveContext(fileUri: string): Promise<void> {
-    await this.contextManager.saveContext(
+    await this.contextManager.saveContext({
       fileUri,
-      this.state.executionLog,
-      this.state.conversationHistory,
-      this.state.error,
-      this.state.content,
-      this.state.selection
-    );
+      executionLog: this.state.executionLog,
+      conversationHistory: this.state.conversationHistory,
+      error: this.state.error,
+      content: this.state.content,
+      selection: this.state.selection,
+    });
   }
 
   async loadContext(fileUri: string): Promise<unknown> {
@@ -228,10 +252,15 @@ export class AgentExecutor {
     if (context) {
       runInAction(() => {
         this.state.updateFileUri(fileUri);
-        this.state.setError(context.error ?? null);
-        this.state.selection = context.selection ?? '';
+        this.state.setError(null);
+        this.state.selection = '';
         this.state.executionLog = context.executionLog ?? [];
-        this.state.conversationHistory = context.conversationHistory ?? [];
+        this.state.conversationHistory = context.messages.map((msg) => ({
+          id: generateId(),
+          role: msg.role as 'user' | 'assistant' | 'system' | 'tool',
+          content: msg.content,
+          timestamp: Date.now(),
+        }));
       });
     } else {
       runInAction(() => {
@@ -246,24 +275,23 @@ export class AgentExecutor {
   }
 
   async saveExecutionState(): Promise<void> {
-    await this.contextManager.saveExecutionState(
-      this.state.fileUri ?? '',
-      this.currentPrompt,
-      this.executionStartTime ?? new Date(),
-      this.state.isRunning,
-      this.state.agentState,
-      0,
-      this.state.todos,
-      this.state.executionLog,
-      this.state.conversationHistory,
-      this.state.content,
-      this.state.selection
-    );
+    await this.contextManager.saveExecutionState({
+      fileUri: this.state.fileUri ?? '',
+      prompt: this.currentPrompt,
+      startTime: this.executionStartTime ?? new Date(),
+      isRunning: this.state.isRunning,
+      agentState: this.state.agentState,
+      currentIteration: 0,
+      todos: this.state.todos,
+      executionLog: this.state.executionLog,
+    });
     this.state.setSavedState(true);
   }
 
   async loadExecutionState(): Promise<any> {
-    const state = await this.contextManager.loadExecutionState(this.state.fileUri ?? '');
+    const state = await this.contextManager.loadExecutionState(
+      this.state.fileUri ?? '',
+    );
     if (state) {
       this.state.loadExecutionState(state);
     } else {
@@ -299,10 +327,15 @@ export class AgentExecutor {
 
       this.orchestrator = new AgentOrchestrator(this.config, this.deps);
 
-      const disposerStep = this.orchestrator.on('step', (step) => this.state.addStep(step));
-      const disposerStateChange = this.orchestrator.on('stateChange', (state) => {
-        this.state.setAgentState(state);
-      });
+      const disposerStep = this.orchestrator.on('step', (step) =>
+        this.state.addStep(step),
+      );
+      const disposerStateChange = this.orchestrator.on(
+        'stateChange',
+        (state) => {
+          this.state.setAgentState(state);
+        },
+      );
       const disposerMessage = this.orchestrator.on('message', (message) => {
         this.state.addMessage(message);
       });
@@ -336,7 +369,8 @@ export class AgentExecutor {
       });
     } catch (error) {
       this.state.setRunning(false);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       this.state.setError(errorMessage);
       logger.error('Agent execution resumed failed', error);
       throw error;

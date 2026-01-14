@@ -1,9 +1,6 @@
-import type { Tool, ToolParameter } from '../../core/types';
+import type { Tool, ToolParameter } from '../../types';
 import type { LLMBoxMessageType } from '../../constants/LLMBoxConstants';
-
-interface Channel {
-  send: (message: { type: LLMBoxMessageType; data: unknown }) => Promise<Record<string, unknown>>;
-}
+import type { Channel } from '../../ipc';
 
 export function createFileTools(channel: Channel): Tool[] {
   return [

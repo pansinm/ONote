@@ -1,4 +1,4 @@
-import type { TodoItem } from '../../core/types';
+import type { TodoItem } from '../../types';
 import { uuid } from '../../../common/tunnel/utils';
 
 export class TodoManager {
@@ -28,8 +28,8 @@ export class TodoManager {
       description,
       status: 'pending',
       priority,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     };
 
     this.todos.push(todo);
@@ -47,7 +47,7 @@ export class TodoManager {
       throw new Error(`Todo not found: ${id}`);
     }
 
-    Object.assign(todo, updates, { updatedAt: new Date() });
+    Object.assign(todo, updates, { updatedAt: Date.now() });
     this.notifyChange();
   }
 

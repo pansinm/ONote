@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import type { AgentStore } from '../AgentStore';
-import styles from '../AgentPanel.module.scss';
+import type { AgentStore } from '../store';
+import styles from './AgentPanel.module.scss';
 import Icon from '/@/components/Icon';
 
 interface AgentStatusProps {

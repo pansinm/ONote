@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Tool } from '../core/types';
+import type { Tool } from '../types';
 
 export const readFileSchema = z.object({
   uri: z.string().min(1, 'URI is required'),

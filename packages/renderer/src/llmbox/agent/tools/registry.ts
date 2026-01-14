@@ -1,15 +1,8 @@
-import type { Tool } from '../../core/types';
-import type { LLMBoxMessageType } from '../../constants/LLMBoxConstants';
+import type { Tool } from '../../types';
 import { createFileTools } from './file';
 import { createTodoTools, type TodoManager } from './todo';
 import { createValidatedFileTools } from '../../core/validation';
-
-interface Channel {
-  send: (message: {
-    type: LLMBoxMessageType;
-    data: unknown;
-  }) => Promise<Record<string, unknown>>;
-}
+import type { Channel } from '../../ipc';
 
 export class ToolRegistry {
   private tools: Map<string, Tool> = new Map();

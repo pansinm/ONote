@@ -1,43 +1,21 @@
-import { makeAutoObservable, runInAction } from 'mobx';
-import {
+import { makeAutoObservable } from 'mobx';
+import type {
   ExecutionStep,
   AgentConfig,
   TodoItem,
-  AgentExecutionState,
   Tool,
-  ToolCall,
-} from '../core/types';
-import { LLMClient } from '../core/api/client';
-import { ToolRegistry, AgentOrchestrator } from '../agent';
-import { TodoManager as TodoManagerImpl } from '../agent/tools/todo-manager';
-import type { TodoManager as TodoManagerType } from '../agent/tools/todo';
+  Message,
+} from '../types';
 import { getLogger } from '/@/shared/logger';
-import { uuid } from '/@/common/tunnel/utils';
-import {
-  LLM_BOX_MESSAGE_TYPES,
-} from '../constants/LLMBoxConstants';
 import { AgentState } from './AgentState';
 import { ConfigManager } from '../service/ConfigManager';
 import { ContextManager } from '../service/ContextManager';
 import { AgentExecutor } from '../agent/AgentExecutor';
+import type { Channel } from '../ipc';
 
 const logger = getLogger('AgentStore');
 
-interface Channel {
-  send: (message: {
-    type: string;
-    data: unknown;
-  }) => Promise<Record<string, unknown>>;
-}
-
-export interface AgentMessage {
-  id: string;
-  role: 'user' | 'assistant' | 'system' | 'tool';
-  content: string;
-  timestamp: Date;
-  toolCallId?: string;
-  tool_calls?: ToolCall[];
-}
+let agentStoreInstance: AgentStore | null = null;
 
 export class AgentStore {
   private state: AgentState;
@@ -45,21 +23,37 @@ export class AgentStore {
   private contextManager: ContextManager;
   private executor: AgentExecutor;
 
-  constructor(config: AgentConfig, channel: Channel) {
+  private constructor(config: AgentConfig, channel: Channel) {
     this.state = new AgentState();
     this.configManager = new ConfigManager(config);
     this.contextManager = new ContextManager(config);
-    this.configManager.setChannel(channel);
-    this.contextManager.setChannel(channel);
     this.executor = new AgentExecutor(
       config,
       channel,
       this.state,
       this.configManager,
-      this.contextManager
+      this.contextManager,
     );
 
     makeAutoObservable(this);
+  }
+
+  static getInstance(config?: AgentConfig, channel?: Channel): AgentStore {
+    if (!agentStoreInstance) {
+      if (!config || !channel) {
+        throw new Error(
+          'AgentStore.getInstance() requires config and channel on first call',
+        );
+      }
+      agentStoreInstance = new AgentStore(config, channel);
+    }
+    return agentStoreInstance;
+  }
+
+  configure(config: AgentConfig): void {
+    this.configManager.updateRootUri(config.rootUri || '');
+    this.configManager = new ConfigManager(config);
+    this.contextManager = new ContextManager(config);
   }
 
   get todos(): TodoItem[] {
@@ -74,7 +68,7 @@ export class AgentStore {
     return this.state.executionLog;
   }
 
-  get conversationHistory(): AgentMessage[] {
+  get conversationHistory(): Message[] {
     return this.state.conversationHistory;
   }
 
@@ -126,11 +120,20 @@ export class AgentStore {
     this.state.updateEditorContent(content, selection);
   }
 
-  async fetchLLMConfig(): Promise<{ apiKey: string; model: string; apiBase: string } | null> {
+  async fetchLLMConfig(): Promise<{
+    apiKey: string;
+    model: string;
+    apiBase: string;
+  } | null> {
     return this.configManager.fetchLLMConfig();
   }
 
-  addMessage(message: { role: string; content: string; toolCallId?: string; tool_calls?: unknown[] }): void {
+  addMessage(message: {
+    role: string;
+    content: string;
+    toolCallId?: string;
+    tool_calls?: unknown[];
+  }): void {
     this.state.addMessage(message as any);
   }
 
@@ -166,7 +169,10 @@ export class AgentStore {
     this.executor.stopAgent();
   }
 
-  async runAgent(prompt: string, options?: { clearTodos?: boolean; clearLog?: boolean }): Promise<void> {
+  async runAgent(
+    prompt: string,
+    options?: { clearTodos?: boolean; clearLog?: boolean },
+  ): Promise<void> {
     await this.executor.runAgent(prompt, options);
   }
 
@@ -190,7 +196,7 @@ export class AgentStore {
     await this.executor.saveExecutionState();
   }
 
-  async loadExecutionState(): Promise<AgentExecutionState | null> {
+  async loadExecutionState(): Promise<unknown> {
     return this.executor.loadExecutionState();
   }
 

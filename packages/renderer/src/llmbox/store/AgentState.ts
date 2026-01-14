@@ -3,16 +3,16 @@ import {
   ExecutionStep,
   TodoItem,
   Tool,
-  AgentConfig,
-  AgentExecutionState,
-} from '../core/types';
-import type { AgentMessage } from './AgentStore';
+  ExecutionStepType,
+  ThinkingStep,
+} from '../types';
+import type { Message } from '../types';
 
 export class AgentState {
   todos: TodoItem[] = [];
   tools: Tool[] = [];
   executionLog: ExecutionStep[] = [];
-  conversationHistory: AgentMessage[] = [];
+  conversationHistory: Message[] = [];
   agentState: 'idle' | 'thinking' | 'executing' = 'idle';
   error: string | null = null;
   isRunning = false;
@@ -45,11 +45,11 @@ export class AgentState {
     });
   }
 
-  addMessage(message: Omit<AgentMessage, 'id' | 'timestamp'>): AgentMessage {
-    const newMessage: AgentMessage = {
+  addMessage(message: Omit<Message, 'id' | 'timestamp'>): Message {
+    const newMessage: Message = {
       ...message,
       id: crypto.randomUUID(),
-      timestamp: new Date(),
+      timestamp: Date.now(),
     };
     runInAction(() => {
       this.conversationHistory.push(newMessage);
@@ -63,8 +63,8 @@ export class AgentState {
       this.executionLog.push({
         ...step,
         id: stepId,
-        timestamp: new Date(),
-      });
+        timestamp: Date.now(),
+      } as ExecutionStep);
     });
     return stepId;
   }
@@ -73,7 +73,7 @@ export class AgentState {
     runInAction(() => {
       const step = this.executionLog.find((s) => s.id === stepId);
       if (step && step.type === 'thinking') {
-        step.content = content;
+        (step as ThinkingStep).content = content;
       }
     });
   }
@@ -125,18 +125,10 @@ export class AgentState {
     });
   }
 
-  loadExecutionState(state: AgentExecutionState): void {
+  loadExecutionState(state: { todos: TodoItem[]; steps: ExecutionStep[] }): void {
     runInAction(() => {
       this.todos = state.todos;
-      this.executionLog = state.executionLog;
-      this.conversationHistory = state.conversationHistory.map((msg) => ({
-        id: crypto.randomUUID(),
-        role: msg.role as 'user' | 'assistant' | 'system' | 'tool',
-        content: msg.content,
-        timestamp: new Date(),
-      }));
-      this.content = state.content;
-      this.selection = state.selection;
+      this.executionLog = state.steps;
       this.hasSavedState = true;
     });
   }

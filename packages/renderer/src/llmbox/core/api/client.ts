@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import type { Message, Tool } from '../types';
+import type { Message, Tool, ToolMessage, AssistantMessage } from '../../types';
 
 export interface LLMConfig {
   apiKey: string;
@@ -65,21 +65,23 @@ export class LLMClient {
 
     const openaiMessages: any[] = messages.map((m) => {
       if (m.role === 'tool') {
+        const tm = m as ToolMessage;
         return {
           role: 'tool' as const,
-          content: m.content,
-          tool_call_id: m.toolCallId,
+          content: tm.content,
+          tool_call_id: tm.toolCallId,
         };
       }
+      const am = m as AssistantMessage;
       return {
-        role: m.role as 'user' | 'assistant' | 'system' | 'tool',
-        content: m.content,
-        tool_calls: m.tool_calls?.map((tc: any) => ({
+        role: am.role as 'user' | 'assistant' | 'system' | 'tool',
+        content: am.content,
+        tool_calls: am.toolCalls?.map((tc) => ({
           id: tc.id,
           type: 'function' as const,
           function: {
-            name: tc.function.name,
-            arguments: tc.function.arguments,
+            name: tc.name,
+            arguments: JSON.stringify(tc.arguments),
           },
         })),
       };

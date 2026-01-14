@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import type { AgentStore } from '../AgentStore';
-import type { TodoItem } from '../core/types';
-import styles from '../AgentPanel.module.scss';
+import type { AgentStore } from '../store';
+import type { TodoItem } from '../types';
+import styles from './AgentPanel.module.scss';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Icon from '/@/components/Icon';
@@ -81,35 +81,35 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
                   isCollapsed ? styles.collapsed : ''
                 }`}
               >
-                {step.content && (
+                {'content' in step && (
                   <div className={styles.LogContent}>
                     <div className="markdown-body">
                       <Markdown remarkPlugins={[remarkGfm]}>
-                        {step.content}
+                        {(step as any).content}
                       </Markdown>
                     </div>
                   </div>
                 )}
 
-                {step.toolName && (
+                {'toolName' in step && (
                   <div className={styles.LogTool}>
                     <Icon type="arrow-right" size={12} className={styles.LogToolLabel} />
                     <span className={styles.LogToolName}>
-                      {step.toolName}
+                      {(step as any).toolName}
                     </span>
                   </div>
                 )}
 
-                {step.toolParams && (
+                {'params' in step && (
                   <div className={styles.ToolParams}>
                     <div className={styles.ToolParamsLabel}>Parameters</div>
                     <pre className={styles.ToolParamsContent}>
-                      {JSON.stringify(step.toolParams, null, 2)}
+                      {JSON.stringify((step as any).params, null, 2)}
                     </pre>
                   </div>
                 )}
 
-                {step.toolResult ? (
+                {'result' in step && (step as any).result !== undefined && (
                   <details
                     className={`${styles.LogDetails} ${styles.LogDetailsResult}`}
                   >
@@ -118,37 +118,37 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
                       <span>Result</span>
                     </summary>
                     <div className={styles.LogDetailsContent}>
-                      {typeof step.toolResult === 'string' ? (
+                      {typeof (step as any).result === 'string' ? (
                         <div className="markdown-body">
                           <Markdown remarkPlugins={[remarkGfm]}>
-                            {step.toolResult}
+                            {(step as any).result}
                           </Markdown>
                         </div>
                       ) : (
                         <pre>
-                          {JSON.stringify(step.toolResult, null, 2)}
+                          {JSON.stringify((step as any).result, null, 2)}
                         </pre>
                       )}
                     </div>
                   </details>
-                ) : null}
+                )}
 
-                {step.error && (
+                {'error' in step && (step as any).error && (
                   <div className={styles.LogError}>
                     <Icon type="x-circle" size={14} className={styles.LogErrorIcon} />
                     <span className={styles.LogErrorText}>
                       <div className="markdown-body">
                         <Markdown remarkPlugins={[remarkGfm]}>
-                          {step.error}
+                          {(step as any).error}
                         </Markdown>
                       </div>
                     </span>
                   </div>
                 )}
 
-                {step.todos && step.todos.length > 0 && (
+                {'todos' in step && (step as any).todos && (step as any).todos.length > 0 && (
                   <div className={styles.TodoList}>
-                    <TodoTree todos={step.todos} />
+                    <TodoTree todos={(step as any).todos} />
                   </div>
                 )}
               </div>
@@ -164,9 +164,9 @@ function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function formatTime(date: Date): string {
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
+function formatTime(timestamp: number): string {
+  const now = Date.now();
+  const diff = now - timestamp;
 
   if (diff < 60000) {
     return 'Just now';
@@ -174,7 +174,7 @@ function formatTime(date: Date): string {
     const mins = Math.floor(diff / 60000);
     return `${mins}m ago`;
   }
-  return date.toLocaleTimeString();
+  return new Date(timestamp).toLocaleTimeString();
 }
 
 interface TodoTreeProps {

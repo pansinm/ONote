@@ -1,4 +1,4 @@
-import type { AgentConfig, Message } from '../core/types';
+import type { AgentConfig, Message } from '../types';
 import type { TodoManager } from './tools/todo-manager';
 import { DEFAULT_CONFIG } from '../core/config';
 import { SYSTEM_PROMPTS, renderSystemPrompt, type SystemPromptContext } from './prompts';

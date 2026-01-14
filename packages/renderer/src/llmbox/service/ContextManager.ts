@@ -1,23 +1,14 @@
-import { AgentConfig, ExecutionStep } from '../core/types';
-import type { AgentMessage } from '../store/AgentStore';
+import type {
+  AgentConfig,
+  ExecutionStep,
+  Message,
+  PersistedContext,
+  PersistedExecutionState,
+  TodoItem,
+} from '../types';
 import { getLogger } from '/@/shared/logger';
 import { LLM_BOX_MESSAGE_TYPES } from '../constants/LLMBoxConstants';
-
-interface Channel {
-  send: (message: {
-    type: string;
-    data: unknown;
-  }) => Promise<Record<string, unknown>>;
-}
-
-interface AgentContext {
-  fileUri: string;
-  executionLog: ExecutionStep[];
-  conversationHistory: AgentMessage[];
-  error: string | null;
-  content: string;
-  selection: string;
-}
+import type { Channel } from '../ipc';
 
 interface ContextSaveResponse {
   error?: string;
@@ -26,7 +17,37 @@ interface ContextSaveResponse {
 
 interface ContextLoadResponse {
   error?: string;
-  agentContext?: AgentContext;
+  agentContext?: PersistedContext;
+}
+
+interface ExecutionStateSaveResponse {
+  error?: string;
+  success?: boolean;
+}
+
+interface ExecutionStateLoadResponse {
+  error?: string;
+  state?: PersistedExecutionState;
+}
+
+export interface ContextSaveOptions {
+  fileUri: string;
+  executionLog: ExecutionStep[];
+  conversationHistory: Message[];
+  error: string | null;
+  content: string;
+  selection: string;
+}
+
+export interface ExecutionStateSaveOptions {
+  fileUri: string;
+  prompt: string;
+  startTime: Date;
+  isRunning: boolean;
+  agentState: 'idle' | 'thinking' | 'executing';
+  currentIteration: number;
+  todos: TodoItem[];
+  executionLog: ExecutionStep[];
 }
 
 const logger = getLogger('ContextManager');
@@ -43,26 +64,23 @@ export class ContextManager {
     this.channel = channel;
   }
 
-  async saveContext(
-    fileUri: string,
-    executionLog: ExecutionStep[],
-    conversationHistory: AgentMessage[],
-    error: string | null,
-    content: string,
-    selection: string
-  ): Promise<void> {
+  async saveContext(options: ContextSaveOptions): Promise<void> {
     if (!this.channel) {
       logger.warn('Channel not set, cannot save context');
       return;
     }
 
-    const contextToSave: AgentContext = {
+    const { fileUri, executionLog, conversationHistory } = options;
+
+    const contextToSave: PersistedContext = {
+      version: 1,
+      savedAt: Date.now(),
       fileUri,
+      messages: conversationHistory.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      })),
       executionLog,
-      conversationHistory,
-      error,
-      content,
-      selection,
     };
 
     try {
@@ -86,7 +104,6 @@ export class ContextManager {
 
       logger.info('Agent context saved', {
         fileUri,
-        stepCount: executionLog.length,
         messageCount: conversationHistory.length,
       });
     } catch (error) {
@@ -95,7 +112,7 @@ export class ContextManager {
     }
   }
 
-  async loadContext(fileUri: string): Promise<AgentContext | null> {
+  async loadContext(fileUri: string): Promise<PersistedContext | null> {
     if (!this.channel) {
       logger.warn('Channel not set, cannot load context');
       return null;
@@ -127,8 +144,8 @@ export class ContextManager {
       logger.info('Agent context loaded', {
         fileUri,
         hasContext: !!agentContext,
-        executionLogCount: agentContext?.executionLog?.length ?? 0,
-        conversationCount: agentContext?.conversationHistory?.length ?? 0,
+        messageCount: agentContext?.messages?.length ?? 0,
+        executionLogLength: agentContext?.executionLog?.length ?? 0,
       });
 
       return agentContext ?? null;
@@ -138,42 +155,34 @@ export class ContextManager {
     }
   }
 
-  async saveExecutionState(
-    fileUri: string,
-    prompt: string,
-    startTime: Date,
-    isRunning: boolean,
-    agentState: 'idle' | 'thinking' | 'executing',
-    currentIteration: number,
-    todos: any[],
-    executionLog: ExecutionStep[],
-    conversationHistory: AgentMessage[],
-    content: string,
-    selection: string
-  ): Promise<void> {
+  async saveExecutionState(options: ExecutionStateSaveOptions): Promise<void> {
     if (!this.channel || !this.config.rootUri) {
-      logger.debug('Cannot save execution state: missing channel, fileUri or rootUri');
+      logger.debug(
+        'Cannot save execution state: missing channel, fileUri or rootUri',
+      );
       return;
     }
 
-    const state = {
+    const {
+      fileUri,
       prompt,
       startTime,
-      isRunning,
       agentState,
       currentIteration,
-      maxIterations: this.config.maxIterations || 50,
       todos,
       executionLog,
-      conversationHistory: conversationHistory.map((msg) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
+    } = options;
+
+    const state = {
+      version: 1,
+      savedAt: Date.now(),
       fileUri,
-      rootUri: this.config.rootUri || null,
-      content,
-      selection,
-      savedAt: new Date(),
+      prompt,
+      startTime: startTime.getTime(),
+      iteration: currentIteration,
+      agentState,
+      todos,
+      steps: executionLog,
     };
 
     try {
@@ -194,10 +203,12 @@ export class ContextManager {
   }
 
   async loadExecutionState(
-    fileUri: string
-  ): Promise<any> {
+    fileUri: string,
+  ): Promise<PersistedExecutionState | null> {
     if (!this.channel || !this.config.rootUri) {
-      logger.warn('Cannot load execution state: missing channel, fileUri or rootUri');
+      logger.warn(
+        'Cannot load execution state: missing channel, fileUri or rootUri',
+      );
       return null;
     }
 
@@ -208,10 +219,12 @@ export class ContextManager {
           fileUri,
           rootUri: this.config.rootUri,
         },
-      })) as { state?: any } | undefined;
+      })) as ExecutionStateLoadResponse | undefined;
 
       if (!response) {
-        logger.warn('No response from main process when loading execution state');
+        logger.warn(
+          'No response from main process when loading execution state',
+        );
         return null;
       }
 
@@ -230,7 +243,9 @@ export class ContextManager {
 
   async deleteExecutionState(fileUri: string): Promise<void> {
     if (!this.channel || !this.config.rootUri) {
-      logger.warn('Cannot delete execution state: missing channel, fileUri or rootUri');
+      logger.warn(
+        'Cannot delete execution state: missing channel, fileUri or rootUri',
+      );
       return;
     }
 

@@ -4,9 +4,8 @@ import type {
   TodoItem,
   Message,
   AgentConfig,
-  ToolCallResult,
-} from '../core/types';
-import { LLMClient, LLMApiError, isLLMApiError } from '../core/api/client';
+} from '../types';
+import { LLMClient, LLMApiError, isLLMApiError, ToolCallResult } from '../core/api/client';
 import { DEFAULT_CONFIG } from '../core/config';
 import { uuid } from '../../common/tunnel/utils';
 import { ToolRegistry } from './tools/registry';
@@ -135,7 +134,7 @@ export class AgentOrchestrator {
             id: uuid('sys-'),
             role: 'system',
             content: `[Summary of previous conversation]`,
-            timestamp: new Date(),
+            timestamp: Date.now(),
           });
         }
 
@@ -156,11 +155,11 @@ export class AgentOrchestrator {
           }
         );
 
-        const assistantMessage: Message = {
+        const assistantMessage: Message & { toolCalls?: ToolCallResult[] } = {
           id: uuid('assistant-'),
           role: 'assistant',
           content: result.content,
-          timestamp: new Date(),
+          timestamp: Date.now(),
         };
 
         this.addStep({
@@ -169,16 +168,9 @@ export class AgentOrchestrator {
         });
 
         if (result.toolCalls && result.toolCalls.length > 0) {
-          assistantMessage.tool_calls = result.toolCalls.map((tc) => ({
-            id: tc.id,
-            type: 'function' as const,
-            function: {
-              name: tc.name,
-              arguments: tc.arguments,
-            },
-          }));
+          assistantMessage.toolCalls = result.toolCalls;
 
-          messages.push(assistantMessage);
+          messages.push(assistantMessage as Message);
 
           for (const toolCall of result.toolCalls) {
             await this.executeToolCall(toolCall, messages);
@@ -227,7 +219,7 @@ export class AgentOrchestrator {
         role: 'tool',
         content: `Error: Invalid tool call - no tool name provided`,
         toolCallId: toolCall.id,
-        timestamp: new Date(),
+        timestamp: Date.now(),
       });
       return;
     }
@@ -237,10 +229,15 @@ export class AgentOrchestrator {
       this.logger.warn('Unknown tool requested', { toolName: toolCall.name, params: toolCall.arguments });
       this.addStep({
         type: 'error',
-        content: `Unknown tool: ${toolCall.name}`,
+        message: `Unknown tool: ${toolCall.name}`,
+        recoverable: false,
+      });
+
+      this.addStep({
+        type: 'tool_call',
+        toolCallId: toolCall.id,
         toolName: toolCall.name,
-        toolParams: this.parseArguments(toolCall.arguments),
-        error: `Tool "${toolCall.name}" not found`,
+        params: this.parseArguments(toolCall.arguments),
         duration: Date.now() - startTime,
       });
 
@@ -249,7 +246,7 @@ export class AgentOrchestrator {
         role: 'tool',
         content: `Error: Tool "${toolCall.name}" not found`,
         toolCallId: toolCall.id,
-        timestamp: new Date(),
+        timestamp: Date.now(),
       });
       return;
     }
@@ -261,10 +258,8 @@ export class AgentOrchestrator {
       this.logger.warn('Invalid tool arguments', { toolName: toolCall.name, rawArgs: toolCall.arguments });
       this.addStep({
         type: 'error',
-        content: `Invalid arguments for ${toolCall.name}`,
-        toolName: toolCall.name,
-        error: error instanceof Error ? error.message : 'Invalid arguments',
-        duration: Date.now() - startTime,
+        message: `Invalid arguments for ${toolCall.name}`,
+        recoverable: true,
       });
       return;
     }
@@ -276,9 +271,9 @@ export class AgentOrchestrator {
 
     this.addStep({
       type: 'tool_call',
-      content: `Using tool: ${toolCall.name}`,
+      toolCallId: toolCall.id,
       toolName: toolCall.name,
-      toolParams: params,
+      params,
       duration: Date.now() - startTime,
     });
 
@@ -287,12 +282,11 @@ export class AgentOrchestrator {
       result = await tool.executor(params);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
+
       this.addStep({
-        type: 'tool_call',
-        content: `Tool error: ${toolCall.name}`,
-        toolName: toolCall.name,
-        toolParams: params,
-        toolResult: errorMessage,
+        type: 'tool_result',
+        toolCallId: toolCall.id,
+        success: false,
         error: errorMessage,
         duration: Date.now() - startTime,
       });
@@ -302,7 +296,9 @@ export class AgentOrchestrator {
         role: 'tool',
         content: `Error: ${errorMessage}`,
         toolCallId: toolCall.id,
-        timestamp: new Date(),
+        toolName: toolCall.name,
+        error: errorMessage,
+        timestamp: Date.now(),
       });
       return;
     }
@@ -310,11 +306,10 @@ export class AgentOrchestrator {
     const resultContent = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
 
     this.addStep({
-      type: 'tool_call',
-      content: `Tool result: ${toolCall.name}`,
-      toolName: toolCall.name,
-      toolParams: params,
-      toolResult: result,
+      type: 'tool_result',
+      toolCallId: toolCall.id,
+      success: true,
+      result,
       duration: Date.now() - startTime,
     });
 
@@ -323,7 +318,9 @@ export class AgentOrchestrator {
       role: 'tool',
       content: resultContent,
       toolCallId: toolCall.id,
-      timestamp: new Date(),
+      toolName: toolCall.name,
+      result,
+      timestamp: Date.now(),
     });
 
     this.logger.info('Tool executed', {
@@ -331,15 +328,6 @@ export class AgentOrchestrator {
       result: typeof result === 'string' ? result : 'JSON result',
       duration: Date.now() - startTime,
     });
-  }
-
-  private parseArguments(args: string): Record<string, unknown> {
-    if (!args.trim()) return {};
-    try {
-      return JSON.parse(args);
-    } catch {
-      return { _raw: args };
-    }
   }
 
   stop(): void {
@@ -368,14 +356,14 @@ export class AgentOrchestrator {
       id: uuid('sys-'),
       role: 'system',
       content: this.strategy.buildSystemPrompt(this.config, toolDescriptions, context),
-      timestamp: new Date(),
+      timestamp: Date.now(),
     };
 
     const userMessage: Message = {
       id: uuid('user-'),
       role: 'user',
       content: prompt,
-      timestamp: new Date(),
+      timestamp: Date.now(),
     };
 
     if (history && history.length > 0) {
@@ -393,11 +381,20 @@ export class AgentOrchestrator {
     return this.strategy.shouldContinue(this.deps.todoManager);
   }
 
-  private addStep(step: Omit<ExecutionStep, 'id' | 'timestamp'>): void {
-    this.emit('step', {
-      id: uuid('step-'),
-      timestamp: new Date(),
+  private addStep(step: any): void {
+    this.emit('step' as const, {
       ...step,
+      id: uuid('step-'),
+      timestamp: Date.now(),
     });
+  }
+
+  private parseArguments(args: string): Record<string, unknown> {
+    if (!args.trim()) return {};
+    try {
+      return JSON.parse(args);
+    } catch {
+      return { _raw: args };
+    }
   }
 }

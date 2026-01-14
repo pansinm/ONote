@@ -1,10 +1,10 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import type { AgentStore } from '../AgentStore';
+import type { AgentStore } from '../store';
 import { AgentStatus } from './AgentStatus';
 import { AgentActionButtons } from './AgentActionButtons';
 import Icon from '/@/components/Icon';
-import styles from '../AgentPanel.module.scss';
+import styles from './AgentPanel.module.scss';
 
 interface AgentToolbarProps {
   store: AgentStore;

@@ -1,4 +1,4 @@
-import type { Tool } from '../../core/types';
+import type { Tool } from '../../types';
 
 export function createSearchTools(): Tool[] {
   return [

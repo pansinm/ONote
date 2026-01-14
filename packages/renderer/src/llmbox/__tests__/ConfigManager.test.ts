@@ -1,5 +1,5 @@
 import { ConfigManager } from '../ConfigManager';
-import { AgentConfig } from '../core/types';
+import { AgentConfig } from '../types';
 
 describe('ConfigManager', () => {
   let configManager: ConfigManager;

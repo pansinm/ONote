@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../AgentPanel.module.scss';
+import styles from './AgentPanel.module.scss';
 import Icon from '/@/components/Icon';
 
 interface BottomTabsProps {
