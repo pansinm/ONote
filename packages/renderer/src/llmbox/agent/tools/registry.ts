@@ -4,7 +4,10 @@ import { createFileTools } from './file';
 import { createTodoTools, type TodoManager } from './todo';
 
 interface Channel {
-  send: (message: { type: LLMBoxMessageType; data: unknown }) => Promise<Record<string, unknown>>;
+  send: (message: {
+    type: LLMBoxMessageType;
+    data: unknown;
+  }) => Promise<Record<string, unknown>>;
 }
 
 export class ToolRegistry {
