@@ -9,7 +9,7 @@ import type {
   AgentFileSearchResponse,
   AgentFileSearchInResponse,
 } from '../types';
-import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/constants/LLMBoxConstants';
+import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/utils/constants';
 import fileService from '/@/main/services/fileService';
 import stores from '/@/main/stores';
 

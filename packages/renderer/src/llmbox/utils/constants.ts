@@ -1,3 +1,7 @@
+// ============================================================================
+// IPC 消息类型常量
+// ============================================================================
+
 export const LLM_BOX_MESSAGE_TYPES = {
   EDITOR_FILE_OPEN: 'EDITOR_FILE_OPEN',
   EDITOR_CONTENT_CHANGED: 'EDITOR_CONTENT_CHANGED',
@@ -35,3 +39,17 @@ export const LLM_BOX_MESSAGE_TYPES = {
 
 export type LLMBoxMessageType =
   (typeof LLM_BOX_MESSAGE_TYPES)[keyof typeof LLM_BOX_MESSAGE_TYPES];
+
+// ============================================================================
+// Agent 默认配置
+// ============================================================================
+
+export const DEFAULT_AGENT_CONFIG = {
+  maxIterations: 50,
+  showThinking: true,
+  contextWindowSize: 128000,
+  compressRatio: 0.3,
+  compressCheckInterval: 10,
+  minCompressCheckInterval: 5,
+  tokenLimitError: ['context_length_exceeded', 'max_tokens'],
+} as const;

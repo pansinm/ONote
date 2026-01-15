@@ -122,7 +122,7 @@ export function renderSystemPrompt(
     currentTime: string;
     toolDescriptions: string;
     maxIterations: number;
-  }
+  },
 ): string {
   const fileDir = getDirectoryFromUri(context.fileUri);
   return template

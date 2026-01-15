@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './InputArea.module.scss';
 import { observer } from 'mobx-react-lite';
+import Icon from '/@/components/Icon';
 
 interface InputAreaProps {
   onSendMessage: (content: string, imageUrls?: string[]) => Promise<void>;
@@ -17,6 +18,16 @@ const InputArea: React.FC<InputAreaProps> = ({
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const revokeImageUrls = useCallback((urls: string[]) => {
+    urls.forEach((url) => {
+      try {
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.warn('Failed to revoke object URL:', url);
+      }
+    });
+  }, []);
+
   const handleSend = useCallback(async () => {
     if ((!inputValue.trim() && imageUrls.length === 0) || isLoading) return;
     try {
@@ -24,12 +35,13 @@ const InputArea: React.FC<InputAreaProps> = ({
         inputValue.trim(),
         imageUrls.length > 0 ? imageUrls : undefined,
       );
+      revokeImageUrls(imageUrls);
       setInputValue('');
       setImageUrls([]);
     } catch (error) {
       console.error('[InputArea] Failed to send message', error);
     }
-  }, [inputValue, imageUrls, isLoading, onSendMessage]);
+  }, [inputValue, imageUrls, isLoading, onSendMessage, revokeImageUrls]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -50,8 +62,12 @@ const InputArea: React.FC<InputAreaProps> = ({
         e.preventDefault();
         const file = item.getAsFile();
         if (file) {
-          const url = URL.createObjectURL(file);
-          setImageUrls((prev) => [...prev, url]);
+          try {
+            const url = URL.createObjectURL(file);
+            setImageUrls((prev) => [...prev, url]);
+          } catch (error) {
+            console.error('[InputArea] Failed to create object URL from paste:', error);
+          }
         }
       }
     }
@@ -62,8 +78,18 @@ const InputArea: React.FC<InputAreaProps> = ({
     const files = Array.from(e.dataTransfer.files);
     const imageFiles = files.filter((file) => file.type.startsWith('image/'));
     if (imageFiles.length > 0) {
-      const newUrls = imageFiles.map((file) => URL.createObjectURL(file));
-      setImageUrls((prev) => [...prev, ...newUrls]);
+      const newUrls: string[] = [];
+      imageFiles.forEach((file) => {
+        try {
+          const url = URL.createObjectURL(file);
+          newUrls.push(url);
+        } catch (error) {
+          console.error('[InputArea] Failed to create object URL from drop:', error);
+        }
+      });
+      if (newUrls.length > 0) {
+        setImageUrls((prev) => [...prev, ...newUrls]);
+      }
     }
   }, []);
 
@@ -71,33 +97,52 @@ const InputArea: React.FC<InputAreaProps> = ({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
       if (!files) return;
-      const imageFiles = Array.from(files).filter((file) =>
-        file.type.startsWith('image/'),
-      );
-      const newUrls = imageFiles.map((file) => URL.createObjectURL(file));
-      setImageUrls((prev) => [...prev, ...newUrls]);
+      const newUrls: string[] = [];
+      Array.from(files).forEach((file) => {
+        if (file.type.startsWith('image/')) {
+          try {
+            const url = URL.createObjectURL(file);
+            newUrls.push(url);
+          } catch (error) {
+            console.error('[InputArea] Failed to create object URL from file:', error);
+          }
+        }
+      });
+      if (newUrls.length > 0) {
+        setImageUrls((prev) => [...prev, ...newUrls]);
+      }
+      e.target.value = '';
     },
     [],
   );
 
-  const removeImage = useCallback((index: number) => {
-    setImageUrls((prev) => {
-      const newUrls = [...prev];
-      URL.revokeObjectURL(newUrls[index]);
-      newUrls.splice(index, 1);
-      return newUrls;
-    });
-  }, []);
+  const removeImage = useCallback(
+    (index: number) => {
+      setImageUrls((prev) => {
+        const newUrls = [...prev];
+        const urlToRemove = newUrls[index];
+        if (urlToRemove) {
+          try {
+            URL.revokeObjectURL(urlToRemove);
+          } catch (e) {
+            console.warn('Failed to revoke object URL:', urlToRemove);
+          }
+        }
+        newUrls.splice(index, 1);
+        return newUrls;
+      });
+    },
+    [],
+  );
 
   useEffect(() => {
     return () => {
-      imageUrls.forEach((url) => URL.revokeObjectURL(url));
+      revokeImageUrls(imageUrls);
     };
-  }, []);
+  }, [imageUrls, revokeImageUrls]);
 
   return (
     <div className={styles.inputArea}>
-      {/* 显示引用内容区域 */}
       {selection && (
         <div className={styles.selectionContainer}>
           <pre className={styles.selectionContent}>{selection}</pre>
@@ -107,14 +152,14 @@ const InputArea: React.FC<InputAreaProps> = ({
       {imageUrls.length > 0 && (
         <div className={styles.imagePreviews}>
           {imageUrls.map((url, index) => (
-            <div key={index} className={styles.imagePreview}>
+            <div key={url} className={styles.imagePreview}>
               <img src={url} alt={`Preview ${index + 1}`} />
               <button
                 type="button"
                 className={styles.removeImage}
                 onClick={() => removeImage(index)}
               >
-                ×
+                <Icon type="x" size={12} />
               </button>
             </div>
           ))}
@@ -146,8 +191,9 @@ const InputArea: React.FC<InputAreaProps> = ({
             onClick={() => fileInputRef.current?.click()}
             disabled={isLoading}
             className={styles.attachButton}
+            title="添加图片"
           >
-            📎
+            <Icon type="paperclip" size={16} />
           </button>
           <button
             type="button"
@@ -157,7 +203,11 @@ const InputArea: React.FC<InputAreaProps> = ({
             }
             className={styles.sendButton}
           >
-            {isLoading ? '⏳' : '发送'}
+            {isLoading ? (
+              <Icon type="arrow-repeat" size={14} className={styles.spinIcon} />
+            ) : (
+              '发送'
+            )}
           </button>
         </div>
       </div>

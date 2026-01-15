@@ -3,27 +3,38 @@ import type { ExecutionStep } from '../types';
 import InputArea from './InputArea';
 import styles from './LLMBox.module.scss';
 import { observer } from 'mobx-react-lite';
+import { isThinkingStep, isFinalAnswerStep, capitalize } from '../utils/formatters';
 
 interface LLMBoxProps {
-  executionLog: ExecutionStep[];
+  steps: ExecutionStep[];
   isRunning: boolean;
   onSendMessage: (content: string) => Promise<void>;
   selection?: string;
 }
 
 export const LLMBox: React.FC<LLMBoxProps> = ({
-  executionLog,
+  steps,
   isRunning,
   onSendMessage,
   selection,
 }) => {
+  const renderStepContent = (step: ExecutionStep) => {
+    if (isThinkingStep(step)) {
+      return <pre className={styles.stepContent}>{step.content}</pre>;
+    }
+    if (isFinalAnswerStep(step)) {
+      return <pre className={styles.stepContent}>{step.content}</pre>;
+    }
+    return null;
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.chatArea}>
-        {executionLog.map((step) => (
+        {steps.map((step) => (
           <div key={step.id} className={styles.step}>
-            <span className={styles.stepType}>{step.type}</span>
-            {'content' in step && <pre className={styles.stepContent}>{(step as any).content}</pre>}
+            <span className={styles.stepType}>{capitalize(step.type)}</span>
+            {renderStepContent(step)}
           </div>
         ))}
         {isRunning && <div className={styles.loading}>Running...</div>}

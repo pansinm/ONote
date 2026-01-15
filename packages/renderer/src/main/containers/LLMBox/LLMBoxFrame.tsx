@@ -8,34 +8,13 @@ import {
   EDITOR_SELECTION_CHANGED,
 } from '../../eventbus/EventName';
 import { subscription } from '../../eventbus';
-import { LLM_BOX_MESSAGE_TYPES } from '../../../llmbox/constants/LLMBoxConstants';
-import {
-  ConversationLoadHandler,
-  ConversationSaveHandler,
-} from './handlers/ConversationHandler';
-import {
-  AgentFileReadHandler,
-  AgentFileWriteHandler,
-  AgentFileReplaceHandler,
-  AgentFileCreateHandler,
-  AgentFileDeleteHandler,
-  AgentFileListHandler,
-  AgentFileSearchHandler,
-  AgentFileSearchInHandler,
-} from './handlers/AgentFileHandler';
-import {
-  AgentContextLoadHandler,
-  AgentContextSaveHandler,
-  AgentExecutionStateLoadHandler,
-  AgentExecutionStateSaveHandler,
-  AgentExecutionStateDeleteHandler,
-} from './handlers/AgentContextHandler';
-import {
-  GetCurrentFileInfoHandler,
-  AgentGetRootUriHandler,
-  AgentGetActiveFileUriHandler,
-} from './handlers/EditorEventHandler';
-import { LLMConfigGetHandler } from './handlers/LLMConfigHandler';
+import { LLM_BOX_MESSAGE_TYPES } from '../../../llmbox/utils/constants';
+import { getLogger } from '/@/shared/logger';
+// 统一导入所有 Handler
+import * as Handlers from './handlers';
+import type { HandlerClass } from './handlers';
+
+const logger = getLogger('LLMBoxFrame');
 
 function LLMBoxFrame() {
   const ref = useRef<HTMLIFrameElement>(null);
@@ -45,40 +24,32 @@ function LLMBoxFrame() {
       return;
     }
 
-    const { send, receive } = createChannel(
-      ref.current!.contentWindow!,
+    const channel = createChannel(
+      ref.current.contentWindow,
       'MAIN_FRAME-LLM_BOX',
     );
 
-    const onote = (window as any).onote;
+    const handlerRegistry = new HandlerRegistry(channel);
 
-    const handlerRegistry = new HandlerRegistry();
-    handlerRegistry.register(ConversationLoadHandler, stores, onote);
-    handlerRegistry.register(ConversationSaveHandler, stores, onote);
-    handlerRegistry.register(AgentFileReadHandler);
-    handlerRegistry.register(AgentFileWriteHandler);
-    handlerRegistry.register(AgentFileReplaceHandler);
-    handlerRegistry.register(AgentFileCreateHandler);
-    handlerRegistry.register(AgentFileDeleteHandler);
-    handlerRegistry.register(AgentFileListHandler);
-    handlerRegistry.register(AgentFileSearchHandler);
-    handlerRegistry.register(AgentFileSearchInHandler);
-    handlerRegistry.register(AgentContextLoadHandler, stores, onote);
-    handlerRegistry.register(AgentContextSaveHandler, stores, onote);
-    handlerRegistry.register(AgentExecutionStateLoadHandler, stores, onote);
-    handlerRegistry.register(AgentExecutionStateSaveHandler, stores, onote);
-    handlerRegistry.register(AgentExecutionStateDeleteHandler, stores, onote);
-    handlerRegistry.register(GetCurrentFileInfoHandler, stores);
-    handlerRegistry.register(AgentGetRootUriHandler, stores);
-    handlerRegistry.register(AgentGetActiveFileUriHandler, stores);
-    handlerRegistry.register(LLMConfigGetHandler);
+    // 自动注册所有 Handler
+    const allHandlers = Object.values(Handlers).filter(
+      (h): h is HandlerClass =>
+        typeof h === 'function' &&
+        'getMessageType' in h &&
+        typeof (h as any).getMessageType === 'function',
+    );
 
-    const handlers = handlerRegistry.getAllHandlers();
+    logger.info(`Registering ${allHandlers.length} handlers...`);
+    allHandlers.forEach((Handler) => handlerRegistry.register(Handler));
+    logger.info('All handlers registered successfully');
+
+    // 启动消息监听
+    handlerRegistry.serve();
 
     const contentChanged = subscription.subscribe(
       EDITOR_CONTENT_CHANGED,
       (data) => {
-        send({
+        channel.send({
           type: LLM_BOX_MESSAGE_TYPES.EDITOR_CONTENT_CHANGED,
           data,
         });
@@ -88,7 +59,7 @@ function LLMBoxFrame() {
     const selectionChanged = subscription.subscribe(
       EDITOR_SELECTION_CHANGED,
       (data) => {
-        send({
+        channel.send({
           type: LLM_BOX_MESSAGE_TYPES.EDITOR_SELECTION_CHANGED,
           data,
         });
@@ -99,19 +70,13 @@ function LLMBoxFrame() {
       () => stores.activationStore.activeFileUri,
       (uri) => {
         if (uri) {
-          send({
+          channel.send({
             type: LLM_BOX_MESSAGE_TYPES.EDITOR_FILE_OPEN,
             data: { uri, rootUri: stores.activationStore.rootUri },
           });
         }
       },
     );
-
-    receive((message: any) => {
-      handlerRegistry.handle(message).then((result) => {
-        return result;
-      });
-    });
 
     return () => {
       contentChanged.dispose();

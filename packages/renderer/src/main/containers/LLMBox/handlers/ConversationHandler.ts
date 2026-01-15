@@ -1,22 +1,19 @@
 import { BaseHandler } from './BaseHandler';
 import type { LLMConversationLoadResponse, LLMConversationSaveResponse } from '../types';
-import type { Stores, OnoteAPI } from '/@/main/stores/types';
-import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/constants/LLMBoxConstants';
+import stores from '/@/main/stores';
+import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/utils/constants';
 
 export class ConversationLoadHandler extends BaseHandler {
-  constructor(private stores: Stores, private onote: OnoteAPI) {
-    super();
-  }
-
   async handle(data: { fileUri: string }): Promise<LLMConversationLoadResponse> {
-    const rootUri = this.stores.activationStore.rootUri;
+    const rootUri = stores.activationStore.rootUri;
+    const onote = (window as any).onote;
 
     return this.wrapWithErrorHandling(async () => {
-      if (!this.onote?.llmConversation) {
+      if (!onote?.llmConversation) {
         throw new Error('llmConversation not available');
       }
 
-      const messages = await this.onote.llmConversation.invoke('loadConversation', {
+      const messages = await onote.llmConversation.invoke('loadConversation', {
         fileUri: data.fileUri,
         rootUri,
       });
@@ -31,19 +28,16 @@ export class ConversationLoadHandler extends BaseHandler {
 }
 
 export class ConversationSaveHandler extends BaseHandler {
-  constructor(private stores: Stores, private onote: OnoteAPI) {
-    super();
-  }
-
   async handle(data: { fileUri: string; messages: unknown[] }): Promise<LLMConversationSaveResponse> {
-    const rootUri = this.stores.activationStore.rootUri;
+    const rootUri = stores.activationStore.rootUri;
+    const onote = (window as any).onote;
 
     return this.wrapWithErrorHandling(async () => {
-      if (!this.onote?.llmConversation) {
+      if (!onote?.llmConversation) {
         throw new Error('llmConversation not available');
       }
 
-      await this.onote.llmConversation.invoke('saveConversation', {
+      await onote.llmConversation.invoke('saveConversation', {
         fileUri: data.fileUri,
         messages: data.messages,
         rootUri,

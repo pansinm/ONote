@@ -4,18 +4,14 @@ import type {
   AgentGetRootUriResponse,
   AgentGetActiveFileUriResponse,
 } from '../types';
-import type { Stores } from '/@/main/stores/types';
-import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/constants/LLMBoxConstants';
+import stores from '/@/main/stores';
+import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/utils/constants';
 
 export class GetCurrentFileInfoHandler extends BaseHandler {
-  constructor(private stores: Stores) {
-    super();
-  }
-
   async handle(data: undefined): Promise<GetCurrentFileInfoResponse> {
     const { fileUri, rootUri } = {
-      fileUri: this.stores.activationStore.activeFileUri,
-      rootUri: this.stores.activationStore.rootUri,
+      fileUri: stores.activationStore.activeFileUri,
+      rootUri: stores.activationStore.rootUri,
     };
     return { fileUri, rootUri };
   }
@@ -26,12 +22,8 @@ export class GetCurrentFileInfoHandler extends BaseHandler {
 }
 
 export class AgentGetRootUriHandler extends BaseHandler {
-  constructor(private stores: Stores) {
-    super();
-  }
-
   async handle(data: undefined): Promise<AgentGetRootUriResponse> {
-    return { rootUri: this.stores.activationStore.rootUri };
+    return { rootUri: stores.activationStore.rootUri };
   }
 
   static getMessageType(): string {
@@ -40,12 +32,8 @@ export class AgentGetRootUriHandler extends BaseHandler {
 }
 
 export class AgentGetActiveFileUriHandler extends BaseHandler {
-  constructor(private stores: Stores) {
-    super();
-  }
-
   async handle(data: undefined): Promise<AgentGetActiveFileUriResponse> {
-    return { fileUri: this.stores.activationStore.activeFileUri };
+    return { fileUri: stores.activationStore.activeFileUri };
   }
 
   static getMessageType(): string {

@@ -228,7 +228,7 @@ interface PersistedExecutionState {
        |   - Conversation history
        |   - User prompt
        |
-       +-> LLMClient.completeWithStreaming()
+        +-> LLMClient.complete()
        |   - Sends messages to LLM API
        |   - Receives streaming response
        |   - Returns content + toolCalls

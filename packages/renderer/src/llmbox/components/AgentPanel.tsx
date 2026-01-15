@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import type { AgentStore } from '../store';
-import type { TodoItem } from '../types';
+import type { Store } from '../store/Store';
 import styles from './AgentPanel.module.scss';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -12,7 +11,7 @@ import { BottomTabs } from './BottomTabs';
 import { EmptyState } from './EmptyState';
 
 interface AgentPanelProps {
-  store: AgentStore;
+  store: Store;
 }
 
 const AgentPanel = observer(({ store }: AgentPanelProps) => {
@@ -22,25 +21,40 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
 
   const logContainerRef = useRef<HTMLDivElement>(null);
+  const scrollTimerRef = useRef<ReturnType<typeof requestAnimationFrame> | null>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (logContainerRef.current) {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'execution') {
       scrollToBottom();
     }
-  }, [store.executionLog, store.agentState, activeTab]);
+  }, [store.steps, store.agentState, activeTab, scrollToBottom]);
 
   useEffect(() => {
     if (store.agentState === 'thinking' && store.isRunning) {
-      const timer = setInterval(() => {
-        scrollToBottom();
-      }, 100);
-      return () => clearInterval(timer);
+      const scroll = () => {
+        if (logContainerRef.current) {
+          logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+        }
+      };
+
+      scrollTimerRef.current = requestAnimationFrame(function animate() {
+        scroll();
+        if (store.agentState === 'thinking' && store.isRunning) {
+          scrollTimerRef.current = requestAnimationFrame(animate);
+        }
+      });
+
+      return () => {
+        if (scrollTimerRef.current) {
+          cancelAnimationFrame(scrollTimerRef.current);
+        }
+      };
     }
   }, [store.agentState, store.isRunning, activeTab]);
 
@@ -53,7 +67,7 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
             activeTab === 'execution' ? styles.active : ''
           }`}
         >
-          {store.executionLog.length === 0 ? (
+          {store.steps.length === 0 ? (
             <EmptyState />
           ) : (
             <ExecutionLogPanel

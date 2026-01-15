@@ -1,11 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import type { AgentStore } from '../store';
+import type { Store } from '../store/Store';
 import styles from './AgentPanel.module.scss';
 import Icon, { type IconType } from '/@/components/Icon';
 
 interface ToolsPanelProps {
-  store: AgentStore;
+  store: Store;
   onToolSelect: (toolName: string) => void;
   selectedTool: string | null;
 }
@@ -59,7 +59,7 @@ export const ToolsPanel = observer(
         </div>
       </div>
     );
-  }
+  },
 );
 
 export default ToolsPanel;

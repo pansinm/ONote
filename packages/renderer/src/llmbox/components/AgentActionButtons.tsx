@@ -1,11 +1,12 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import type { AgentStore } from '../store';
+import type { Store } from '../store/Store';
+import { getAgent } from '../agent';
 import styles from './AgentPanel.module.scss';
 import Icon from '/@/components/Icon';
 
 interface AgentActionButtonsProps {
-  store: AgentStore;
+  store: Store;
 }
 
 export const AgentActionButtons = observer(({ store }: AgentActionButtonsProps) => {
@@ -32,7 +33,7 @@ export const AgentActionButtons = observer(({ store }: AgentActionButtonsProps) 
       {store.hasSavedState && !store.isRunning && (
         <button
           className={styles.ActionBtn}
-          onClick={() => store.resumeExecution()}
+          onClick={() => getAgent().resume()}
           title="Resume from saved state"
         >
           <Icon type="play-fill" size={16} />
@@ -53,7 +54,7 @@ export const AgentActionButtons = observer(({ store }: AgentActionButtonsProps) 
       {store.isRunning && (
         <button
           className={styles.ActionBtn}
-          onClick={() => store.stopAgent()}
+          onClick={() => getAgent().stop()}
           title="Stop"
         >
           <Icon type="stop-fill" size={16} />

@@ -1,8 +1,36 @@
+// ============================================================================
+// 类型导出
+// ============================================================================
 export * from './types';
-export { agentStore } from './store';
-export { AgentState } from './store/AgentState';
-export { AgentExecutor } from './agent/AgentExecutor';
-export { ConfigManager } from './service/ConfigManager';
-export { ContextManager } from './service/ContextManager';
-export { LLMBox } from './components/LLMBox';
-export * from './agent';
+
+// ============================================================================
+// 核心 Store
+// ============================================================================
+export { Store } from './store/Store';
+
+// ============================================================================
+// Agent
+// ============================================================================
+export { Agent, getAgent, disposeAgent } from './agent';
+export { ToolRegistry, createFileTools, createTodoTools } from './agent/tools';
+export type { TodoManager } from './agent/tools';
+
+// ============================================================================
+// Prompts
+// ============================================================================
+export * from './agent/prompts';
+
+// ============================================================================
+// LLM Client
+// ============================================================================
+export { LLMClient } from './core/api/client';
+export type {
+  LLMConfig,
+  ToolCallResult,
+  StreamingCallbacks,
+} from './core/api/client';
+
+// ============================================================================
+// 组件
+// ============================================================================
+export { default as LLMBox } from './components/LLMBox';

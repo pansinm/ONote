@@ -30,20 +30,7 @@ export class LLMClient {
   private model: string;
 
   constructor(config: LLMConfig) {
-    let baseURL = config.apiBase?.trim() || '';
-    if (!baseURL) {
-      baseURL = 'https://api.openai.com/v1';
-    }
-    if (!baseURL.startsWith('http://') && !baseURL.startsWith('https://')) {
-      baseURL = 'https://' + baseURL;
-    }
-    if (baseURL.endsWith('/chat/completions')) {
-      baseURL = baseURL.replace(/\/chat\/completions$/, '');
-    }
-    if (baseURL.endsWith('/')) {
-      baseURL = baseURL.slice(0, -1);
-    }
-
+    const baseURL = this.normalizeBaseURL(config.apiBase);
     this.client = new OpenAI({
       apiKey: config.apiKey,
       baseURL,
@@ -52,18 +39,25 @@ export class LLMClient {
     this.model = config.model;
   }
 
-  async *stream(
-    messages: Message[],
-    options?: { signal?: AbortSignal; tools?: Tool | Tool[] }
-  ): AsyncGenerator<{
-    content: string;
-    toolCalls: { id: string; name: string; arguments: string }[];
-  }> {
-    const tools = options?.tools
-      ? (Array.isArray(options.tools) ? options.tools : [options.tools])
-      : undefined;
+  private normalizeBaseURL(baseURL: string): string {
+    if (!baseURL?.trim()) {
+      return 'https://api.openai.com/v1';
+    }
 
-    const openaiMessages: any[] = messages.map((m) => {
+    // Remove trailing chat/completions
+    let normalized = baseURL.replace(/\/chat\/completions$/, '');
+
+    // Ensure protocol
+    if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
+      normalized = 'https://' + normalized;
+    }
+
+    // Remove trailing slash
+    return normalized.replace(/\/$/, '');
+  }
+
+  private convertMessages(messages: Message[]): OpenAI.Chat.ChatCompletionMessageParam[] {
+    return messages.map((m) => {
       if (m.role === 'tool') {
         const tm = m as ToolMessage;
         return {
@@ -74,7 +68,7 @@ export class LLMClient {
       }
       const am = m as AssistantMessage;
       return {
-        role: am.role as 'user' | 'assistant' | 'system' | 'tool',
+        role: am.role as 'user' | 'assistant' | 'system',
         content: am.content,
         tool_calls: am.toolCalls?.map((tc) => ({
           id: tc.id,
@@ -86,18 +80,32 @@ export class LLMClient {
         })),
       };
     });
+  }
 
+  private convertTools(tools?: Tool | Tool[]): OpenAI.Chat.ChatCompletionTool[] | undefined {
+    if (!tools) return undefined;
+    const toolsArray = Array.isArray(tools) ? tools : [tools];
+    return toolsArray.map((t) => ({
+      type: 'function' as const,
+      function: {
+        name: t.name,
+        description: t.description,
+        parameters: t.parameters as Record<string, unknown>,
+      },
+    }));
+  }
+
+  async *stream(
+    messages: Message[],
+    options?: { signal?: AbortSignal; tools?: Tool | Tool[] },
+  ): AsyncGenerator<{
+    content: string;
+    toolCalls: { id: string; name: string; arguments: string }[];
+  }> {
     const stream = await this.client.chat.completions.create({
       model: this.model,
-      messages: openaiMessages,
-      tools: tools?.map((t) => ({
-        type: 'function' as const,
-        function: {
-          name: t.name,
-          description: t.description,
-          parameters: t.parameters as Record<string, unknown>,
-        },
-      })),
+      messages: this.convertMessages(messages),
+      tools: this.convertTools(options?.tools),
       tool_choice: 'auto',
       stream: true,
     });
@@ -120,104 +128,46 @@ export class LLMClient {
 
   async complete(
     messages: Message[],
-    options?: { signal?: AbortSignal; tools?: Tool[] }
-  ): Promise<{ content: string; toolCalls: ToolCallResult[] }> {
-    let content = '';
-    const toolCalls: Map<string, ToolCallResult> = new Map();
-
-    for await (const chunk of this.stream(messages, options)) {
-      if (chunk.content) {
-        content += chunk.content;
-      }
-
-      for (const tc of chunk.toolCalls) {
-        if (!tc.name) continue; // 跳过没有名称的工具调用
-
-        if (!toolCalls.has(tc.id)) {
-          toolCalls.set(tc.id, {
-            id: tc.id,
-            name: tc.name,
-            arguments: '',
-            content: '',
-          });
-        } else {
-          const existing = toolCalls.get(tc.id)!;
-          if (!existing.name && tc.name) {
-            existing.name = tc.name;
-          }
-          existing.arguments += tc.arguments;
-        }
-      }
-    }
-
-    return {
-      content,
-      toolCalls: Array.from(toolCalls.values()).filter((tc) => tc.name),
-    };
-  }
-
-  async completeWithStreaming(
-    messages: Message[],
-    options?: { signal?: AbortSignal; tools?: Tool[] },
-    callbacks?: StreamingCallbacks
+    options?: { signal?: AbortSignal; tools?: Tool | Tool[] },
+    callbacks?: StreamingCallbacks,
   ): Promise<{ content: string; toolCalls: ToolCallResult[] }> {
     let content = '';
     let isFirstChunk = true;
-    const toolCalls: Map<string, ToolCallResult> = new Map();
+    const toolCallsMap = new Map<string, ToolCallResult>();
 
     for await (const chunk of this.stream(messages, options)) {
+      // Handle content
       if (chunk.content) {
         content += chunk.content;
-        if (callbacks?.onChunk) {
-          callbacks.onChunk(chunk.content, isFirstChunk);
-          isFirstChunk = false;
-        }
+        callbacks?.onChunk?.(chunk.content, isFirstChunk);
+        isFirstChunk = false;
       }
 
+      // Handle tool calls
       for (const tc of chunk.toolCalls) {
-        if (!tc.name) continue; // 跳过没有名称的工具调用
-
-        if (!toolCalls.has(tc.id)) {
-          toolCalls.set(tc.id, {
+        if (!toolCallsMap.has(tc.id)) {
+          toolCallsMap.set(tc.id, {
             id: tc.id,
-            name: tc.name,
-            arguments: '',
+            name: tc.name || '',
+            arguments: tc.arguments || '',
             content: '',
           });
         } else {
-          const existing = toolCalls.get(tc.id)!;
-          if (!existing.name && tc.name) {
+          const existing = toolCallsMap.get(tc.id)!;
+          if (tc.name && !existing.name) {
             existing.name = tc.name;
           }
+          if (tc.arguments) {
+            existing.arguments += tc.arguments;
+          }
         }
-        const existing = toolCalls.get(tc.id)!;
-        existing.arguments += tc.arguments;
       }
     }
 
-    const result = {
-      content,
-      toolCalls: Array.from(toolCalls.values()).filter((tc) => tc.name),
-    };
+    const toolCalls = Array.from(toolCallsMap.values()).filter((tc) => tc.name);
 
-    if (callbacks?.onComplete) {
-      callbacks.onComplete(result.content, result.toolCalls);
-    }
+    callbacks?.onComplete?.(content, toolCalls);
 
-    return result;
+    return { content, toolCalls };
   }
-}
-
-export class LLMApiError extends Error {
-  constructor(
-    public readonly status: number,
-    public readonly body: string
-  ) {
-    super(`LLM API error: ${status} - ${body.slice(0, 100)}`);
-    this.name = 'LLMApiError';
-  }
-}
-
-export function isLLMApiError(error: unknown): error is LLMApiError {
-  return error instanceof LLMApiError;
 }

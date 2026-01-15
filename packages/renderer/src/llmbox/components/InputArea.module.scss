@@ -160,11 +160,28 @@
   cursor: pointer;
   font-size: 12px;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   &:hover:not(:disabled) {
     background: #0056b3;
   }
   &:disabled {
     background: #ccc;
     cursor: not-allowed;
+  }
+}
+
+.spinIcon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

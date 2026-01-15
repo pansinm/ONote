@@ -1,11 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import type { AgentStore } from '../store';
+import type { Store } from '../store/Store';
 import styles from './AgentPanel.module.scss';
 import Icon from '/@/components/Icon';
 
 interface AgentStatusProps {
-  store: AgentStore;
+  store: Store;
 }
 
 export const AgentStatus = observer(({ store }: AgentStatusProps) => {
@@ -24,7 +24,7 @@ export const AgentStatus = observer(({ store }: AgentStatusProps) => {
           <span className={styles.TodoCount}>{completedTodos}/{store.todos.length}</span>
         </span>
       )}
-      <span className={styles.TaskCount}>{store.executionLog.length} tasks</span>
+      <span className={styles.TaskCount}>{store.steps.length} tasks</span>
       <span className={styles.MessageCount}>{store.conversationHistory.length} messages</span>
       {store.error && (
         <span className={styles.ErrorIndicator} title={store.error}>

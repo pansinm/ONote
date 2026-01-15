@@ -1,14 +1,28 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import type { AgentStore } from '../store';
-import type { TodoItem } from '../types';
+import type { Store } from '../store/Store';
+import type {
+  ExecutionStep,
+  TodoItem,
+} from '../types';
 import styles from './AgentPanel.module.scss';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Icon from '/@/components/Icon';
+import {
+  capitalize,
+  formatTime,
+  getStepContent,
+  getStepToolName,
+  getStepParams,
+  getStepResult,
+  getStepError,
+  getStepTodos,
+  isThinkingStep,
+} from '../utils/formatters';
 
 interface ExecutionLogPanelProps {
-  store: AgentStore;
+  store: Store;
   logContainerRef: React.RefObject<HTMLDivElement>;
 }
 
@@ -27,14 +41,101 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
     });
   };
 
+  const renderStepContent = (step: ExecutionStep) => {
+    const content = getStepContent(step);
+    if (!content) return null;
+
+    return (
+      <div className={styles.LogContent}>
+        <div className="markdown-body">
+          <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
+        </div>
+      </div>
+    );
+  };
+
+  const renderStepTool = (step: ExecutionStep) => {
+    const toolName = getStepToolName(step);
+    if (!toolName) return null;
+
+    return (
+      <div className={styles.LogTool}>
+        <Icon type="arrow-right" size={12} className={styles.LogToolLabel} />
+        <span className={styles.LogToolName}>{toolName}</span>
+      </div>
+    );
+  };
+
+  const renderStepParams = (step: ExecutionStep) => {
+    const params = getStepParams(step);
+    if (!params) return null;
+
+    return (
+      <div className={styles.ToolParams}>
+        <div className={styles.ToolParamsLabel}>Parameters</div>
+        <pre className={styles.ToolParamsContent}>
+          {JSON.stringify(params, null, 2)}
+        </pre>
+      </div>
+    );
+  };
+
+  const renderStepResult = (step: ExecutionStep) => {
+    const result = getStepResult(step);
+    if (result === undefined || result === null) return null;
+
+    return (
+      <details className={`${styles.LogDetails} ${styles.LogDetailsResult}`}>
+        <summary className={styles.LogDetailsToggle}>
+          <Icon type="check-circle" size={14} />
+          <span>Result</span>
+        </summary>
+        <div className={styles.LogDetailsContent}>
+          {typeof result === 'string' ? (
+            <div className="markdown-body">
+              <Markdown remarkPlugins={[remarkGfm]}>{result}</Markdown>
+            </div>
+          ) : (
+            <pre>{JSON.stringify(result, null, 2)}</pre>
+          )}
+        </div>
+      </details>
+    );
+  };
+
+  const renderStepError = (step: ExecutionStep) => {
+    const error = getStepError(step);
+    if (!error) return null;
+
+    return (
+      <div className={styles.LogError}>
+        <Icon type="x-circle" size={14} className={styles.LogErrorIcon} />
+        <span className={styles.LogErrorText}>
+          <div className="markdown-body">
+            <Markdown remarkPlugins={[remarkGfm]}>{error}</Markdown>
+          </div>
+        </span>
+      </div>
+    );
+  };
+
+  const renderStepTodos = (step: ExecutionStep) => {
+    const todos = getStepTodos(step);
+    if (!todos || todos.length === 0) return null;
+
+    return (
+      <div className={styles.TodoList}>
+        <TodoTree todos={todos} />
+      </div>
+    );
+  };
+
   return (
     <div className={styles.ExecutionLog} ref={logContainerRef}>
       <div className={styles.LogList}>
-        {store.executionLog.map((step, index) => {
-          const isThinking = step.type === 'thinking';
+        {store.steps.map((step, index) => {
           const isCollapsed = collapsedLogIds.has(step.id);
-          const isCurrentlyThinking =
-            isThinking && store.agentState === 'thinking';
+          const isCurrentlyThinking = isThinkingStep(step) && store.agentState === 'thinking';
 
           return (
             <div
@@ -54,7 +155,7 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
                     {(step.duration / 1000).toFixed(2)}s
                   </span>
                 )}
-                {isThinking && (
+                {isThinkingStep(step) && (
                   <button
                     className={styles.LogItemCollapseBtn}
                     onClick={() => toggleLogItemCollapse(step.id)}
@@ -81,76 +182,12 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
                   isCollapsed ? styles.collapsed : ''
                 }`}
               >
-                {'content' in step && (
-                  <div className={styles.LogContent}>
-                    <div className="markdown-body">
-                      <Markdown remarkPlugins={[remarkGfm]}>
-                        {(step as any).content}
-                      </Markdown>
-                    </div>
-                  </div>
-                )}
-
-                {'toolName' in step && (
-                  <div className={styles.LogTool}>
-                    <Icon type="arrow-right" size={12} className={styles.LogToolLabel} />
-                    <span className={styles.LogToolName}>
-                      {(step as any).toolName}
-                    </span>
-                  </div>
-                )}
-
-                {'params' in step && (
-                  <div className={styles.ToolParams}>
-                    <div className={styles.ToolParamsLabel}>Parameters</div>
-                    <pre className={styles.ToolParamsContent}>
-                      {JSON.stringify((step as any).params, null, 2)}
-                    </pre>
-                  </div>
-                )}
-
-                {'result' in step && (step as any).result !== undefined && (
-                  <details
-                    className={`${styles.LogDetails} ${styles.LogDetailsResult}`}
-                  >
-                    <summary className={styles.LogDetailsToggle}>
-                      <Icon type="check-circle" size={14} />
-                      <span>Result</span>
-                    </summary>
-                    <div className={styles.LogDetailsContent}>
-                      {typeof (step as any).result === 'string' ? (
-                        <div className="markdown-body">
-                          <Markdown remarkPlugins={[remarkGfm]}>
-                            {(step as any).result}
-                          </Markdown>
-                        </div>
-                      ) : (
-                        <pre>
-                          {JSON.stringify((step as any).result, null, 2)}
-                        </pre>
-                      )}
-                    </div>
-                  </details>
-                )}
-
-                {'error' in step && (step as any).error && (
-                  <div className={styles.LogError}>
-                    <Icon type="x-circle" size={14} className={styles.LogErrorIcon} />
-                    <span className={styles.LogErrorText}>
-                      <div className="markdown-body">
-                        <Markdown remarkPlugins={[remarkGfm]}>
-                          {(step as any).error}
-                        </Markdown>
-                      </div>
-                    </span>
-                  </div>
-                )}
-
-                {'todos' in step && (step as any).todos && (step as any).todos.length > 0 && (
-                  <div className={styles.TodoList}>
-                    <TodoTree todos={(step as any).todos} />
-                  </div>
-                )}
+                {renderStepContent(step)}
+                {renderStepTool(step)}
+                {renderStepParams(step)}
+                {renderStepResult(step)}
+                {renderStepError(step)}
+                {renderStepTodos(step)}
               </div>
             </div>
           );
@@ -159,23 +196,6 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
     </div>
   );
 });
-
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function formatTime(timestamp: number): string {
-  const now = Date.now();
-  const diff = now - timestamp;
-
-  if (diff < 60000) {
-    return 'Just now';
-  } else if (diff < 3600000) {
-    const mins = Math.floor(diff / 60000);
-    return `${mins}m ago`;
-  }
-  return new Date(timestamp).toLocaleTimeString();
-}
 
 interface TodoTreeProps {
   todos: TodoItem[];

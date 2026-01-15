@@ -1,6 +1,3 @@
-import AgentStore from './AgentStore';
+import Store from './Store';
 
-export { AgentStore } from './AgentStore';
-export { AgentState } from './AgentState';
-
-export const agentStore = AgentStore.getInstance();
+export const store = new Store();

@@ -6,23 +6,20 @@ import type {
   AgentExecutionStateSaveResponse,
   AgentExecutionStateDeleteResponse,
 } from '../types';
-import type { Stores, OnoteAPI } from '/@/main/stores/types';
-import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/constants/LLMBoxConstants';
+import stores from '/@/main/stores';
+import { LLM_BOX_MESSAGE_TYPES } from '../../../../llmbox/utils/constants';
 
 export class AgentContextLoadHandler extends BaseHandler {
-  constructor(private stores: Stores, private onote: OnoteAPI) {
-    super();
-  }
-
   async handle(data: { fileUri: string }): Promise<AgentContextLoadResponse> {
-    const rootUri = this.stores.activationStore.rootUri;
+    const rootUri = stores.activationStore.rootUri;
+    const onote = (window as any).onote;
 
     return this.wrapWithErrorHandling(async () => {
-      if (!this.onote?.agentContext) {
+      if (!onote?.agentContext) {
         throw new Error('agentContext not available');
       }
 
-      const agentContext = await this.onote.agentContext.invoke('loadAgentContext', {
+      const agentContext = await onote.agentContext.invoke('loadAgentContext', {
         fileUri: data.fileUri,
         rootUri,
       });
@@ -37,19 +34,16 @@ export class AgentContextLoadHandler extends BaseHandler {
 }
 
 export class AgentContextSaveHandler extends BaseHandler {
-  constructor(private stores: Stores, private onote: OnoteAPI) {
-    super();
-  }
-
   async handle(data: { fileUri: string; context: unknown }): Promise<AgentContextSaveResponse> {
-    const rootUri = this.stores.activationStore.rootUri;
+    const rootUri = stores.activationStore.rootUri;
+    const onote = (window as any).onote;
 
     return this.wrapWithErrorHandling(async () => {
-      if (!this.onote?.agentContext) {
+      if (!onote?.agentContext) {
         throw new Error('agentContext not available');
       }
 
-      await this.onote.agentContext.invoke('saveAgentContext', {
+      await onote.agentContext.invoke('saveAgentContext', {
         fileUri: data.fileUri,
         rootUri,
         context: data.context,
@@ -65,19 +59,16 @@ export class AgentContextSaveHandler extends BaseHandler {
 }
 
 export class AgentExecutionStateLoadHandler extends BaseHandler {
-  constructor(private stores: Stores, private onote: OnoteAPI) {
-    super();
-  }
-
   async handle(data: { fileUri: string }): Promise<AgentExecutionStateLoadResponse> {
-    const rootUri = this.stores.activationStore.rootUri;
+    const rootUri = stores.activationStore.rootUri;
+    const onote = (window as any).onote;
 
     return this.wrapWithErrorHandling(async () => {
-      if (!this.onote?.agentContext) {
+      if (!onote?.agentContext) {
         throw new Error('agentContext not available');
       }
 
-      const state = await this.onote.agentContext.invoke('loadExecutionState', {
+      const state = await onote.agentContext.invoke('loadExecutionState', {
         fileUri: data.fileUri,
         rootUri,
       });
@@ -92,19 +83,16 @@ export class AgentExecutionStateLoadHandler extends BaseHandler {
 }
 
 export class AgentExecutionStateSaveHandler extends BaseHandler {
-  constructor(private stores: Stores, private onote: OnoteAPI) {
-    super();
-  }
-
   async handle(data: { fileUri: string; state: unknown }): Promise<AgentExecutionStateSaveResponse> {
-    const rootUri = this.stores.activationStore.rootUri;
+    const rootUri = stores.activationStore.rootUri;
+    const onote = (window as any).onote;
 
     return this.wrapWithErrorHandling(async () => {
-      if (!this.onote?.agentContext) {
+      if (!onote?.agentContext) {
         throw new Error('agentContext not available');
       }
 
-      await this.onote.agentContext.invoke('saveExecutionState', {
+      await onote.agentContext.invoke('saveExecutionState', {
         fileUri: data.fileUri,
         rootUri,
         state: data.state,
@@ -120,19 +108,16 @@ export class AgentExecutionStateSaveHandler extends BaseHandler {
 }
 
 export class AgentExecutionStateDeleteHandler extends BaseHandler {
-  constructor(private stores: Stores, private onote: OnoteAPI) {
-    super();
-  }
-
   async handle(data: { fileUri: string }): Promise<AgentExecutionStateDeleteResponse> {
-    const rootUri = this.stores.activationStore.rootUri;
+    const rootUri = stores.activationStore.rootUri;
+    const onote = (window as any).onote;
 
     return this.wrapWithErrorHandling(async () => {
-      if (!this.onote?.agentContext) {
+      if (!onote?.agentContext) {
         throw new Error('agentContext not available');
       }
 
-      await this.onote.agentContext.invoke('deleteExecutionState', {
+      await onote.agentContext.invoke('deleteExecutionState', {
         fileUri: data.fileUri,
         rootUri,
       });
