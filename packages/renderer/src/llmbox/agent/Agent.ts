@@ -1,4 +1,4 @@
-import type { Message } from '../types';
+import type { Message, AssistantMessage, ToolCall } from '../types';
 import type { ToolCallResult } from '../core/api/client';
 import { LLMClient } from '../core/api/client';
 import { store } from '../store';
@@ -48,7 +48,7 @@ export class Agent {
   constructor() {
     this.todoManager = new TodoManager();
     this.toolRegistry = new ToolRegistry(this.todoManager);
-    this.llmClient = new LLMClient(store.getConfig());
+    this.llmClient = new LLMClient();
 
     store.loadTools();
     const tools = this.toolRegistry.getAll();
@@ -124,7 +124,7 @@ export class Agent {
   private buildContext(): SystemPromptContext {
     const config = store.getConfig();
     return {
-      fileUri: config.fileUri,
+      fileUri: store.fileUri!,
       rootUri: config.rootUri,
     };
   }
@@ -203,7 +203,11 @@ export class Agent {
       messages.push(assistantMessage);
 
       const decision = this.evaluateResult(result);
-      await this.handleDecision(decision, messages, stepId);
+      await this.handleDecision(decision, messages);
+
+      if (decision.type !== 'continue') {
+        break;
+      }
     }
 
     await this.cleanup();
@@ -238,7 +242,7 @@ export class Agent {
     const tools = this.toolRegistry.getAll();
 
     let content = '';
-    const toolCallsMap = new Map<string, ToolCallResult>();
+    const toolCallsMap = new Map<number, ToolCallResult>();
 
     for await (const chunk of this.llmClient.stream(messages, {
       signal: this.abortController!.signal,
@@ -250,20 +254,23 @@ export class Agent {
       }
 
       for (const tc of chunk.toolCalls) {
-        if (!toolCallsMap.has(tc.id)) {
-          toolCallsMap.set(tc.id, {
-            id: tc.id,
+        if (!toolCallsMap.has(tc.index)) {
+          toolCallsMap.set(tc.index, {
+            id: tc.id || '',
             name: tc.name || '',
             arguments: tc.arguments || '',
             content: '',
           });
         } else {
-          const existing = toolCallsMap.get(tc.id)!;
+          const existing = toolCallsMap.get(tc.index)!;
           if (tc.name && !existing.name) {
             existing.name = tc.name;
           }
           if (tc.arguments) {
             existing.arguments += tc.arguments;
+          }
+          if (tc.id && !existing.id) {
+            existing.id = tc.id;
           }
         }
       }
@@ -274,13 +281,24 @@ export class Agent {
     return { content, toolCalls };
   }
 
-  private createAssistantMessage(result: LLMResult): Message {
-    return {
+  private createAssistantMessage(result: LLMResult): AssistantMessage {
+    const message: AssistantMessage = {
       id: uuid('assistant-'),
       role: 'assistant',
       content: result.content,
       timestamp: Date.now(),
     };
+
+    // Add tool_calls if present
+    if (result.toolCalls.length > 0) {
+      message.toolCalls = result.toolCalls.map((tc): ToolCall => ({
+        id: tc.id,
+        name: tc.name,
+        arguments: this.parseArguments(tc.arguments),
+      }));
+    }
+
+    return message;
   }
 
   private evaluateResult(result: LLMResult): ExecutionDecision {
@@ -303,7 +321,6 @@ export class Agent {
   private async handleDecision(
     decision: ExecutionDecision,
     messages: Message[],
-    stepId: string,
   ): Promise<void> {
     switch (decision.type) {
       case 'continue':
@@ -311,10 +328,6 @@ export class Agent {
         break;
 
       case 'complete':
-        store.addStep({
-          type: 'thinking',
-          content: decision.answer,
-        });
         store.addStep({
           type: 'final_answer',
           content: decision.answer,

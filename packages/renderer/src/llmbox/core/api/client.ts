@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import type { Message, Tool, ToolMessage, AssistantMessage } from '../../types';
+import _ from 'lodash';
 
 export interface LLMConfig {
   apiKey: string;
@@ -26,37 +27,11 @@ export interface StreamingCallbacks {
 }
 
 export class LLMClient {
-  private client: OpenAI;
-  private model: string;
+  private client?: OpenAI;
 
-  constructor(config: LLMConfig) {
-    const baseURL = this.normalizeBaseURL(config.apiBase);
-    this.client = new OpenAI({
-      apiKey: config.apiKey,
-      baseURL,
-      dangerouslyAllowBrowser: true,
-    });
-    this.model = config.model;
-  }
-
-  private normalizeBaseURL(baseURL: string): string {
-    if (!baseURL?.trim()) {
-      return 'https://api.openai.com/v1';
-    }
-
-    // Remove trailing chat/completions
-    let normalized = baseURL.replace(/\/chat\/completions$/, '');
-
-    // Ensure protocol
-    if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
-      normalized = 'https://' + normalized;
-    }
-
-    // Remove trailing slash
-    return normalized.replace(/\/$/, '');
-  }
-
-  private convertMessages(messages: Message[]): OpenAI.Chat.ChatCompletionMessageParam[] {
+  private convertMessages(
+    messages: Message[],
+  ): OpenAI.Chat.ChatCompletionMessageParam[] {
     return messages.map((m) => {
       if (m.role === 'tool') {
         const tm = m as ToolMessage;
@@ -82,7 +57,9 @@ export class LLMClient {
     });
   }
 
-  private convertTools(tools?: Tool | Tool[]): OpenAI.Chat.ChatCompletionTool[] | undefined {
+  private convertTools(
+    tools?: Tool | Tool[],
+  ): OpenAI.Chat.ChatCompletionTool[] | undefined {
     if (!tools) return undefined;
     const toolsArray = Array.isArray(tools) ? tools : [tools];
     return toolsArray.map((t) => ({
@@ -95,15 +72,52 @@ export class LLMClient {
     }));
   }
 
+  getConfig() {
+    const settings =
+      (window as any).__settings || ({} as Record<string, string>);
+
+    const apiKey = settings['chatgpt.api-key'];
+    const apiBase = settings['chatgpt.base-url'];
+    const model = settings['chatgpt.model-name'];
+    return {
+      apiBase,
+      apiKey,
+      model,
+    };
+  }
+
+  getOrCreateClient(config: ReturnType<typeof this.getConfig>) {
+    const prevConfig = {
+      apiBase: this.client?.baseURL,
+      apiKey: this.client?.apiKey,
+    };
+    if (
+      !this.client ||
+      !_.isEqual(prevConfig, {
+        apiBase: config.apiBase,
+        apiKey: config.apiKey,
+      })
+    ) {
+      this.client = new OpenAI({
+        baseURL: config.apiBase,
+        apiKey: config.apiKey,
+        dangerouslyAllowBrowser: true,
+      });
+    }
+    return this.client!;
+  }
+
   async *stream(
     messages: Message[],
     options?: { signal?: AbortSignal; tools?: Tool | Tool[] },
   ): AsyncGenerator<{
     content: string;
-    toolCalls: { id: string; name: string; arguments: string }[];
+    toolCalls: { index: number; id: string; name: string; arguments: string }[];
   }> {
-    const stream = await this.client.chat.completions.create({
-      model: this.model,
+    const config = this.getConfig();
+    const client = this.getOrCreateClient(config);
+    const stream = await client.chat.completions.create({
+      model: config.model,
       messages: this.convertMessages(messages),
       tools: this.convertTools(options?.tools),
       tool_choice: 'auto',
@@ -118,6 +132,7 @@ export class LLMClient {
       yield {
         content,
         toolCalls: toolCalls.map((tc) => ({
+          index: tc.index,
           id: tc.id || '',
           name: tc.function?.name || '',
           arguments: tc.function?.arguments || '',
@@ -133,7 +148,7 @@ export class LLMClient {
   ): Promise<{ content: string; toolCalls: ToolCallResult[] }> {
     let content = '';
     let isFirstChunk = true;
-    const toolCallsMap = new Map<string, ToolCallResult>();
+    const toolCallsMap = new Map<number, ToolCallResult>();
 
     for await (const chunk of this.stream(messages, options)) {
       // Handle content
@@ -145,20 +160,23 @@ export class LLMClient {
 
       // Handle tool calls
       for (const tc of chunk.toolCalls) {
-        if (!toolCallsMap.has(tc.id)) {
-          toolCallsMap.set(tc.id, {
-            id: tc.id,
+        if (!toolCallsMap.has(tc.index)) {
+          toolCallsMap.set(tc.index, {
+            id: tc.id || '',
             name: tc.name || '',
             arguments: tc.arguments || '',
             content: '',
           });
         } else {
-          const existing = toolCallsMap.get(tc.id)!;
+          const existing = toolCallsMap.get(tc.index)!;
           if (tc.name && !existing.name) {
             existing.name = tc.name;
           }
           if (tc.arguments) {
             existing.arguments += tc.arguments;
+          }
+          if (tc.id && !existing.id) {
+            existing.id = tc.id;
           }
         }
       }
