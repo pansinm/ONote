@@ -19,6 +19,7 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
     'execution',
   );
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
 
   const logContainerRef = useRef<HTMLDivElement>(null);
   const scrollTimerRef = useRef<ReturnType<typeof requestAnimationFrame> | null>(null);
@@ -29,14 +30,23 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
     }
   }, []);
 
-  useEffect(() => {
-    if (activeTab === 'execution') {
-      scrollToBottom();
-    }
-  }, [store.steps, store.agentState, activeTab, scrollToBottom]);
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLDivElement;
+    const threshold = 100; // 距离底部 100px 内认为是"在底部"
+
+    const isAtBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - threshold;
+
+    setIsUserScrolling(!isAtBottom);
+  }, []);
 
   useEffect(() => {
-    if (store.agentState === 'thinking' && store.isRunning) {
+    if (activeTab === 'execution' && !isUserScrolling) {
+      scrollToBottom();
+    }
+  }, [store.steps, store.agentState, activeTab, scrollToBottom, isUserScrolling]);
+
+  useEffect(() => {
+    if (store.agentState === 'thinking' && store.isRunning && !isUserScrolling) {
       const scroll = () => {
         if (logContainerRef.current) {
           logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
@@ -45,7 +55,7 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
 
       scrollTimerRef.current = requestAnimationFrame(function animate() {
         scroll();
-        if (store.agentState === 'thinking' && store.isRunning) {
+        if (store.agentState === 'thinking' && store.isRunning && !isUserScrolling) {
           scrollTimerRef.current = requestAnimationFrame(animate);
         }
       });
@@ -56,7 +66,7 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
         }
       };
     }
-  }, [store.agentState, store.isRunning, activeTab]);
+  }, [store.agentState, store.isRunning, activeTab, isUserScrolling]);
 
   return (
     <div className={styles.AgentPanel}>
@@ -73,6 +83,7 @@ const AgentPanel = observer(({ store }: AgentPanelProps) => {
             <ExecutionLogPanel
               store={store}
               logContainerRef={logContainerRef}
+              onScroll={handleScroll}
             />
           )}
         </div>

@@ -27,7 +27,7 @@ export class Store {
   isRunning = false;
   hasSavedState = false;
   lastStateSavedAt: Date | null = null;
-  fileUri: string | null = null;
+  fileUri = '';
   content = '';
   selection = '';
 
@@ -46,12 +46,10 @@ export class Store {
   }
 
   getConfig(): AgentConfig {
-    const settings = (window as any).__settings;
     return {
       ...this.config,
-      apiBase: settings['chatgpt.api-key'],
-      apiKey: settings['chatgpt.base-url'],
-      model: 'chatgpt.model-name',
+      fileUri: this.fileUri!,
+      rootUri: this.config.rootUri,
     };
   }
 

@@ -24,9 +24,10 @@ import {
 interface ExecutionLogPanelProps {
   store: Store;
   logContainerRef: React.RefObject<HTMLDivElement>;
+  onScroll?: (e: React.UIEvent<HTMLDivElement>) => void;
 }
 
-export const ExecutionLogPanel = observer(({ store, logContainerRef }: ExecutionLogPanelProps) => {
+export const ExecutionLogPanel = observer(({ store, logContainerRef, onScroll }: ExecutionLogPanelProps) => {
   const [collapsedLogIds, setCollapsedLogIds] = useState<Set<string>>(new Set());
 
   const toggleLogItemCollapse = (logId: string) => {
@@ -131,7 +132,7 @@ export const ExecutionLogPanel = observer(({ store, logContainerRef }: Execution
   };
 
   return (
-    <div className={styles.ExecutionLog} ref={logContainerRef}>
+    <div className={styles.ExecutionLog} ref={logContainerRef} onScroll={onScroll}>
       <div className={styles.LogList}>
         {store.steps.map((step, index) => {
           const isCollapsed = collapsedLogIds.has(step.id);
