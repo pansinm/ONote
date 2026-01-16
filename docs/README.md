@@ -15,6 +15,8 @@
 
 - [新手教程](./guides/新手教程.md) - 快速上手 ONote 开发
 - [开发指南](./guides/开发指南.md) - 详细的开发流程和最佳实践
+- [UI 拖拽调整功能开发指南](./guides/UI拖拽调整功能开发指南.md) - 面板拖拽调整实现
+- [对话复盘-LLMBox 拖拽调整功能](./guides/对话复盘-LLMBox拖拽调整功能.md) - 拖拽功能开发复盘
 
 ### 🔧 技术文档
 深入了解各个功能模块的技术实现细节。
@@ -37,10 +39,6 @@
 - [DataSource 设计](./design/DataSource设计.md) - 数据源架构设计
 - [Todo 设计](./design/Todo设计.md) - 待办事项系统设计
 - [Agent 功能设计](./design/Agent设计.md) - AI Agent 功能架构设计
-- [Agent 功能实现总结](./Agent功能实现总结.md) - Agent 功能完整实现报告
-- [AgentPanel 样式改进说明](./AgentPanel样式改进说明.md) - Agent Panel 样式改进完整指南
-- [Agent 功能快速测试指南](./Agent功能快速测试指南.md) - Agent 功能完整测试指南
-- [Agent 功能完整实现总结](./Agent功能完整实现总结.md) - Agent 功能完整实现与样式美化 - 最终报告
 
 ### 📦 归档文档
 历史文档和已完成的项目记录。
@@ -83,7 +81,9 @@ docs/
 │   └── 特性说明.md
 ├── guides/                # 指南文档
 │   ├── 新手教程.md
-│   └── 开发指南.md
+│   ├── 开发指南.md
+│   ├── UI拖拽调整功能开发指南.md
+│   └── 对话复盘-LLMBox拖拽调整功能.md
 ├── technical/             # 技术文档
 │   ├── LLMBox架构说明.md
 │   ├── LLM对话持久化实现.md
@@ -95,16 +95,19 @@ docs/
 │   └── 插件开发指南.md
 ├── design/                # 设计文档
 │   ├── DataSource设计.md
-│   └── Todo设计.md
+│   ├── Todo设计.md
+│   └── Agent设计.md
 ├── examples/              # 示例代码
 │   └── 示例.md
-└── archive/               # 归档文档
-    ├── README.md
-    ├── 第四阶段进度报告.md
-    ├── 第三阶段总结.md
-    ├── 安全审计报告.md
-    ├── 安全检查清单.md
-    └── 日志系统迁移完成报告.md
+├── archive/               # 归档文档
+│   ├── README.md
+│   ├── 第四阶段进度报告.md
+│   ├── 第三阶段总结.md
+│   ├── 安全审计报告.md
+│   ├── 安全检查清单.md
+│   └── 日志系统迁移完成报告.md
+└── assets/                # 资源文件
+    └── (图片文件)
 ```
 
 ---
@@ -127,21 +130,19 @@ docs/
 
 ## 🔗 相关资源
 
- - [项目主页](https://github.com/your-org/onote)
-- [问题追踪](https://github.com/your-org/onote/issues)
-- [CLAUDE.md](../CLAUDE.md) - Claude Code 项目上下文
-- [CONTRIBUTING.md](../CONTRIBUTING.md) - 贡献指南
-- [Agent 功能实现总结](./Agent功能实现总结.md) - Agent 功能完整实现报告
+- [项目主页](https://github.com/anomalyco/ONote)
+- [问题追踪](https://github.com/anomalyco/ONote/issues)
+- [AGENTS.md](../AGENTS.md) - AI 助手开发指南
+- [README.md](../README.md) - 项目自述文件
 
 ---
 
 ## 📅 更新记录
 
+- **2026-01-16** - 整理 docs 目录，合并重复内容，更新过时信息，删除报告类文档
+- **2026-01-16** - 重组 Agent 文档到独立目录
 - **2026-01-06** - 重组文档结构，新增文档导航页
-- **2026-01-06** - 新增 LLM 对话持久化实现文档
-- **2025-01-05** - 完善日志系统文档
-- **2025-01-04** - 添加安全审计和检查清单
 
 ---
 
-**最后更新**: 2026-01-06
+**最后更新**: 2026-01-16

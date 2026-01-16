@@ -520,6 +520,70 @@ interface LLMProvider {
 }
 ```
 
+## 设计系统
+
+### 配色方案
+
+#### 亮色模式
+| 类型 | 颜色值 | 用途 |
+|------|--------|------|
+| Primary | `#3b82f6` | 主要按钮、链接 |
+| Primary Light | `#60a5fa` | 浅色背景强调 |
+| Success | `#10b981` | 成功状态 |
+| Warning | `#f59e0b` | 警告状态 |
+| Error | `#ef4444` | 错误状态 |
+| Primary BG | `#ffffff` | 面板背景 |
+| Secondary BG | `#f8f9fa` | 次级背景 |
+| Border | `#e5e7eb` | 边框颜色 |
+| Primary Text | `#1f2937` | 主要文本 |
+| Secondary Text | `#6c757d` | 次要文本 |
+
+#### 深色模式
+| 类型 | 颜色值 | 用途 |
+|------|--------|------|
+| Primary | `#60a5fa` | 主要按钮、链接 |
+| Success | `#10b981` | 成功状态 |
+| Error | `#ef4444` | 错误状态 |
+| Primary BG | `#1e293b` | 面板背景 |
+| Secondary BG | `#0f172a` | 次级背景 |
+| Tertiary BG | `#334155` | 输入框背景 |
+| Primary Text | `#f1f5f9` | 主要文本 |
+| Secondary Text | `#94a3b8` | 次要文本 |
+
+### 阴影系统
+| 层级 | 阴影值 | 用途 |
+|------|--------|------|
+| Small | `0 1px 2px rgba(0, 0, 0, 0.05)` | 小元素 |
+| Medium | `0 2px 8px rgba(0, 0, 0, 0.1)` | 卡片、按钮 |
+| Large | `0 4px 16px rgba(0, 0, 0, 0.15)` | 面板、弹窗 |
+
+### 圆角系统
+| 层级 | 圆角值 | 用途 |
+|------|--------|------|
+| Small | `6px` | 小元素、标签 |
+| Medium | `10px` | 卡片、按钮 |
+| Large | `16px` | 面板、大元素 |
+
+### 步骤类型视觉区分
+| 步骤类型 | 图标 | 边框色 | 背景色 |
+|---------|------|--------|--------|
+| thinking | 💭 | 蓝色 | 浅蓝背景 |
+| tool_call | 🔧 | 橙色 | 浅橙背景 |
+| tool_result | ✅ | 绿色 | 浅绿背景 |
+| final_answer | 🎯 | 紫色 | 浅紫背景 |
+| error | ❌ | 红色 | 浅红背景 |
+
+### 工具图标
+| 工具 | 图标 |
+|------|------|
+| readFile | 📄 |
+| writeFile | ✏️ |
+| createFile | 📝 |
+| deleteFile | 🗑️ |
+| listFiles | 📂 |
+| searchFiles | 🔍 |
+| searchInFile | 🔎 |
+
 ## 测试策略
 
 ### 单元测试
@@ -574,7 +638,7 @@ interface LLMProvider {
 
 ---
 
-**文档版本**: 1.0
+**文档版本**: 1.1
 **创建日期**: 2026-01-06
-**最后更新**: 2026-01-06
+**最后更新**: 2026-01-16
 **作者**: ONote 开发团队

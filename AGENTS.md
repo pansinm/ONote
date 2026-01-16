@@ -554,3 +554,4 @@ function isUser(value: unknown): value is User {
 - [LLMBox 架构说明](./docs/technical/LLMBox架构说明.md)
 - [LLM 对话持久化实现](./docs/technical/LLM对话持久化实现.md)
 - [日志系统使用指南](./docs/technical/日志系统使用指南.md)
+- [Agent 功能设计](./docs/design/Agent设计.md)

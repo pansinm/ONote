@@ -6,6 +6,7 @@
 
 - [行为准则](#行为准则)
 - [如何贡献](#如何贡献)
+- [OpenSpec 规范开发](#openspec-规范开发)
 - [开发流程](#开发流程)
 - [提交规范](#提交规范)
 - [Pull Request 流程](#pull-request-流程)
@@ -30,7 +31,7 @@
 - 使用性别化语言或图像，以及不受欢迎的性关注或示好
 - 挑衅、侮辱/贬损的评论，以及人身或政治攻击
 - 公开或私下骚扰
-+ 未经明确许可发布他人的私人信息
+- 未经明确许可发布他人的私人信息
 - 其他在专业场合可能被合理认为不适当的行为
 
 ---
@@ -41,9 +42,9 @@
 
 #### 1. 报告 Bug
 
-如果你发现了 Bug，请：
+如果发现了 Bug，请：
 
-1. 在 [Issues](https://github.com/your-org/ONote/issues) 中搜索，确保问题未被报告
+1. 在 [Issues](https://github.com/pansinm/ONote/issues) 中搜索，确保问题未被报告
 2. 创建新 Issue，使用 Bug Report 模板
 3. 提供详细信息：
    - 复现步骤
@@ -54,9 +55,11 @@
 
 #### 2. 提出新功能
 
+新功能需要通过 OpenSpec 提案流程：
+
 1. 先在 Issues 中讨论你的想法
-2. 说明功能的用途和使用场景
-3. 等待维护者反馈
+2. 创建 OpenSpec 提案（参考 [OpenSpec 规范开发](#openspec-规范开发)）
+3. 等待维护者反馈和批准
 4. 获得批准后开始开发
 
 #### 3. 改进文档
@@ -69,9 +72,154 @@
 #### 4. 提交代码
 
 - 修复 Bug
-- 实现新功能
+- 实现已批准的新功能
 - 优化性能
 - 重构代码
+
+---
+
+## OpenSpec 规范开发
+
+本项目使用 OpenSpec 进行规范驱动开发。所有功能变更和架构调整都需要通过 OpenSpec 提案流程。
+
+### 何时需要创建提案
+
+**需要提案：**
+- 新增功能或功能变更
+- 破坏性变更（API、schema）
+- 架构或模式变更
+- 性能优化（变更行为）
+- 安全模式更新
+
+**不需要提案：**
+- Bug 修复（恢复预期行为）
+- 拼写、格式、注释修改
+- 依赖更新（非破坏性）
+- 配置变更
+- 测试现有行为
+
+### 快速开始
+
+```bash
+# 查看现有变更和规范
+openspec list
+openspec list --specs
+
+# 选择 change-id（kebab-case，动词开头）
+# 例如：add-dark-mode、update-ipc-handlers
+
+# 创建提案框架
+openspec/changes/[change-id]/
+├── proposal.md     # 为什么、是什么、影响
+├── tasks.md        # 实施清单
+└── specs/
+    └── [capability]/
+        └── spec.md # ADDED/MODIFIED/REMOVED
+```
+
+### 三阶段工作流
+
+#### 阶段 1：创建提案
+
+1. **查看上下文**
+   ```bash
+   openspec/project.md
+   openspec list
+   openspec list --specs
+   ```
+
+2. **创建提案文件**
+
+   `proposal.md` 模板：
+   ```markdown
+   # Change: [简要描述]
+
+   ## Why
+   [1-2 句关于问题/机会]
+
+   ## What Changes
+   - [变更列表]
+   - [用 **BREAKING** 标记破坏性变更]
+
+   ## Impact
+   - Affected specs: [能力列表]
+   - Affected code: [关键文件]
+   ```
+
+   `tasks.md` 模板：
+   ```markdown
+   ## 1. 实施
+   - [ ] 1.1 任务一
+   - [ ] 1.2 任务二
+   ```
+
+3. **编写规范增量**
+
+   `specs/[capability]/spec.md`：
+   ```markdown
+   ## ADDED Requirements
+   ### Requirement: 新功能名称
+   系统应提供...
+
+   #### Scenario: 场景名称
+   - **WHEN** 条件
+   - **THEN** 预期结果
+   ```
+
+4. **验证**
+   ```bash
+   openspec validate [change-id] --strict --no-interactive
+   ```
+
+5. **请求批准** - 在获得批准前不要开始实施
+
+#### 阶段 2：实施变更
+
+按 `tasks.md` 清单顺序完成：
+
+1. 阅读 `proposal.md` 了解目标
+2. 阅读 `design.md`（如果存在）理解技术决策
+3. 按顺序实施每个任务
+4. 全部完成后，将任务标记为 `- [x]`
+
+#### 阶段 3：归档
+
+部署后创建 PR：
+```bash
+# 归档变更
+openspec archive [change-id] --yes
+
+# 验证
+openspec validate --strict --no-interactive
+```
+
+### 常用命令
+
+| 命令 | 说明 |
+|------|------|
+| `openspec list` | 列出活跃变更 |
+| `openspec list --specs` | 列出所有规范 |
+| `openspec show [item]` | 显示详情 |
+| `openspec validate [item]` | 验证变更/规范 |
+| `openspec archive <id>` | 归档变更 |
+| `openspec update` | 更新说明文件 |
+
+### 关键格式规范
+
+**场景格式（必须使用）：**
+```markdown
+#### Scenario: 用户登录成功
+- **WHEN** 提供有效凭证
+- **THEN** 返回 JWT 令牌
+```
+
+**每个需求必须至少有一个场景。**
+
+### 相关资源
+
+- [OpenSpec 完整文档](./openspec/AGENTS.md)
+- [架构说明](./docs/overview/架构说明.md)
+- [代码规范](./docs/reference/代码规范.md)
 
 ---
 
@@ -89,7 +237,7 @@ git clone https://github.com/YOUR_USERNAME/ONote.git
 cd ONote
 
 # 添加上游仓库
-git remote add upstream https://github.com/ORIGINAL_OWNER/ONote.git
+git remote add upstream https://github.com/pansinm/ONote.git
 ```
 
 ### 3. 安装依赖
@@ -106,8 +254,8 @@ yarn dev
 
 ```bash
 # 更新主分支
-git checkout master
-git pull upstream master
+git checkout main
+git pull upstream main
 
 # 创建功能分支
 git checkout -b feature/your-feature-name
@@ -122,38 +270,32 @@ git checkout -b fix/bug-description
   ```
   feature/add-user-profile
   feature/dark-mode
-  feature/export-to-pdf
   ```
 
 - `fix/` - Bug 修复
   ```
   fix/memory-leak-in-editor
   fix/scroll-sync-issue
-  fix/typo-in-documentation
   ```
 
 - `docs/` - 文档更新
   ```
   docs/update-readme
-  docs/add-api-documentation
   ```
 
 - `refactor/` - 代码重构
   ```
   refactor/optimize-ipcs-handlers
-  refactor/clean-up-unused-code
   ```
 
 - `test/` - 测试相关
   ```
   test/add-unit-tests-for-store
-  test/improve-test-coverage
   ```
 
 - `chore/` - 构建配置等
   ```
   chore/update-dependencies
-  chore/upgrade-webpack
   ```
 
 ### 5. 进行开发
@@ -191,7 +333,7 @@ yarn lint --fix
 git fetch upstream
 
 # 合并上游更新
-git rebase upstream/master
+git rebase upstream/main
 ```
 
 ---
@@ -457,7 +599,7 @@ git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
 
 # 设置默认分支名
-git config --global init.defaultBranch master
+git config --global init.defaultBranch main
 ```
 
 ### VS Code 设置
@@ -485,17 +627,17 @@ git config --global init.defaultBranch master
 
 ### 资源
 
-- [架构说明](./docs/架构说明.md)
-- [开发指南](./docs/开发指南.md)
-- [新手教程](./docs/新手教程.md)
-- [代码规范](./docs/代码规范.md)
-- [常见问题](./docs/常见问题.md)
+- [架构说明](./docs/overview/架构说明.md)
+- [开发指南](./docs/guides/开发指南.md)
+- [新手教程](./docs/guides/新手教程.md)
+- [代码规范](./docs/reference/代码规范.md)
+- [常见问题](./docs/reference/常见问题.md)
+- [OpenSpec 完整文档](./openspec/AGENTS.md)
 
 ### 联系方式
 
 - **GitHub Issues**: 报告 Bug 和功能请求
 - **GitHub Discussions**: 技术讨论
-- **Email**: your-email@example.com
 
 ### 社区
 
