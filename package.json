@@ -40,8 +40,6 @@
     "@types/d3-dispatch": "3.0.6"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^10.3.1",
-    "chokidar": "^3.5.3",
     "sharp": "^0.34.5"
   }
 }
