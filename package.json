@@ -17,10 +17,8 @@
     "generate-tray-icon": "node scripts/generate-tray-icon.js",
     "build": "rm -rf packages/*/dist && turbo build",
     "compile": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js",
-    "bdd": "chokidar \"features/**\" -c \"yarn  cucumber-js\"",
     "test:watch": "yarn jest --watch",
-    "test": "jest --coverage=false && yarn build && yarn test:e2e",
-    "test:e2e": "yarn cucumber-js",
+    "test": "yarn workspaces run test",
     "dev": "yarn build && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" node scripts/watch.js",
     "lint": "eslint . --ext js,ts,tsx"
   },

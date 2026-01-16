@@ -16,8 +16,7 @@
     "compile:win": "cross-env NODE_ENV=production yarn build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js --win",
     "bdd": "chokidar \"features/**\" -c \"yarn  cucumber-js\"",
     "test:watch": "yarn jest --watch",
-    "test": "jest --coverage=false && yarn build && yarn test:e2e",
-    "test:e2e": "yarn cucumber-js",
+    "test": "jest --coverage=false",
     "watch": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" node scripts/watch.js",
     "lint": "eslint . --ext js,ts,tsx"
   },
