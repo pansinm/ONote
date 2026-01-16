@@ -297,6 +297,31 @@ logger.debug('Debug message', { context: data });
 logger.error('Error occurred', error);
 ```
 
+### 行号功能
+当用户向 LLMBox 发送消息时，系统会自动将当前编辑器内容（带行号）添加到消息开头，使大模型能够进行更精确的文本引用和替换。
+
+**消息格式**:
+```markdown
+## 当前文件内容（带行号）
+```
+1: function hello() {
+2:   console.log('hello');
+3: }
+```
+
+## 用户请求
+请修改第 2 行的 'hello' 为 'world'
+```
+
+**行号格式**:
+- 格式: `${lineNumber}: ${content}`
+- 行号从 1 开始连续编号
+- 空行显示为 `2:` (无内容部分)
+
+**相关文件**:
+- `packages/renderer/src/llmbox/utils/addLineNumbers.ts` - 行号添加函数
+- `packages/renderer/src/llmbox/agent/Agent.ts` - 消息构建集成
+
 ### IPC (主进程)
 ```typescript
 class MyHandler extends IpcHandler {

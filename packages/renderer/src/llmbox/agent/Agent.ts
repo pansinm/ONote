@@ -12,6 +12,7 @@ import {
   type SystemPromptContext,
 } from './prompts';
 import { DEFAULT_CONFIG } from '../types';
+import { addLineNumbers } from '../utils';
 
 const logger = getLogger('Agent');
 
@@ -101,9 +102,16 @@ export class Agent {
       store.clearLog();
     }
 
+    const fileContent = store.content;
+    let messageContent = prompt;
+    if (fileContent) {
+      const numberedContent = addLineNumbers(fileContent);
+      messageContent = `## 当前文件内容（带行号）\n\`\`\`\n${numberedContent}\n\`\`\`\n\n## 用户请求\n${prompt}`;
+    }
+
     store.addMessage({
       role: 'user',
-      content: prompt,
+      content: messageContent,
     });
 
     if (options?.clearTodos !== false) {
