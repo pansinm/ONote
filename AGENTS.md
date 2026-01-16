@@ -1,3 +1,22 @@
+<!-- OPENSPEC:START -->
+# OpenSpec Instructions
+
+These instructions are for AI assistants working in this project.
+
+Always open `@/openspec/AGENTS.md` when the request:
+- Mentions planning or proposals (words like proposal, spec, change, plan)
+- Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
+- Sounds ambiguous and you need the authoritative spec before coding
+
+Use `@/openspec/AGENTS.md` to learn:
+- How to create and apply change proposals
+- Spec format and conventions
+- Project structure and guidelines
+
+Keep this managed block so 'openspec update' can refresh the instructions.
+
+<!-- OPENSPEC:END -->
+
 # AGENTS.md - AI 代码助手指南
 
 本文件为 AI 编程助手提供 ONote 项目的基本信息和开发指南。
@@ -168,6 +187,11 @@ import { pathUtil } from '/@/shared/libs';
 - 引号: 单引号
 - 尾随逗号: 多行对象/数组中必须使用
 - 缩进: 2 空格，无制表符
+
+### 文档规范
+- 所有文档（README、proposal、spec、tasks 等）必须使用**中文**编写。
+- 代码注释可以使用中文或英文，但需保持一致性。
+- 提交信息（Commit Message）使用英文。
 
 ### TypeScript 规则
 - 启用严格模式
