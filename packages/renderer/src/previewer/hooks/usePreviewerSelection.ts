@@ -1,18 +1,40 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import tunnel from '../ipc/tunnel';
 import IPCMethod from '/@/common/ipc/IPCMethod';
 import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('PreviewerSelection');
 
-/**
- * 监听 previewer 中的文本选择，并通过 tunnel 发送选择内容
- */
 export function usePreviewerSelection() {
+  const hadSelectionRef = useRef(false);
+
   useEffect(() => {
+    const handleMouseDown = () => {
+      const selection = window.getSelection();
+      hadSelectionRef.current = !!selection && !selection.isCollapsed;
+    };
+
     const handleSelection = () => {
       const selection = window.getSelection();
-      if (!selection || selection.isCollapsed) {
+      if (!selection) {
+        if (hadSelectionRef.current) {
+          logger.info('Selection cleared (no selection object)');
+          tunnel.send(IPCMethod.PreviewerSelectionChangedEvent, {
+            content: '',
+          });
+          hadSelectionRef.current = false;
+        }
+        return;
+      }
+
+      if (selection.isCollapsed) {
+        if (hadSelectionRef.current) {
+          logger.info('Selection cleared');
+          tunnel.send(IPCMethod.PreviewerSelectionChangedEvent, {
+            content: '',
+          });
+        }
+        hadSelectionRef.current = false;
         return;
       }
 
@@ -23,17 +45,17 @@ export function usePreviewerSelection() {
 
       logger.info('Text selected in previewer', { selectedText, length: selectedText.length });
 
-      // 通过 tunnel 发送选择内容到主应用
       tunnel.send(IPCMethod.PreviewerSelectionChangedEvent, {
         content: selectedText,
       });
+      hadSelectionRef.current = true;
     };
 
-    // 监听鼠标抬起事件（选择文本时触发）
+    document.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('mouseup', handleSelection);
 
-    // 清理函数
     return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('mouseup', handleSelection);
     };
   }, []);

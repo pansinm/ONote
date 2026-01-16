@@ -89,6 +89,9 @@ const LLMBoxApp = observer(() => {
           }}
           isLoading={agentStore.isRunning}
           selection={agentStore.selection}
+          onClearSelection={() => {
+            agentStore.updateEditorContent(agentStore.content, '');
+          }}
         />
       </div>
     </div>

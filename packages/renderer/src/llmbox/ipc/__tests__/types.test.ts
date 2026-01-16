@@ -5,7 +5,7 @@
  */
 
 import type { MessageData, MessageResponse } from '../types';
-import { LLM_BOX_MESSAGE_TYPES } from '../../utils/constants';
+import type { LLM_BOX_MESSAGE_TYPES } from '../../utils/constants';
 
 // ============================================================================
 // 类型安全验证

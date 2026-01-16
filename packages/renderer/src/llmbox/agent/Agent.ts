@@ -77,7 +77,7 @@ export class Agent {
   }
 
   setPromptTemplate(template: 'base' | 'developer' | 'writer'): void {
-    this.promptTemplate = SYSTEM_PROMPTS[template] || SYSTEM_PROMPTS.base;
+    this.promptTemplate = SYSTEM_PROMPTS[template] || SYSTEM_PROMPTS.writer;
   }
 
   async run(prompt: string, options?: RunOptions): Promise<void> {
@@ -291,11 +291,13 @@ export class Agent {
 
     // Add tool_calls if present
     if (result.toolCalls.length > 0) {
-      message.toolCalls = result.toolCalls.map((tc): ToolCall => ({
-        id: tc.id,
-        name: tc.name,
-        arguments: this.parseArguments(tc.arguments),
-      }));
+      message.toolCalls = result.toolCalls.map(
+        (tc): ToolCall => ({
+          id: tc.id,
+          name: tc.name,
+          arguments: this.parseArguments(tc.arguments),
+        }),
+      );
     }
 
     return message;

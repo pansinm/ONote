@@ -7,12 +7,14 @@ interface InputAreaProps {
   onSendMessage: (content: string, imageUrls?: string[]) => Promise<void>;
   isLoading: boolean;
   selection?: string;
+  onClearSelection?: () => void;
 }
 
 const InputArea: React.FC<InputAreaProps> = ({
   onSendMessage,
   isLoading,
   selection,
+  onClearSelection,
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -145,6 +147,17 @@ const InputArea: React.FC<InputAreaProps> = ({
     <div className={styles.inputArea}>
       {selection && (
         <div className={styles.selectionContainer}>
+          <div className={styles.selectionHeader}>
+            <span style={{ fontSize: '12px', color: '#666' }}>选中文本</span>
+            <button
+              type="button"
+              className={styles.clearSelection}
+              onClick={onClearSelection}
+              title="清除选中"
+            >
+              <Icon type="x" size={14} />
+            </button>
+          </div>
           <pre className={styles.selectionContent}>{selection}</pre>
         </div>
       )}

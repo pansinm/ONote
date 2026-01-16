@@ -10,7 +10,7 @@ export class IPCError extends Error {
     public code: string,
     message: string,
     public details?: unknown,
-    public requestId?: string
+    public requestId?: string,
   ) {
     super(message);
     this.name = 'IPCError';
@@ -43,7 +43,7 @@ export class TimeoutError extends IPCError {
       'TIMEOUT',
       `Request timeout after ${timeout}ms`,
       { timeout },
-      requestId
+      requestId,
     );
     this.name = 'TimeoutError';
   }
@@ -57,7 +57,7 @@ export class HandlerNotFoundError extends IPCError {
     super(
       'HANDLER_NOT_FOUND',
       `No handler registered for message type: ${messageType}`,
-      { messageType }
+      { messageType },
     );
     this.name = 'HandlerNotFoundError';
   }
@@ -71,13 +71,13 @@ export class MessageValidationError extends IPCError {
     messageType: string,
     field: string,
     expected: string,
-    received: unknown
+    received: unknown,
   ) {
     super(
       'VALIDATION_ERROR',
       `Message validation failed for ${messageType}.${field}`,
       { field, expected, received },
-      undefined
+      undefined,
     );
     this.name = 'MessageValidationError';
   }
@@ -90,7 +90,7 @@ export class HandlerExecutionError extends IPCError {
   constructor(
     messageType: string,
     requestId: string,
-    originalError: Error
+    originalError: Error,
   ) {
     super(
       'HANDLER_ERROR',
@@ -99,7 +99,7 @@ export class HandlerExecutionError extends IPCError {
         originalError: originalError.message,
         stack: originalError.stack,
       },
-      requestId
+      requestId,
     );
     this.name = 'HandlerExecutionError';
   }
