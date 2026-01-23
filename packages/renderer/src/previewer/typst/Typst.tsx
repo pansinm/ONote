@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toONoteUri } from '/@/common/utils/uri';
 import diagramRenderer from '../ipc/diagramRenderer';
 import { getLogger } from '/@/shared/logger';
+import { useImagePreview } from '../context/ImagePreviewContext';
 
 const logger = getLogger('Typst');
 
@@ -12,6 +13,7 @@ export const Typst = ({ uri, content }: { uri: string; content: string }) => {
     content,
     compiling: false,
   });
+  const { openPreview } = useImagePreview();
 
   const compile = useCallback(async (uri: string, content: string) => {
     const next = nextRef.current;
@@ -40,8 +42,14 @@ export const Typst = ({ uri, content }: { uri: string; content: string }) => {
     compile(uri, content);
   }, [uri, content]);
 
+  const handleDoubleClick = useCallback(() => {
+    if (ouput) {
+      openPreview(ouput, 'typst');
+    }
+  }, [ouput, openPreview]);
+
   return (
-    <div>
+    <div onDoubleClick={handleDoubleClick}>
       <img src={ouput} />
       {/* <iframe
         src={ouput + '?' + Date.now()}

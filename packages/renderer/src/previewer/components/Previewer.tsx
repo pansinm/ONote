@@ -5,13 +5,16 @@ import useModel from '../hooks/useModel';
 import { usePreviewerSelection } from '../hooks/usePreviewerSelection';
 import Fallback from './Fallback';
 import { getLogger } from '/@/shared/logger';
+import { ImagePreviewProvider, useImagePreview } from '../context/ImagePreviewContext';
+import ImagePreviewModal from './ImagePreviewModal';
 import('github-markdown-css/github-markdown.css');
 
 const logger = getLogger('Previewer');
 
-export default function Previewer({ className }: { className: string }) {
+function PreviewerContent({ className }: { className: string }) {
   const resource = useModel();
   usePreviewerSelection();
+  const { isOpen, previewSrc, previewType, previewContent, closePreview } = useImagePreview();
 
   if (!resource.uri) {
     return null;
@@ -19,7 +22,6 @@ export default function Previewer({ className }: { className: string }) {
 
   return (
     <>
-      {/* <button onClick={() => exportDocx()}>导出docx</button> */}
       <div className={className}>
         <ErrorBoundary
           FallbackComponent={Fallback}
@@ -29,6 +31,21 @@ export default function Previewer({ className }: { className: string }) {
           <Render {...resource}></Render>
         </ErrorBoundary>
       </div>
+      <ImagePreviewModal
+        isOpen={isOpen}
+        src={previewSrc}
+        type={previewType}
+        content={previewContent}
+        onClose={closePreview}
+      />
     </>
+  );
+}
+
+export default function Previewer({ className }: { className: string }) {
+  return (
+    <ImagePreviewProvider>
+      <PreviewerContent className={className} />
+    </ImagePreviewProvider>
   );
 }

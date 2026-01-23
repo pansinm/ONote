@@ -1,0 +1,149 @@
+.PreviewModal {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.Overlay {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.Content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.DraggableContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.DragHandle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  z-index: 10;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.CloseButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 4px;
+  padding: 8px;
+  cursor: pointer;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.ImageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: #fff;
+}
+
+.PreviewImage {
+  max-width: 100%;
+  max-height: calc(90vh - 60px);
+  object-fit: contain;
+  transform-origin: center center;
+  user-select: none;
+  pointer-events: none;
+}
+
+.SvgContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+
+  :global(svg) {
+    max-width: 100%;
+    max-height: calc(90vh - 60px);
+    object-fit: contain;
+    transform-origin: center center;
+  }
+}
+
+.ZoomControls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 20;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.ZoomButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.ZoomLevel {
+  color: #fff;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+}

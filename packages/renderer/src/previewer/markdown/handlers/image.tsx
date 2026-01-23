@@ -7,6 +7,7 @@ import { createLineClass } from './util/position';
 import tunnel from '../../ipc/tunnel';
 import { isEquals } from '/@/common/utils/uri';
 import { copyUrlAsImage } from '../../utils/clipboard';
+import { useImagePreview } from '../../context/ImagePreviewContext';
 function Image(props: {
   className?: string;
   src: string;
@@ -17,10 +18,15 @@ function Image(props: {
   const srcUrl = new URL(props.src);
   srcUrl.searchParams.set('_', version);
   const src = srcUrl.toString();
+  const { openPreview } = useImagePreview();
 
   const handleCopyImg = useCallback(() => {
     copyUrlAsImage(src);
   }, [src]);
+
+  const handleDoubleClick = useCallback(() => {
+    openPreview(src, 'image');
+  }, [src, openPreview]);
 
   useEffect(() => {
     const disposer = tunnel.on('file.content.changed', ({ uri }) => {
@@ -45,6 +51,7 @@ function Image(props: {
         src={src}
         alt={props.alt}
         title={props.title}
+        onDoubleClick={handleDoubleClick}
       />
     </Block>
   );
