@@ -2,16 +2,16 @@
 export const RESIZE_CONFIG = {
   // 编辑器配置
   editor: {
-    minPercent: 10,
-    maxPercent: 90,
-    defaultPercent: 50,
+    min: 100,
+    max: 1200,
+    default: 500,
     cssVar: '--editor-width',
   },
   // LLMBox 配置
   llmbox: {
-    minPercent: 10,
-    maxPercent: 50,
-    defaultPercent: 30,
+    min: 200,
+    max: 800,
+    default: 400,
     cssVar: '--llmbox-width',
   },
   // 拖拽手柄配置
@@ -37,37 +37,25 @@ export const RESIZE_CONFIG = {
  * 更新 CSS 变量宽度
  * @param cssVarName CSS 变量名
  * @param delta 拖拽增量
- * @param containerWidth 容器宽度
- * @param minPercent 最小百分比
- * @param maxPercent 最大百分比
+ * @param min 最小像素值
+ * @param max 最大像素值
  * @param isReverse 是否反向（LLMBox 拖拽时需要反向）
  */
 export function updateWidth(
   cssVarName: string,
   delta: number,
-  containerWidth: number,
-  minPercent: number,
-  maxPercent: number,
+  min: number,
+  max: number,
   isReverse = false,
 ): void {
-  if (containerWidth <= 0) {
-    console.warn('[updateWidth] Invalid container width:', containerWidth);
-    return;
-  }
-
   const widthStr = getComputedStyle(document.documentElement)
     .getPropertyValue(cssVarName)
     .trim();
-  const width = parseFloat(widthStr) || minPercent;
-
-  const currentPixels = (width / 100) * containerWidth;
+  const currentPixels = parseFloat(widthStr) || min;
   const newPixels = isReverse ? currentPixels - delta : currentPixels + delta;
-  const newWidth = (newPixels / containerWidth) * 100;
+  const newWidth = Math.max(min, Math.min(max, newPixels));
 
-  document.documentElement.style.setProperty(
-    cssVarName,
-    `${Math.max(minPercent, Math.min(maxPercent, newWidth))}%`,
-  );
+  document.documentElement.style.setProperty(cssVarName, `${newWidth}px`);
 }
 
 /**
@@ -116,11 +104,11 @@ export function saveWidths(): void {
 export function resetWidths(): void {
   document.documentElement.style.setProperty(
     '--editor-width',
-    `${RESIZE_CONFIG.editor.defaultPercent}%`,
+    `${RESIZE_CONFIG.editor.default}px`,
   );
   document.documentElement.style.setProperty(
     '--llmbox-width',
-    `${RESIZE_CONFIG.llmbox.defaultPercent}%`,
+    `${RESIZE_CONFIG.llmbox.default}px`,
   );
   saveWidths();
 }

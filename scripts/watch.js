@@ -61,7 +61,9 @@ const setupElectronPackageWatcher = ({ server }) => {
         spawnProcess = null;
       }
 
-      spawnProcess = spawn(String(electronPath), ['.']);
+      spawnProcess = spawn(String(electronPath), ['.'], {
+        env: { ...process.env, DEV_SERVER_URL: process.env.DEV_SERVER_URL },
+      });
 
       spawnProcess.stdout.on(
         'data',

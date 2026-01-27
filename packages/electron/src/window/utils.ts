@@ -7,10 +7,12 @@ export function findWindow(type: 'main' | 'previewer') {
 }
 
 export const getPageUrl = (type: 'main' | 'previewer') => {
-  return process.env.NODE_ENV === 'development'
-    ? `http://localhost:8080/${type}.html`
-    : new URL(
-        `../renderer/dist/${type}.html`,
-        'file://' + __dirname,
-      ).toString();
+  if (process.env.NODE_ENV === 'development' && process.env.DEV_SERVER_URL) {
+    const url = new URL(process.env.DEV_SERVER_URL);
+    return `${url.protocol}//${url.host}/${type}.html`;
+  }
+  return new URL(
+    `../renderer/dist/${type}.html`,
+    'file://' + __dirname,
+  ).toString();
 };

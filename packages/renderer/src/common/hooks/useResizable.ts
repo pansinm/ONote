@@ -60,18 +60,16 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
         updateWidth(
           RESIZE_CONFIG.editor.cssVar,
           delta,
-          containerWidth,
-          RESIZE_CONFIG.editor.minPercent,
-          RESIZE_CONFIG.editor.maxPercent,
+          RESIZE_CONFIG.editor.min,
+          RESIZE_CONFIG.editor.max,
           false,
         );
       } else if (dragState.type === 'llmbox') {
         updateWidth(
           RESIZE_CONFIG.llmbox.cssVar,
           delta,
-          containerWidth,
-          RESIZE_CONFIG.llmbox.minPercent,
-          RESIZE_CONFIG.llmbox.maxPercent,
+          RESIZE_CONFIG.llmbox.min,
+          RESIZE_CONFIG.llmbox.max,
           true,
         );
       } else if (dragState.type === 'sidebar') {

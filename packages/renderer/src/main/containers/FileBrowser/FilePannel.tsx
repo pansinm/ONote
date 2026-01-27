@@ -38,7 +38,10 @@ function Previewer({ previewerUri }: { previewerUri?: string }) {
         <iframe
           key={uri}
           className="fullfill"
-          style={{ display: isEquals(uri, previewerUri) ? 'block' : 'none', zIndex: 1 }}
+          style={{
+            display: isEquals(uri, previewerUri) ? 'block' : 'none',
+            zIndex: 1,
+          }}
           name="previewer"
           src={uri}
         />
@@ -63,6 +66,8 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
 
   // 使用自定义 Hook 处理拖拽
   const { dragState, startDrag } = useResizable({ containerRef });
+
+  const editorWidth = showEditorOnly ? '100%' : 'var(--editor-width)';
 
   return (
     <>
@@ -90,12 +95,12 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               style={{
                 maxWidth: '100%',
                 overflowY: 'hidden',
-                width: showEditorOnly ? '100%' : 'var(--editor-width)',
+                width: editorWidth,
                 position: 'relative',
                 zIndex: 1000,
                 display:
                   panel?.editable && layout !== 'previewer-only'
-                    ? 'block'
+                    ? 'flex'
                     : 'none',
               }}
             >
@@ -139,7 +144,9 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
             <div
               className="llmbox-container"
               style={{
-                width: stores.layoutStore.sidebarShown ? 'var(--llmbox-width)' : '0',
+                minWidth: stores.layoutStore.sidebarShown
+                  ? 'var(--llmbox-width)'
+                  : '0',
                 position: 'relative',
                 display: stores.layoutStore.sidebarShown ? 'block' : 'none',
                 overflowY: 'hidden',
