@@ -54,8 +54,8 @@ it('trigger event when port receive message', async () => {
     },
   });
   await waitFor(() => {
-    expect(fn).toHaveBeenCalledWith('test', { tunnelId: '22' }),
-      tunnel.dispose();
+    (expect(fn).toHaveBeenCalledWith('test', { tunnelId: '22' }),
+      tunnel.dispose());
   });
 });
 
@@ -147,7 +147,7 @@ it('tunnel can invoke peer handler', async () => {
   try {
     await tunnel2.call('test', 'aabb');
   } catch (err) {
-    expect(err.message).toBe('failed');
+    expect((err as any).message).toBe('failed');
   }
   tunnel1.dispose();
   tunnel2.dispose();

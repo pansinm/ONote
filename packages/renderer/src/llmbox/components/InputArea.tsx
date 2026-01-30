@@ -1,231 +1,145 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import styles from './InputArea.module.scss';
-import { observer } from 'mobx-react-lite';
-import Icon from '/@/components/Icon';
+/**
+ * Agent输入区域组件
+ * 1. 多行输入框 + 工具条
+ * 2. 输入框跟工具条上下布局
+ * 3. 工具条当前仅包含发送按钮，在右侧
+ * 4. 支持引用属性，引用的文本展示在输入框上方，绝对定位。
+ * 5. 引用文本带x按钮，可关闭
+ * 6. 组件为受控组件
+ * 7. 样式符合项目整体风格
+ */
 
-interface InputAreaProps {
-  onSendMessage: (content: string, imageUrls?: string[]) => Promise<void>;
-  isLoading: boolean;
-  selection?: string;
-  onClearSelection?: () => void;
+import classNames from 'classnames';
+import type { FC } from 'react';
+import React from 'react';
+import { Button } from '@fluentui/react-components';
+import {
+  SendRegular,
+  DismissRegular,
+  ArrowClockwiseRegular,
+} from '@fluentui/react-icons';
+import styles from './InputArea.module.scss';
+
+export interface Quote {
+  id: string;
+  content: string;
+  source?: string;
 }
 
-const InputArea: React.FC<InputAreaProps> = ({
-  onSendMessage,
-  isLoading,
-  selection,
-  onClearSelection,
-}) => {
-  const [inputValue, setInputValue] = useState('');
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+export interface InputAreaProps {
+  // 输入框的值
+  value: string;
 
-  const revokeImageUrls = useCallback((urls: string[]) => {
-    urls.forEach((url) => {
-      try {
-        URL.revokeObjectURL(url);
-      } catch (e) {
-        console.warn('Failed to revoke object URL:', url);
-      }
-    });
-  }, []);
+  // 值变化回调
+  onChange: (value: string) => void;
 
-  const handleSend = useCallback(async () => {
-    if ((!inputValue.trim() && imageUrls.length === 0) || isLoading) return;
-    try {
-      await onSendMessage(
-        inputValue.trim(),
-        imageUrls.length > 0 ? imageUrls : undefined,
-      );
-      revokeImageUrls(imageUrls);
-      setInputValue('');
-      setImageUrls([]);
-    } catch (error) {
-      console.error('[InputArea] Failed to send message', error);
-    }
-  }, [inputValue, imageUrls, isLoading, onSendMessage, revokeImageUrls]);
+  // 发送按钮点击回调
+  onSend: () => void;
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleSend();
-      }
-    },
-    [handleSend],
-  );
+  // 引用内容（可选）
+  quote?: Quote;
 
-  const handlePaste = useCallback((e: React.ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.type.startsWith('image/')) {
-        e.preventDefault();
-        const file = item.getAsFile();
-        if (file) {
-          try {
-            const url = URL.createObjectURL(file);
-            setImageUrls((prev) => [...prev, url]);
-          } catch (error) {
-            console.error('[InputArea] Failed to create object URL from paste:', error);
-          }
-        }
+  // 清除引用回调
+  onClearQuote?: () => void;
+
+  // 占位符文本
+  placeholder?: string;
+
+  // 是否禁用
+  disabled?: boolean;
+
+  // 是否正在发送（用于显示加载状态）
+  loading?: boolean;
+
+  // 最小行数
+  minRows?: number;
+
+  // 自定义容器类名（用于外部样式覆盖）
+  className?: string;
+
+  // 自定义容器样式（用于外部样式定义）
+  style?: React.CSSProperties;
+}
+
+const InputArea: FC<InputAreaProps> = (props) => {
+  const {
+    value,
+    onChange,
+    onSend,
+    quote,
+    onClearQuote,
+    placeholder = '输入消息...',
+    disabled = false,
+    loading = false,
+    minRows = 3,
+    className,
+    style,
+  } = props;
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Ctrl/Cmd + Enter 发送消息
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      if (value.trim() && !disabled && !loading) {
+        onSend();
       }
     }
-  }, []);
+  };
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files);
-    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
-    if (imageFiles.length > 0) {
-      const newUrls: string[] = [];
-      imageFiles.forEach((file) => {
-        try {
-          const url = URL.createObjectURL(file);
-          newUrls.push(url);
-        } catch (error) {
-          console.error('[InputArea] Failed to create object URL from drop:', error);
-        }
-      });
-      if (newUrls.length > 0) {
-        setImageUrls((prev) => [...prev, ...newUrls]);
-      }
-    }
-  }, []);
-
-  const handleFileSelect = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files;
-      if (!files) return;
-      const newUrls: string[] = [];
-      Array.from(files).forEach((file) => {
-        if (file.type.startsWith('image/')) {
-          try {
-            const url = URL.createObjectURL(file);
-            newUrls.push(url);
-          } catch (error) {
-            console.error('[InputArea] Failed to create object URL from file:', error);
-          }
-        }
-      });
-      if (newUrls.length > 0) {
-        setImageUrls((prev) => [...prev, ...newUrls]);
-      }
-      e.target.value = '';
-    },
-    [],
-  );
-
-  const removeImage = useCallback(
-    (index: number) => {
-      setImageUrls((prev) => {
-        const newUrls = [...prev];
-        const urlToRemove = newUrls[index];
-        if (urlToRemove) {
-          try {
-            URL.revokeObjectURL(urlToRemove);
-          } catch (e) {
-            console.warn('Failed to revoke object URL:', urlToRemove);
-          }
-        }
-        newUrls.splice(index, 1);
-        return newUrls;
-      });
-    },
-    [],
-  );
-
-  useEffect(() => {
-    return () => {
-      revokeImageUrls(imageUrls);
-    };
-  }, [imageUrls, revokeImageUrls]);
+  const canSend = value.trim() && !disabled && !loading;
 
   return (
-    <div className={styles.inputArea}>
-      {selection && (
-        <div className={styles.selectionContainer}>
-          <div className={styles.selectionHeader}>
-            <span style={{ fontSize: '12px', color: '#666' }}>选中文本</span>
-            <button
-              type="button"
-              className={styles.clearSelection}
-              onClick={onClearSelection}
-              title="清除选中"
-            >
-              <Icon type="x" size={14} />
-            </button>
+    <div
+      className={classNames(styles.inputArea, className)}
+      style={style}
+    >
+      {/* 引用区域 */}
+      {quote && (
+        <div className={styles.quoteArea}>
+          <div className={styles.quoteContent}>
+            {quote.source && <span className={styles.quoteSource}>{quote.source}</span>}
+            <span className={styles.quoteText}>
+              {quote.content.length > 100
+                ? `${quote.content.slice(0, 100)}...`
+                : quote.content}
+            </span>
           </div>
-          <pre className={styles.selectionContent}>{selection}</pre>
+          {onClearQuote && (
+            <button
+              className={styles.quoteClose}
+              onClick={onClearQuote}
+              aria-label="清除引用"
+              type="button"
+            >
+              <DismissRegular />
+            </button>
+          )}
         </div>
       )}
 
-      {imageUrls.length > 0 && (
-        <div className={styles.imagePreviews}>
-          {imageUrls.map((url, index) => (
-            <div key={url} className={styles.imagePreview}>
-              <img src={url} alt={`Preview ${index + 1}`} />
-              <button
-                type="button"
-                className={styles.removeImage}
-                onClick={() => removeImage(index)}
-              >
-                <Icon type="x" size={12} />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-      <div className={styles.inputContainer}>
-        <textarea
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          onDrop={handleDrop}
-          placeholder="输入内容..."
-          disabled={isLoading}
-          className={styles.textInput}
-          rows={1}
+      {/* 输入框 */}
+      <textarea
+        className={styles.textarea}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
+        disabled={disabled}
+        rows={minRows}
+      />
+
+      {/* 工具条 */}
+      <div className={styles.toolbar}>
+        <Button
+          className={styles.sendButton}
+          appearance="primary"
+          disabled={!canSend}
+          onClick={onSend}
+          icon={loading ? <ArrowClockwiseRegular /> : <SendRegular />}
         />
-        <div className={styles.actions}>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileSelect}
-            className={styles.fileInput}
-            accept="image/*"
-            multiple
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isLoading}
-            className={styles.attachButton}
-            title="添加图片"
-          >
-            <Icon type="paperclip" size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={handleSend}
-            disabled={
-              (!inputValue.trim() && imageUrls.length === 0) || isLoading
-            }
-            className={styles.sendButton}
-          >
-            {isLoading ? (
-              <Icon type="arrow-repeat" size={14} className={styles.spinIcon} />
-            ) : (
-              '发送'
-            )}
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
-export default observer(InputArea);
+export default InputArea;

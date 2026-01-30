@@ -1,0 +1,49 @@
+/**
+ * Header 组件样式
+ * 显示 Agent 标题和图标，支持工作状态动画
+ */
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e1dfdd;
+  min-height: 48px;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  font-size: 20px;
+  color: #0078d4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.iconAnimating {
+    animation: rotate 1s linear infinite;
+  }
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #323130;
+  user-select: none;
+}
+
+// 旋转动画关键帧
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

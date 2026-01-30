@@ -1,187 +1,115 @@
-.selectionContainer {
-  position: absolute;
-  bottom: 100%;
-  left: 10px;
-  right: 10px;
-  max-height: 150px;
-  background-color: rgba(255, 255, 255, 0.95);
-  border: 1px solid #e0e0e0;
-  border-left: 4px solid #007bff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.selectionHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  border-bottom: 1px solid #e0e0e0;
-  background-color: #f5f5f5;
-}
-
-.selectionContent {
-  padding: 12px;
-  overflow-y: auto;
-  max-height: calc(150px - 36px);
-  font-size: 14px;
-  line-height: 1.5;
-  color: #333;
-}
-
-.clearSelection {
-  background: none;
-  border: none;
-  color: #666;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 0 4px;
-  line-height: 1;
-
-  &:hover {
-    color: #333;
-  }
-}
-
 .inputArea {
-  border-top: 1px solid #e9ecef;
-  background: #ffffff;
-  padding: 8px;
-  position: relative;
-}
-.imagePreviews {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-}
-.imagePreview {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  border-radius: 6px;
-  overflow: hidden;
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-.removeImage {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 18px;
-  height: 18px;
-  border: none;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  border-radius: 50%;
-  font-size: 12px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  &:hover {
-    background: rgba(0, 0, 0, 0.9);
-  }
-}
-.inputContainer {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  align-items: stretch;
-}
-.textInput {
-  width: 100%;
-  min-height: 50px;
-  max-height: 120px;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 18px;
-  resize: none;
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1.4;
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-  }
-  &:disabled {
-    background-color: #f8f9fa;
-    cursor: not-allowed;
-  }
-  &::placeholder {
-    color: #999;
-  }
-}
-.actions {
-  display: flex;
   gap: 8px;
-  align-items: center;
-  align-self: flex-end;
+  position: relative;
 }
-.fileInput {
-  display: none;
-}
-.attachButton {
-  width: 32px;
-  height: 32px;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 50%;
-  cursor: pointer;
+
+// 引用区域
+.quoteArea {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  &:hover {
-    background: #f8f9fa;
-    border-color: #ccc;
-  }
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: #f3f2f1;
+  border-left: 3px solid #0078d4;
+  border-radius: 4px;
+  font-size: 14px;
 }
-.sendButton {
-  height: 32px;
-  padding: 0 10px;
-  border: none;
-  background: #007bff;
-  color: white;
-  border-radius: 16px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
+
+.quoteContent {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   gap: 4px;
-  &:hover:not(:disabled) {
-    background: #0056b3;
+  flex: 1;
+  overflow: hidden;
+}
+
+.quoteSource {
+  font-size: 12px;
+  color: #605e5c;
+  font-weight: 600;
+}
+
+.quoteText {
+  color: #323130;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quoteClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #605e5c;
+  padding: 0;
+  margin-left: 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+
+  &:hover {
+    background-color: #edebe9;
+    color: #323130;
   }
+
+  &:active {
+    background-color: #e1dfdd;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// 输入框
+.textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  outline-style: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    border-color: #0078d4;
+    box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+  }
+
   &:disabled {
-    background: #ccc;
+    background-color: #f3f2f1;
+    color: #a19f9d;
     cursor: not-allowed;
   }
-}
 
-.spinIcon {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+  &::placeholder {
+    color: #a19f9d;
   }
-  to {
-    transform: rotate(360deg);
+}
+
+// 工具条
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.sendButton {
+  min-width: 40px;
+  height: 36px;
+
+  svg {
+    width: 16px;
+    height: 16px;
   }
 }

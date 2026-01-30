@@ -7,6 +7,21 @@ export interface Message {
   isStreaming?: boolean;
 }
 
+export interface SessionDividerMessage {
+  id: string;
+  role: 'session_divider';
+  sessionId: string;
+  title?: string;
+  description?: string;
+  startTime: Date;  // IPC层使用Date
+  endTime?: Date;
+  messageCount: number;
+  tags?: string[];
+  icon?: 'folder' | 'calendar' | 'tag' | 'bookmark' | 'clock' | 'chat';
+  color?: string;
+  timestamp: Date;
+}
+
 export interface EditorContentChangedMessage {
   type: 'EDITOR_CONTENT_CHANGED';
   data: {

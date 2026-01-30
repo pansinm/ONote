@@ -1,0 +1,39 @@
+.container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #ffffff;
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #c8c6c4;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: #a19f9d;
+    }
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  min-height: 100%;
+}
+
+.messageWrapper {
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
