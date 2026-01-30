@@ -10,6 +10,12 @@ export interface DragState {
   currentX: number;
 }
 
+export interface ShrinkNeighborConfig {
+  cssVar: string;
+  min: number;
+  max: number;
+}
+
 interface UseResizableOptions {
   containerRef: React.RefObject<HTMLDivElement>;
   onResizeEnd?: () => void;
@@ -26,14 +32,18 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
     currentX: 0,
   });
 
-  // 开始拖拽
-  const startDrag = useCallback((type: DragType, startX: number) => {
+  const [shrinkConfig, setShrinkConfig] = useState<ShrinkNeighborConfig | null>(null);
+
+  const startDrag = useCallback((type: DragType, startX: number, shrinkNeighbor?: ShrinkNeighborConfig) => {
     setDragState({
       isDragging: true,
       type,
       startX,
       currentX: startX,
     });
+    if (shrinkNeighbor) {
+      setShrinkConfig(shrinkNeighbor);
+    }
   }, []);
 
   // 处理鼠标移动
@@ -72,6 +82,15 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
           RESIZE_CONFIG.llmbox.max,
           true,
         );
+        if (shrinkConfig) {
+          const neighborWidth = getComputedStyle(document.documentElement)
+            .getPropertyValue(shrinkConfig.cssVar)
+            .trim();
+          const currentNeighborPixels = parseFloat(neighborWidth) || shrinkConfig.min;
+          const newNeighborPixels = currentNeighborPixels - delta;
+          const clampedNeighbor = Math.max(shrinkConfig.min, Math.min(shrinkConfig.max, newNeighborPixels));
+          document.documentElement.style.setProperty(shrinkConfig.cssVar, `${clampedNeighbor}px`);
+        }
       } else if (dragState.type === 'sidebar') {
         const root = document.documentElement;
         const sidebarEle = document.querySelector('.sidebar')!;
@@ -96,6 +115,7 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
         startX: 0,
         currentX: 0,
       });
+      setShrinkConfig(null);
 
       // 回调
       onResizeEnd?.();
@@ -108,7 +128,7 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [dragState.isDragging, dragState.startX, dragState.type, containerRef, onResizeEnd]);
+  }, [dragState.isDragging, dragState.startX, dragState.type, containerRef, onResizeEnd, shrinkConfig]);
 
   return { dragState, startDrag };
 }

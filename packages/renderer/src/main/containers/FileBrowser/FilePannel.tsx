@@ -56,6 +56,9 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
   const layout = stores.layoutStore.layout;
 
   const showEditorOnly = layout === 'editor-only' || !previewerUri;
+  const showPreviewerOnly = layout === 'previewer-only';
+  const showSidebar = typeof stores.layoutStore.sidebarShown === 'boolean';
+  const showBothEditorAndPreview = !showEditorOnly && !showPreviewerOnly;
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -63,6 +66,10 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
   useEffect(() => {
     loadSavedWidths();
   }, []);
+
+  const containerWidth = showSidebar
+    ? 'calc(100% - var(--llmbox-width))'
+    : '100%';
 
   // 使用自定义 Hook 处理拖拽
   const { dragState, startDrag } = useResizable({ containerRef });
@@ -88,14 +95,21 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
           }}
           ref={containerRef}
         >
-          <div style={{ position: 'relative', flex: 1, display: 'flex' }}>
+          <div
+            style={{
+              position: 'relative',
+              flex: 1,
+              display: 'flex',
+              width: containerWidth,
+            }}
+          >
             <div
               className="fill-height editor-container"
               ref={editorContainerRef}
               style={{
                 maxWidth: '100%',
-                overflowY: 'hidden',
                 width: editorWidth,
+                overflow: 'hidden',
                 position: 'relative',
                 zIndex: 1000,
                 display:
@@ -139,42 +153,54 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               )}
               <Previewer previewerUri={previewerUri} />
             </div>
+            {showSidebar && (
+              <div
+                className="llmbox-container"
+                style={{
+                  minWidth: stores.layoutStore.sidebarShown
+                    ? 'var(--llmbox-width)'
+                    : '0',
+                  position: 'relative',
+                  display: stores.layoutStore.sidebarShown ? 'block' : 'none',
+                  overflowY: 'hidden',
+                  flexShrink: 0,
+                }}
+              >
+                {dragState.isDragging && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      zIndex: 1,
+                      background: 'transparent',
+                    }}
+                  ></div>
+                )}
+                <DragHandle
+                  type="llmbox"
+                  left="-2px"
+                  onStartDrag={(type, startX) =>
+                    startDrag(
+                      type,
+                      startX,
+                      showEditorOnly
+                        ? {
+                            cssVar: RESIZE_CONFIG.editor.cssVar,
+                            min: RESIZE_CONFIG.editor.min,
+                            max: RESIZE_CONFIG.editor.max,
+                          }
+                        : undefined,
+                    )
+                  }
+                  onDoubleClick={resetWidths}
+                />
+                <LLMBoxFrame />
+              </div>
+            )}
           </div>
-          {typeof stores.layoutStore.sidebarShown === 'boolean' && (
-            <div
-              className="llmbox-container"
-              style={{
-                minWidth: stores.layoutStore.sidebarShown
-                  ? 'var(--llmbox-width)'
-                  : '0',
-                position: 'relative',
-                display: stores.layoutStore.sidebarShown ? 'block' : 'none',
-                overflowY: 'hidden',
-                flexShrink: 0,
-              }}
-            >
-              {dragState.isDragging && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    zIndex: 1,
-                    background: 'transparent',
-                  }}
-                ></div>
-              )}
-              <DragHandle
-                type="llmbox"
-                left="-2px"
-                onStartDrag={startDrag}
-                onDoubleClick={resetWidths}
-              />
-              <LLMBoxFrame />
-            </div>
-          )}
         </div>
       </div>
       <DragIndicator
