@@ -7,7 +7,7 @@
 
 import classNames from 'classnames';
 import type { FC } from 'react';
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Header from './Header';
 import MessageList, { type MessageListRef } from './MessageList';
 import InputArea from './InputArea';
@@ -180,6 +180,11 @@ const LLMBox: FC<LLMBoxProps> = ({ className, style }) => {
   // Refs
   const messageListRef = useRef<MessageListRef>(null);
 
+  // 初始滚动到底部
+  useEffect(() => {
+    messageListRef.current?.scrollToBottom('auto');
+  }, []);
+
   // Handlers
   const handleSend = useCallback(() => {
     if (!inputValue.trim() || isLoading) {
@@ -196,6 +201,7 @@ const LLMBox: FC<LLMBoxProps> = ({ className, style }) => {
 
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
+    messageListRef.current?.scrollToBottom('auto');
     setIsLoading(true);
     setAgentState('thinking');
 

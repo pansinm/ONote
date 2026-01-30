@@ -11,6 +11,8 @@
 import classNames from 'classnames';
 import type { FC } from 'react';
 import React, { useState, useCallback } from 'react';
+import ReactMarkdown from 'react-markdown';
+import type { Components } from 'react-markdown';
 import {
   CheckmarkCircle12Regular,
   ArrowClockwise12Regular,
@@ -45,6 +47,44 @@ function isUserMessage(message: IMessage): message is UserMessage {
 function isAgentMessage(message: IMessage): message is AgentMessage {
   return message.role === 'assistant';
 }
+
+const markdownComponents: Components = {
+  p: ({ children }) => <p className={styles.markdownP}>{children}</p>,
+  code: ({ className, children }) => {
+    const isInline = !className || !className.startsWith('language-');
+    return isInline
+      ? <code className={styles.markdownCodeInline}>{children}</code>
+      : <code className={className}>{children}</code>;
+  },
+  pre: ({ children }) => <pre className={styles.markdownCodeBlock}>{children}</pre>,
+  ul: ({ children }) => <ul className={styles.markdownUl}>{children}</ul>,
+  ol: ({ children }) => <ol className={styles.markdownOl}>{children}</ol>,
+  li: ({ children }) => <li className={styles.markdownLi}>{children}</li>,
+  blockquote: ({ children }) => <blockquote className={styles.markdownBlockquote}>{children}</blockquote>,
+  a: ({ href, children }) => (
+    <a
+      href={href}
+      className={styles.markdownLink}
+      onClick={(e) => { e.preventDefault(); }}
+    >
+      {children}
+    </a>
+  ),
+  strong: ({ children }) => <strong className={styles.markdownStrong}>{children}</strong>,
+  em: ({ children }) => <em className={styles.markdownEm}>{children}</em>,
+  del: ({ children }) => <del className={styles.markdownDel}>{children}</del>,
+  h1: ({ children }) => <h1 className={styles.markdownH1}>{children}</h1>,
+  h2: ({ children }) => <h2 className={styles.markdownH2}>{children}</h2>,
+  h3: ({ children }) => <h3 className={styles.markdownH3}>{children}</h3>,
+};
+
+const MarkdownStepContent: FC<{ content: string }> = React.memo(({ content }) => (
+  <div className={styles.workStep__content}>
+    <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>
+  </div>
+));
+
+MarkdownStepContent.displayName = 'MarkdownStepContent';
 
 // ========== 工具调用详情子组件 ==========
 interface ToolCallDetailsProps {
@@ -165,7 +205,7 @@ const WorkStepItem: FC<WorkStepItemProps> = React.memo(({ step }) => {
       );
     }
 
-    return <div className={styles.workStep__content}>{step.content}</div>;
+    return <MarkdownStepContent content={step.content} />;
   };
 
   return (
@@ -203,7 +243,7 @@ interface UserMessageBubbleProps {
 const UserMessageBubble: FC<UserMessageBubbleProps> = ({ message }) => {
   return (
     <div className={styles.userContent}>
-      {message.content}
+      <ReactMarkdown components={markdownComponents}>{message.content}</ReactMarkdown>
       <div className={styles.userTimestamp}>
         {new Date(message.timestamp).toLocaleTimeString()}
       </div>
@@ -236,8 +276,6 @@ const AgentMessageContainer: FC<AgentMessageContainerProps> = ({ message }) => {
 
 // ========== 主组件 ==========
 const Message: FC<MessageProps> = ({ message, className, style }) => {
-  const isStreaming = isAgentMessage(message) && message.isStreaming;
-
   if (isUserMessage(message)) {
     return (
       <div
@@ -248,9 +286,6 @@ const Message: FC<MessageProps> = ({ message, className, style }) => {
         )}
         style={style}
       >
-        <div className={classNames(styles.avatar, styles.userAvatar)}>
-          <i className="bi bi-person-circle" aria-label="User" />
-        </div>
         <UserMessageBubble message={message} />
       </div>
     );
@@ -266,15 +301,6 @@ const Message: FC<MessageProps> = ({ message, className, style }) => {
         )}
         style={style}
       >
-        <div
-          className={classNames(
-            styles.avatar,
-            styles.agentAvatar,
-            isStreaming && styles.streaming,
-          )}
-        >
-          <i className="bi bi-robot" aria-label="Agent" />
-        </div>
         <AgentMessageContainer message={message} />
       </div>
     );

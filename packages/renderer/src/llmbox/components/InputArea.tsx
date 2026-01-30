@@ -77,8 +77,7 @@ const InputArea: FC<InputAreaProps> = (props) => {
   } = props;
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Ctrl/Cmd + Enter 发送消息
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if (value.trim() && !disabled && !loading) {
         onSend();

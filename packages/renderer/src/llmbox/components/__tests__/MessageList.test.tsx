@@ -154,6 +154,13 @@ describe('MessageList', () => {
         value: scrollIntoViewMock,
       });
 
+      // Mock scrollTo for the scroll container
+      const scrollContainer = container.querySelector('.message-list-container');
+      const scrollToMock = jest.fn();
+      Object.defineProperty(scrollContainer!, 'scrollTo', {
+        value: scrollToMock,
+      });
+
       ref.current?.scrollToMessage('user-2', 'smooth');
 
       expect(scrollIntoViewMock).toHaveBeenCalledWith({

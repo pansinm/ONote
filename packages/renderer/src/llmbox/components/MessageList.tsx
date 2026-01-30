@@ -31,16 +31,26 @@ const MessageList: FC<MessageListProps & React.RefAttributes<MessageListRef>> =
     } = props;
 
     const containerRef = useRef<HTMLDivElement>(null);
-    const contentRef = useRef<HTMLDivElement>(null);
     const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
     const prevMessagesLengthRef = useRef(messages.length);
 
     const scrollToBottom = useCallback(
       (behavior: ScrollBehavior = scrollBehavior) => {
-        if (containerRef.current) {
-          containerRef.current.scrollTo({
-            top: containerRef.current.scrollHeight,
+        const container = containerRef.current;
+        if (!container) return;
+
+        const scroll = () => {
+          container.scrollTo({
+            top: container.scrollHeight,
             behavior,
+          });
+        };
+
+        if (behavior === 'auto') {
+          scroll();
+        } else {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(scroll);
           });
         }
       },
@@ -49,11 +59,20 @@ const MessageList: FC<MessageListProps & React.RefAttributes<MessageListRef>> =
 
     const scrollToMessage = useCallback(
       (messageId: string, behavior: ScrollBehavior = scrollBehavior) => {
-        const element = containerRef.current?.querySelector(
+        const container = containerRef.current;
+        if (!container) return;
+
+        const element = container.querySelector(
           `[data-message-id="${messageId}"]`,
         );
         if (element) {
-          element.scrollIntoView({ behavior, block: 'center' });
+          const rect = element.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          const relativeTop = rect.top - containerRect.top + container.scrollTop;
+          container.scrollTo({
+            top: relativeTop - container.clientHeight / 2 + rect.height / 2,
+            behavior,
+          });
         }
       },
       [scrollBehavior],
@@ -68,7 +87,7 @@ const MessageList: FC<MessageListProps & React.RefAttributes<MessageListRef>> =
     }, []);
 
     const handleScroll = useCallback(() => {
-      if (!containerRef.current || !contentRef.current) return;
+      if (!containerRef.current) return;
 
       const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
       const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 50;
@@ -138,7 +157,7 @@ const MessageList: FC<MessageListProps & React.RefAttributes<MessageListRef>> =
         onScroll={handleScroll}
         data-testid="message-list"
       >
-        <div ref={contentRef} className={styles.content}>
+        <div className={styles.content}>
           {messages.map((message) => (
             <div
               key={message.id}

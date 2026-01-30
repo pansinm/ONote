@@ -8,6 +8,9 @@ import type {
   ToolCall,
 } from '../../types/IMessage';
 
+// Mock react-markdown to avoid ESM issues
+jest.mock('react-markdown', () => ({ children }: any) => <>{children}</>);
+
 // Mock Fluent UI 图标
 jest.mock('@fluentui/react-icons', () => ({
   CheckmarkCircle12Regular: () => (

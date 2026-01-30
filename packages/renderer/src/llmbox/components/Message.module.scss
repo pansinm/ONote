@@ -7,56 +7,28 @@
 // ========== 主容器 ==========
 .message {
   display: flex;
-  gap: 12px;
-  padding: 12px 16px;
-  transition: background-color 0.2s ease;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 12px;
 
   &--user {
-    background-color: transparent;
-    align-items: flex-start;
+    background-color: #e8f4fd;
+    border-radius: 8px;
   }
 
   &--agent {
     background-color: #faf9f8;
-    align-items: flex-start;
-  }
-}
-
-// ========== 头像通用样式 ==========
-.avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 18px;
-
-  i {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: 8px;
   }
 }
 
 // ========== 用户消息样式 ==========
-.userAvatar {
-  background-color: #e1dfdd;
-  color: #605e5c;
-}
-
 .userContent {
   flex: 1;
-  background-color: #f3f2f1;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border-top-left-radius: 2px;
-  color: #323130;
   font-size: 14px;
-  line-height: 1.6;
-  white-space: pre-wrap;
+  line-height: 1.5;
   word-break: break-word;
+  color: #323130;
 }
 
 .userTimestamp {
@@ -67,34 +39,25 @@
 }
 
 // ========== Agent 消息样式 ==========
-.agentAvatar {
-  background-color: #eff6fc;
-  color: #0078d4;
-
-  &.streaming {
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-}
-
 .agentContent {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 // 工作步骤列表
 .workSteps {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 // 工作步骤项
 .workStep {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 
   &__header {
     display: flex;
@@ -106,8 +69,7 @@
 
   &__content {
     font-size: 14px;
-    line-height: 1.6;
-    white-space: pre-wrap;
+    line-height: 1.5;
     word-break: break-word;
   }
 
@@ -119,8 +81,8 @@
 
     .workStep__content {
       background-color: #fff4ce;
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 6px 10px;
+      border-radius: 4px;
       border-left: 3px solid #ffe066;
       font-style: italic;
       color: #323130;
@@ -130,7 +92,7 @@
   // 工具调用步骤
   &--toolCall {
     .workStep__content {
-      margin-top: 4px;
+      margin-top: 2px;
     }
   }
 
@@ -142,8 +104,8 @@
 
     .workStep__content {
       background-color: #ffffff;
-      padding: 10px 14px;
-      border-radius: 6px;
+      padding: 8px 10px;
+      border-radius: 4px;
       border: 1px solid #e1dfdd;
       color: #323130;
     }
@@ -163,7 +125,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 6px 10px;
   background-color: #f3f2f1;
   cursor: pointer;
   user-select: none;
@@ -208,11 +170,11 @@
 }
 
 .toolCallBody {
-  padding: 12px;
+  padding: 10px;
   border-top: 1px solid #e1dfdd;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .toolCallSection {
@@ -234,7 +196,6 @@
   font-family: 'Droid Sans Mono', 'Consolas', monospace;
   font-size: 12px;
   overflow-x: auto;
-  white-space: pre-wrap;
   color: #323130;
   line-height: 1.5;
 }
@@ -245,7 +206,6 @@
   border-radius: 4px;
   font-size: 13px;
   color: #323130;
-  white-space: pre-wrap;
   word-break: break-word;
   max-height: 200px;
   overflow-y: auto;
@@ -336,4 +296,89 @@
   &--pending {
     color: #a19f9d;
   }
+}
+
+.markdownP {
+  margin: 0 0 6px;
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.markdownCodeInline {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Droid Sans Mono', 'Consolas', monospace;
+  font-size: 0.9em;
+}
+
+.markdownCodeBlock {
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 6px 0;
+
+  code {
+    background: transparent;
+    padding: 0;
+    font-size: 13px;
+  }
+}
+
+.markdownUl,
+.markdownOl {
+  margin: 0 0 6px;
+  padding-left: 20px;
+}
+
+.markdownLi {
+  margin-bottom: 2px;
+}
+
+.markdownBlockquote {
+  border-left: 3px solid #dfe2e5;
+  color: #6a737d;
+  padding-left: 10px;
+  margin: 6px 0;
+}
+
+.markdownLink {
+  color: #0078d4;
+  text-decoration: none;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.markdownStrong {
+  font-weight: 600;
+}
+
+.markdownEm {
+  font-style: italic;
+}
+
+.markdownDel {
+  text-decoration: line-through;
+}
+
+.markdownH1 {
+  font-size: 1.4em;
+  margin: 10px 0 6px;
+  font-weight: 600;
+}
+
+.markdownH2 {
+  font-size: 1.2em;
+  margin: 8px 0 4px;
+  font-weight: 600;
+}
+
+.markdownH3 {
+  font-size: 1.1em;
+  margin: 6px 0 4px;
+  font-weight: 600;
 }
