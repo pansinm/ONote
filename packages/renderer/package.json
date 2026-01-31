@@ -18,19 +18,25 @@
   },
   "jest": {
     "setupFilesAfterEnv": [
+      "<rootDir>/src/test-utils/jest-setup.ts",
       "@testing-library/jest-dom"
     ],
     "moduleNameMapper": {
-      "^/@/(.*)$": "<rootDir>/src/$1"
+      "^/@/(.*)$": "<rootDir>/src/$1",
+      "^monaco-editor$": "<rootDir>/src/__mocks__/monaco-editor.ts",
+      "^monaco-editor/esm/(.*)$": "<rootDir>/src/__mocks__/monaco-editor.ts",
+      "^/@/common/markdown$": "<rootDir>/src/__mocks__/markdown.ts"
     },
     "modulePaths": [
       "<rootDir>/src"
     ],
     "transform": {
-      "^.+\\.(ts|tsx)$": "ts-jest"
+      "^.+\\.(ts|tsx)$": ["ts-jest", {
+        "tsconfig": "./tsconfig.json"
+      }]
     },
     "transformIgnorePatterns": [
-      "node_modules/(?!react-markdown|mdast-util-definitions|monaco-editor)"
+      "node_modules/(?!(react-markdown|mdast-util-definitions|monaco-editor|monaco-editor/.*|unified|remark-parse|remark-stringify|remark-gfm|remark-frontmatter|remark-footnotes|remark-directive|remark-math|rehype-parse|hast-util-to-mdast|mdast-util-from-markdown|vfile|unist-util-stringify-position|bail|hast-util-.*|mdast-util-.*|unist-util-.*|unist|unist-util-visit|unist-util-visit-parents|is-plain-obj|is-plain-object|trough|micromark|micromark-.*|decode-named-character-reference|character-entities|character-entities-legacy|property-information|web-namespaces|html-void-elements|ccount|decode-entity|toml|yaml|yaml-types|@iarna/toml))"
     ],
     "testEnvironment": "jsdom",
     "moduleFileExtensions": [
@@ -44,13 +50,7 @@
     "extensionsToTreatAsEsm": [
       ".ts",
       ".tsx"
-    ],
-    "globals": {
-      "ts-jest": {
-        "useESM": true,
-        "tsconfig": "./tsconfig.json"
-      }
-    }
+    ]
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",

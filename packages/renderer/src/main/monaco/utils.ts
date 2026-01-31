@@ -82,6 +82,7 @@ export function isInFence(
   position: monaco.Position,
   lang = '',
 ) {
+  console.log('DEBUG: Position', position.lineNumber, position.column);
   const prev = model.findPreviousMatch(
     '```',
     position,
@@ -91,19 +92,63 @@ export function isInFence(
     false,
   );
   const next = model.findNextMatch('```', position, false, true, null, false);
-  const openLine = prev?.range.startLineNumber;
-  const closeLine = next?.range.startLineNumber;
-  if (openLine && closeLine) {
-    let firstLine = model.getLineContent(openLine);
+  console.log('DEBUG: prev', prev ? `line ${prev.range.startLineNumber} col ${prev.range.startColumn}` : null);
+  console.log('DEBUG: next', next ? `line ${next.range.startLineNumber} col ${next.range.startColumn}` : null);
+  let openLine = prev?.range.startLineNumber;
+  let closeLine = next?.range.startLineNumber;
+
+  console.log('DEBUG: initial openLine', openLine);
+
+  while (openLine && !model.getLineContent(openLine).trim().startsWith('```')) {
+    console.log('DEBUG: skipping line', openLine, 'content:', JSON.stringify(model.getLineContent(openLine)));
+    openLine = openLine - 1;
+  }
+
+  while (closeLine && !model.getLineContent(closeLine).trim().startsWith('```')) {
+    console.log('DEBUG: skipping closeLine', closeLine, 'content:', JSON.stringify(model.getLineContent(closeLine)));
+    closeLine = closeLine + 1;
+  }
+
+  console.log('DEBUG: final openLine', openLine, 'closeLine', closeLine);
+
+  if (openLine && closeLine && openLine < closeLine) {
     const lastLine = model.getLineContent(closeLine);
-    if (openLine === position.lineNumber) {
-      firstLine = firstLine.slice(0, position.column);
+    console.log('DEBUG: lastLine', JSON.stringify(lastLine));
+
+    if (lastLine.trim() !== '```') {
+      console.log('DEBUG: not a valid closing fence');
+      return false;
     }
 
-    return (
-      firstLine.trim().startsWith('```' + lang) && lastLine.trim() === '```'
-    );
+    if (openLine === position.lineNumber) {
+      console.log('DEBUG: on opening fence line');
+      if (position.column < 4) {
+        console.log('DEBUG: column before fence end');
+        return false;
+      }
+      if (!lang) {
+        console.log('DEBUG: empty lang, considered on fence');
+        console.log('DEBUG: result', true);
+        return true;
+      }
+      console.log('DEBUG: specific lang, not inside fence');
+      console.log('DEBUG: result', false);
+      return false;
+    } else {
+      console.log('DEBUG: inside fence body');
+      if (lang) {
+        const content = model.getLineContent(openLine);
+        console.log('DEBUG: opening line content:', JSON.stringify(content));
+        const result = content.trim().startsWith('```' + lang) && position.lineNumber < closeLine;
+        console.log('DEBUG: result', result);
+        return result;
+      }
+      const result = position.lineNumber < closeLine;
+      console.log('DEBUG: result', result);
+      return result;
+    }
   }
+  console.log('DEBUG: returning false');
   return false;
 }
 
