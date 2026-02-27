@@ -52,6 +52,10 @@ function useEditor() {
       unicodeHighlight: {
         ambiguousCharacters: false,
       },
+      minimap: {
+        enabled: true,
+        autohide: true,
+      },
       autoClosingBrackets: 'always',
       autoClosingQuotes: 'always',
     });
