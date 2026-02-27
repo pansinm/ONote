@@ -86,7 +86,7 @@ export default observer(function EditorTabs() {
         onContextMenu={handleContextMenu}
         tabs={tabs}
       ></Tabs>
-      <Menu id={MENU_ID}>
+      <Menu style={{ zIndex: 10001 }} id={MENU_ID}>
         <Item data={{ action: 'CLOSE' }} onClick={handleItemClick}>
           关闭
         </Item>
