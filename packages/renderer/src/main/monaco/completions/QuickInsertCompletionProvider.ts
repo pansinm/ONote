@@ -41,6 +41,18 @@ class QuickInsertCompletionItemProvider
           filterText: '@riqi date insert',
           range,
         },
+        {
+          kind: monaco.languages.CompletionItemKind.Function,
+          insertText: '',
+          command: {
+            id: 'onote.command.insertTime',
+            title: '插入时间',
+            arguments: [model, range],
+          },
+          label: '插入时间',
+          filterText: '@shijian time insert',
+          range,
+        },
       ],
     };
   }
