@@ -31,9 +31,12 @@
       "<rootDir>/src"
     ],
     "transform": {
-      "^.+\\.(ts|tsx)$": ["ts-jest", {
-        "tsconfig": "./tsconfig.json"
-      }]
+      "^.+\\.(ts|tsx)$": [
+        "ts-jest",
+        {
+          "tsconfig": "./tsconfig.json"
+        }
+      ]
     },
     "transformIgnorePatterns": [
       "node_modules/(?!(react-markdown|mdast-util-definitions|monaco-editor|monaco-editor/.*|unified|remark-parse|remark-stringify|remark-gfm|remark-frontmatter|remark-footnotes|remark-directive|remark-math|rehype-parse|hast-util-to-mdast|mdast-util-from-markdown|vfile|unist-util-stringify-position|bail|hast-util-.*|mdast-util-.*|unist-util-.*|unist|unist-util-visit|unist-util-visit-parents|is-plain-obj|is-plain-object|trough|micromark|micromark-.*|decode-named-character-reference|character-entities|character-entities-legacy|property-information|web-namespaces|html-void-elements|ccount|decode-entity|toml|yaml|yaml-types|@iarna/toml))"
@@ -53,6 +56,7 @@
     ]
   },
   "devDependencies": {
+    "@ai-sdk/openai-compatible": "^2.0.24",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@editorjs/editorjs": "^2.23.2",
@@ -104,7 +108,7 @@
     "@types/yaml": "^1.9.7",
     "@typescript-eslint/eslint-plugin": "5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
-    "ai": "^4.3.16",
+    "ai": "^6.0.64",
     "ajv": "^8.11.2",
     "bidc": "^0.0.3",
     "bootstrap-icons": "^1.8.1",
