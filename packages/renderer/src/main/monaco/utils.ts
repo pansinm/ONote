@@ -18,6 +18,16 @@ export function getCurrentRange(editor: monaco.editor.ICodeEditor) {
   return undefined;
 }
 
+export function selectionToRange(selection: monaco.Selection) {
+  const { startLineNumber, startColumn, endLineNumber, endColumn } = selection;
+  return new monaco.Range(
+    startLineNumber,
+    startColumn,
+    endLineNumber,
+    endColumn,
+  );
+}
+
 export function isTextMatch(text: string, matcher: Matcher) {
   if (typeof matcher === 'string') {
     return text.includes(matcher);
@@ -92,20 +102,43 @@ export function isInFence(
     false,
   );
   const next = model.findNextMatch('```', position, false, true, null, false);
-  console.log('DEBUG: prev', prev ? `line ${prev.range.startLineNumber} col ${prev.range.startColumn}` : null);
-  console.log('DEBUG: next', next ? `line ${next.range.startLineNumber} col ${next.range.startColumn}` : null);
+  console.log(
+    'DEBUG: prev',
+    prev
+      ? `line ${prev.range.startLineNumber} col ${prev.range.startColumn}`
+      : null,
+  );
+  console.log(
+    'DEBUG: next',
+    next
+      ? `line ${next.range.startLineNumber} col ${next.range.startColumn}`
+      : null,
+  );
   let openLine = prev?.range.startLineNumber;
   let closeLine = next?.range.startLineNumber;
 
   console.log('DEBUG: initial openLine', openLine);
 
   while (openLine && !model.getLineContent(openLine).trim().startsWith('```')) {
-    console.log('DEBUG: skipping line', openLine, 'content:', JSON.stringify(model.getLineContent(openLine)));
+    console.log(
+      'DEBUG: skipping line',
+      openLine,
+      'content:',
+      JSON.stringify(model.getLineContent(openLine)),
+    );
     openLine = openLine - 1;
   }
 
-  while (closeLine && !model.getLineContent(closeLine).trim().startsWith('```')) {
-    console.log('DEBUG: skipping closeLine', closeLine, 'content:', JSON.stringify(model.getLineContent(closeLine)));
+  while (
+    closeLine &&
+    !model.getLineContent(closeLine).trim().startsWith('```')
+  ) {
+    console.log(
+      'DEBUG: skipping closeLine',
+      closeLine,
+      'content:',
+      JSON.stringify(model.getLineContent(closeLine)),
+    );
     closeLine = closeLine + 1;
   }
 
@@ -139,7 +172,9 @@ export function isInFence(
       if (lang) {
         const content = model.getLineContent(openLine);
         console.log('DEBUG: opening line content:', JSON.stringify(content));
-        const result = content.trim().startsWith('```' + lang) && position.lineNumber < closeLine;
+        const result =
+          content.trim().startsWith('```' + lang) &&
+          position.lineNumber < closeLine;
         console.log('DEBUG: result', result);
         return result;
       }

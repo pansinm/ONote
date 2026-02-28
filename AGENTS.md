@@ -112,9 +112,11 @@ yarn bdd                                      # 监听 E2E 测试
 
 ### 代码检查
 ```bash
-yarn lint             # Lint 检查
-yarn lint --fix       # 自动修复
-yarn tsc --noEmit     # 类型检查
+yarn lint                        # Lint 检查
+yarn lint --fix                  # 自动修复
+yarn tsc --noEmit                # 类型检查
+yarn eslint path/to/file.tsx     # 检查单个文件
+yarn eslint path/to/file.tsx --fix  # 自动修复单个文件
 ```
 
 ### 开发
@@ -463,6 +465,9 @@ docs: 更新 API 文档
 1. 搜索依赖关系: `grep -r "ComponentName" packages/renderer/src/`
 2. 检查是否有其他引用
 3. 考虑向后兼容性
+
+**修改文件后:**
+1. 对修改的文件执行 `yarn eslint path/to/file.tsx --fix`，确保代码符合规范
 
 **删除文件时:**
 1. 先确认没有其他引用

@@ -80,7 +80,7 @@ describe('Header', () => {
       const customClassName = 'my-class';
       const customStyle = { color: 'red' };
       const { container } = render(
-        <Header {...defaultProps} className={customClassName} style={customStyle} />
+        <Header {...defaultProps} className={customClassName} style={customStyle} />,
       );
       const header = container.querySelector('.header');
       expect(header).toHaveClass(customClassName);
@@ -156,7 +156,7 @@ describe('Header', () => {
           agentState="thinking"
           style={customStyle}
           className="working"
-        />
+        />,
       );
       expect(screen.getByText('Working Agent')).toBeInTheDocument();
       const header = container.querySelector('.header');
@@ -169,7 +169,7 @@ describe('Header', () => {
       const customIcon = <i data-testid="star-icon">★</i>;
       const customStyle = { backgroundColor: 'yellow' };
       const { container } = render(
-        <Header icon={customIcon} style={customStyle} title="Star Agent" />
+        <Header icon={customIcon} style={customStyle} title="Star Agent" />,
       );
       expect(screen.getByTestId('star-icon')).toBeInTheDocument();
       expect(container.querySelector('.header')).toHaveStyle(customStyle);
@@ -182,7 +182,7 @@ describe('Header', () => {
           agentState="idle"
           className="idle-class"
           style={{ opacity: 0.7 }}
-        />
+        />,
       );
       expect(screen.getByText('Idle Agent')).toBeInTheDocument();
       const header = container.querySelector('.header');

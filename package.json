@@ -37,7 +37,8 @@
     "webpack": "5.88.2",
     "@types/mdast": "4.0.3",
     "vfile-message": "4.0.0",
-    "@types/d3-dispatch": "3.0.6"
+    "@types/d3-dispatch": "3.0.6",
+    "typescript": "^5"
   },
   "devDependencies": {
     "sharp": "^0.34.5"

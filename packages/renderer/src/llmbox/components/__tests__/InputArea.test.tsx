@@ -66,7 +66,7 @@ describe('InputArea', () => {
       const customClassName = 'custom-class';
       const customStyle = { backgroundColor: 'red' };
       const { container } = render(
-        <InputArea {...defaultProps} className={customClassName} style={customStyle} />
+        <InputArea {...defaultProps} className={customClassName} style={customStyle} />,
       );
       const wrapper = container.querySelector('.input-area');
       expect(wrapper).toHaveClass(customClassName);
@@ -156,7 +156,7 @@ describe('InputArea', () => {
     it('应该在点击关闭按钮时触发 onClearQuote', () => {
       const handleClearQuote = jest.fn();
       render(
-        <InputArea {...defaultProps} quote={mockQuote} onClearQuote={handleClearQuote} />
+        <InputArea {...defaultProps} quote={mockQuote} onClearQuote={handleClearQuote} />,
       );
 
       const closeButton = screen.getByLabelText('清除引用');
@@ -251,7 +251,7 @@ describe('InputArea', () => {
     it('应该正确应用 className 到根元素', () => {
       const customClass = 'my-custom-class';
       const { container } = render(
-        <InputArea {...defaultProps} className={customClass} />
+        <InputArea {...defaultProps} className={customClass} />,
       );
       expect(container.querySelector('.input-area')).toHaveClass('input-area');
       expect(container.querySelector('.input-area')).toHaveClass(customClass);
