@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import '/@/common/emoji/emoji.scss';
 import Sidebar from './containers/Sidebar';
 import styles from './App.module.scss';
@@ -11,12 +11,22 @@ import { getLogger } from '/@/shared/logger';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { DragIndicator, DragHandle } from '/@/components/DragBarNew';
 import { useResizable } from '/@/common/hooks/useResizable';
+import useToast from '/@/hooks/useToast';
+import Pop from '/@/utils/Pop';
 
 const logger = getLogger('App');
 
 const App: FC = observer(() => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { dragState, startDrag } = useResizable({ containerRef });
+  const { showToast, Toast } = useToast();
+
+  useEffect(() => {
+    Pop.setToast(showToast);
+    return () => {
+      Pop.setToast(null);
+    };
+  }, [showToast]);
 
   return (
     <ErrorBoundary
@@ -46,6 +56,7 @@ const App: FC = observer(() => {
           x={dragState.currentX}
           height="100%"
         />
+        <Toast />
       </div>
     </ErrorBoundary>
   );

@@ -59,13 +59,36 @@ class LocalDataSourceProvider implements IDataSourceProvider<null> {
   }
   async mkdir(uri: string) {
     const localPath = url.fileURLToPath(uri);
-    await fs.mkdir(localPath, { recursive: true });
+    try {
+      await fs.access(localPath);
+      const error = new Error('Directory already exists') as NodeJS.ErrnoException;
+      error.code = 'EEXIST';
+      throw error;
+    } catch (err) {
+      const error = err as NodeJS.ErrnoException;
+      if (error.code === 'ENOENT') {
+        await fs.mkdir(localPath, { recursive: true });
+        return;
+      }
+      throw err;
+    }
   }
   async write(uri: string, buffer: Buffer) {
     const localPath = url.fileURLToPath(uri);
-    const dirname = path.dirname(localPath);
-    await fs.mkdir(dirname, { recursive: true }).catch((err) => 0);
-    return fs.writeFile(localPath, Buffer.from(buffer));
+    try {
+      await fs.access(localPath);
+      const error = new Error('File already exists') as NodeJS.ErrnoException;
+      error.code = 'EEXIST';
+      throw error;
+    } catch (err) {
+      const error = err as NodeJS.ErrnoException;
+      if (error.code === 'ENOENT') {
+        const dirname = path.dirname(localPath);
+        await fs.mkdir(dirname, { recursive: true }).catch((err) => 0);
+        return fs.writeFile(localPath, Buffer.from(buffer));
+      }
+      throw err;
+    }
   }
   delete(uri: string) {
     const localPath = url.fileURLToPath(uri);

@@ -4,7 +4,8 @@ import React, { useCallback } from 'react';
 import stores from '../main/stores';
 import { alertAndThrow } from '../common/utils/alert';
 import fileService from '/@/main/services/fileService';
-import { resolveUri } from '../common/utils/uri';
+import { resolveUri, basename } from '../common/utils/uri';
+import Pop from '/@/utils/Pop';
 
 function useFileOperation() {
   const { open: openPrompt, Prompt } = usePrompt();
@@ -24,23 +25,50 @@ function useFileOperation() {
     }
 
     const fileUri = resolveUri(dirUri + '/', name);
-    const node = await fileService
-      .create(dirUri, {
+
+    try {
+      const existingFiles = await fileService.listDir(dirUri);
+      const exists = existingFiles.some((file) => basename(file.uri) === name);
+      if (exists) {
+        Pop.showToast({
+          message: type === 'directory' ? `目录已存在：${name}` : `文件已存在：${name}`,
+          type: 'error',
+        });
+        throw new Error('File already exists');
+      }
+    } catch (error) {
+      if ((error as Error).message === 'File already exists') {
+        throw error;
+      }
+    }
+
+    try {
+      const node = await fileService.create(dirUri, {
         type: type,
         uri: fileUri,
-      })
-      .catch(alertAndThrow);
+      });
 
-    // 只为文件写入模板内容，目录不需要写入
-    if (type === 'file') {
-      const template = await fileService
-        .readText(resolveUri(dirUri + '/', 'template.md'))
-        .catch(() => '');
-      await fileService.writeText(fileUri, template);
-      await stores.fileListStore.refreshFiles();
-      stores.activationStore.activeFile(node.uri);
+      // 只为文件写入模板内容，目录不需要写入
+      if (type === 'file') {
+        const template = await fileService
+          .readText(resolveUri(dirUri + '/', 'template.md'))
+          .catch(() => '');
+        await fileService.writeText(fileUri, template);
+        await stores.fileListStore.refreshFiles();
+        stores.activationStore.activeFile(node.uri);
+      }
+      return node;
+    } catch (error) {
+      const err = error as NodeJS.ErrnoException;
+      if (err.code === 'EEXIST') {
+        Pop.showToast({
+          message: type === 'directory' ? `目录已存在：${name}` : `文件已存在：${name}`,
+          type: 'error',
+        });
+        throw new Error('File already exists');
+      }
+      throw error;
     }
-    return node;
   };
 
   const deleteFile = async (uri: string, type: 'directory' | 'file') => {
@@ -94,12 +122,16 @@ function useFileOperation() {
   };
 
   const Modal = useCallback(
-    () => (
-      <>
-        <Prompt />
-        <Confirm />
-      </>
-    ),
+    () => {
+      const Component = () => (
+        <>
+          <Prompt />
+          <Confirm />
+        </>
+      );
+      Component.displayName = 'Modal';
+      return <Component />;
+    },
     [Prompt, Confirm],
   );
 
