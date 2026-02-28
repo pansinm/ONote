@@ -13,7 +13,7 @@ export function parseStyle(styles: string) {
 }
 
 export function parseText(text: string) {
-  const emojiReg = /:[a-z0-9-+_]+:/g;
+  const emojiReg = /:[a-z0-9-+_]+:(?![a-zA-Z0-9])/g;
   const emojiParts = text.matchAll(emojiReg);
   const results: { type: string; value: string }[] = [];
   let pos = 0;
