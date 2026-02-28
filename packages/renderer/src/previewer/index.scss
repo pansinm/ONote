@@ -33,9 +33,19 @@ body {
 }
 
 body {
-  font-family: Source Han Sans, Noto, 'Droid Sans Mono', 'monospace',
-    Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei,
-    WenQuanYi Micro Hei, Arial, sans-serif;
+  font-family:
+    Source Han Sans,
+    Noto,
+    'Droid Sans Mono',
+    'monospace',
+    Helvetica Neue,
+    Helvetica,
+    PingFang SC,
+    Hiragino Sans GB,
+    Microsoft YaHei,
+    WenQuanYi Micro Hei,
+    Arial,
+    sans-serif;
 }
 
 * {
@@ -81,6 +91,19 @@ blockquote {
 .container {
   padding: 10px;
   position: relative;
+}
+
+.markdown-body {
+  font-family:
+    'Noto Sans', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji';
+  line-height: 1.7em;
+  text-align: justify;
+  text-justify: ideographic;
+
+  p {
+    text-indent: 2em;
+  }
 }
 
 #app {
