@@ -4,14 +4,10 @@ import {
   Button,
   DialogSurface,
   DialogBody,
-  DialogContent,
   makeStyles,
-  shorthands,
 } from '@fluentui/react-components';
 import {
-  ClosedCaption16Regular,
   DismissRegular,
-  DismissSquareFilled,
   SettingsRegular,
   ArrowExitFilled,
 } from '@fluentui/react-icons';
@@ -27,8 +23,11 @@ const useStyles = makeStyles({
   dialogActions: {
     display: 'flex',
     justifyContent: 'flex-end',
-    ...shorthands.padding('10px'),
-    ...shorthands.marginTop('auto'),
+    paddingTop: '10px',
+    paddingRight: '10px',
+    paddingBottom: '10px',
+    paddingLeft: '10px',
+    marginTop: 'auto',
   },
 });
 export default function SettingTrigger() {
@@ -46,7 +45,7 @@ export default function SettingTrigger() {
   return (
     <Dialog
       open={open}
-      onOpenChange={(e, { open: needOpen }) => setOpen(needOpen)}
+      onOpenChange={(_e, { open: needOpen }) => setOpen(needOpen)}
     >
       <DialogTrigger>
         <Button icon={<SettingsRegular />} shape="square"></Button>
