@@ -5,7 +5,7 @@ const logger = getLogger('AgentConversationStore');
 
 export interface AgentConversation {
   id: string;
-  projectId: string;
+  projectId?: string;
   userInput: string;
   messages: Array<{
     id: string;
@@ -20,7 +20,8 @@ export interface AgentConversation {
 
 export class AgentConversationStore {
   conversations: AgentConversation[] = [];
-  currentProjectId: string | null = null;
+  rootUri: string | null = null;
+  fileUri: string | null = null;
   loading = false;
   error: string | null = null;
 
@@ -28,10 +29,36 @@ export class AgentConversationStore {
     makeAutoObservable(this);
   }
 
-  setProjectId(projectId: string) {
+  setContext(rootUri: string, fileUri: string | null) {
     runInAction(() => {
-      this.currentProjectId = projectId;
+      this.rootUri = rootUri;
+      this.fileUri = fileUri;
     });
+  }
+
+  private async getUriHash(): Promise<string> {
+    if (!this.fileUri || !this.rootUri) {
+      return 'default';
+    }
+
+    try {
+      const filePath = decodeURIComponent(new URL(this.fileUri).pathname);
+      const rootPath = decodeURIComponent(new URL(this.rootUri).pathname);
+
+      const relativePath = filePath.replace(rootPath, '').replace(/^\//, '');
+
+      if (!relativePath) {
+        return 'default';
+      }
+
+      const encoder = new TextEncoder();
+      const data = encoder.encode(relativePath);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch {
+      return 'default';
+    }
   }
 
   async saveConversation(conversation: Omit<AgentConversation, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }): Promise<string> {
@@ -45,16 +72,17 @@ export class AgentConversationStore {
       const fullConversation: AgentConversation = {
         ...conversation,
         id,
-        projectId: conversation.projectId || this.currentProjectId || 'default',
+        projectId: this.rootUri || 'default',
         createdAt: now,
         updatedAt: now,
       };
 
-      const projectUri = this.currentProjectId || 'file:///default';
-      const conversationDir = `${projectUri}/.onote/agent`;
-      
+      const rootUri = this.rootUri || 'file:///default';
+      const uriHash = await this.getUriHash();
+      const conversationDir = `${rootUri}/.onote/${uriHash}`;
+
       await onote.dataSource.invoke('mkdir', conversationDir);
-      
+
       const filePath = `${conversationDir}/${id}.json`;
       const content = JSON.stringify(fullConversation, null, 2);
       await onote.dataSource.invoke('writeText', filePath, content);
@@ -83,10 +111,11 @@ export class AgentConversationStore {
     try {
       this.loading = true;
       const onote = (window as any).onote;
-      
-      const projectUri = this.currentProjectId || 'file:///default';
-      const filePath = `${projectUri}/.onote/agent/${conversationId}.json`;
-      
+
+      const rootUri = this.rootUri || 'file:///default';
+      const uriHash = await this.getUriHash();
+      const filePath = `${rootUri}/.onote/${uriHash}/${conversationId}.json`;
+
       const content = await onote.dataSource.invoke('readText', filePath);
       const conversation: AgentConversation = JSON.parse(content);
       
@@ -119,8 +148,9 @@ export class AgentConversationStore {
       this.loading = true;
       const onote = (window as any).onote;
 
-      const projectUri = this.currentProjectId || 'file:///default';
-      const conversationDir = `${projectUri}/.onote/agent`;
+      const rootUri = this.rootUri || 'file:///default';
+      const uriHash = await this.getUriHash();
+      const conversationDir = `${rootUri}/.onote/${uriHash}`;
 
       try {
         const files = await onote.dataSource.invoke('list', conversationDir);
@@ -169,8 +199,9 @@ export class AgentConversationStore {
       this.loading = true;
       const onote = (window as any).onote;
 
-      const projectUri = this.currentProjectId || 'file:///default';
-      const filePath = `${projectUri}/.onote/agent/${conversationId}.json`;
+      const rootUri = this.rootUri || 'file:///default';
+      const uriHash = await this.getUriHash();
+      const filePath = `${rootUri}/.onote/${uriHash}/${conversationId}.json`;
 
       await onote.dataSource.invoke('delete', filePath);
 
@@ -196,7 +227,8 @@ export class AgentConversationStore {
   clear() {
     runInAction(() => {
       this.conversations = [];
-      this.currentProjectId = null;
+      this.rootUri = null;
+      this.fileUri = null;
       this.error = null;
     });
   }

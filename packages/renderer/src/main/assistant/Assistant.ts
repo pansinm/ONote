@@ -22,10 +22,8 @@ export class Assistant {
       this.currentToolCalls.clear();
 
       const fileUri = stores.activationStore.activeFileUri;
-      const projectId = fileUri
-        ? fileUri.substring(0, fileUri.lastIndexOf('/'))
-        : 'default';
-      this.conversationStore.setProjectId(projectId);
+      const rootUri = stores.activationStore.rootUri;
+      this.conversationStore.setContext(rootUri, fileUri);
 
       callback({ type: 'agent-start' });
 
@@ -73,7 +71,6 @@ export class Assistant {
       callback({ type: 'agent-complete' });
 
       const conversationId = await this.conversationStore.saveConversation({
-        projectId,
         userInput: input,
         messages: [
           {
