@@ -6,12 +6,14 @@ import {
   DialogBody,
   DialogContent,
   makeStyles,
+  shorthands,
 } from '@fluentui/react-components';
 import {
   ClosedCaption16Regular,
   DismissRegular,
   DismissSquareFilled,
   SettingsRegular,
+  ArrowExitFilled,
 } from '@fluentui/react-icons';
 import React from 'react';
 import Setting from './Setting';
@@ -21,6 +23,12 @@ const useStyles = makeStyles({
     position: 'absolute',
     top: '5px',
     right: '5px',
+  },
+  dialogActions: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    ...shorthands.padding('10px'),
+    ...shorthands.marginTop('auto'),
   },
 });
 export default function SettingTrigger() {
@@ -51,8 +59,19 @@ export default function SettingTrigger() {
             appearance="transparent"
           ></Button>
         </DialogTrigger>
-        <DialogBody>
+        <DialogBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <Setting />
+          <div className={styles.dialogActions}>
+            <Button
+              appearance="primary"
+              icon={<ArrowExitFilled />}
+              onClick={async () => {
+                await (window as any).onote.app.invoke('quit');
+              }}
+            >
+              退出应用
+            </Button>
+          </div>
         </DialogBody>
       </DialogSurface>
     </Dialog>

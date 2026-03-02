@@ -7,8 +7,7 @@ import type PluginManagerHandler from '../../ipc-server/handlers/PluginManagerHa
 import type DevelopToolsHandler from '../../ipc-server/handlers/DevelopToolsHandler';
 import type CronHandler from '../../ipc-server/handlers/CronHandler';
 import type TypstHandler from '../../ipc-server/handlers/TypstHandler';
-import type LLMConversationHandler from '../../ipc-server/handlers/LLMConversationHandler';
-import type AgentContextHandler from '../../ipc-server/handlers/AgentContextHandler';
+import type AppHandler from '../../ipc-server/handlers/AppHandler';
 
 export const onote = {
   dataSource: new IPCClient<DataSourceHandler>(IPCNamespaces.DataSource),
@@ -19,8 +18,7 @@ export const onote = {
   cron: new IPCClient<CronHandler>(IPCNamespaces.Cron),
   developTools: new IPCClient<DevelopToolsHandler>(IPCNamespaces.DevelopTools),
   typst: new IPCClient<TypstHandler>(IPCNamespaces.Typst),
-  llmConversation: new IPCClient<LLMConversationHandler>(IPCNamespaces.LLMConversation),
-  agentContext: new IPCClient<AgentContextHandler>(IPCNamespaces.AgentContext),
+  app: new IPCClient<AppHandler>(IPCNamespaces.App),
 };
 
 exposeInMainWorld('onote', onote);
