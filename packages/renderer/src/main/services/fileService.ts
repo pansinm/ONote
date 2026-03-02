@@ -1,7 +1,12 @@
 import type { TreeNode } from '@sinm/react-file-tree';
 import { sortTreeNodes } from '/@/common/utils/treeNode';
-import { FILE_CONTENT_CHANGED, FILE_CREATED, FILE_DELETED } from '../eventbus/EventName';
+import {
+  FILE_CONTENT_CHANGED,
+  FILE_CREATED,
+  FILE_DELETED,
+} from '../eventbus/EventName';
 import eventbus from '../eventbus/eventbus';
+import Pop from '/@/utils/Pop';
 
 const dataSource = window.onote.dataSource;
 
@@ -62,13 +67,23 @@ class FileService {
     return dataSource.invoke('readText', uri);
   }
   writeText(uri: string, content: string): Promise<void> {
-    return dataSource.invoke('writeText', uri, content);
+    return dataSource.invoke('writeText', uri, content).catch((err: Error) => {
+      Pop.showToast({
+        message: err.message,
+      });
+      throw err;
+    });
   }
   readFile(uri: string): Promise<Buffer> {
     return dataSource.invoke('read', uri);
   }
   writeFile(uri: string, buffer: Buffer): Promise<void> {
-    return dataSource.invoke('write', uri, buffer);
+    return dataSource.invoke('write', uri, buffer).catch((err: Error) => {
+      Pop.showToast({
+        message: err.message,
+      });
+      throw err;
+    });
   }
   getLocalUri(uri: string): Promise<string> {
     return dataSource.invoke('cache', uri);

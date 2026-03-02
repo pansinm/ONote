@@ -60,14 +60,9 @@ class LocalDataSourceProvider implements IDataSourceProvider<null> {
   async mkdir(uri: string) {
     const localPath = url.fileURLToPath(uri);
     try {
-      await fs.access(localPath);
+      await fs.mkdir(localPath, { recursive: true });
     } catch (err) {
-      const error = err as NodeJS.ErrnoException;
-      if (error.code === 'ENOENT') {
-        await fs.mkdir(localPath, { recursive: true });
-        return;
-      }
-      throw err;
+      return;
     }
   }
   async write(uri: string, buffer: Buffer) {
@@ -79,10 +74,9 @@ class LocalDataSourceProvider implements IDataSourceProvider<null> {
       if (error.code === 'ENOENT') {
         const dirname = path.dirname(localPath);
         await fs.mkdir(dirname, { recursive: true }).catch((err) => 0);
-        return fs.writeFile(localPath, Buffer.from(buffer));
       }
-      throw err;
     }
+    return fs.writeFile(localPath, Buffer.from(buffer));
   }
   delete(uri: string) {
     const localPath = url.fileURLToPath(uri);
