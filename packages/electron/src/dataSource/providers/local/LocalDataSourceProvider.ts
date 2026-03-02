@@ -74,9 +74,6 @@ class LocalDataSourceProvider implements IDataSourceProvider<null> {
     const localPath = url.fileURLToPath(uri);
     try {
       await fs.access(localPath);
-      const error = new Error('File already exists') as NodeJS.ErrnoException;
-      error.code = 'EEXIST';
-      throw error;
     } catch (err) {
       const error = err as NodeJS.ErrnoException;
       if (error.code === 'ENOENT') {

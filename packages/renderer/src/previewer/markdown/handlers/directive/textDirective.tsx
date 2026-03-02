@@ -19,9 +19,8 @@ export default function textDirective(
       <span
         className={createLineClass(node.position)}
         style={{
-          borderRadius: 6,
-          padding: '2px 8px',
-          fontSize: 12,
+          borderRadius: '1em',
+          padding: '2px 0.5em',
           background: `linear-gradient(rgba(255,255,255,.8),rgba(255,255,255,.8)),linear-gradient(${color}, ${color})`,
           color,
         }}
