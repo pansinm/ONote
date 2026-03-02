@@ -104,6 +104,15 @@ blockquote {
   p {
     text-indent: 2em;
   }
+
+  ul,
+  ol {
+    padding-left: 2em;
+  }
+
+  li {
+    margin-left: 0.5em;
+  }
 }
 
 #app {
