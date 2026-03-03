@@ -10,7 +10,7 @@ monaco.editor.registerCommand(
     applyModelEdits(model, [
       {
         range: range,
-        text: new Date().toLocaleDateString(),
+        text: `${new Date().toLocaleDateString()}`,
         forceMoveMarkers: true,
       },
     ]);

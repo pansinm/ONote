@@ -11,22 +11,23 @@ class QuickInsertCompletionItemProvider
     context: monaco.languages.CompletionContext,
     token: monaco.CancellationToken,
   ): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
-    const lineTextBefore = model
-      .getLineContent(position.lineNumber)
-      .substring(0, position.column);
+    const lineContent = model.getLineContent(position.lineNumber);
+    const lineTextBefore = lineContent.substring(0, position.column - 1);
     const startIndex = lineTextBefore.lastIndexOf('@');
 
-    const range = new monaco.Range(
-      position.lineNumber,
-      startIndex + 1,
-      position.lineNumber,
-      position.column,
-    );
     if (startIndex < 0) {
       return {
         suggestions: [],
       };
     }
+
+    // range 应该只包含 @ 字符本身，从 startIndex + 1 开始，到 startIndex + 2 结束
+    const range = new monaco.Range(
+      position.lineNumber,
+      startIndex + 1,
+      position.lineNumber,
+      position.column - 1,
+    );
     return {
       suggestions: [
         {
