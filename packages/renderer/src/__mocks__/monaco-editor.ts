@@ -244,6 +244,69 @@ class TextModel {
     return result;
   }
 
+  getValue(): string {
+    return this.content;
+  }
+
+  setValue(newContent: string): void {
+    this.content = newContent;
+    this.lines = newContent.split('\n');
+  }
+
+  pushEditOperations(
+    editOperations: any[],
+    edits: { range: Range; text: string; forceMoveMarkers: boolean }[],
+    cursorStateComputer: any,
+  ): void {
+    // Apply edits in reverse order to avoid offset issues
+    for (let i = edits.length - 1; i >= 0; i--) {
+      const edit = edits[i];
+      this.applyEdit(edit.range, edit.text);
+    }
+  }
+
+  pushStackElement(): void {
+    // No-op for mock
+  }
+
+  private applyEdit(range: Range, text: string): void {
+    let result = '';
+
+    // Add lines before the start line (with newlines after each)
+    for (let i = 1; i < range.startLineNumber; i++) {
+      result += this.lines[i - 1];
+      if (i < this.lines.length) result += '\n';
+    }
+
+    // Add partial start line up to start column
+    if (range.startLineNumber <= this.lines.length) {
+      const startLine = this.lines[range.startLineNumber - 1] || '';
+      result += startLine.slice(0, range.startColumn - 1);
+    }
+
+    // Add replacement text
+    result += text;
+
+    // Add partial end line from end column
+    if (range.endLineNumber <= this.lines.length) {
+      const endLine = this.lines[range.endLineNumber - 1] || '';
+      // If we're at the end of a line and replacing with empty text,
+      // and the next edit will handle the newline, skip it here
+      const atLineEnd = range.endColumn > endLine.length;
+      if (!atLineEnd || text !== '') {
+        result += endLine.slice(range.endColumn - 1);
+      }
+    }
+
+    // Add remaining lines after the end line
+    for (let i = range.endLineNumber + 1; i <= this.lines.length; i++) {
+      result += '\n' + this.lines[i - 1];
+    }
+
+    this.content = result;
+    this.lines = result.split('\n');
+  }
+
   dispose() {}
 }
 
