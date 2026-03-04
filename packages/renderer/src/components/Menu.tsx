@@ -21,7 +21,9 @@ const Menu: FC<MenuProps> = ({ menuId, menus, onClick }) => {
     menus.map((menu) => {
       if (menu.children) {
         return (
-          <Submenu label={menu.title}>{renderMenus(menu.children)}</Submenu>
+          <Submenu key={menu.id} label={menu.title}>
+            {renderMenus(menu.children)}
+          </Submenu>
         );
       }
       return (
@@ -36,7 +38,11 @@ const Menu: FC<MenuProps> = ({ menuId, menus, onClick }) => {
         </Item>
       );
     });
-  return <RMenu id={menuId}>{renderMenus(menus)}</RMenu>;
+  return (
+    <RMenu style={{ zIndex: 1001 }} id={menuId}>
+      {renderMenus(menus)}
+    </RMenu>
+  );
 };
 
 export default Menu;
