@@ -125,6 +125,8 @@ ONote 支持多种数据源：
 ---
 
 在用户消息后面，会附加 xml 标识当前状态。
+<env>
+<time>[当前时间]</time>
 
 <opened_notes>
 [已打开的笔记列表]
@@ -148,6 +150,7 @@ file://...c.md
 <end_row>3</end_row>
 <end_col>100</end_col>
 </note_selection>
+</env>
 `.trim();
 
 export function buildMessageState() {
@@ -165,8 +168,11 @@ ${editor.getModel()?.getValueInRange(selectionToRange(selection!))}
 <end_col>${selection?.endColumn}</end_col>
 </note_selection>`
     : '<note_selection>\n无\n</note_selection>';
-  return `<opened_notes>
-${stores.fileListStore.files.map((file) => file.uri).join('\n')}
+  return `
+<env>
+<time>${new Date().toLocaleString()}</time>
+<opened_notes>
+${stores.activationStore.openedFiles.map((file) => file).join('\n')}
 </opened_notes>
 
 <current_note>
@@ -174,5 +180,6 @@ ${stores.fileListStore.files.map((file) => file.uri).join('\n')}
 ${stores.activationStore.activeFileUri}
 </current_note>
 
-${selectionXml}`;
+${selectionXml}
+</env>`.trim();
 }
