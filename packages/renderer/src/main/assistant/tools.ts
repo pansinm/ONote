@@ -1,16 +1,21 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-const onote = (window as any).onote;
+import * as monaco from 'monaco-editor';
+import stores from '../stores';
 
 export const readFile = tool({
-  description: 'Read file content from file URI',
+  description: 'Read file content from file URI, returns content with line numbers in format: lineNo|lineContent',
   inputSchema: z.object({
     uri: z.string().describe('File URI to read, e.g., file:///path/to/file.md'),
   }),
   execute: async ({ uri }) => {
     try {
-      const content = await onote.dataSource.invoke('readText', uri);
-      return content;
+      const model = await stores.fileStore.getOrCreateModel(uri);
+      const content = model.getValue();
+      // Add line numbers in format: lineNo|lineContent
+      const lines = content.split('\n');
+      const numberedLines = lines.map((line, index) => `${index + 1}|${line}`);
+      return numberedLines.join('\n');
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -27,7 +32,9 @@ export const writeFile = tool({
   }),
   execute: async ({ uri, content }) => {
     try {
-      await onote.dataSource.invoke('writeText', uri, content);
+      const model = await stores.fileStore.getOrCreateModel(uri);
+      model.setValue(content);
+      await stores.fileStore.save(uri);
       return 'File written successfully';
     } catch (error) {
       const errorMessage =
@@ -44,6 +51,7 @@ export const listFiles = tool({
   }),
   execute: async ({ uri }) => {
     try {
+      const onote = (window as any).onote;
       const files = await onote.dataSource.invoke('list', uri);
       return JSON.stringify(files, null, 2);
     } catch (error) {
@@ -62,7 +70,8 @@ export const searchInFile = tool({
   }),
   execute: async ({ uri, query }) => {
     try {
-      const content: string = await onote.dataSource.invoke('readText', uri);
+      const model = await stores.fileStore.getOrCreateModel(uri);
+      const content = model.getValue();
       const lines = content.split('\n');
       const matches = lines
         .map((line, index) => ({ line, lineNum: index + 1 }))
@@ -84,9 +93,62 @@ export const searchInFile = tool({
   },
 });
 
+export const applyPatch = tool({
+  description: 'Apply text edits using Monaco Editor range-based operations. Supports single-line, multi-line, and cross-line edits.',
+  inputSchema: z.object({
+    uri: z.string().describe('File URI to edit, e.g., file:///path/to/file.md'),
+    patches: z.array(
+      z.object({
+        startLine: z.number().describe('Start line number (1-indexed)'),
+        startColumn: z.number().optional().default(1).describe('Start column (default: 1)'),
+        endLine: z.number().describe('End line number (1-indexed)'),
+        endColumn: z.number().optional().describe('End column (default: end of line)'),
+        newText: z.string().describe('Replacement text (use "" for deletion, end with \\n for insertion)'),
+      }),
+    ).describe('Array of edit operations using line/column ranges'),
+  }),
+  execute: async ({ uri, patches }) => {
+    try {
+      const model = await stores.fileStore.getOrCreateModel(uri);
+
+      // Convert to Monaco edit operations
+      const edits: monaco.editor.IIdentifiedSingleEditOperation[] = patches.map(patch => {
+        const { startLine, startColumn = 1, endLine, endColumn, newText } = patch;
+
+        // Calculate end column if not provided
+        let actualEndColumn = endColumn;
+        if (actualEndColumn === undefined) {
+          const lineContent = model.getLineContent(endLine) || '';
+          actualEndColumn = lineContent.length + 1;
+        }
+
+        return {
+          range: new monaco.Range(startLine, startColumn, endLine, actualEndColumn),
+          text: newText,
+          forceMoveMarkers: true,
+        };
+      });
+
+      // Apply all edits in one batch
+      const { applyModelEdits } = await import('../monaco/utils');
+      applyModelEdits(model, edits);
+
+      // Save file
+      await stores.fileStore.save(uri);
+
+      return `Successfully applied ${patches.length} edit operation(s)`;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to apply edits: ${errorMessage}`);
+    }
+  },
+});
+
 export const TOOLS = {
   readFile,
   writeFile,
   listFiles,
   searchInFile,
+  applyPatch,
 } as const;

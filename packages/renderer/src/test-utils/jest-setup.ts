@@ -271,3 +271,41 @@ window.removeEventListener = function (type: any, listener: any, options?: any) 
   }
   return originalRemoveEventListener.call(this, type, listener, options);
 };
+
+// TransformStream polyfill for jsdom environment
+// Required by ai SDK's eventsource-parser dependency
+if (typeof (global as any).TransformStream === 'undefined') {
+  class TransformStreamImpl {
+    readable: any;
+    writable: any;
+
+    constructor() {
+      // Simple polyfill - the actual implementation is complex
+      // This provides a minimal implementation for tests
+      this.readable = {};
+      this.writable = {};
+    }
+  }
+
+  (global as any).TransformStream = TransformStreamImpl as any;
+}
+
+if (typeof (global as any).ReadableStream === 'undefined') {
+  class ReadableStreamImpl {
+    constructor() {
+      // Minimal polyfill
+    }
+  }
+
+  (global as any).ReadableStream = ReadableStreamImpl as any;
+}
+
+if (typeof (global as any).WritableStream === 'undefined') {
+  class WritableStreamImpl {
+    constructor() {
+      // Minimal polyfill
+    }
+  }
+
+  (global as any).WritableStream = WritableStreamImpl as any;
+}
