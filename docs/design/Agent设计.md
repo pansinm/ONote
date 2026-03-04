@@ -599,9 +599,11 @@ new ToolLoopAgent({
 
 **存储位置**:
 ```
-.onote/llm/conversations/
-└── {encoded_file_uri}.json
+{rootUri}/.onote/{uriHash}/
+└── {conversationId}.json
 ```
+
+其中 `uriHash` 是文件相对路径的 SHA-256 哈希值，确保每个文件有独立的对话存储目录。
 
 **对话格式**:
 ```typescript

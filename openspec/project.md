@@ -6,11 +6,11 @@ ONote 是基于 Electron + React + TypeScript 的跨平台桌面笔记应用。
 ## Tech Stack
 - Electron 35.7.5
 - React 18.2.0
-- TypeScript 5.3.3
+- TypeScript 5.9.3
 - MobX 6.4.1 (状态管理)
 - Monaco Editor 0.45.0 (编辑器)
 - Webpack 5 (构建工具)
-- Turborepo (Monorepo 管理)
+- Yarn Workspaces (Monorepo 管理)
 
 ## Project Conventions
 

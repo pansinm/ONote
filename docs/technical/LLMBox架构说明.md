@@ -1,5 +1,9 @@
 # LLMBox 架构说明
 
+> **注意**: 本文档描述的是 LLMBox 的早期架构。当前应用已迁移到基于 Vercel AI SDK 的 Agent 架构。
+>
+> 最新架构说明请参考: [Agent 功能设计](../design/Agent设计.md)
+
 ## 目录
 
 - [概述](#概述)

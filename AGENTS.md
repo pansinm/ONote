@@ -28,11 +28,11 @@ ONote 是基于 Electron + React + TypeScript 的跨平台桌面笔记应用。
 **技术栈：**
 - Electron 35.7.5
 - React 18.2.0
-- TypeScript 5.3.3
+- TypeScript 5.9.3
 - MobX 6.4.1 (状态管理)
 - Monaco Editor 0.45.0 (编辑器)
 - Webpack 5 (构建工具)
-- Turborepo (Monorepo 管理)
+- Yarn Workspaces (Monorepo 管理)
 
 ## 架构
 
@@ -106,8 +106,6 @@ yarn test                                     # 运行所有测试
 yarn test:watch                               # 监听模式
 yarn test -- path/to/file.test.ts             # 单个测试文件
 yarn test -- --testNamePattern="description"  # 测试模式
-yarn test:e2e                                 # E2E 测试 (Cucumber)
-yarn bdd                                      # 监听 E2E 测试
 ```
 
 ### 代码检查
@@ -145,10 +143,15 @@ packages/
 │       │   ├── stores/        # MobX 状态管理
 │       │   ├── containers/    # 容器组件
 │       │   ├── services/      # 服务层
+│       │   ├── assistant/     # Agent 执行引擎
+│       │   │   ├── Assistant.ts
+│       │   │   ├── agent.ts
+│       │   │   ├── tools.ts
+│       │   │   └── prompts.ts
 │       │   └── App.tsx        # 应用根组件
 │       ├── components/        # 通用组件
 │       ├── previewer/         # Markdown 预览器
-│       │   └── handlers/      # 渲染处理器
+│       │   └── markdown/handlers/  # Markdown 渲染处理器
 │       ├── llmbox/            # AI 对话框
 │       ├── entry/             # 独立入口 (llmbox.tsx)
 │       ├── common/            # 通用工具
@@ -321,8 +324,8 @@ logger.error('Error occurred', error);
 - 空行显示为 `2:` (无内容部分)
 
 **相关文件**:
-- `packages/renderer/src/llmbox/utils/addLineNumbers.ts` - 行号添加函数
-- `packages/renderer/src/llmbox/agent/Agent.ts` - 消息构建集成
+- `packages/renderer/src/main/assistant/prompts.ts` - 提示词模板（包含行号格式）
+- `packages/renderer/src/main/assistant/Assistant.ts` - Agent 执行引擎
 
 ### IPC (主进程)
 ```typescript
@@ -412,8 +415,8 @@ describe('Feature', () => {
 3. 在组件中使用 `observer()` 包裹
 
 ### 添加新的 Markdown 渲染 Handler
-1. 在 `packages/renderer/src/previewer/handlers/` 创建 Handler
-2. 在 `packages/renderer/src/previewer/index.ts` 注册到管道
+1. 在 `packages/renderer/src/previewer/markdown/handlers/` 创建 Handler
+2. 在 `packages/renderer/src/previewer/markdown/handlers/index.ts` 注册到管道
 
 ## Git 操作
 
