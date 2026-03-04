@@ -2,9 +2,11 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import * as monaco from 'monaco-editor';
 import stores from '../stores';
+import fileService from '../services/fileService';
 
 export const readFile = tool({
-  description: 'Read file content from file URI, returns content with line numbers in format: lineNo|lineContent',
+  description:
+    'Read file content from file URI, returns content with line numbers in format: lineNo|lineContent',
   inputSchema: z.object({
     uri: z.string().describe('File URI to read, e.g., file:///path/to/file.md'),
   }),
@@ -27,7 +29,9 @@ export const readFile = tool({
 export const writeFile = tool({
   description: 'Write content to file URI (will overwrite existing file)',
   inputSchema: z.object({
-    uri: z.string().describe('File URI to write, e.g., file:///path/to/file.md'),
+    uri: z
+      .string()
+      .describe('File URI to write, e.g., file:///path/to/file.md'),
     content: z.string().describe('Content to write to the file'),
   }),
   execute: async ({ uri, content }) => {
@@ -47,12 +51,13 @@ export const writeFile = tool({
 export const listFiles = tool({
   description: 'List files in a directory',
   inputSchema: z.object({
-    uri: z.string().describe('Directory URI to list, e.g., file:///path/to/dir'),
+    uri: z
+      .string()
+      .describe('Directory URI to list, e.g., file:///path/to/dir'),
   }),
   execute: async ({ uri }) => {
     try {
-      const onote = (window as any).onote;
-      const files = await onote.dataSource.invoke('list', uri);
+      const files = await fileService.listDir(uri);
       return JSON.stringify(files, null, 2);
     } catch (error) {
       const errorMessage =
@@ -65,7 +70,9 @@ export const listFiles = tool({
 export const searchInFile = tool({
   description: 'Search for text content within a file',
   inputSchema: z.object({
-    uri: z.string().describe('File URI to search in, e.g., file:///path/to/file.md'),
+    uri: z
+      .string()
+      .describe('File URI to search in, e.g., file:///path/to/file.md'),
     query: z.string().describe('Text to search for'),
   }),
   execute: async ({ uri, query }) => {
@@ -94,40 +101,67 @@ export const searchInFile = tool({
 });
 
 export const applyPatch = tool({
-  description: 'Apply text edits using Monaco Editor range-based operations. Supports single-line, multi-line, and cross-line edits.',
+  description:
+    'Apply text edits using Monaco Editor range-based operations. Supports single-line, multi-line, and cross-line edits.',
   inputSchema: z.object({
     uri: z.string().describe('File URI to edit, e.g., file:///path/to/file.md'),
-    patches: z.array(
-      z.object({
-        startLine: z.number().describe('Start line number (1-indexed)'),
-        startColumn: z.number().optional().default(1).describe('Start column (default: 1)'),
-        endLine: z.number().describe('End line number (1-indexed)'),
-        endColumn: z.number().optional().describe('End column (default: end of line)'),
-        newText: z.string().describe('Replacement text (use "" for deletion, end with \\n for insertion)'),
-      }),
-    ).describe('Array of edit operations using line/column ranges'),
+    patches: z
+      .array(
+        z.object({
+          startLine: z.number().describe('Start line number (1-indexed)'),
+          startColumn: z
+            .number()
+            .optional()
+            .default(1)
+            .describe('Start column (default: 1)'),
+          endLine: z.number().describe('End line number (1-indexed)'),
+          endColumn: z
+            .number()
+            .optional()
+            .describe('End column (default: end of line)'),
+          newText: z
+            .string()
+            .describe(
+              'Replacement text (use "" for deletion, end with \\n for insertion)',
+            ),
+        }),
+      )
+      .describe('Array of edit operations using line/column ranges'),
   }),
   execute: async ({ uri, patches }) => {
     try {
       const model = await stores.fileStore.getOrCreateModel(uri);
 
       // Convert to Monaco edit operations
-      const edits: monaco.editor.IIdentifiedSingleEditOperation[] = patches.map(patch => {
-        const { startLine, startColumn = 1, endLine, endColumn, newText } = patch;
+      const edits: monaco.editor.IIdentifiedSingleEditOperation[] = patches.map(
+        (patch) => {
+          const {
+            startLine,
+            startColumn = 1,
+            endLine,
+            endColumn,
+            newText,
+          } = patch;
 
-        // Calculate end column if not provided
-        let actualEndColumn = endColumn;
-        if (actualEndColumn === undefined) {
-          const lineContent = model.getLineContent(endLine) || '';
-          actualEndColumn = lineContent.length + 1;
-        }
+          // Calculate end column if not provided
+          let actualEndColumn = endColumn;
+          if (actualEndColumn === undefined) {
+            const lineContent = model.getLineContent(endLine) || '';
+            actualEndColumn = lineContent.length + 1;
+          }
 
-        return {
-          range: new monaco.Range(startLine, startColumn, endLine, actualEndColumn),
-          text: newText,
-          forceMoveMarkers: true,
-        };
-      });
+          return {
+            range: new monaco.Range(
+              startLine,
+              startColumn,
+              endLine,
+              actualEndColumn,
+            ),
+            text: newText,
+            forceMoveMarkers: true,
+          };
+        },
+      );
 
       // Apply all edits in one batch
       const { applyModelEdits } = await import('../monaco/utils');
