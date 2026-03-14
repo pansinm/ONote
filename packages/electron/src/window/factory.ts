@@ -1,5 +1,5 @@
 import type { WebFrameMain } from 'electron';
-import { app, BrowserWindow, nativeImage, shell, webFrameMain } from 'electron';
+import { app, BrowserWindow, dialog, nativeImage, shell, webFrameMain } from 'electron';
 import { join } from 'path';
 import { pluginManager as pluginManager } from '../plugin';
 import { sendToMain } from './ipc';
@@ -168,9 +168,26 @@ export async function restoreOrCreateWindow(type: 'main' | 'previewer') {
   if (window === undefined) {
     window = await createWindow(type);
     if (type === 'main') {
-      window.on('close', (e) => {
+      const mainWindow = window;
+      mainWindow.on('close', async (e) => {
         e.preventDefault();
-        window?.hide();
+
+        const { response } = await dialog.showMessageBox(mainWindow, {
+          type: 'question',
+          title: '关闭应用',
+          message: '您想要隐藏窗口还是退出应用？',
+          detail: '隐藏窗口后，应用将继续在后台运行，可通过托盘图标恢复。',
+          buttons: ['隐藏到托盘', '退出应用', '取消'],
+          defaultId: 0,
+          cancelId: 2,
+        });
+
+        if (response === 0) {
+          mainWindow.hide();
+        } else if (response === 1) {
+          mainWindow.destroy();
+          app.quit();
+        }
       });
     }
   }
