@@ -23,9 +23,6 @@ jest.mock('../../stores', () => {
       get layoutStore() {
         return {};
       },
-      get todoStore() {
-        return {};
-      },
       get fileListStore() {
         return { files: [] };
       },

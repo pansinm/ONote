@@ -8,7 +8,7 @@ class ActivationStore {
 
   rootUri = '';
 
-  activatedPage: 'notebook' | 'todo' = 'notebook';
+  activatedPage: 'notebook' = 'notebook';
 
   dataSourceId = 'local';
 
@@ -20,7 +20,7 @@ class ActivationStore {
 
   fileStore: FileStateStore;
 
-  activatePage(page: 'notebook' | 'todo') {
+  activatePage(page: 'notebook') {
     this.activatedPage = page;
   }
 

@@ -10,7 +10,6 @@ import { useLocalStorage } from 'react-use';
 import fileService from '../../services/fileService';
 import ProjectSelector from './ProjectSelector';
 import SettingTrigger from '../Setting/SettingTrigger';
-import Tasks from './Tasks';
 
 export default observer(function ActivityBar() {
   const [ref] = useDimensions();
@@ -47,7 +46,6 @@ export default observer(function ActivityBar() {
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
         <Directory />
       </div>
-      {stores.activationStore.rootUri ? <Tasks /> : null}
       <Flex justifyContent={'space-between'}>
         <SettingTrigger />
         <ProjectSelector

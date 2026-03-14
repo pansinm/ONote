@@ -2,7 +2,6 @@ import type ActivationStore from './ActivationStore';
 import type FileStateStore from './FileStore';
 import type SettingStore from './SettingStore';
 import type LayoutStore from './LayoutStore';
-import type TodoStore from './TodoStore';
 import type FileListStore from './FileListStore';
 
 export interface Stores {
@@ -10,7 +9,6 @@ export interface Stores {
   fileStore: FileStateStore;
   settingStore: SettingStore;
   layoutStore: LayoutStore;
-  todoStore: TodoStore;
   fileListStore: FileListStore;
 }
 

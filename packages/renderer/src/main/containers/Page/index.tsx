@@ -5,7 +5,6 @@ import FileList from '../../containers/FileList';
 import ContentPanel from '../../containers/ContentPanel';
 import stores from '../../stores';
 import View from '/@/components/View';
-import TodoPage from '../TodoPage/TodoPage';
 import { observer } from 'mobx-react-lite';
 import { DragIndicator, DragHandle } from '/@/components/DragBarNew';
 import { useResizable } from '/@/common/hooks/useResizable';
@@ -13,10 +12,6 @@ import { useResizable } from '/@/common/hooks/useResizable';
 const Page = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { dragState, startDrag } = useResizable({ containerRef });
-
-  if (stores.activationStore.activatedPage === 'todo') {
-    return <TodoPage />;
-  }
 
   return (
     <div ref={containerRef} style={{ display: 'flex', flex: 1, position: 'relative' }}>
