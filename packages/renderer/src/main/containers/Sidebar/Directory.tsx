@@ -32,11 +32,15 @@ const MENUS: MenuItem[] = [
     id: 'DELETE_DIRECTORY',
     title: '删除目录',
   },
+  {
+    id: 'COPY_PATH',
+    title: '复制路径',
+  },
 ];
 
 import orderBy from 'lodash/orderBy';
 import { when } from 'mobx';
-import { getParentUri, isEquals } from '/@/common/utils/uri';
+import { getParentUri, isEquals, pathanme } from '/@/common/utils/uri';
 import fileService from '../../services/fileService';
 
 // directory first and filename dict sort
@@ -127,6 +131,10 @@ const Directory = observer(() => {
         });
       case 'OPEN_FOLDER':
         return window.simmer.openPath(getParentUri(dirUri));
+      case 'COPY_PATH':
+        return navigator.clipboard.writeText(
+          decodeURIComponent(pathanme(dirUri)),
+        );
       default:
         return;
     }

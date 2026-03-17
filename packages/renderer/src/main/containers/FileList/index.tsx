@@ -16,7 +16,7 @@ import Flex from '/@/components/Flex';
 import SearchList from './SearchList';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { useLatest } from 'react-use';
-import { isEquals, resolveUri } from '../../../common/utils/uri';
+import { isEquals, resolveUri, pathanme } from '../../../common/utils/uri';
 import { blobToBuffer } from '../../../common/utils/transform';
 import fileService from '../../services/fileService';
 import { FILE_CONTENT_CHANGED } from '../../eventbus/EventName';
@@ -39,6 +39,10 @@ const menus: MenuItem[] = [
   {
     id: 'DELETE_NOTE',
     title: '删除笔记',
+  },
+  {
+    id: 'COPY_PATH',
+    title: '复制路径',
   },
   {
     id: 'SORTER',
@@ -127,6 +131,10 @@ const FileList: FC = observer(() => {
         return renameFile(uri, 'file');
       case 'DELETE_NOTE':
         return deleteFile(uri, 'file');
+      case 'COPY_PATH':
+        return navigator.clipboard.writeText(
+          decodeURIComponent(pathanme(uri)),
+        );
       default:
         return;
     }
