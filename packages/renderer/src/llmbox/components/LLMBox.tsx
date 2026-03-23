@@ -128,7 +128,7 @@ const LLMBox: FC<LLMBoxProps> = observer(({ channel, className, style }) => {
 
   return (
     <div className={classNames(styles.container, className)} style={style}>
-      <Header title="Agent" agentState={agentStore.agentState} className={styles.header} />
+      <Header title={t('agentTitle')} agentState={agentStore.agentState} className={styles.header} />
       <MessageList
         ref={messageListRef}
         messages={messages}

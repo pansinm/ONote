@@ -1,5 +1,12 @@
 {
   "newConversation": "New conversation below",
   "inputPlaceholder": "Type a message...",
-  "clearQuote": "Clear quote"
+  "clearQuote": "Clear quote",
+  "thinking": "Thinking",
+  "toolCall": "Tool Call",
+  "summary": "Summary",
+  "generating": "Generating...",
+  "arguments": "Arguments:",
+  "result": "Result:",
+  "agentTitle": "Agent"
 }

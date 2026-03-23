@@ -10,6 +10,7 @@
 import classNames from 'classnames';
 import type { FC } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './Header.module.scss';
 
 export type AgentState = 'idle' | 'thinking' | 'executing';
@@ -39,6 +40,7 @@ const Header: FC<HeaderProps> = (props) => {
     style,
     icon,
   } = props;
+  const { t } = useTranslation('common');
 
   // 判断 Agent 是否在工作状态
   const isWorking = agentState === 'thinking' || agentState === 'executing';
@@ -57,7 +59,7 @@ const Header: FC<HeaderProps> = (props) => {
               styles.icon,
               isWorking && styles.iconAnimating,
             )}
-            aria-label="Agent icon"
+            aria-label={t('agentIcon')}
           />
         )}
         <span className={styles.title}>{title}</span>

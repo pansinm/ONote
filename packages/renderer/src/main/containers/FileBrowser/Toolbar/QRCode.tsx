@@ -30,6 +30,7 @@ function QRCodeContent() {
 const ObserverQRCode = observer(QRCodeContent);
 
 function QRCode() {
+  const { t } = useTranslation('common');
   const [visible, setVisible] = useState(false);
   return (
     <Tooltip
@@ -40,7 +41,7 @@ function QRCode() {
       relationship={'description'}
     >
       <span>
-        <QrCode20Regular title="insert" />
+        <QrCode20Regular title={t('insertFile')} />
       </span>
     </Tooltip>
   );

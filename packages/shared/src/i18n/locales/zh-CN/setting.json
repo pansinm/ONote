@@ -16,5 +16,8 @@
   "useLocalCache": "使用本地缓存",
   "pluginMarket": "插件市场",
   "installed": "已安装",
-  "uninstall": "卸载"
+  "uninstall": "卸载",
+  "llmBaseUrl": "LLM BASE URL",
+  "modelName": "MODEL NAME",
+  "apiKey": "API KEY"
 }

@@ -21,5 +21,6 @@
   "file": "file",
   "searchFiles": "Search files",
   "createDirectory": "Create Directory",
-  "deleteDirectory": "Delete Directory"
+  "deleteDirectory": "Delete Directory",
+  "openFolderHint": "Open a directory first..."
 }

@@ -9,6 +9,7 @@ import {
   OverlayDrawer,
 } from '@fluentui/react-components';
 import { Dismiss24Regular } from '@fluentui/react-icons';
+import { useTranslation } from 'react-i18next';
 
 type DrawerSeparatorExampleProps = {
   open: boolean;
@@ -28,6 +29,7 @@ export const Drawer: React.FC<DrawerSeparatorExampleProps> = ({
   children,
   title,
 }) => {
+  const { t } = useTranslation('common');
   const DrawerComponent = type === 'inline' ? InlineDrawer : OverlayDrawer;
   return (
     <DrawerComponent
@@ -41,7 +43,7 @@ export const Drawer: React.FC<DrawerSeparatorExampleProps> = ({
           action={
             <Button
               appearance="subtle"
-              aria-label="Close"
+              aria-label={t('close')}
               autoFocus={false}
               tabIndex={-1}
               icon={<Dismiss24Regular />}

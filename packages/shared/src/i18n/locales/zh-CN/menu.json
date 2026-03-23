@@ -21,5 +21,6 @@
   "file": "文件",
   "searchFiles": "搜索文件",
   "createDirectory": "创建目录",
-  "deleteDirectory": "删除目录"
+  "deleteDirectory": "删除目录",
+  "openFolderHint": "先打开目录..."
 }

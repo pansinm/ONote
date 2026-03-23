@@ -54,5 +54,18 @@
   "pluginError": "插件 \"{{pluginName}}\" 错误: {{message}}",
   "llmError": "AI 助手{{provider}}错误: {{message}}",
   "configError": "配置项 \"{{configKey}}\" 错误: {{message}}",
-  "operationFailed": "操作失败"
+  "operationFailed": "操作失败",
+  "moveDown": "下移",
+  "moveUp": "上移",
+  "remove": "移除",
+  "agentTitle": "智能助手",
+  "chatGPT": "AI 对话",
+  "host": "主机",
+  "port": "端口",
+  "username": "用户名",
+  "password": "密码",
+  "agentIcon": "智能助手图标",
+  "completed": "已完成",
+  "inProgress": "进行中",
+  "selectDirectory": "选择目录"
 }

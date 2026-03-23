@@ -16,5 +16,8 @@
   "useLocalCache": "Use Local Cache",
   "pluginMarket": "Plugin Market",
   "installed": "Installed",
-  "uninstall": "Uninstall"
+  "uninstall": "Uninstall",
+  "llmBaseUrl": "LLM BASE URL",
+  "modelName": "MODEL NAME",
+  "apiKey": "API KEY"
 }

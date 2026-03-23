@@ -54,5 +54,18 @@
   "pluginError": "Plugin \"{{pluginName}}\" error: {{message}}",
   "llmError": "AI Assistant{{provider}} error: {{message}}",
   "configError": "Config \"{{configKey}}\" error: {{message}}",
-  "operationFailed": "Operation failed"
+  "operationFailed": "Operation failed",
+  "moveDown": "Move down",
+  "moveUp": "Move up",
+  "remove": "Remove",
+  "agentTitle": "Agent",
+  "chatGPT": "AI Chat",
+  "host": "Host",
+  "port": "Port",
+  "username": "Username",
+  "password": "Password",
+  "agentIcon": "Agent icon",
+  "completed": "Completed",
+  "inProgress": "In progress",
+  "selectDirectory": "Select Directory"
 }

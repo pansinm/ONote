@@ -52,13 +52,13 @@ const SSHForm: FC<SSHFormProps> = (props) => {
   }, []);
   return (
     <form ref={formRef} className={styles.SSHForm}>
-      <Input disabled={disabled} name="host" placeholder="Host" />
-      <Input disabled={disabled} name="port" placeholder="Port" />
-      <Input disabled={disabled} name="username" placeholder="Username" />
+      <Input disabled={disabled} name="host" placeholder={t('host')} />
+      <Input disabled={disabled} name="port" placeholder={t('port')} />
+      <Input disabled={disabled} name="username" placeholder={t('username')} />
       <Input
         disabled={disabled}
         name="password"
-        placeholder="Password"
+        placeholder={t('password')}
         type={'password'}
       />
       <Button

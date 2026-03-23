@@ -9,6 +9,7 @@ import {
 } from '@fluentui/react-components';
 import { Dismiss24Regular } from '@fluentui/react-icons';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Project } from './components/ProjectSelect';
 import ProjectSelect from './components/ProjectSelect';
 
@@ -17,6 +18,7 @@ export default function ProjectSelector(props: {
   onSelected: (project: Project) => void;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { t } = useTranslation('common');
   if (!props.open) {
     return (
       <Button
@@ -25,7 +27,7 @@ export default function ProjectSelector(props: {
         appearance="primary"
         shape="square"
       >
-        打开目录
+        {t('openDirectory')}
       </Button>
     );
   }
@@ -36,7 +38,7 @@ export default function ProjectSelector(props: {
     >
       <DialogTrigger>
         <Button style={{ flex: 1 }} appearance="primary" shape="square">
-          打开目录
+          {t('openDirectory')}
         </Button>
       </DialogTrigger>
       <DialogSurface>
@@ -46,13 +48,13 @@ export default function ProjectSelector(props: {
               <DialogTrigger action="close">
                 <Button
                   appearance="subtle"
-                  aria-label="close"
+                  aria-label={t('close')}
                   icon={<Dismiss24Regular />}
                 />
               </DialogTrigger>
             }
           >
-            选择目录
+            {t('selectDirectory')}
           </DialogTitle>
           <DialogContent>
             <ProjectSelect onSelect={props.onSelected} />

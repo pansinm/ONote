@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import stores from '../../stores';
 import { getLogger } from '/@/shared/logger';
 import { createChannel } from 'bidc';
@@ -8,6 +9,7 @@ import { assistant } from '../../assistant';
 const logger = getLogger('LLMBoxFrame');
 
 function LLMBoxFrame() {
+  const { t } = useTranslation('common');
   const ref = useRef<HTMLIFrameElement>(null);
   useEffect(() => {
     const channel = createChannel(
@@ -32,7 +34,7 @@ function LLMBoxFrame() {
   return (
     <iframe
       ref={ref}
-      title="LLMBox"
+      title={t('agentTitle')}
       style={{
         position: 'absolute',
         bottom: 0,

@@ -47,7 +47,7 @@ function Toolbar() {
         />
         <Icon
           style={{ marginLeft: 10, marginTop: 1 }}
-          title="ChatGPT"
+          title={t('chatGPT')}
           type="chat-dots"
           size={18}
           onClick={toggleChatBox}

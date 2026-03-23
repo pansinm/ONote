@@ -6,6 +6,7 @@ import {
   ArrowUp16Regular,
   Delete16Regular,
 } from '@fluentui/react-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function FluentIconButton(props: IconButtonProps) {
   return (
@@ -19,9 +20,10 @@ export default function FluentIconButton(props: IconButtonProps) {
 }
 
 export function MoveDownButton(props: IconButtonProps) {
+  const { t } = useTranslation('common');
   return (
     <FluentIconButton
-      title="Move down"
+      title={t('moveDown')}
       {...props}
       icon={<ArrowDown16Regular />}
     />
@@ -29,13 +31,15 @@ export function MoveDownButton(props: IconButtonProps) {
 }
 
 export function MoveUpButton(props: IconButtonProps) {
+  const { t } = useTranslation('common');
   return (
-    <FluentIconButton title="Move up" {...props} icon={<ArrowUp16Regular />} />
+    <FluentIconButton title={t('moveUp')} {...props} icon={<ArrowUp16Regular />} />
   );
 }
 
 export function RemoveButton(props: IconButtonProps) {
+  const { t } = useTranslation('common');
   return (
-    <FluentIconButton title="Remove" {...props} icon={<Delete16Regular />} />
+    <FluentIconButton title={t('remove')} {...props} icon={<Delete16Regular />} />
   );
 }

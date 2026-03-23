@@ -13,6 +13,7 @@ import type { FC } from 'react';
 import React, { useState, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { Components } from 'react-markdown';
+import { useTranslation } from 'react-i18next';
 import {
   CheckmarkCircle12Regular,
   ArrowClockwise12Regular,
@@ -92,6 +93,7 @@ interface ToolCallDetailsProps {
 }
 
 const ToolCallDetails: FC<ToolCallDetailsProps> = React.memo(({ toolCall }) => {
+  const { t } = useTranslation('llmbox');
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpanded = useCallback(() => {
@@ -142,7 +144,7 @@ const ToolCallDetails: FC<ToolCallDetailsProps> = React.memo(({ toolCall }) => {
       {isExpanded && (
         <div className={styles.toolCallBody}>
           <div className={styles.toolCallSection}>
-            <span className={styles.toolCallSection__label}>Arguments:</span>
+            <span className={styles.toolCallSection__label}>{t('arguments')}</span>
             <pre className={styles.toolCallArguments}>
               {formatArguments(toolCall.arguments)}
             </pre>
@@ -150,7 +152,7 @@ const ToolCallDetails: FC<ToolCallDetailsProps> = React.memo(({ toolCall }) => {
 
           {toolCall.result && (
             <div className={styles.toolCallSection}>
-              <span className={styles.toolCallSection__label}>Result:</span>
+              <span className={styles.toolCallSection__label}>{t('result')}</span>
               <div className={styles.toolCallResult}>{toolCall.result}</div>
             </div>
           )}
@@ -168,6 +170,7 @@ interface WorkStepItemProps {
 }
 
 const WorkStepItem: FC<WorkStepItemProps> = React.memo(({ step }) => {
+  const { t } = useTranslation('llmbox');
   const renderStepIcon = () => {
     switch (step.type) {
       case 'thinking':
@@ -179,14 +182,14 @@ const WorkStepItem: FC<WorkStepItemProps> = React.memo(({ step }) => {
           return (
             <CheckmarkCircle12Regular
               className={styles.statusIcon__completed}
-              aria-label="Completed"
+              aria-label={t('completed')}
             />
           );
         }
         return (
           <ArrowClockwise12Regular
             className={styles.statusIcon__inProgress}
-            aria-label="In progress"
+            aria-label={t('inProgress')}
           />
         );
       default:
@@ -214,9 +217,9 @@ const WorkStepItem: FC<WorkStepItemProps> = React.memo(({ step }) => {
     >
       <div className={styles.workStep__header}>
         {renderStepIcon()}
-        {step.type === 'thinking' && <span>Thinking</span>}
-        {step.type === 'tool_call' && <span>Tool Call</span>}
-        {step.type === 'summary' && <span>Summary</span>}
+        {step.type === 'thinking' && <span>{t('thinking')}</span>}
+        {step.type === 'tool_call' && <span>{t('toolCall')}</span>}
+        {step.type === 'summary' && <span>{t('summary')}</span>}
         {step.type === 'summary' && !step.isCompleted && (
           <div className={styles.streamingIndicator}>
             <div className={styles.streamingDots}>
@@ -224,7 +227,7 @@ const WorkStepItem: FC<WorkStepItemProps> = React.memo(({ step }) => {
               <span className={styles.dot} />
               <span className={styles.dot} />
             </div>
-            <span className={styles.streamingText}>Generating...</span>
+            <span className={styles.streamingText}>{t('generating')}</span>
           </div>
         )}
       </div>
