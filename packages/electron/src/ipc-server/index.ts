@@ -13,6 +13,7 @@ import PluginManagerHandler from './handlers/PluginManagerHandler';
 import CronHandler from './handlers/CronHandler';
 import TypstHandler from './handlers/TypstHandler';
 import AppHandler from './handlers/AppHandler';
+import ExportHandler from './handlers/ExportHandler';
 import { getLogger } from '/@/shared/logger';
 
 const logger = getLogger('IPCServer');
@@ -63,5 +64,6 @@ export function startIpcServer() {
   ipcServer.register(IPCNamespaces.Cron, CronHandler);
   ipcServer.register(IPCNamespaces.Typst, TypstHandler);
   ipcServer.register(IPCNamespaces.App, AppHandler);
+  ipcServer.register(IPCNamespaces.Export, ExportHandler);
   logger.info('IPC server started');
 }

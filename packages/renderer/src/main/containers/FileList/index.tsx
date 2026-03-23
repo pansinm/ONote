@@ -45,6 +45,10 @@ const menus: MenuItem[] = [
     title: '复制路径',
   },
   {
+    id: 'EXPORT_PDF',
+    title: '导出为 PDF',
+  },
+  {
     id: 'SORTER',
     title: '文件排序',
     children: [
@@ -135,6 +139,10 @@ const FileList: FC = observer(() => {
         return navigator.clipboard.writeText(
           decodeURIComponent(pathanme(uri)),
         );
+      case 'EXPORT_PDF': {
+        const content = await fileService.readText(uri);
+        return window.onote.export.invoke('exportToPdf', uri, content);
+      }
       default:
         return;
     }

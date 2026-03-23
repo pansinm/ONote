@@ -6,6 +6,7 @@ export const IPCNamespaces = {
   PluginManager: 'PluginManager',
   Typst: 'Typst',
   App: 'App',
+  Export: 'Export',
 };
 
 export const EventNames = {

@@ -8,6 +8,7 @@ import type DevelopToolsHandler from '../../ipc-server/handlers/DevelopToolsHand
 import type CronHandler from '../../ipc-server/handlers/CronHandler';
 import type TypstHandler from '../../ipc-server/handlers/TypstHandler';
 import type AppHandler from '../../ipc-server/handlers/AppHandler';
+import type ExportHandler from '../../ipc-server/handlers/ExportHandler';
 
 export const onote = {
   dataSource: new IPCClient<DataSourceHandler>(IPCNamespaces.DataSource),
@@ -19,6 +20,7 @@ export const onote = {
   developTools: new IPCClient<DevelopToolsHandler>(IPCNamespaces.DevelopTools),
   typst: new IPCClient<TypstHandler>(IPCNamespaces.Typst),
   app: new IPCClient<AppHandler>(IPCNamespaces.App),
+  export: new IPCClient<ExportHandler>(IPCNamespaces.Export),
 };
 
 exposeInMainWorld('onote', onote);
