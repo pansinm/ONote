@@ -1,0 +1,32 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景渐变 -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357ABD;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="noteGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F0F4F8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 圆角矩形背景 -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGradient)"/>
+
+  <!-- 笔记本主体 - O 形状 -->
+  <circle cx="256" cy="256" r="140" fill="url(#noteGradient)" stroke="#2C5F8D" stroke-width="8"/>
+
+  <!-- 内圈 -->
+  <circle cx="256" cy="256" r="100" fill="none" stroke="#4A90E2" stroke-width="6"/>
+
+  <!-- 笔记线条 -->
+  <line x1="200" y1="230" x2="312" y2="230" stroke="#4A90E2" stroke-width="4" stroke-linecap="round"/>
+  <line x1="200" y1="256" x2="312" y2="256" stroke="#4A90E2" stroke-width="4" stroke-linecap="round"/>
+  <line x1="200" y1="282" x2="280" y2="282" stroke="#4A90E2" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- 装饰点 -->
+  <circle cx="180" cy="230" r="4" fill="#E74C3C"/>
+  <circle cx="180" cy="256" r="4" fill="#F39C12"/>
+  <circle cx="180" cy="282" r="4" fill="#27AE60"/>
+</svg>
