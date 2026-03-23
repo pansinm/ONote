@@ -5,7 +5,7 @@
     "node": ">=v16.13",
     "npm": ">=8.1"
   },
-  "version": "0.13.1",
+  "version": "0.14.0",
   "main": "packages/electron/dist/index.cjs",
   "type": "commonjs",
   "packageManager": "yarn@1.22.22",
@@ -16,7 +16,7 @@
     "postinstall": "patch-package && electron-builder install-app-deps",
     "generate-tray-icon": "node scripts/generate-tray-icon.js",
     "generate-icons": "node scripts/generate-icons.js",
-    "build": "rm -rf packages/*/dist && yarn workspaces run build",
+    "build": "rm -rf packages/*/dist && yarn workspace onote-shared build && yarn workspace onote-renderer build && yarn workspace onote-electron build",
     "compile": "cross-env NODE_ENV=production npm run build && cross-env NODE_ENV=production electron-builder --config .electron-builder.config.js",
     "test:watch": "yarn jest --watch",
     "test": "yarn workspaces run test",
