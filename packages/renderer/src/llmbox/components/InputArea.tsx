@@ -13,6 +13,7 @@ import classNames from 'classnames';
 import type { FC } from 'react';
 import React from 'react';
 import { Button } from '@fluentui/react-components';
+import { useTranslation } from 'react-i18next';
 import {
   SendRegular,
   DismissRegular,
@@ -68,13 +69,15 @@ const InputArea: FC<InputAreaProps> = (props) => {
     onSend,
     quote,
     onClearQuote,
-    placeholder = '输入消息...',
+    placeholder,
     disabled = false,
     loading = false,
     minRows = 3,
     className,
     style,
   } = props;
+
+  const { t } = useTranslation('llmbox');
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -107,7 +110,7 @@ const InputArea: FC<InputAreaProps> = (props) => {
             <button
               className={styles.quoteClose}
               onClick={onClearQuote}
-              aria-label="清除引用"
+              aria-label={t('clearQuote')}
               type="button"
             >
               <DismissRegular />
@@ -122,7 +125,7 @@ const InputArea: FC<InputAreaProps> = (props) => {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={placeholder}
+        placeholder={placeholder || t('inputPlaceholder')}
         disabled={disabled}
         rows={minRows}
       />

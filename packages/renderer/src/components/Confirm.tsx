@@ -1,7 +1,7 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
 import React from 'react';
 import { Button, FluentProvider } from '@fluentui/react-components';
+import { useTranslation } from 'react-i18next';
 import Flex from './Flex';
 import Modal from './Modal';
 
@@ -24,12 +24,12 @@ const Confirm: FC<ConfirmProps> = ({
   showCancelButton = true,
   title,
 }) => {
+  const { t } = useTranslation('common');
   return (
     <Modal
       isOpen={isOpen}
-      title={title || '提示'}
+      title={title || t('tip')}
       shouldCloseOnEsc={shouldCloseOnEsc}
-      // onRequestClose={onCancel}
     >
       <FluentProvider>
         <Flex
@@ -44,11 +44,11 @@ const Confirm: FC<ConfirmProps> = ({
               appearance="primary"
               onClick={() => onOk?.()}
             >
-              确定
+              {t('confirm')}
             </Button>
             {showCancelButton ? (
               <Button appearance="secondary" onClick={onCancel}>
-                取消
+                {t('cancel')}
               </Button>
             ) : null}
           </Flex>

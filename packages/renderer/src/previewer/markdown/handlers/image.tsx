@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import type { Image as IImage } from 'mdast';
+import { useTranslation } from 'react-i18next';
 import { resolveAssetUri } from './util/uri';
 import Block from './components/Block';
 import Icon from '/@/components/Icon';
@@ -14,6 +15,7 @@ function Image(props: {
   title?: string;
   alt?: string;
 }) {
+  const { t } = useTranslation('common');
   const [version, setVersion] = useState(Date.now() + '');
   const srcUrl = new URL(props.src);
   srcUrl.searchParams.set('_', version);
@@ -43,7 +45,7 @@ function Image(props: {
     <Block
       className={props.className}
       icons={
-        <Icon type="images" title="复制成图片" onClick={handleCopyImg}></Icon>
+        <Icon type="images" title={t('copyAsImage')} onClick={handleCopyImg}></Icon>
       }
     >
       <img

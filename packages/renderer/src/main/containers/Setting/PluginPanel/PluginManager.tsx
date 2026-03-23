@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Tab, TabList } from '@fluentui/react-components';
+import { useTranslation } from 'react-i18next';
 import PluginMarket from './PluginMarket';
 import { useAsync, useAsyncFn } from 'react-use';
 import type { IPlugin } from '/@/main/services/pluginManager';
@@ -31,6 +32,7 @@ async function getDefaultRepo(): Promise<Record<string, IPlugin>> {
 }
 
 export default function PluginManager() {
+  const { t } = useTranslation('setting');
   const [tab, setTab] = useState('market');
   const [pluginState, refetch] = useAsyncFn(
     () => pluginManager.getPlugins(),
@@ -60,9 +62,8 @@ export default function PluginManager() {
         selectedValue={tab}
         onTabSelect={(e, data) => setTab(data.value as string)}
       >
-        <Tab value="market">插件市场</Tab>
-        <Tab value="installed">已安装</Tab>
-        {/* <Tab value="setting">设置</Tab> */}
+        <Tab value="market">{t('pluginMarket')}</Tab>
+        <Tab value="installed">{t('installed')}</Tab>
       </TabList>
       {tab === 'market' && (
         <PluginMarket

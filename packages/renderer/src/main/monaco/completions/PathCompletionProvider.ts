@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import i18next from '../../i18n';
 import fileService from '/@/main/services/fileService';
 import type { TreeNode } from '@sinm/react-file-tree';
 
@@ -236,11 +237,11 @@ class PathCompletionProvider implements monaco.languages.CompletionItemProvider 
           insertText,
           range,
           sortText,
-          detail: file.type === 'directory' ? '文件夹' : '文件',
+          detail: file.type === 'directory' ? i18next.t('common:folder') : i18next.t('common:file'),
           command: file.type === 'directory'
             ? {
                 id: 'editor.action.triggerSuggest',
-                title: '触发补全',
+                title: i18next.t('common:triggerCompletion'),
               }
             : undefined,
         };

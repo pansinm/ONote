@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { FileTreeProps } from '@sinm/react-file-tree';
 import { utils } from '@sinm/react-file-tree';
 import { FileTree } from '@sinm/react-file-tree';
 import { observer } from 'mobx-react-lite';
+import { useTranslation } from 'react-i18next';
 import stores from '../../stores';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import FileTreeItem from '/@/components/FileTreeItem';
@@ -15,28 +16,6 @@ import '@sinm/react-file-tree/styles.css';
 import '@sinm/react-file-tree/icons.css';
 
 const MENU_ID = 'DIRECTORY_MENU';
-const MENUS: MenuItem[] = [
-  {
-    id: 'CREATE_FILE',
-    title: '创建笔记',
-  },
-  {
-    id: 'CREATE_DIRECTORY',
-    title: '创建目录',
-  },
-  {
-    id: 'RENAME_DIRECTORY',
-    title: '修改名称',
-  },
-  {
-    id: 'DELETE_DIRECTORY',
-    title: '删除目录',
-  },
-  {
-    id: 'COPY_PATH',
-    title: '复制路径',
-  },
-];
 
 import orderBy from 'lodash/orderBy';
 import { when } from 'mobx';
@@ -57,6 +36,30 @@ const sorter = (treeNodes: TreeNode[]) =>
 const Directory = observer(() => {
   const rootUri = stores.activationStore.rootUri;
   const [tree, setTree] = useState<TreeNode | undefined>(undefined);
+  const { t } = useTranslation('menu');
+
+  const baseMenus: MenuItem[] = useMemo(() => [
+    {
+      id: 'CREATE_FILE',
+      title: t('createNote'),
+    },
+    {
+      id: 'CREATE_DIRECTORY',
+      title: t('createDirectory'),
+    },
+    {
+      id: 'RENAME_DIRECTORY',
+      title: t('renameNote'),
+    },
+    {
+      id: 'DELETE_DIRECTORY',
+      title: t('deleteDirectory'),
+    },
+    {
+      id: 'COPY_PATH',
+      title: t('copyPath'),
+    },
+  ], [t]);
 
   const toggleExpanded = (treeNode: TreeNode) => {
     const loading = !treeNode.children;
@@ -164,10 +167,11 @@ const Directory = observer(() => {
     stores.fileListStore.refreshFiles();
   };
 
-  let menus = MENUS;
-  if (stores.activationStore.dataSourceId === 'local') {
-    menus = [...MENUS, { id: 'OPEN_FOLDER', title: '打开所在文件夹' }];
-  }
+  const menus = useMemo(() =>
+    stores.activationStore.dataSourceId === 'local'
+      ? [...baseMenus, { id: 'OPEN_FOLDER', title: t('openFolder') }]
+      : baseMenus,
+  [baseMenus, t]);
 
   const handleItemClick = (treeNode: TreeNode) => {
     if (
@@ -188,7 +192,7 @@ const Directory = observer(() => {
         sorter={sorter}
         tree={tree}
         onDrop={handleDrop}
-        emptyRenderer={() => <NoDirectory>先打开目录...</NoDirectory>}
+        emptyRenderer={() => <NoDirectory>{t('openFolderHint')}</NoDirectory>}
         onItemClick={handleItemClick}
         itemRenderer={treeItemRenderer}
         rowHeight={34}

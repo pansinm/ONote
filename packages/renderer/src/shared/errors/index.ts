@@ -4,6 +4,8 @@
  * 提供标准化的错误类和错误码，便于错误处理和用户提示
  */
 
+import i18next from '../../main/i18n';
+
 /**
  * 错误码枚举
  */
@@ -176,7 +178,7 @@ export class PluginError extends AppError {
 
   getUserMessage(): string {
     if (this.context?.pluginName) {
-      return `插件 "${this.context.pluginName as string}" 错误: ${this.message}`;
+      return i18next.t('common:pluginError', { pluginName: this.context.pluginName as string, message: this.message });
     }
     return this.message;
   }
@@ -218,7 +220,7 @@ export class LLMError extends AppError {
 
   getUserMessage(): string {
     const provider = this.context?.provider ? ` (${this.context.provider as string})` : '';
-    return `AI 助手${provider}错误: ${this.message}`;
+    return i18next.t('common:llmError', { provider, message: this.message });
   }
 }
 
@@ -243,7 +245,7 @@ export class ConfigError extends AppError {
 
   getUserMessage(): string {
     if (this.context?.configKey) {
-      return `配置项 "${this.context.configKey as string}" 错误: ${this.message}`;
+      return i18next.t('common:configError', { configKey: this.context.configKey as string, message: this.message });
     }
     return this.message;
   }
@@ -252,17 +254,18 @@ export class ConfigError extends AppError {
 /**
  * 工具函数：包装未知错误为 AppError
  */
-export function wrapError(error: unknown, defaultMessage = '操作失败'): AppError {
+export function wrapError(error: unknown, defaultMessage?: string): AppError {
+  const msg = defaultMessage || i18next.t('common:operationFailed');
   if (error instanceof AppError) {
     return error;
   }
 
   if (error instanceof Error) {
-    return new AppError(defaultMessage, ErrorCode.OPERATION_FAILED, ErrorSeverity.MEDIUM, undefined, error);
+    return new AppError(msg, ErrorCode.OPERATION_FAILED, ErrorSeverity.MEDIUM, undefined, error);
   }
 
   return new AppError(
-    defaultMessage,
+    msg,
     ErrorCode.UNKNOWN,
     ErrorSeverity.MEDIUM,
     { originalValue: error },

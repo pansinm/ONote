@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tabs } from '@sinm/react-chrome-tabs';
 import { observer } from 'mobx-react-lite';
+import { useTranslation } from 'react-i18next';
 import type { ItemParams } from 'react-contexify';
 import { Menu, Item, useContextMenu } from 'react-contexify';
 import type { TabProperties } from '@sinm/react-chrome-tabs/dist/chrome-tabs';
@@ -12,11 +13,10 @@ import 'react-contexify/dist/ReactContexify.css';
 import './index.scss';
 import { getFileIconClass } from '@sinm/react-file-tree/lib/FileItemWithFileIcon';
 import { getFileName } from '@sinm/react-file-tree/lib/utils';
-// import diagramIcon from 'bootstrap-icons/icons/diagram-2.svg';
 
 const MENU_ID = 'TABS_MENU';
 export default observer(function EditorTabs() {
-  // const [menuVisible, setMenuVisible] = useState(false);
+  const { t } = useTranslation('common');
   const { fileStore, activationStore } = stores;
   const openedFiles = activationStore.openedFiles;
   const tabs: TabProperties[] = openedFiles.map((fileUri) => {
@@ -27,7 +27,6 @@ export default observer(function EditorTabs() {
       active: isEquals(fileUri, activationStore.activeFileUri),
       id: fileUri,
       faviconClass: ` ${getFileIconClass(getFileName(fileUri), false)}`,
-      // favicon: markdownIcon as any,
     };
   });
 
@@ -88,22 +87,22 @@ export default observer(function EditorTabs() {
       ></Tabs>
       <Menu style={{ zIndex: 10001 }} id={MENU_ID}>
         <Item data={{ action: 'CLOSE' }} onClick={handleItemClick}>
-          关闭
+          {t('close')}
         </Item>
         <Item data={{ action: 'CLOSE_OTHERS' }} onClick={handleItemClick}>
-          关闭其他
+          {t('closeOther')}
         </Item>
         <Item data={{ action: 'CLOSE_RIGHT' }} onClick={handleItemClick}>
-          关闭右侧
+          {t('closeRight')}
         </Item>
         <Item data={{ action: 'CLOSE_LEFT' }} onClick={handleItemClick}>
-          关闭左侧
+          {t('closeLeft')}
         </Item>
         <Item data={{ action: 'CLOSE_SAVED' }} onClick={handleItemClick}>
-          关闭已保存
+          {t('closeSaved')}
         </Item>
         <Item data={{ action: 'CLOSE_ALL' }} onClick={handleItemClick}>
-          全部关闭
+          {t('closeAll')}
         </Item>
       </Menu>
     </>

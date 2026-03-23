@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import MonacoEditor from '../../MonacoEditor/MonacoEditor';
 import Flex from '/@/components/Flex';
 import Icon from '/@/components/Icon';
@@ -9,6 +10,7 @@ interface PlainTextPanelProps {
 }
 
 const PlainTextPanel: FC<PlainTextPanelProps> = (props) => {
+  const { t } = useTranslation('common');
   return (
     <Flex className="fullfill" flexDirection="column">
       <Flex
@@ -19,7 +21,7 @@ const PlainTextPanel: FC<PlainTextPanelProps> = (props) => {
         <div></div>
         <Flex paddingRight={10}>
           <Icon
-            title="演示"
+            title={t('demo')}
             type="play-btn-fill"
             onClick={() => window.simmer.showPreviewerWindow()}
           />

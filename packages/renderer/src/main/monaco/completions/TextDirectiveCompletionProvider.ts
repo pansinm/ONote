@@ -1,7 +1,6 @@
 import * as monaco from 'monaco-editor';
 import { isInFence } from '../utils';
-
-const DIRECTIVES = [{ label: ':tag', insertText: ':tag[$1]', detail: '文本标签' }];
+import i18next from '../../i18n';
 
 class TextDirectiveCompletionProvider implements monaco.languages.CompletionItemProvider {
   triggerCharacters = [':'];
@@ -28,8 +27,12 @@ class TextDirectiveCompletionProvider implements monaco.languages.CompletionItem
       position.column,
     );
 
+    const directives = [
+      { label: ':tag', insertText: ':tag[$1]', detail: i18next.t('common:textTag') },
+    ];
+
     return {
-      suggestions: DIRECTIVES.map((d) => ({
+      suggestions: directives.map((d) => ({
         kind: monaco.languages.CompletionItemKind.Snippet,
         label: d.label,
         insertText: d.insertText,

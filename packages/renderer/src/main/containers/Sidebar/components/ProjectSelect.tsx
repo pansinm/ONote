@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import React, { useState } from 'react';
 import type { TabListProps } from '@fluentui/react-components';
 import { TabList, Tab, makeStyles } from '@fluentui/react-components';
+import { useTranslation } from 'react-i18next';
 import {
   DeviceMeetingRoomRemoteRegular,
   FolderRegular,
@@ -32,6 +33,7 @@ interface ProjectSelectProps {
 
 const ProjectSelect: FC<ProjectSelectProps> = (props) => {
   const styles = useStyles();
+  const { t } = useTranslation('common');
   const [tab, setTab] = useState<Project['type']>('local');
   const handleSelect = async (type: typeof tab, uri: string, config: any) => {
     props.onSelect({
@@ -49,7 +51,7 @@ const ProjectSelect: FC<ProjectSelectProps> = (props) => {
     <View flexDirection="column" height={300}>
       <TabList selectedValue={tab} onTabSelect={handleTabSelect}>
         <Tab id="Local" icon={<FolderRegular />} value="local">
-          本地
+          {t('local')}
         </Tab>
         <Tab id="SSH" icon={<DeviceMeetingRoomRemoteRegular />} value="ssh">
           SSH

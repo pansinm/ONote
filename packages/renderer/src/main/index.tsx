@@ -8,14 +8,17 @@ import '../styles/index.scss';
 import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 
 import { createRoot } from 'react-dom/client';
+import { initI18n } from './i18n';
 import App from './App';
 import './hotkey';
 import './integration';
 
-const root = createRoot(document.getElementById('app') as HTMLDivElement);
+initI18n().then(() => {
+  const root = createRoot(document.getElementById('app') as HTMLDivElement);
 
-root.render(
-  <FluentProvider theme={webLightTheme}>
-    <App />
-  </FluentProvider>,
-);
+  root.render(
+    <FluentProvider theme={webLightTheme}>
+      <App />
+    </FluentProvider>,
+  );
+});

@@ -1,6 +1,7 @@
 import useConfirm from './useConfirm';
 import usePrompt from './usePrompt';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import stores from '../main/stores';
 import { alertAndThrow } from '../common/utils/alert';
 import fileService from '/@/main/services/fileService';
@@ -10,12 +11,13 @@ import Pop from '/@/utils/Pop';
 function useFileOperation() {
   const { open: openPrompt, Prompt } = usePrompt();
   const { open: openConfirm, Confirm } = useConfirm();
+  const { t } = useTranslation('menu');
 
   const createFile = async (dirUri: string, type: 'directory' | 'file') => {
     let name = await openPrompt({
-      title: '创建笔记',
+      title: t('createNote'),
       defaultValue: '',
-      description: '请输入笔记名称:',
+      description: t('inputNoteName'),
     });
     if (!name) {
       throw new Error('cancel create');
@@ -31,7 +33,7 @@ function useFileOperation() {
       const exists = existingFiles.some((file) => basename(file.uri) === name);
       if (exists) {
         Pop.showToast({
-          message: type === 'directory' ? `目录已存在：${name}` : `文件已存在：${name}`,
+          message: type === 'directory' ? t('directoryExists', { name }) : t('fileExists', { name }),
           type: 'error',
         });
         throw new Error('File already exists');
@@ -48,7 +50,6 @@ function useFileOperation() {
         uri: fileUri,
       });
 
-      // 只为文件写入模板内容，目录不需要写入
       if (type === 'file') {
         const template = await fileService
           .readText(resolveUri(dirUri + '/', 'template.md'))
@@ -62,7 +63,7 @@ function useFileOperation() {
       const err = error as NodeJS.ErrnoException;
       if (err.code === 'EEXIST') {
         Pop.showToast({
-          message: type === 'directory' ? `目录已存在：${name}` : `文件已存在：${name}`,
+          message: type === 'directory' ? t('directoryExists', { name }) : t('fileExists', { name }),
           type: 'error',
         });
         throw new Error('File already exists');
@@ -74,7 +75,7 @@ function useFileOperation() {
   const deleteFile = async (uri: string, type: 'directory' | 'file') => {
     const tips = (
       <>
-        是否删除{type === 'directory' ? '目录及子目录' : '文件'}
+        {t('confirmDelete', { type: type === 'directory' ? t('directoryAndSubdirs') : t('file') })}
         <span style={{ color: 'red' }}>
           {decodeURIComponent(uri.split('/').pop()!)}
         </span>
@@ -82,7 +83,7 @@ function useFileOperation() {
     );
     if (
       await openConfirm({
-        title: '删除',
+        title: t('deleteNote'),
         content: tips,
         shouldCloseOnEsc: true,
       })
@@ -102,9 +103,9 @@ function useFileOperation() {
   const renameFile = async (uri: string, type: 'directory' | 'file') => {
     const title = decodeURIComponent(uri.split('/').pop()!);
     const newName = await openPrompt({
-      title: '重命名',
+      title: t('renameNote'),
       defaultValue: title,
-      description: '请输入名称',
+      description: t('inputName'),
     });
     if (newName) {
       const newNode = await fileService

@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Icon from '/@/components/Icon';
 import {
   TextHanging24Regular,
@@ -23,7 +24,6 @@ const useStyles = makeStyles({
     ...shorthands.padding('10px'),
   },
   prefix: {
-    // marginRight: '5px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -59,6 +59,7 @@ const ListHeader: FC<ListHeaderProps> = ({
   onPrefixIconClick,
 }) => {
   const styles = useStyles();
+  const { t } = useTranslation('menu');
   return (
     <div className={styles.root}>
       <span className={styles.prefix}>
@@ -69,7 +70,7 @@ const ListHeader: FC<ListHeaderProps> = ({
         value={searchText}
         type="search"
         onChange={(e) => onTextChange?.(e.target.value)}
-        placeholder={`${SEARCH_ICON} 搜索文件`}
+        placeholder={`${SEARCH_ICON} ${t('searchFiles')}`}
       ></input>
       <Icon className={styles.suffix} type="plus" onClick={onNoteCreate} />
     </div>

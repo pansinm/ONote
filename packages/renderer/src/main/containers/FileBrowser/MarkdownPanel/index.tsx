@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import type { FC } from 'react';
 import { useState } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Previewer from './Previewer';
 import MonacoEditor from '../../MonacoEditor/MonacoEditor';
 import Flex from '/@/components/Flex';
@@ -33,6 +34,7 @@ interface MarkdownResourcePanelProps {
 
 const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
   (props) => {
+    const { t } = useTranslation('common');
     const [dragging, setDragging] = useState(false);
     return (
       <div
@@ -50,7 +52,7 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
           <div></div>
           <Flex paddingRight={10}>
             <Icon
-              title="演示"
+              title={t('demo')}
               type="play-btn-fill"
               onClick={() => window.simmer.showPreviewerWindow()}
             />

@@ -1,0 +1,20 @@
+{
+  "editor": "编辑器",
+  "plantuml": "PlantUML",
+  "plugin": "插件管理",
+  "gptConfig": "GPT配置",
+  "general": "通用",
+  "language": "语言",
+  "languageDesc": "选择应用界面语言",
+  "zhCN": "简体中文",
+  "enUS": "English",
+  "wordWrap": "自动换行",
+  "vimMode": "VIM 模式",
+  "fontSize": "字体大小",
+  "fontFamily": "字体",
+  "maxOpenTabs": "最大打开标签数",
+  "useLocalCache": "使用本地缓存",
+  "pluginMarket": "插件市场",
+  "installed": "已安装",
+  "uninstall": "卸载"
+}

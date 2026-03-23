@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import QRCode from './QRCode';
 import Flex from '/@/components/Flex';
 import Icon from '/@/components/Icon';
@@ -7,6 +8,7 @@ import stores from '/@/main/stores';
 import { LLM_BASE_URL } from '/@/common/constants/SettingKey';
 
 function Toolbar() {
+  const { t } = useTranslation('common');
   const toggleChatBox = () => {
     const shown = stores.layoutStore.sidebarShown;
     if (shown) {
@@ -16,7 +18,7 @@ function Toolbar() {
       if (url) {
         stores.layoutStore.showSidebar(url);
       } else {
-        alert('先在设置里面配置LLM API URL');
+        alert(t('configureLLMApiUrlFirst'));
       }
     }
   };
@@ -31,14 +33,14 @@ function Toolbar() {
       </div>
       <Flex paddingRight={10}>
         <Icon
-          title="切换布局"
+          title={t('switchLayout')}
           type="layout-split"
           size={18}
           onClick={() => stores.layoutStore.switchLayout()}
         />
         <Icon
           style={{ marginLeft: 10 }}
-          title="演示"
+          title={t('demo')}
           type="play-btn"
           size={20}
           onClick={() => window.simmer.showPreviewerWindow()}

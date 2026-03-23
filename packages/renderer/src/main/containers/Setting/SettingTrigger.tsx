@@ -12,6 +12,7 @@ import {
   ArrowExitFilled,
 } from '@fluentui/react-icons';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Setting from './Setting';
 
 const useStyles = makeStyles({
@@ -32,6 +33,7 @@ const useStyles = makeStyles({
 });
 export default function SettingTrigger() {
   const styles = useStyles();
+  const { t } = useTranslation('common');
   const [open, setOpen] = React.useState(false);
   if (!open) {
     return (
@@ -68,7 +70,7 @@ export default function SettingTrigger() {
                 await (window as any).onote.app.invoke('quit');
               }}
             >
-              退出应用
+              {t('exitApp')}
             </Button>
           </div>
         </DialogBody>

@@ -2,6 +2,7 @@ import { Checkbox, Input, makeStyles } from '@fluentui/react-components';
 import { Field } from '@fluentui/react-components';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   EDITOR_FONT_FAMILY,
   EDITOR_FONT_SIZE,
@@ -24,6 +25,7 @@ const useStyles = makeStyles({
 });
 const EditorPanel = observer(function EditorPanel() {
   const styles = useStyles();
+  const { t } = useTranslation('setting');
   const mode = stores.settingStore.settings[EDITOR_MODE];
   const toggleVIMMode = () => {
     stores.settingStore.update(
@@ -67,31 +69,31 @@ const EditorPanel = observer(function EditorPanel() {
     <div>
       <Field>
         <Checkbox
-          label={'自动换行'}
+          label={t('wordWrap')}
           checked={wordWrap === 'on'}
           onChange={toggleWordWrap}
         />
       </Field>
       <Field>
         <Checkbox
-          label={'VIM 模式'}
+          label={t('vimMode')}
           checked={mode === 'VIM_MODE'}
           onChange={toggleVIMMode}
         />
       </Field>
-      <Field className={styles.input} label="Font Size">
+      <Field className={styles.input} label={t('fontSize')}>
         <Input
           defaultValue={(fontSize as string) || '14'}
           onChange={(e) => setFontSize(e.target.value)}
         />
       </Field>
-      <Field className={styles.input} label="Font Family">
+      <Field className={styles.input} label={t('fontFamily')}>
         <Input
           defaultValue={family}
           onChange={(e) => setFamily(e.target.value)}
         />
       </Field>
-      <Field className={styles.input} label="最大打开标签数">
+      <Field className={styles.input} label={t('maxOpenTabs')}>
         <Input
           type="number"
           min="1"

@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Input from '../../../../../components/Input';
 import styles from './SSHForm.module.scss';
 import { Button } from '@fluentui/react-components';
@@ -18,6 +19,7 @@ export interface SSHFormProps {
 }
 
 const SSHForm: FC<SSHFormProps> = (props) => {
+  const { t } = useTranslation('common');
   const [disabled, setDisabled] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const handleSubmit = async () => {
@@ -65,7 +67,7 @@ const SSHForm: FC<SSHFormProps> = (props) => {
         style={{ float: 'right', height: 30 }}
         onClick={handleSubmit}
       >
-        {disabled ? '连接中' : '连接'}
+        {disabled ? t('connecting') : t('connect')}
       </Button>
     </form>
   );

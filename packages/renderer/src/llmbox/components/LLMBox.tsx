@@ -7,6 +7,7 @@
 import classNames from 'classnames';
 import type { FC } from 'react';
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
 import Header from './Header';
 import MessageList from './MessageList';
@@ -32,6 +33,7 @@ const generateId = (): string => {
 // ========== LLMBox 组件 ==========
 
 const LLMBox: FC<LLMBoxProps> = observer(({ channel, className, style }) => {
+  const { t } = useTranslation('common');
   // State
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -137,7 +139,7 @@ const LLMBox: FC<LLMBoxProps> = observer(({ channel, className, style }) => {
         onChange={setInputValue}
         onSend={handleSend}
         onClearQuote={handleClearQuote}
-        placeholder="输入消息... (Ctrl+Enter 发送)"
+        placeholder={t('inputMessagePlaceholder')}
         disabled={isLoading}
         loading={isLoading}
         minRows={3}

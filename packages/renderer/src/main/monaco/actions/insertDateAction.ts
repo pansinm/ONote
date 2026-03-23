@@ -1,9 +1,12 @@
 import type * as monaco from 'monaco-editor';
 import { getCurrentRange } from '../utils';
+import i18next from '../../i18n';
 
 const insertDateAction: monaco.editor.IActionDescriptor = {
   id: 'onote.action.insertDate',
-  label: '插入日期',
+  get label() {
+    return i18next.t('common:insertDate');
+  },
   // precondition: 'insert date',
   run: function (
     editor: monaco.editor.ICodeEditor,

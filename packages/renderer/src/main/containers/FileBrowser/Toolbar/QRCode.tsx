@@ -1,11 +1,13 @@
 import { Tooltip } from '@fluentui/react-components';
 import { QrCode20Regular } from '@fluentui/react-icons';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import _QRCode from 'react-qr-code';
 import stores from '/@/main/stores';
 import { observer } from 'mobx-react-lite';
 
 function QRCodeContent() {
+  const { t } = useTranslation('common');
   const [url, setUrl] = useState('');
 
   useEffect(() => {
@@ -18,7 +20,7 @@ function QRCodeContent() {
 
   return (
     <div>
-      <p>从手机插入文件</p>
+      <p>{t('insertFileFromPhone')}</p>
       {url ? <_QRCode style={{ width: '100%' }} value={url} /> : <p>...</p>}
       <p>{url}</p>
     </div>

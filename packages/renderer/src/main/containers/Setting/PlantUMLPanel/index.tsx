@@ -5,6 +5,7 @@ import {
 } from '@fluentui/react-components';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   PLANTUML_ENDPOINT,
   PLANTUML_USECACHE,
@@ -12,6 +13,7 @@ import {
 import stores from '/@/main/stores';
 
 function PlantUMLPanel() {
+  const { t } = useTranslation('setting');
   const server = stores.settingStore.settings[PLANTUML_ENDPOINT] as string;
   const useCache =
     (stores.settingStore.settings[PLANTUML_USECACHE] as boolean) || false;
@@ -27,7 +29,7 @@ function PlantUMLPanel() {
         />
       </Field>
       <CheckboxField
-        label={'使用本地缓存'}
+        label={t('useLocalCache')}
         checked={useCache}
         onChange={(e, data) =>
           stores.settingStore.update(PLANTUML_USECACHE, data.checked)

@@ -6,6 +6,7 @@
 
 import type { ErrorInfo, ReactNode } from 'react';
 import React, { Component } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AppError} from '/@/shared/errors';
 import { wrapError } from '/@/shared/errors';
 import { getLogger } from '/@/shared/logger';
@@ -92,6 +93,7 @@ interface DefaultErrorUIProps {
 }
 
 const DefaultErrorUI: React.FC<DefaultErrorUIProps> = ({ error, retry }) => {
+  const { t } = useTranslation('common');
   const showDetails =
     process.env.NODE_ENV === 'development' || error.severity === 'high';
 
@@ -106,7 +108,7 @@ const DefaultErrorUI: React.FC<DefaultErrorUIProps> = ({ error, retry }) => {
         color: '#721c24',
       }}
     >
-      <h3>⚠️ 出错了</h3>
+      <h3>⚠️ {t('error')}</h3>
       <p style={{ marginTop: '10px' }}>{error.getUserMessage()}</p>
 
       {showDetails && (
@@ -115,7 +117,7 @@ const DefaultErrorUI: React.FC<DefaultErrorUIProps> = ({ error, retry }) => {
             style={{ cursor: 'pointer', fontWeight: 'bold' }}
             onClick={(e) => e.preventDefault()}
           >
-            详细信息
+            {t('details')}
           </summary>
           <div
             style={{
@@ -131,19 +133,19 @@ const DefaultErrorUI: React.FC<DefaultErrorUIProps> = ({ error, retry }) => {
             }}
           >
             <div>
-              <strong>错误类型:</strong> {error.name}
+              <strong>{t('errorType')}:</strong> {error.name}
             </div>
             <div style={{ marginTop: '5px' }}>
-              <strong>错误消息:</strong> {error.message}
+              <strong>{t('errorMessage')}:</strong> {error.message}
             </div>
             {error.code && (
               <div style={{ marginTop: '5px' }}>
-                <strong>错误码:</strong> {error.code}
+                <strong>{t('errorCode')}:</strong> {error.code}
               </div>
             )}
             {error.context && Object.keys(error.context).length > 0 && (
               <div style={{ marginTop: '5px' }}>
-                <strong>上下文:</strong>
+                <strong>{t('context')}:</strong>
                 <pre style={{ margin: '5px 0 0 0' }}>
                   {JSON.stringify(error.context, null, 2)}
                 </pre>
@@ -151,7 +153,7 @@ const DefaultErrorUI: React.FC<DefaultErrorUIProps> = ({ error, retry }) => {
             )}
             {error.stack && (
               <div style={{ marginTop: '10px' }}>
-                <strong>堆栈跟踪:</strong>
+                <strong>{t('stackTrace')}:</strong>
                 <pre style={{ margin: '5px 0 0 0', maxHeight: '200px', overflow: 'auto' }}>
                   {error.stack}
                 </pre>
@@ -180,7 +182,7 @@ const DefaultErrorUI: React.FC<DefaultErrorUIProps> = ({ error, retry }) => {
             e.currentTarget.style.backgroundColor = '#007bff';
           }}
         >
-          重试
+          {t('retry')}
         </button>
       </div>
     </div>

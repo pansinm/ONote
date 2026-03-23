@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { useState } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@fluentui/react-components';
 import FileIcon from '/@/components/FileIcon';
 import View from '/@/components/View';
@@ -11,6 +12,7 @@ interface UnSupportProps {
 }
 
 const UnSupport: FC<UnSupportProps> = (props) => {
+  const { t } = useTranslation('common');
   const [opening, setOpening] = useState(false);
   const handleClick = async () => {
     try {
@@ -32,9 +34,9 @@ const UnSupport: FC<UnSupportProps> = (props) => {
       <View flexDirection="column" alignItems={'center'}>
         <FileIcon size={40} uri={props.uri}></FileIcon>
         <p style={{ marginTop: 10 }}>{basename(props.uri)}</p>
-        <p>不支持当前文件格式</p>
+        <p>{t('unsupportedFileFormat')}</p>
         <Button appearance="primary" disabled={opening} onClick={handleClick}>
-          使用系统应用打开
+          {t('openWithSystemApp')}
         </Button>
       </View>
     </View>

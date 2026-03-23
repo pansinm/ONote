@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import diagramEngine from './engine';
 import Block from '../../markdown/handlers/components/Block';
 import Icon from '/@/components/Icon';
@@ -45,6 +46,7 @@ export function Diagram(props: {
   meta: any;
   lang: string;
 }) {
+  const { t } = useTranslation('common');
   const ref = useRef<HTMLDivElement>(null);
   const [renderedContent, setRenderedContent] = useState<string>('');
   const { openPreview } = useImagePreview();
@@ -89,7 +91,7 @@ export function Diagram(props: {
     <Block
       className={props.className}
       icons={
-        <Icon type="images" title="复制成图片" onClick={handleCopyImg}></Icon>
+        <Icon type="images" title={t('copyAsImage')} onClick={handleCopyImg}></Icon>
       }
     >
       <div ref={ref} onDoubleClick={handleDoubleClick}></div>

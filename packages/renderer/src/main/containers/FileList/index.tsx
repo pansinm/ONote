@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import type { FC } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useState } from 'react';
 import React from 'react';
 import { useContextMenu } from 'react-contexify';
+import { useTranslation } from 'react-i18next';
 import styles from './index.module.scss';
 import stores from '../../stores';
 import ListHeader from './ListHeader';
@@ -27,53 +28,54 @@ const logger = getLogger('FileList');
 
 const MENU_ID = 'NOTE_MENU';
 
-const BASE_MENUS: MenuItem[] = [
-  {
-    id: 'CREATE_NOTE',
-    title: '创建笔记',
-  },
-  {
-    id: 'RENAME_NOTE',
-    title: '修改名称',
-  },
-  {
-    id: 'DELETE_NOTE',
-    title: '删除笔记',
-  },
-  {
-    id: 'COPY_PATH',
-    title: '复制路径',
-  },
-  {
-    id: 'EXPORT_PDF',
-    title: '导出为 PDF',
-  },
-  {
-    id: 'SORTER',
-    title: '文件排序',
-    children: [
-      {
-        id: 'SORTER_NAME_ASC',
-        title: '名字排序',
-      },
-      {
-        id: 'SORTER_NAME_DESC',
-        title: '名字倒序',
-      },
-      {
-        id: 'SORTER_TIME_ASC',
-        title: '时间排序',
-      },
-      {
-        id: 'SORTER_TIME_DESC',
-        title: '时间倒序',
-      },
-    ],
-  },
-];
-
 const FileList: FC = observer(() => {
   const { activationStore } = stores;
+  const { t } = useTranslation('menu');
+
+  const baseMenus: MenuItem[] = useMemo(() => [
+    {
+      id: 'CREATE_NOTE',
+      title: t('createNote'),
+    },
+    {
+      id: 'RENAME_NOTE',
+      title: t('renameNote'),
+    },
+    {
+      id: 'DELETE_NOTE',
+      title: t('deleteNote'),
+    },
+    {
+      id: 'COPY_PATH',
+      title: t('copyPath'),
+    },
+    {
+      id: 'EXPORT_PDF',
+      title: t('exportPdf'),
+    },
+    {
+      id: 'SORTER',
+      title: t('fileSort'),
+      children: [
+        {
+          id: 'SORTER_NAME_ASC',
+          title: t('sortNameAsc'),
+        },
+        {
+          id: 'SORTER_NAME_DESC',
+          title: t('sortNameDesc'),
+        },
+        {
+          id: 'SORTER_TIME_ASC',
+          title: t('sortTimeAsc'),
+        },
+        {
+          id: 'SORTER_TIME_DESC',
+          title: t('sortTimeDesc'),
+        },
+      ],
+    },
+  ], [t]);
 
   const [text, setText] = useState('');
   const [files, setFiles] = useState<TreeNode[]>([]);
@@ -112,7 +114,7 @@ const FileList: FC = observer(() => {
     if (stores.activationStore.activeDirUri) {
       createFile(stores.activationStore.activeDirUri, 'file');
     } else {
-      alert('请选中笔记本');
+      alert(t('selectNotebook'));
     }
   };
 
@@ -157,7 +159,7 @@ const FileList: FC = observer(() => {
   };
   const handleDrop = (ev: React.DragEvent) => {
     if (!activationStore.activeDirUri) {
-      alert('未选中目录');
+      alert(t('selectDirectory'));
       return;
     }
     setBackground('transparent');
@@ -222,10 +224,11 @@ const FileList: FC = observer(() => {
     };
   }, [activationStore.activeDirUri]);
 
-  const menus =
+  const menus = useMemo(() =>
     stores.activationStore.dataSourceId === 'local'
-      ? [...BASE_MENUS, { id: 'OPEN_FOLDER', title: '打开所在文件夹' }]
-      : BASE_MENUS;
+      ? [...baseMenus, { id: 'OPEN_FOLDER', title: t('openFolder') }]
+      : baseMenus,
+  [baseMenus, t]);
 
   return (
     <Flex flexDirection="column" className={styles.NoteList}>
@@ -244,7 +247,6 @@ const FileList: FC = observer(() => {
             background,
           }}
           draggable
-          // onDragEnter={() => setBackground('rgba(0,0,0,0.2)')}
           onDragLeave={() => setBackground('transparent')}
           onDragOver={handleDragover}
           onDrop={handleDrop}

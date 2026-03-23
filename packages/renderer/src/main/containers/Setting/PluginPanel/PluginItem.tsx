@@ -12,6 +12,7 @@ import {
   shorthands,
   Text,
 } from '@fluentui/react-components';
+import { useTranslation } from 'react-i18next';
 import { ArrowDownloadRegular, ArrowSyncRegular } from '@fluentui/react-icons';
 import type { IPlugin } from '../../../services/pluginManager';
 import pluginManager from '../../../services/pluginManager';
@@ -21,7 +22,6 @@ const logger = getLogger('PluginItem');
 
 interface PluginItemProps {
   plugin: IPlugin;
-  // logo: string;
   onInstalled?(plugin: IPlugin): void;
   onUninstalled?(plugin: IPlugin): void;
 }
@@ -38,17 +38,17 @@ const useStyles = makeStyles({
 function PluginItem({ plugin, onInstalled, onUninstalled }: PluginItemProps) {
   const [installing, setInstalling] = useState(false);
   const styles = useStyles();
+  const { t } = useTranslation('setting');
 
   return (
     <Card size="large" className={styles.card}>
       <CardHeader
-        // image={{ as: 'img', src: props.logo }}
         header={<Text weight="semibold">{plugin.title}</Text>}
         description={<Caption1>{plugin.name}</Caption1>}
         action={
           plugin.state === 'installed' && !plugin.hasUpdate ? (
             <>
-              <Button disabled>已安装</Button>
+              <Button disabled>{t('installed')}</Button>
               <Button
                 onClick={() => {
                   pluginManager
@@ -57,7 +57,7 @@ function PluginItem({ plugin, onInstalled, onUninstalled }: PluginItemProps) {
                     .then(() => onUninstalled?.(plugin));
                 }}
               >
-                卸载
+                {t('uninstall')}
               </Button>
             </>
           ) : (
@@ -79,7 +79,6 @@ function PluginItem({ plugin, onInstalled, onUninstalled }: PluginItemProps) {
                     onInstalled?.(plugin);
                   })
                   .finally(() => setInstalling(true));
-                // todo
               }}
             />
           )

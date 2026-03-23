@@ -6,6 +6,7 @@ import { orderBy } from 'lodash';
 import type { FC } from 'react';
 import { useEffect } from 'react';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import FileTreeItem from '/@/components/FileTreeItem';
 import View from '/@/components/View';
 import { isEquals } from '/@/common/utils/uri';
@@ -26,6 +27,7 @@ const sorter = (treeNodes: TreeNode[]) =>
   );
 
 const GiteeDirSelect: FC<SSHDirSelectProps> = (props) => {
+  const { t } = useTranslation('common');
   const [selected, setSelected] = useState('');
   const [tree, setTree] = useState<TreeNode | undefined>(undefined);
 
@@ -84,14 +86,14 @@ const GiteeDirSelect: FC<SSHDirSelectProps> = (props) => {
         <FileTree
           tree={tree}
           sorter={sorter}
-          emptyRenderer={() => <div>加载中，请稍候...</div>}
+          emptyRenderer={() => <div>{t('pleaseWait')}</div>}
           itemRenderer={itemRenderer}
           onItemClick={handleItemClick}
         ></FileTree>
       </View>
       <View paddingTop={10} justifyContent="flex-end">
         <Button appearance="primary" onClick={handleClick}>
-          打开
+          {t('open')}
         </Button>
       </View>
     </View>

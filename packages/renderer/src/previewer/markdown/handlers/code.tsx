@@ -2,6 +2,7 @@
 /* eslint-disable react/display-name */
 import type { Code as ICode } from 'mdast';
 import React, { useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import Block from './components/Block';
 import Prism from './util/Prism';
 import cz from 'classnames';
@@ -53,6 +54,7 @@ export interface CodeBlockProps extends CodeProps {
 }
 
 function CodeBlock(props: CodeBlockProps) {
+  const { t } = useTranslation('common');
   const codeRef = useRef<HTMLPreElement>(null);
   const handleCopyImg = useCallback(() => {
     const pre = codeRef.current;
@@ -64,7 +66,7 @@ function CodeBlock(props: CodeBlockProps) {
     <Block
       className={props.className}
       icons={
-        <Icon type="images" title="复制成图片" onClick={handleCopyImg}></Icon>
+        <Icon type="images" title={t('copyAsImage')} onClick={handleCopyImg}></Icon>
       }
     >
       <Code

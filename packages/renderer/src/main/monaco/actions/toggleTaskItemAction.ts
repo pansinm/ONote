@@ -1,9 +1,12 @@
 import * as monaco from 'monaco-editor';
 import { applyModelEdits, toggleTask } from '../utils';
+import i18next from '../../i18n';
 
 const toggleTaskItemAction: monaco.editor.IActionDescriptor = {
   id: 'onote.action.toggleTaskListAction',
-  label: '切换任务完成状态',
+  get label() {
+    return i18next.t('common:toggleTaskStatus');
+  },
   // precondition: 'insert date',
   keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.KeyD],
   run: function (

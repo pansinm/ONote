@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import i18next from '../../i18n';
 
 class QuickInsertCompletionItemProvider
   implements monaco.languages.CompletionItemProvider
@@ -21,13 +22,13 @@ class QuickInsertCompletionItemProvider
       };
     }
 
-    // range 应该只包含 @ 字符本身，从 startIndex + 1 开始，到 startIndex + 2 结束
     const range = new monaco.Range(
       position.lineNumber,
       startIndex + 1,
       position.lineNumber,
       position.column - 1,
     );
+    const t = i18next.t.bind(i18next);
     return {
       suggestions: [
         {
@@ -35,10 +36,10 @@ class QuickInsertCompletionItemProvider
           insertText: '',
           command: {
             id: 'onote.command.insertDate',
-            title: '插入日期',
+            title: t('common:insertDate'),
             arguments: [model, range],
           },
-          label: '插入日期',
+          label: t('common:insertDate'),
           filterText: '@riqi date insert',
           range,
         },
@@ -47,10 +48,10 @@ class QuickInsertCompletionItemProvider
           insertText: '',
           command: {
             id: 'onote.command.insertTime',
-            title: '插入时间',
+            title: t('common:insertTime'),
             arguments: [model, range],
           },
-          label: '插入时间',
+          label: t('common:insertTime'),
           filterText: '@shijian time insert',
           range,
         },

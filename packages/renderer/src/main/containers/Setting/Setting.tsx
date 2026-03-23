@@ -5,10 +5,13 @@ import {
   makeStyles,
   shorthands,
 } from '@fluentui/react-components';
+import { useTranslation } from 'react-i18next';
+import { observer } from 'mobx-react-lite';
 import PluginManager from './PluginPanel/PluginManager';
 import EditorPanel from './EditorPanel';
 import PlantUMLPanel from './PlantUMLPanel';
 import ChatGPT from './ChatGPT';
+import GeneralPanel from './GeneralPanel';
 
 const useStyles = makeStyles({
   root: {
@@ -25,9 +28,10 @@ const useStyles = makeStyles({
   },
 });
 
-export default function Setting() {
+const Setting: React.FC = observer(() => {
   const styles = useStyles();
-  const [tab, setTab] = useState('editor');
+  const { t } = useTranslation('setting');
+  const [tab, setTab] = useState('general');
   return (
     <div className={styles.root}>
       <TabList
@@ -36,12 +40,14 @@ export default function Setting() {
         onTabSelect={(e, data) => setTab(data.value as string)}
         vertical
       >
-        <Tab value="editor">编辑器</Tab>
+        <Tab value="general">{t('general')}</Tab>
+        <Tab value="editor">{t('editor')}</Tab>
         <Tab value="plantuml">PlantUML</Tab>
-        <Tab value="plugin">插件管理</Tab>
-        <Tab value="chatgpt">GPT配置</Tab>
+        <Tab value="plugin">{t('plugin')}</Tab>
+        <Tab value="chatgpt">{t('gptConfig')}</Tab>
       </TabList>
       <div className={styles.panel}>
+        {tab === 'general' && <GeneralPanel />}
         {tab === 'editor' && <EditorPanel />}
         {tab === 'plantuml' && <PlantUMLPanel />}
         {tab === 'plugin' && <PluginManager />}
@@ -49,4 +55,6 @@ export default function Setting() {
       </div>
     </div>
   );
-}
+});
+
+export default Setting;
