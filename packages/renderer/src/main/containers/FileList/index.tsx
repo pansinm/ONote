@@ -16,7 +16,7 @@ import Flex from '/@/components/Flex';
 import SearchList from './SearchList';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { useLatest } from 'react-use';
-import { isEquals, resolveUri, pathanme } from '../../../common/utils/uri';
+import { isEquals, resolveUri, pathanme, getParentUri } from '../../../common/utils/uri';
 import { blobToBuffer } from '../../../common/utils/transform';
 import fileService from '../../services/fileService';
 import { FILE_CONTENT_CHANGED } from '../../eventbus/EventName';
@@ -27,7 +27,7 @@ const logger = getLogger('FileList');
 
 const MENU_ID = 'NOTE_MENU';
 
-const menus: MenuItem[] = [
+const BASE_MENUS: MenuItem[] = [
   {
     id: 'CREATE_NOTE',
     title: '创建笔记',
@@ -143,6 +143,8 @@ const FileList: FC = observer(() => {
         const content = await fileService.readText(uri);
         return window.onote.export.invoke('exportToPdf', uri, content);
       }
+      case 'OPEN_FOLDER':
+        return window.simmer.openPath(getParentUri(uri));
       default:
         return;
     }
@@ -219,6 +221,12 @@ const FileList: FC = observer(() => {
       eventbus.off(FILE_CONTENT_CHANGED, handleFileContentChanged);
     };
   }, [activationStore.activeDirUri]);
+
+  const menus =
+    stores.activationStore.dataSourceId === 'local'
+      ? [...BASE_MENUS, { id: 'OPEN_FOLDER', title: '打开所在文件夹' }]
+      : BASE_MENUS;
+
   return (
     <Flex flexDirection="column" className={styles.NoteList}>
       <ListHeader
