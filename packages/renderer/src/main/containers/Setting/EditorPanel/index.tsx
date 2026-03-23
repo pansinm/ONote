@@ -7,6 +7,7 @@ import {
   EDITOR_FONT_SIZE,
   EDITOR_MODE,
   EDITOR_WORD_WRAP,
+  MAX_OPEN_TABS,
 } from '/@/common/constants/SettingKey';
 import stores from '/@/main/stores';
 import { getLogger } from '/@/shared/logger';
@@ -54,6 +55,14 @@ const EditorPanel = observer(function EditorPanel() {
       wordWrap === 'on' ? 'off' : 'on',
     );
   };
+
+  const maxOpenTabs = stores.settingStore.settings[MAX_OPEN_TABS];
+  const setMaxOpenTabs = (val: string) => {
+    const num = parseInt(val, 10);
+    if (!isNaN(num) && num > 0) {
+      stores.settingStore.update(MAX_OPEN_TABS, num);
+    }
+  };
   return (
     <div>
       <Field>
@@ -80,6 +89,14 @@ const EditorPanel = observer(function EditorPanel() {
         <Input
           defaultValue={family}
           onChange={(e) => setFamily(e.target.value)}
+        />
+      </Field>
+      <Field className={styles.input} label="最大打开标签数">
+        <Input
+          type="number"
+          min="1"
+          defaultValue={(maxOpenTabs as string) || '10'}
+          onChange={(e) => setMaxOpenTabs(e.target.value)}
         />
       </Field>
     </div>

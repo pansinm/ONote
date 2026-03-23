@@ -1,7 +1,9 @@
-import { makeAutoObservable, reaction, runInAction } from 'mobx';
+import { makeAutoObservable, reaction } from 'mobx';
 import _ from 'lodash';
 import type FileStateStore from './FileStore';
 import { isEquals } from '/@/common/utils/uri';
+import type SettingStore from './SettingStore';
+import { MAX_OPEN_TABS } from '/@/common/constants/SettingKey';
 
 class ActivationStore {
   openedFiles: string[] = [];
@@ -20,12 +22,17 @@ class ActivationStore {
 
   fileStore: FileStateStore;
 
+  settingStore: SettingStore;
+
+  fileActivationTimes: Map<string, number> = new Map();
+
   activatePage(page: 'notebook') {
     this.activatedPage = page;
   }
 
-  constructor(fileStore: FileStateStore) {
+  constructor(fileStore: FileStateStore, settingStore: SettingStore) {
     this.fileStore = fileStore;
+    this.settingStore = settingStore;
     makeAutoObservable(this);
     reaction(
       () => this.openedFiles,
@@ -51,6 +58,30 @@ class ActivationStore {
   activeFile(uri: string) {
     if (uri) {
       this.openedFiles = _.uniq([...this.openedFiles, uri]);
+      this.fileActivationTimes.set(uri, Date.now());
+
+      const maxTabs = parseInt(String(this.settingStore.settings[MAX_OPEN_TABS] || '10'), 10);
+      const limit = maxTabs > 0 ? maxTabs : 10;
+
+      if (this.openedFiles.length > limit) {
+        let oldestUri = '';
+        let oldestTime = Infinity;
+
+        for (const fileUri of this.openedFiles) {
+          if (fileUri !== uri) {
+            const time = this.fileActivationTimes.get(fileUri) || 0;
+            if (time < oldestTime) {
+              oldestTime = time;
+              oldestUri = fileUri;
+            }
+          }
+        }
+
+        if (oldestUri) {
+          this.openedFiles = this.openedFiles.filter((f) => f !== oldestUri);
+          this.fileActivationTimes.delete(oldestUri);
+        }
+      }
     }
     this.activeFileUri = uri;
     this.activatePage('notebook');
@@ -62,6 +93,7 @@ class ActivationStore {
     );
     if (index > -1) {
       this.openedFiles = this.openedFiles.filter((fileUri) => fileUri !== uri);
+      this.fileActivationTimes.delete(uri);
       if (isEquals(uri, this.activeFileUri)) {
         this.activeFile(
           this.openedFiles[index - 1] || this.openedFiles[index] || '',
@@ -102,6 +134,11 @@ class ActivationStore {
       }
       return file;
     });
+    const activationTime = this.fileActivationTimes.get(uri);
+    if (activationTime !== undefined) {
+      this.fileActivationTimes.delete(uri);
+      this.fileActivationTimes.set(newUri, activationTime);
+    }
     if (isEquals(this.activeFileUri, newUri)) {
       this.activeFile(newUri);
     }
@@ -187,6 +224,7 @@ class ActivationStore {
   closeAllFiles() {
     this.activeFile('');
     this.openedFiles = [];
+    this.fileActivationTimes.clear();
   }
 
   /** 关闭已保存标签 */

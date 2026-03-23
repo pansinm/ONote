@@ -17,3 +17,5 @@ export const LLM_API_KEY = 'chatgpt.api-key';
 export const LLM_MODEL_NAME = 'chatgpt.model-name';
 
 export const CHATGPT_MESSAGE_CLASS_STARTS_WITH = 'chatgpt.class';
+
+export const MAX_OPEN_TABS = 'editor.max-open-tabs';
