@@ -1,4 +1,4 @@
-@import '../styles/scrollbar.scss';
+@use '../styles/scrollbar.scss' as *;
 :root {
   --base-size-4: 0.25rem;
   --base-size-8: 0.5rem;
