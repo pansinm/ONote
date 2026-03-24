@@ -1,6 +1,8 @@
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
+const { default: pngToIco } = require('png-to-ico');
+const png2icons = require('png2icons');
 
 const svgPath = path.join(__dirname, '../buildResources/icon.svg');
 const outputDir = path.join(__dirname, '../buildResources');
@@ -31,6 +33,22 @@ async function generateIcons() {
       .toFile(path.join(outputDir, `icon-${size}x${size}.png`));
     console.log(`✓ Generated icon-${size}x${size}.png`);
   }
+
+  // 生成 .ico 文件 (Windows)
+  const icoBuffer = await pngToIco([
+    path.join(outputDir, 'icon-16x16.png'),
+    path.join(outputDir, 'icon-32x32.png'),
+    path.join(outputDir, 'icon-48x48.png'),
+    path.join(outputDir, 'icon-256x256.png'),
+  ]);
+  fs.writeFileSync(path.join(outputDir, 'icon.ico'), icoBuffer);
+  console.log('✓ Generated icon.ico');
+
+  // 生成 .icns 文件 (macOS)
+  const pngBuffer = fs.readFileSync(path.join(outputDir, 'icon.png'));
+  const icnsBuffer = await png2icons.createICNS(pngBuffer, png2icons.BILINEAR, 0);
+  fs.writeFileSync(path.join(outputDir, 'icon.icns'), icnsBuffer);
+  console.log('✓ Generated icon.icns');
 
   console.log('\n✓ All icons generated successfully!');
 }
