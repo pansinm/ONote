@@ -24,11 +24,18 @@ const config = {
   extraMetadata: {
     version: process.env.APP_VERSION,
   },
+  afterPack: './scripts/afterPack.js',
   linux: {
     target: ['deb', 'rpm', 'AppImage'],
     category: 'Utility',
     icon: 'buildResources/icon.png',
     maintainer: 'pansinm <pansinm@foxmail.com>',
+  },
+  deb: {
+    afterInstall: './scripts/linux-postinstall.sh',
+  },
+  rpm: {
+    afterInstall: './scripts/linux-postinstall.sh',
   },
   mac: {
     icon: './buildResources/icon.icns',
@@ -43,6 +50,7 @@ const config = {
   },
   nsis: {
     perMachine: false,
+    include: './scripts/nsis-installer.nsh',
   },
 };
 

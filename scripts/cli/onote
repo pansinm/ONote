@@ -1,0 +1,12 @@
+#!/bin/bash
+# ONote CLI tool
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  APP_PATH="$SCRIPT_DIR/../../MacOS/ONote"
+else
+  APP_PATH="$SCRIPT_DIR/../onote"
+fi
+
+exec "$APP_PATH" "$@"

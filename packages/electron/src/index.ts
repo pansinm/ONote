@@ -16,6 +16,7 @@ import { pluginManager as pluginManager } from './plugin';
 import './tunnel';
 import { pathToFileURL } from 'url';
 import { initLogger, getLogger, LogLevel } from '/@/shared/logger';
+import { checkAndPromptCliInstall } from './cli-installer';
 
 // 初始化日志系统
 initLogger({
@@ -124,6 +125,7 @@ app
   .then(() => startIpcServer())
   .then(() => restoreOrCreateWindow('main'))
   .then(() => pluginManager.loadAll())
+  .then(() => checkAndPromptCliInstall())
   .catch((e) => logger.error('Failed create window', e));
 
 app.whenReady().then(() => {
