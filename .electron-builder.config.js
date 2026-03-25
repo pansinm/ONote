@@ -19,11 +19,13 @@ const config = {
     {
       from: 'buildResources',
       to: 'buildResources',
+      filter: ['icon.png', 'tray-icon.png'],
     },
   ],
   extraMetadata: {
     version: process.env.APP_VERSION,
   },
+  compression: 'maximum',
   afterPack: './scripts/afterPack.js',
   linux: {
     target: ['deb', 'rpm', 'AppImage'],
@@ -41,7 +43,13 @@ const config = {
     icon: './buildResources/icon.icns',
     gatekeeperAssess: false,
     hardenedRuntime: true,
-    target: ['dmg', 'zip'],
+    target: [
+      { target: 'dmg', arch: ['x64', 'arm64'] },
+      { target: 'zip', arch: ['x64', 'arm64'] },
+    ],
+  },
+  dmg: {
+    writeUpdateInfo: false,
   },
   artifactName: 'ONote-${os}-${arch}-${version}.${ext}',
   win: {
@@ -51,6 +59,8 @@ const config = {
   nsis: {
     perMachine: false,
     include: './scripts/nsis-installer.nsh',
+    oneClick: false,
+    allowToChangeInstallationDirectory: true,
   },
 };
 
