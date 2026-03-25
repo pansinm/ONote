@@ -14,12 +14,7 @@ function Toolbar() {
     if (shown) {
       stores.layoutStore.hideSidebar();
     } else {
-      const url = './llmbox.html';
-      if (url) {
-        stores.layoutStore.showSidebar(url);
-      } else {
-        alert(t('configureLLMApiUrlFirst'));
-      }
+      stores.layoutStore.showSidebar('llmbox');
     }
   };
   return (

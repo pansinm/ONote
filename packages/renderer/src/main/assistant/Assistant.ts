@@ -5,7 +5,7 @@ import type {
   AgentStepEvent,
   ExecutionStep,
   ToolCall,
-} from '/@/llmbox/types/AgentEvents';
+} from '/@/main/types/AgentEvents';
 import stores from '../stores';
 import { v4 as uuidv4 } from 'uuid';
 import { buildMessageState } from './prompts';

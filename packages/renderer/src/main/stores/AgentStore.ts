@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import type { AgentStepEvent, ExecutionStep } from '../types/AgentEvents';
+import type { AgentStepEvent, ExecutionStep } from '/@/main/types/AgentEvents';
 import { v4 as uuidv4 } from 'uuid';
 
 export class AgentStore {

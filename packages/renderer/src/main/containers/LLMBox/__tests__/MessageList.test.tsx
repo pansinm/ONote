@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import MessageList, { type MessageListRef } from '../MessageList';
-import type { UserMessage, AgentMessage } from '../../types/IMessage';
+import type { UserMessage, AgentMessage } from '/@/main/types/IMessage';
 
 global.IntersectionObserver = class IntersectionObserver {
   constructor(

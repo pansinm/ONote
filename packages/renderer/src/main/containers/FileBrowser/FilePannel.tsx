@@ -11,7 +11,7 @@ import { filePanelManager } from '../../frame';
 import { isEquals, isMarkdown } from '/@/common/utils/uri';
 import Toolbar from './Toolbar';
 import stores from '../../stores';
-import LLMBoxFrame from '../LLMBox/LLMBoxFrame';
+import LLMBoxContainer from '../LLMBox';
 import { DragIndicator, DragHandle } from '/@/components/DragBarNew';
 import { useResizable, DragType } from '/@/common/hooks/useResizable';
 import { resetWidths, loadSavedWidths } from '/@/common/constants/resize';
@@ -197,7 +197,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
                   }
                   onDoubleClick={resetWidths}
                 />
-                <LLMBoxFrame />
+                <LLMBoxContainer />
               </div>
             )}
           </div>

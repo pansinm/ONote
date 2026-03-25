@@ -6,7 +6,7 @@ import type {
   AgentMessage,
   WorkStep,
   ToolCall,
-} from '../../types/IMessage';
+} from '/@/main/types/IMessage';
 
 // Mock react-markdown to avoid ESM issues
 jest.mock('react-markdown', () => ({ children }: any) => <>{children}</>);

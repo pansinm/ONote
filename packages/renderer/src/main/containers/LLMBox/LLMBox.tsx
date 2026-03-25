@@ -6,23 +6,21 @@
 
 import classNames from 'classnames';
 import type { FC } from 'react';
-import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
 import Header from './Header';
 import MessageList from './MessageList';
 import type { MessageListRef } from './MessageList';
 import InputArea from './InputArea';
-import type { Message, UserMessage, AgentMessage } from '../types/IMessage';
+import type { Message, UserMessage, AgentMessage } from '/@/main/types/IMessage';
 import styles from './LLMBox.module.scss';
-import type { IChannel } from '../ipc/constants';
-import { useMainIpc } from '../ipc';
-import { AgentStore } from '../stores/AgentStore';
+import { assistant } from '../../assistant';
+import stores from '../../stores';
 
 export interface LLMBoxProps {
   className?: string;
   style?: React.CSSProperties;
-  channel: IChannel;
 }
 
 // 生成唯一 ID
@@ -32,15 +30,14 @@ const generateId = (): string => {
 
 // ========== LLMBox 组件 ==========
 
-const LLMBox: FC<LLMBoxProps> = observer(({ channel, className, style }) => {
+const LLMBox: FC<LLMBoxProps> = observer(({ className, style }) => {
   const { t } = useTranslation('common');
   // State
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const agentStore = useMemo(() => new AgentStore(), []);
-  const ipc = useMainIpc(channel);
+  const { agentStore } = stores;
 
   // Refs
   const messageListRef = useRef<MessageListRef>(null);
@@ -68,7 +65,7 @@ const LLMBox: FC<LLMBoxProps> = observer(({ channel, className, style }) => {
     messageListRef.current?.scrollToBottom('auto');
     setIsLoading(true);
 
-    ipc.sendMessage(inputValue, async (event) => {
+    assistant.chat(inputValue, async (event) => {
       agentStore.handleEvent(event);
 
       if (event.type === 'step-start' || event.type === 'step-delta' || event.type === 'step-complete') {
@@ -120,7 +117,7 @@ const LLMBox: FC<LLMBoxProps> = observer(({ channel, className, style }) => {
         );
       }
     });
-  }, [inputValue, isLoading, agentStore, messages, ipc]);
+  }, [inputValue, isLoading, agentStore, messages]);
 
   const handleClearQuote = useCallback(() => {
     // 当前没有实现引用功能，预留接口

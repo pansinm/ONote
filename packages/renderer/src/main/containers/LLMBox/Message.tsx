@@ -25,7 +25,7 @@ import type {
   AgentMessage,
   WorkStep,
   ToolCall,
-} from '../types/IMessage';
+} from '/@/main/types/IMessage';
 import styles from './Message.module.scss';
 
 // ========== Props 接口 ==========

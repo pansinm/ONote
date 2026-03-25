@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import type { FC, RefObject } from 'react';
 import React, { useRef, useEffect, useCallback, useState } from 'react';
-import type { Message as MessageType } from '../types/IMessage';
+import type { Message as MessageType } from '/@/main/types/IMessage';
 import IMessage from './Message';
 import styles from './MessageList.module.scss';
 

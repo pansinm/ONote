@@ -4,6 +4,7 @@ import FileStateStore from './FileStore';
 import I18nStore from './I18nStore';
 import LayoutStore from './LayoutStore';
 import SettingStore from './SettingStore';
+import { AgentStore } from './AgentStore';
 
 const fileStore = new FileStateStore();
 const settingStore = new SettingStore();
@@ -15,4 +16,5 @@ export default {
   settingStore,
   layoutStore: new LayoutStore(),
   fileListStore: new FileListStore(activationStore),
+  agentStore: new AgentStore(),
 };
