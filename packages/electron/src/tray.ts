@@ -14,13 +14,10 @@ function getIconPath() {
 export function createTrayIcon() {
   if (!tray) {
     const iconPath = getIconPath();
-    let icon = nativeImage.createFromPath(iconPath);
+    const icon = nativeImage.createFromPath(iconPath);
 
     if (process.platform === 'darwin') {
-      icon = icon.resize({ width: 16, height: 16 });
       icon.setTemplateImage(true);
-    } else {
-      icon = icon.resize({ width: 16, height: 16 });
     }
 
     tray = new Tray(icon);
