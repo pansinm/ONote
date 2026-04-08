@@ -2,7 +2,9 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import ResourcePanel from '../FileBrowser';
 import ResourceTabs from '../ResourceTabs';
+import ToolbarActions from '../FileBrowser/Toolbar';
 import stores from '../../stores';
+import { isMarkdown } from '/@/common/utils/uri';
 import { DocumentRegular } from '@fluentui/react-icons';
 import { makeStyles, Button } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
@@ -55,10 +57,24 @@ const ContentPanel = observer(() => {
       </>
     );
   }
+
+  const activeFileUri = stores.activationStore.activeFileUri;
+  const currentIsMarkdown = activeFileUri ? isMarkdown(activeFileUri) : true;
+
   return (
     <div className="fullfill">
-      <ResourceTabs />
-      <div style={{ height: 'calc(100% - 40px)', position: 'relative' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'stretch',
+        }}
+      >
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          <ResourceTabs />
+        </div>
+        <ToolbarActions isMarkdown={currentIsMarkdown} />
+      </div>
+      <div style={{ flex: 1, position: 'relative' }}>
         <ResourcePanel />
       </div>
     </div>

@@ -1,10 +1,10 @@
 .react-tabs-container {
-  background: transparent !important;
-  border-color: #e5dfd3 !important;
+  background: var(--tab-bar-bg) !important;
+  border-color: transparent !important;
 }
 
 .react-tabs-tab {
-  color: #333 !important;
+  color: #4a3f35 !important;
 }
 
 .react-tabs-tab-content {
@@ -16,7 +16,7 @@
 .react-tabs-active {
   border-color: transparent !important;
   background-color: transparent !important;
-  border-bottom: 2px solid #6cc7f6 !important;
+  border-bottom: none !important;
 }
 
 .react-tabs-tab-close {
@@ -26,7 +26,7 @@
 
 .react-tabs-tab-close:hover {
   border: 0 !important;
-  background: transparent !important;
+  background: rgba(0, 0, 0, 0.06) !important;
 }
 
 .chrome-tabs {

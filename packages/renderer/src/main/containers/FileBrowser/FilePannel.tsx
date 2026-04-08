@@ -5,11 +5,9 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import React from 'react';
 import MonacoEditor from '../MonacoEditor/MonacoEditor';
-import Flex from '/@/components/Flex';
 import UnSupport from './UnSupport';
 import { filePanelManager } from '../../frame';
-import { isEquals, isMarkdown } from '/@/common/utils/uri';
-import Toolbar from './Toolbar';
+import { isEquals } from '/@/common/utils/uri';
 import stores from '../../stores';
 import LLMBoxContainer from '../LLMBox';
 import { DragIndicator, DragHandle } from '/@/components/DragBarNew';
@@ -85,7 +83,6 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
           flexDirection: 'column',
         }}
       >
-        <Toolbar isMarkdown={isMarkdown(props.uri)} />
         <div
           style={{
             position: 'relative',

@@ -44,6 +44,12 @@ body {
   --editor-width: 50%;
   --sidebar-width: 230px;
   --llmbox-width: 30%;
+  /* 纸与墨 色板 */
+  --tab-bar-bg: #e8e0d0;
+  --tab-inactive-bg: #ede6d6;
+  --tab-active-bg: #fffcf5;
+  --content-bg: #fffcf5;
+  --tool-bg: #ffffff;
 }
 
 .sidebar {
@@ -57,7 +63,7 @@ body {
 }
 
 .chrome-tabs {
-  background: #e9f1f6 !important;
+  background: var(--tab-bar-bg) !important;
 }
 
 [data-tab-id$='.md'] .chrome-tab-favicon {
@@ -69,7 +75,47 @@ body {
   .chrome-tab-background
   > svg
   .chrome-tab-geometry {
-  // fill: #fffbf0;
+  fill: var(--tab-active-bg);
+}
+
+.chrome-tabs
+  .chrome-tab:not([active])
+  .chrome-tab-background
+  > svg
+  .chrome-tab-geometry {
+  fill: var(--tab-inactive-bg);
+}
+
+/* Tab 分隔线 — 暖色 */
+.chrome-tabs .chrome-tab .chrome-tab-dividers::before,
+.chrome-tabs .chrome-tab .chrome-tab-dividers::after {
+  background: rgba(139, 126, 104, 0.25) !important;
+}
+
+/* 底栏 — 跟内容区色无缝衔接 */
+.chrome-tabs .chrome-tabs-bottom-bar {
+  background: var(--content-bg);
+}
+
+/* Tab 标题色 — 暖黑 */
+.chrome-tabs .chrome-tab .chrome-tab-title {
+  color: #4a3f35;
+}
+.chrome-tabs .chrome-tab[active] .chrome-tab-title {
+  color: #2b2118;
+}
+
+/* Tab close 按钮 hover — 暖灰 */
+.chrome-tabs .chrome-tab .chrome-tab-close:hover {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+.chrome-tabs .chrome-tab .chrome-tab-close:hover:active {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 内容区背景 — 微暖白 */
+.editor-container {
+  background: var(--content-bg);
 }
 
 #app {
