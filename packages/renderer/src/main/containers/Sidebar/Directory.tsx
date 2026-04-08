@@ -36,6 +36,7 @@ const sorter = (treeNodes: TreeNode[]) =>
 
 const Directory = observer(() => {
   const rootUri = stores.activationStore.rootUri;
+  const activeFileUri = stores.activationStore.activeFileUri;
   const [tree, setTree] = useState<TreeNode | undefined>(undefined);
   const { t } = useTranslation('menu');
 
@@ -175,13 +176,13 @@ const Directory = observer(() => {
           }}
           active={
             !isDir &&
-            isEquals(treeNode.uri, stores.activationStore.activeFileUri)
+            isEquals(treeNode.uri, activeFileUri)
           }
           treeNode={treeNode}
         />
       );
     },
-    [showDirMenu, showFileMenu],
+    [showDirMenu, showFileMenu, activeFileUri],
   );
 
   const handleDrop: FileTreeProps['onDrop'] = async (e, fromUri, toDirUri) => {
