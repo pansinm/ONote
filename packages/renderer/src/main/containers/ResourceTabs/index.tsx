@@ -15,7 +15,7 @@ import { getFileIconClass } from '@sinm/react-file-tree/lib/FileItemWithFileIcon
 import { getFileName } from '@sinm/react-file-tree/lib/utils';
 
 const MENU_ID = 'TABS_MENU';
-export default observer(function EditorTabs() {
+export default observer(function EditorTabs({ pinnedRight }: { pinnedRight?: React.ReactNode }) {
   const { t } = useTranslation('common');
   const { fileStore, activationStore } = stores;
   const openedFiles = activationStore.openedFiles;
@@ -84,6 +84,7 @@ export default observer(function EditorTabs() {
         onTabClose={remove}
         onContextMenu={handleContextMenu}
         tabs={tabs}
+        pinnedRight={pinnedRight}
       ></Tabs>
       <Menu style={{ zIndex: 10001 }} id={MENU_ID}>
         <Item data={{ action: 'CLOSE' }} onClick={handleItemClick}>

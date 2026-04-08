@@ -63,18 +63,7 @@ const ContentPanel = observer(() => {
 
   return (
     <div className="fullfill" style={{ display: 'flex', flexDirection: 'column' }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'stretch',
-          background: 'var(--tab-bar-bg)',
-        }}
-      >
-        <div style={{ flex: 1, overflow: 'hidden' }}>
-          <ResourceTabs />
-        </div>
-        <ToolbarActions isMarkdown={currentIsMarkdown} />
-      </div>
+      <ResourceTabs pinnedRight={<ToolbarActions isMarkdown={currentIsMarkdown} />} />
       <div style={{ flex: 1, position: 'relative' }}>
         <ResourcePanel />
       </div>
