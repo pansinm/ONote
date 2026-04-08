@@ -28,6 +28,7 @@ export default function SettingTrigger() {
       <Button
         icon={<SettingsRegular />}
         onClick={() => setOpen(!open)}
+        appearance="subtle"
         shape="square"
       ></Button>
     );

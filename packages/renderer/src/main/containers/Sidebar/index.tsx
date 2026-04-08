@@ -216,9 +216,9 @@ export default observer(function Sidebar() {
       </div>
 
       {/* 底部按钮 */}
-      <Flex justifyContent={'space-between'}>
-        <SettingTrigger />
+      <Flex gap="4px">
         <ProjectSelector open={open} onOpenChange={setOpen} onSelected={handleSelect} />
+        <SettingTrigger />
       </Flex>
       <Modal />
     </div>
