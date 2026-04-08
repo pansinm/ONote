@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './index.module.scss';
 import stores from '../../stores';
 import Flex from '/@/components/Flex';
@@ -124,19 +124,6 @@ export default observer(function Sidebar() {
     }
   }, [searchText]);
 
-  // ESC 清空搜索
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape' && searchText) {
-      e.preventDefault();
-      setSearchText('');
-    }
-  }, [searchText]);
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown, true);
-    return () => document.removeEventListener('keydown', handleKeyDown, true);
-  }, [handleKeyDown]);
-
   const isSearching = searchText.length > 0;
 
   const handleSelect = async (project: Project) => {
@@ -169,6 +156,12 @@ export default observer(function Sidebar() {
             value={searchText}
             type="text"
             onChange={(e) => setSearchText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' && searchText) {
+                e.stopPropagation();
+                setSearchText('');
+              }
+            }}
             placeholder={t('searchFiles')}
           />
           {searchText && (

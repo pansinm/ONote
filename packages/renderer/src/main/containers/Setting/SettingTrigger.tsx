@@ -9,10 +9,8 @@ import {
 import {
   DismissRegular,
   SettingsRegular,
-  ArrowExitFilled,
 } from '@fluentui/react-icons';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import Setting from './Setting';
 
 const useStyles = makeStyles({
@@ -21,19 +19,9 @@ const useStyles = makeStyles({
     top: '5px',
     right: '5px',
   },
-  dialogActions: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    paddingTop: '10px',
-    paddingRight: '10px',
-    paddingBottom: '10px',
-    paddingLeft: '10px',
-    marginTop: 'auto',
-  },
 });
 export default function SettingTrigger() {
   const styles = useStyles();
-  const { t } = useTranslation('common');
   const [open, setOpen] = React.useState(false);
   if (!open) {
     return (
@@ -62,17 +50,6 @@ export default function SettingTrigger() {
         </DialogTrigger>
         <DialogBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <Setting />
-          <div className={styles.dialogActions}>
-            <Button
-              appearance="primary"
-              icon={<ArrowExitFilled />}
-              onClick={async () => {
-                await (window as any).onote.app.invoke('quit');
-              }}
-            >
-              {t('exitApp')}
-            </Button>
-          </div>
         </DialogBody>
       </DialogSurface>
     </Dialog>
