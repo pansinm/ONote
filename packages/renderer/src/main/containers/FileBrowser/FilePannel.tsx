@@ -125,9 +125,10 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               {!showEditorOnly && (
                 <DragHandle
                   type="editor-preview"
-                  right="-2px"
+                  right="-5px"
                   onStartDrag={startDrag}
                   onDoubleClick={resetWidths}
+                  isDragging={dragState.isDragging && dragState.type === 'editor-preview'}
                 />
               )}
             </div>
@@ -185,7 +186,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
                 )}
                 <DragHandle
                   type="llmbox"
-                  left="-2px"
+                  left="-5px"
                   onStartDrag={(type, startX) =>
                     startDrag(
                       type,
@@ -201,6 +202,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
                     )
                   }
                   onDoubleClick={resetWidths}
+                  isDragging={dragState.isDragging && dragState.type === 'llmbox'}
                 />
                 <LLMBoxContainer />
               </div>

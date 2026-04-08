@@ -34,9 +34,16 @@ export const RESIZE_CONFIG = {
   },
   // 拖拽手柄配置
   dragHandle: {
-    width: '4px',
-    hoverColor: 'rgb(56, 147, 199)',
-    defaultColor: 'rgba(56, 147, 199, 0.2)',
+    /** 可交互区域宽度（视觉线更细，居中显示） */
+    hitAreaWidth: '10px',
+    /** 可见拖拽指示线宽度 */
+    lineWidth: '2px',
+    /** 默认状态（几乎不可见） */
+    defaultColor: 'rgba(0,120,212,0)',
+    /** hover 状态（半透明蓝色发光） */
+    hoverColor: 'rgba(0,120,212,0.5)',
+    /** 拖拽中状态（实心蓝色） */
+    draggingColor: '#0078d4',
     zIndex: 1000,
   },
   // 拖拽指示线配置

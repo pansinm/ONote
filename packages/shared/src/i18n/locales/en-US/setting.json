@@ -1,9 +1,10 @@
 {
   "editor": "Editor",
-  "plantuml": "PlantUML",
+  "diagrams": "Diagrams",
   "plugin": "Plugins",
-  "gptConfig": "GPT Config",
+  "aiAssistant": "AI Assistant",
   "general": "General",
+  "about": "About",
   "language": "Language",
   "languageDesc": "Select application interface language",
   "zhCN": "简体中文",
@@ -19,5 +20,8 @@
   "uninstall": "Uninstall",
   "llmBaseUrl": "LLM BASE URL",
   "modelName": "MODEL NAME",
-  "apiKey": "API KEY"
+  "apiKey": "API KEY",
+  "version": "Version",
+  "onoteDesc": "An elegant Markdown note-taking app with built-in AI assistant.",
+  "checkUpdate": "Check for Updates"
 }

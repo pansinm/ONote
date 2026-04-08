@@ -35,10 +35,30 @@ interface DragHandleProps {
   right?: string;
   onStartDrag: (type: DragType, startX: number) => void;
   onDoubleClick?: () => void;
+  /** 是否正在拖拽中（由父组件的 dragState 传入） */
+  isDragging?: boolean;
 }
 
-function DragHandle({ type, left, right, onStartDrag, onDoubleClick }: DragHandleProps) {
+function DragHandle({ type, left, right, onStartDrag, onDoubleClick, isDragging }: DragHandleProps) {
   const [hovering, setHovering] = useState(false);
+
+  const lineColor = isDragging
+    ? RESIZE_CONFIG.dragHandle.draggingColor
+    : hovering
+      ? RESIZE_CONFIG.dragHandle.hoverColor
+      : RESIZE_CONFIG.dragHandle.defaultColor;
+
+  const lineStyle: CSSProperties = {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: RESIZE_CONFIG.dragHandle.lineWidth,
+    background: lineColor,
+    transition: 'background 0.15s ease',
+    pointerEvents: 'none',
+  };
 
   return (
     <div
@@ -48,13 +68,9 @@ function DragHandle({ type, left, right, onStartDrag, onDoubleClick }: DragHandl
         right,
         top: 0,
         bottom: 0,
-        width: RESIZE_CONFIG.dragHandle.width,
-        background: hovering
-          ? RESIZE_CONFIG.dragHandle.hoverColor
-          : RESIZE_CONFIG.dragHandle.defaultColor,
-        cursor: 'ew-resize',
+        width: RESIZE_CONFIG.dragHandle.hitAreaWidth,
+        cursor: 'col-resize',
         zIndex: RESIZE_CONFIG.dragHandle.zIndex,
-        transition: 'background 0.1s',
       }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
@@ -63,9 +79,10 @@ function DragHandle({ type, left, right, onStartDrag, onDoubleClick }: DragHandl
         e.preventDefault();
         onStartDrag(type, e.clientX);
       }}
-    />
+    >
+      <div style={lineStyle} />
+    </div>
   );
 }
 
 export { DragIndicator, DragHandle };
-

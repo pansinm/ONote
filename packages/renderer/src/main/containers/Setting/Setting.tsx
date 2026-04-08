@@ -19,7 +19,7 @@ const useStyles = makeStyles({
     display: 'flex',
   },
   tabList: {
-    width: '120px',
+    width: '140px',
     ...shorthands.padding('10px', '5px'),
     ...shorthands.borderRight('1px', 'solid'),
   },
@@ -43,19 +43,40 @@ const Setting: React.FC = observer(() => {
       >
         <Tab value="general">{t('general')}</Tab>
         <Tab value="editor">{t('editor')}</Tab>
-        <Tab value="plantuml">PlantUML</Tab>
+        <Tab value="diagrams">{t('diagrams')}</Tab>
         {/* <Tab value="plugin">{t('plugin')}</Tab> */}
-        <Tab value="chatgpt">{t('gptConfig')}</Tab>
+        <Tab value="ai-assistant">{t('aiAssistant')}</Tab>
+        <Tab value="about">{t('about')}</Tab>
       </TabList>
       <div className={styles.panel}>
         {tab === 'general' && <GeneralPanel />}
         {tab === 'editor' && <EditorPanel />}
-        {tab === 'plantuml' && <PlantUMLPanel />}
+        {tab === 'diagrams' && <PlantUMLPanel />}
         {/* {tab === 'plugin' && <PluginManager />} */}
-        {tab === 'chatgpt' && <ChatGPT />}
+        {tab === 'ai-assistant' && <ChatGPT />}
+        {tab === 'about' && <AboutPanel />}
       </div>
     </div>
   );
 });
+
+// ========== 关于面板 ==========
+const APP_VERSION = '0.14.0';
+
+const AboutPanel: React.FC = () => {
+  const { t } = useTranslation('setting');
+
+  return (
+    <div style={{ padding: '20px', maxWidth: '400px' }}>
+      <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>ONote</h2>
+      <p style={{ color: '#605e5c', fontSize: '13px', marginBottom: '16px', lineHeight: 1.5 }}>
+        {t('onoteDesc')}
+      </p>
+      <div style={{ fontSize: '13px', color: '#8a8886', marginBottom: '8px' }}>
+        {t('version')}: {APP_VERSION}
+      </div>
+    </div>
+  );
+};
 
 export default Setting;

@@ -18,5 +18,10 @@
   "insert": "新增 {{count}} 行",
   "delete": "删除 {{count}} 行",
   "change": "替换 {{count}} 行",
-  "conflicted": "内容已被手动修改，无法自动还原"
+  "conflicted": "内容已被手动修改，无法自动还原",
+  "welcomeTitle": "有什么可以帮你的？",
+  "welcomeHint": "选择一个快捷提示词开始，或直接输入你的问题",
+  "quickPrompt1": "帮我整理这篇笔记的结构",
+  "quickPrompt2": "解释选中的内容",
+  "quickPrompt3": "帮我继续写下去"
 }

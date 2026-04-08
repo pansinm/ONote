@@ -7,12 +7,30 @@ import {
   TextHangingRegular,
 } from '@fluentui/react-icons';
 import { makeStyles, shorthands } from '@fluentui/react-components';
+import type FileListStore from '../../stores/FileListStore';
+
+type SorterType = FileListStore['sorter'];
+
+const SORTER_I18N_KEY: Record<SorterType, string> = {
+  'name-asc': 'sortNameAsc',
+  'name-desc': 'sortNameDesc',
+  'time-asc': 'sortTimeAsc',
+  'time-desc': 'sortTimeDesc',
+};
+
+const SORTER_ICON: Record<SorterType, string> = {
+  'name-asc': 'sort-alpha-down',
+  'name-desc': 'sort-alpha-up',
+  'time-asc': 'sort-down',
+  'time-desc': 'sort-up',
+};
 
 interface ListHeaderProps {
   searchText?: string;
   onTextChange?: (text: string) => void;
   onNoteCreate?: () => void;
   onPrefixIconClick(): void;
+  sorter?: SorterType;
 }
 
 const useStyles = makeStyles({
@@ -39,7 +57,23 @@ const useStyles = makeStyles({
     ...shorthands.padding('5px', '10px'),
     ...shorthands.border('1px', 'solid', '#d3b17d'),
     minWidth: '50px',
-    fontFamily: 'bootstrap-icons',
+    '::placeholder': {
+      fontFamily: 'bootstrap-icons, inherit',
+    },
+  },
+  sortIndicator: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '28px',
+    height: '28px',
+    marginLeft: '4px',
+    opacity: 0.5,
+    cursor: 'default',
+    transition: 'opacity 0.15s',
+    ':hover': {
+      opacity: 0.8,
+    },
   },
   suffix: {
     width: '40px',
@@ -57,6 +91,7 @@ const ListHeader: FC<ListHeaderProps> = ({
   onNoteCreate,
   onTextChange,
   onPrefixIconClick,
+  sorter = 'name-asc',
 }) => {
   const styles = useStyles();
   const { t } = useTranslation('menu');
@@ -72,6 +107,9 @@ const ListHeader: FC<ListHeaderProps> = ({
         onChange={(e) => onTextChange?.(e.target.value)}
         placeholder={`${SEARCH_ICON} ${t('searchFiles')}`}
       ></input>
+      <span className={styles.sortIndicator} title={t(SORTER_I18N_KEY[sorter])}>
+        <Icon type={SORTER_ICON[sorter]} size={14} />
+      </span>
       <Icon className={styles.suffix} type="plus" onClick={onNoteCreate} />
     </div>
   );

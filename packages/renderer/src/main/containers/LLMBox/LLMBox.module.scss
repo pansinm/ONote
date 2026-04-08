@@ -24,3 +24,62 @@
   padding: 16px;
   background-color: #ffffff;
 }
+
+// ========== 欢迎面板 ==========
+.welcomePanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  opacity: 0.85;
+}
+
+.welcomeIcon {
+  color: #0078d4;
+  margin-bottom: 4px;
+}
+
+.welcomeTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #323130;
+}
+
+.welcomeHint {
+  font-size: 13px;
+  color: #8a8886;
+}
+
+.quickPrompts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.quickPrompt {
+  padding: 10px 16px;
+  border: 1px solid #e1dfdd;
+  border-radius: 8px;
+  background-color: #faf9f8;
+  color: #323130;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background-color 0.15s;
+
+  &:hover {
+    border-color: #0078d4;
+    background-color: #f0f8ff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #0078d4;
+    outline-offset: -2px;
+  }
+}

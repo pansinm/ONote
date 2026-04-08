@@ -237,6 +237,7 @@ const FileList: FC = observer(() => {
         onTextChange={setText}
         onNoteCreate={createNote}
         onPrefixIconClick={() => stores.activationStore.toggleSidebar()}
+        sorter={stores.fileListStore.sorter}
       />
       <Flex flex={1} flexDirection="column" overflow="auto">
         <div

@@ -45,8 +45,9 @@ const App: FC = observer(() => {
           <Sidebar />
           <DragHandle
             type="sidebar"
-            right="-2px"
+            right="-5px"
             onStartDrag={startDrag}
+            isDragging={dragState.isDragging && dragState.type === 'sidebar'}
           />
         </div>
         <Page />

@@ -18,5 +18,10 @@
   "insert": "Added {{count}} lines",
   "delete": "Deleted {{count}} lines",
   "change": "Modified {{count}} lines",
-  "conflicted": "Content was modified manually, cannot auto-revert"
+  "conflicted": "Content was modified manually, cannot auto-revert",
+  "welcomeTitle": "How can I help you?",
+  "welcomeHint": "Pick a quick prompt to get started, or type your own question",
+  "quickPrompt1": "Help me organize the structure of this note",
+  "quickPrompt2": "Explain the selected content",
+  "quickPrompt3": "Help me continue writing"
 }

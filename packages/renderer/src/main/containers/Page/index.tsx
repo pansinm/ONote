@@ -19,8 +19,9 @@ const Page = () => {
         <FileList />
         <DragHandle
           type="file-list"
-          right="-2px"
+          right="-5px"
           onStartDrag={startDrag}
+          isDragging={dragState.isDragging && dragState.type === 'file-list'}
         />
       </div>
       <View

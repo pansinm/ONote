@@ -13,6 +13,8 @@ import type { FC } from 'react';
 import React, { useState, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { Components } from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTranslation } from 'react-i18next';
 import {
   CheckmarkCircle12Regular,
@@ -57,7 +59,49 @@ const markdownComponents: Components = {
       ? <code className={styles.markdownCodeInline}>{children}</code>
       : <code className={className}>{children}</code>;
   },
-  pre: ({ children }) => <pre className={styles.markdownCodeBlock}>{children}</pre>,
+  pre: ({ children }) => {
+    // Check if children is a code element with language- className
+    if (
+      React.isValidElement(children) &&
+      children.props &&
+      typeof children.props.className === 'string' &&
+      children.props.className.startsWith('language-')
+    ) {
+      const language = children.props.className.replace('language-', '');
+      const code = String(children.props.children).replace(/\n$/, '');
+      return (
+        <SyntaxHighlighter
+          style={oneDark}
+          language={language}
+          PreTag="div"
+          className={styles.markdownCodeBlock}
+          wrapLongLines
+        >
+          {code}
+        </SyntaxHighlighter>
+      );
+    }
+    // Pure text code block (no language)
+    if (
+      React.isValidElement(children) &&
+      children.props &&
+      typeof children.props.className === 'undefined'
+    ) {
+      const code = String(children.props.children).replace(/\n$/, '');
+      return (
+        <SyntaxHighlighter
+          style={oneDark}
+          language="text"
+          PreTag="div"
+          className={styles.markdownCodeBlock}
+          wrapLongLines
+        >
+          {code}
+        </SyntaxHighlighter>
+      );
+    }
+    return <pre className={styles.markdownCodeBlock}>{children}</pre>;
+  },
   ul: ({ children }) => <ul className={styles.markdownUl}>{children}</ul>,
   ol: ({ children }) => <ol className={styles.markdownOl}>{children}</ol>,
   li: ({ children }) => <li className={styles.markdownLi}>{children}</li>,
@@ -248,8 +292,8 @@ interface UserMessageBubbleProps {
 
 const UserMessageBubble: FC<UserMessageBubbleProps> = ({ message }) => {
   return (
-    <div className={styles.userContent}>
-      <ReactMarkdown components={markdownComponents}>{message.content}</ReactMarkdown>
+    <div className={styles.userContent} style={{ whiteSpace: 'pre-wrap' }}>
+      {message.content}
       <div className={styles.userTimestamp}>
         {new Date(message.timestamp).toLocaleTimeString()}
       </div>

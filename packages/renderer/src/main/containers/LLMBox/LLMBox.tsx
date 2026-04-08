@@ -10,6 +10,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
 import * as monaco from 'monaco-editor';
+import { SparkleRegular } from '@fluentui/react-icons';
 import MessageList from './MessageList';
 import type { MessageListRef } from './MessageList';
 import InputArea from './InputArea';
@@ -34,6 +35,7 @@ const generateId = (): string => {
 
 const LLMBox: FC<LLMBoxProps> = observer(({ className, style }) => {
   const { t } = useTranslation('common');
+  const { t: tLlm } = useTranslation('llmbox');
   // State
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -77,40 +79,32 @@ const LLMBox: FC<LLMBoxProps> = observer(({ className, style }) => {
     return () => disposable.dispose();
   }, [agentStore.agentState]);
 
-  // Handlers
-  const handleSend = useCallback(() => {
-    if (!inputValue.trim() || isLoading) {
-      return;
-    }
+  // Core send logic — extracted so both handleSend and handleQuickPrompt reuse it
+  const sendMessage = useCallback((text: string) => {
+    if (!text.trim() || isLoading) return;
 
     const userMessage: UserMessage = {
       id: generateId(),
       role: 'user',
-      content: inputValue,
+      content: text,
       timestamp: Date.now(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInputValue('');
     setQuote(null);
     messageListRef.current?.scrollToBottom('auto');
     setIsLoading(true);
 
-    const capturedInput = inputValue;
-
-    assistant.chat(capturedInput, async (event) => {
+    assistant.chat(text, async (event) => {
       agentStore.handleEvent(event);
 
       if (event.type === 'step-start' || event.type === 'step-delta' || event.type === 'step-complete') {
-        // 通过 ref 读取最新 messages，避免闭包陈旧值
-        const currentMessages = messagesRef.current;
-        const existingMessage = currentMessages.find(
-          (msg) => msg.id === agentStore.currentMessageId && msg.role === 'assistant',
-        ) as AgentMessage | undefined;
-
         if (event.type === 'step-start') {
-          if (!existingMessage) {
-            const newAgentMessage: AgentMessage = {
+          const exists = messagesRef.current.some(
+            (msg) => msg.id === agentStore.currentMessageId && msg.role === 'assistant',
+          );
+          if (!exists) {
+            const newMsg: AgentMessage = {
               id: agentStore.currentMessageId || generateId(),
               role: 'assistant',
               content: '',
@@ -118,7 +112,7 @@ const LLMBox: FC<LLMBoxProps> = observer(({ className, style }) => {
               isStreaming: true,
               timestamp: Date.now(),
             };
-            setMessages((prev) => [...prev, newAgentMessage]);
+            setMessages((prev) => [...prev, newMsg]);
           } else {
             setMessages((prev) =>
               prev.map((msg) =>
@@ -152,16 +146,46 @@ const LLMBox: FC<LLMBoxProps> = observer(({ className, style }) => {
         );
       }
     });
-  }, [inputValue, isLoading, agentStore]);
+  }, [isLoading, agentStore]);
+
+  const handleSend = useCallback(() => {
+    sendMessage(inputValue);
+    setInputValue('');
+  }, [inputValue, sendMessage]);
+
+  // Quick prompt — directly sends without going through inputValue
+  const handleQuickPrompt = useCallback((prompt: string) => {
+    sendMessage(prompt);
+  }, [sendMessage]);
 
   return (
     <div className={classNames(styles.container, className)} style={style}>
       <PendingChangesBar />
-      <MessageList
-        ref={messageListRef}
-        messages={messages}
-        className={styles.messageList}
-      />
+      {messages.length === 0 ? (
+        <div className={styles.welcomePanel}>
+          <SparkleRegular className={styles.welcomeIcon} fontSize={28} />
+          <div className={styles.welcomeTitle}>{tLlm('welcomeTitle')}</div>
+          <div className={styles.welcomeHint}>{tLlm('welcomeHint')}</div>
+          <div className={styles.quickPrompts}>
+            {[tLlm('quickPrompt1'), tLlm('quickPrompt2'), tLlm('quickPrompt3')].map((prompt) => (
+              <button
+                key={prompt}
+                type="button"
+                className={styles.quickPrompt}
+                onClick={() => handleQuickPrompt(prompt)}
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <MessageList
+          ref={messageListRef}
+          messages={messages}
+          className={styles.messageList}
+        />
+      )}
       <InputArea
         value={inputValue}
         onChange={setInputValue}
