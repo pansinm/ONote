@@ -1,10 +1,10 @@
 import { Tooltip } from '@fluentui/react-components';
-import { QrCode20Regular } from '@fluentui/react-icons';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import _QRCode from 'react-qr-code';
 import stores from '/@/main/stores';
 import { observer } from 'mobx-react-lite';
+import Icon from '/@/components/Icon';
 
 function QRCodeContent() {
   const { t } = useTranslation('common');
@@ -41,7 +41,7 @@ function QRCode() {
       relationship={'description'}
     >
       <span>
-        <QrCode20Regular title={t('insertFile')} />
+        <Icon title={t('insertFile')} type="qr-code" size={18} />
       </span>
     </Tooltip>
   );

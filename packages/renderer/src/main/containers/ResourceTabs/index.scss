@@ -32,4 +32,9 @@
 .chrome-tabs {
   height: 40px;
   padding: 6px 0px 0px 0px;
+  justify-content: space-between;
+}
+
+.chrome-tabs-toolbar-right {
+  align-items: center;
 }
