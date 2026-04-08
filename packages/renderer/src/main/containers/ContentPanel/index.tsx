@@ -3,8 +3,10 @@ import React from 'react';
 import ResourcePanel from '../FileBrowser';
 import ResourceTabs from '../ResourceTabs';
 import stores from '../../stores';
-import { BeachRegular } from '@fluentui/react-icons';
-import { makeStyles } from '@fluentui/react-components';
+import { DocumentRegular } from '@fluentui/react-icons';
+import { makeStyles, Button } from '@fluentui/react-components';
+import { useTranslation } from 'react-i18next';
+import useFileOperation from '../../../hooks/useFileOperation';
 
 const useStyles = makeStyles({
   empty: {
@@ -13,17 +15,41 @@ const useStyles = makeStyles({
     alignItems: 'center',
     flexDirection: 'column',
     justifyContent: 'center',
-    fontSize: '150px',
+    gap: '16px',
+    userSelect: 'none',
+  },
+  emptyIcon: {
+    color: '#c8c6c4',
+  },
+  emptyText: {
+    fontSize: '14px',
+    color: '#605e5c',
   },
 });
 
 const ContentPanel = observer(() => {
   const styles = useStyles();
+  const { t } = useTranslation('common');
+  const { createFile, Modal } = useFileOperation();
+
   if (!stores.activationStore.openedFiles.length) {
+    const rootUri = stores.activationStore.rootUri;
     return (
-      <div className={styles.empty}>
-        <BeachRegular primaryFill="#ebf3fc" />
-      </div>
+      <>
+        <div className={styles.empty}>
+          <DocumentRegular className={styles.emptyIcon} style={{ fontSize: '48px' }} />
+          <span className={styles.emptyText}>{t('emptyStateHint')}</span>
+          {rootUri && (
+            <Button
+              appearance="primary"
+              onClick={() => createFile(rootUri, 'file').catch(() => {})}
+            >
+              {t('menu:createNote')}
+            </Button>
+          )}
+        </div>
+        <Modal />
+      </>
     );
   }
   return (

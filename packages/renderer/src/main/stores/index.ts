@@ -5,6 +5,7 @@ import I18nStore from './I18nStore';
 import LayoutStore from './LayoutStore';
 import SettingStore from './SettingStore';
 import { AgentStore } from './AgentStore';
+import { PendingChangeStore } from './PendingChangeStore';
 
 const fileStore = new FileStateStore();
 const settingStore = new SettingStore();
@@ -17,4 +18,5 @@ export default {
   layoutStore: new LayoutStore(),
   fileListStore: new FileListStore(activationStore),
   agentStore: new AgentStore(),
+  pendingChangeStore: new PendingChangeStore(),
 };

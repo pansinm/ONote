@@ -7,7 +7,8 @@ import {
 } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
-import PluginManager from './PluginPanel/PluginManager';
+// Plugin 面板暂时隐藏——插件系统未实现，不可用的入口是认知负债
+// import PluginManager from './PluginPanel/PluginManager';
 import EditorPanel from './EditorPanel';
 import PlantUMLPanel from './PlantUMLPanel';
 import ChatGPT from './ChatGPT';
@@ -43,14 +44,14 @@ const Setting: React.FC = observer(() => {
         <Tab value="general">{t('general')}</Tab>
         <Tab value="editor">{t('editor')}</Tab>
         <Tab value="plantuml">PlantUML</Tab>
-        <Tab value="plugin">{t('plugin')}</Tab>
+        {/* <Tab value="plugin">{t('plugin')}</Tab> */}
         <Tab value="chatgpt">{t('gptConfig')}</Tab>
       </TabList>
       <div className={styles.panel}>
         {tab === 'general' && <GeneralPanel />}
         {tab === 'editor' && <EditorPanel />}
         {tab === 'plantuml' && <PlantUMLPanel />}
-        {tab === 'plugin' && <PluginManager />}
+        {/* {tab === 'plugin' && <PluginManager />} */}
         {tab === 'chatgpt' && <ChatGPT />}
       </div>
     </div>

@@ -14,6 +14,7 @@ export interface ShrinkNeighborConfig {
   cssVar: string;
   min: number;
   max: number;
+  unit: 'px' | '%';
 }
 
 interface UseResizableOptions {
@@ -61,51 +62,44 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
     const handleMouseUp = (e: MouseEvent) => {
       if (!dragState.isDragging || !containerRef.current) return;
 
-      const containerRect = containerRef.current.getBoundingClientRect();
       const delta = e.clientX - dragState.startX;
-      const containerWidth = containerRect.width;
 
-      // 更新宽度
-      if (dragState.type === 'editor-preview') {
+      if (!dragState.type) return;
+
+      const config = {
+        'editor-preview': RESIZE_CONFIG.editor,
+        'llmbox': RESIZE_CONFIG.llmbox,
+        'sidebar': RESIZE_CONFIG.sidebar,
+        'file-list': RESIZE_CONFIG.fileList,
+      }[dragState.type];
+
+      if (config) {
+        const referenceWidth = containerRef.current?.offsetWidth;
+
         updateWidth(
-          RESIZE_CONFIG.editor.cssVar,
+          config.cssVar,
           delta,
-          RESIZE_CONFIG.editor.min,
-          RESIZE_CONFIG.editor.max,
-          false,
+          config.min,
+          config.max,
+          config.unit,
+          dragState.type === 'llmbox',
+          referenceWidth,
         );
-      } else if (dragState.type === 'llmbox') {
-        updateWidth(
-          RESIZE_CONFIG.llmbox.cssVar,
-          delta,
-          RESIZE_CONFIG.llmbox.min,
-          RESIZE_CONFIG.llmbox.max,
-          true,
-        );
-        if (shrinkConfig) {
-          const neighborWidth = getComputedStyle(document.documentElement)
-            .getPropertyValue(shrinkConfig.cssVar)
-            .trim();
-          const currentNeighborPixels = parseFloat(neighborWidth) || shrinkConfig.min;
-          const newNeighborPixels = currentNeighborPixels - delta;
-          const clampedNeighbor = Math.max(shrinkConfig.min, Math.min(shrinkConfig.max, newNeighborPixels));
-          document.documentElement.style.setProperty(shrinkConfig.cssVar, `${clampedNeighbor}px`);
+
+        if (dragState.type === 'llmbox' && shrinkConfig) {
+          // llmbox 变大 → neighbor 缩小，方向相同（不取反）
+          updateWidth(
+            shrinkConfig.cssVar,
+            delta,
+            shrinkConfig.min,
+            shrinkConfig.max,
+            shrinkConfig.unit,
+            false,
+            referenceWidth,
+          );
         }
-      } else if (dragState.type === 'sidebar') {
-        const root = document.documentElement;
-        const sidebarEle = document.querySelector('.sidebar')!;
-        const currentWidth = parseFloat(getComputedStyle(sidebarEle).width);
-        const newWidth = Math.max(150, Math.min(500, currentWidth + delta));
-        root.style.setProperty('--sidebar-width', `${newWidth}px`);
-      } else if (dragState.type === 'file-list') {
-        const root = document.documentElement;
-        const fileListEle = document.querySelector('.file-list')!;
-        const currentWidth = parseFloat(getComputedStyle(fileListEle).width);
-        const newWidth = Math.max(150, Math.min(500, currentWidth + delta));
-        root.style.setProperty('--file-list-width', `${newWidth}px`);
       }
 
-      // 保存设置
       saveWidths();
 
       // 重置状态

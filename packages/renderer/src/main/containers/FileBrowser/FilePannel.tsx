@@ -157,12 +157,16 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               <div
                 className="llmbox-container"
                 style={{
+                  width: stores.layoutStore.sidebarShown
+                    ? 'var(--llmbox-width)'
+                    : '0',
                   minWidth: stores.layoutStore.sidebarShown
                     ? 'var(--llmbox-width)'
                     : '0',
+                  maxWidth: 'var(--llmbox-width)',
                   position: 'relative',
                   display: stores.layoutStore.sidebarShown ? 'block' : 'none',
-                  overflowY: 'hidden',
+                  overflow: 'hidden',
                   flexShrink: 0,
                 }}
               >
@@ -191,6 +195,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
                             cssVar: RESIZE_CONFIG.editor.cssVar,
                             min: RESIZE_CONFIG.editor.min,
                             max: RESIZE_CONFIG.editor.max,
+                            unit: RESIZE_CONFIG.editor.unit,
                           }
                         : undefined,
                     )

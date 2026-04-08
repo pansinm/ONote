@@ -32,6 +32,8 @@
 
 .messageWrapper {
   margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
 
   &:last-child {
     margin-bottom: 0;

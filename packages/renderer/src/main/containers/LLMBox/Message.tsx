@@ -175,6 +175,8 @@ const WorkStepItem: FC<WorkStepItemProps> = React.memo(({ step }) => {
     switch (step.type) {
       case 'thinking':
         return <i className="bi bi-lightbulb" aria-hidden="true" />;
+      case 'response':
+        return <i className="bi bi-chat-square-text" aria-hidden="true" />;
       case 'tool_call':
         return <i className="bi bi-gear" aria-hidden="true" />;
       case 'summary':
@@ -218,6 +220,7 @@ const WorkStepItem: FC<WorkStepItemProps> = React.memo(({ step }) => {
       <div className={styles.workStep__header}>
         {renderStepIcon()}
         {step.type === 'thinking' && <span>{t('thinking')}</span>}
+        {step.type === 'response' && <span>{t('response', { defaultValue: 'Response' })}</span>}
         {step.type === 'tool_call' && <span>{t('toolCall')}</span>}
         {step.type === 'summary' && <span>{t('summary')}</span>}
         {step.type === 'summary' && !step.isCompleted && (

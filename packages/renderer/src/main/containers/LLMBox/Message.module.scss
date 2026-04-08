@@ -12,13 +12,48 @@
   padding: 8px 12px;
 
   &--user {
-    background-color: #e8f4fd;
-    border-radius: 8px;
+    background-color: #0078d4;
+    border-radius: 12px 12px 2px 12px;
+    align-self: flex-end;
+    max-width: 85%;
+
+    .userContent {
+      color: #ffffff;
+    }
+
+    .userTimestamp {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    // markdown 子元素蓝色背景下的颜色修正
+    .markdownCodeInline {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+
+    .markdownBlockquote {
+      border-left-color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .markdownLink {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .markdownH1,
+    .markdownH2,
+    .markdownH3 {
+      color: #ffffff;
+    }
   }
 
   &--agent {
-    background-color: #faf9f8;
-    border-radius: 8px;
+    background-color: #f5f5f5;
+    border-radius: 12px 12px 12px 2px;
+    border-left: 3px solid #0078d4;
+    align-self: flex-start;
+    max-width: 90%;
   }
 }
 
@@ -107,6 +142,21 @@
       padding: 8px 10px;
       border-radius: 4px;
       border: 1px solid #e1dfdd;
+      color: #323130;
+    }
+  }
+
+  // Response 步骤
+  &--response {
+    .workStep__header {
+      color: #0078d4;
+    }
+
+    .workStep__content {
+      background-color: transparent;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border-left: 3px solid #0078d4;
       color: #323130;
     }
   }

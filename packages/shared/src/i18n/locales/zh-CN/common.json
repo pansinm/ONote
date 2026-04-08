@@ -67,5 +67,6 @@
   "agentIcon": "智能助手图标",
   "completed": "已完成",
   "inProgress": "进行中",
-  "selectDirectory": "选择目录"
+  "selectDirectory": "选择目录",
+  "emptyStateHint": "打开笔记开始书写"
 }

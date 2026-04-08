@@ -1,0 +1,35 @@
+{
+  "skill_name": "onote",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我的 WebDAV 服务器在 http://localhost:8080/webdav/，用户名是 admin，密码是 pass123。请帮我把 daily.md 文件里的 '今天天气不错' 改成 '今天天气很好'",
+      "expected_output": "使用 curl GET 读取文件，用 sed 替换文本，然后用 curl PUT 写回",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "通过 WebDAV (http://localhost:8080/webdav/, user: admin, pass: pass123) 给 project.md 添加 frontmatter，包含 title 和 tags",
+      "expected_output": "GET 读取文件，在内容前添加 YAML frontmatter，PUT 写回",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "用 WebDAV 在 meeting-2026-03-14.md 末尾添加 '行动项' 章节，服务器: http://localhost:8080/webdav/, 用户: admin, 密码: pass123",
+      "expected_output": "GET 读取当前内容，追加新章节，PUT 写回完整内容",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "WebDAV 修改 tasks.md，把 '## 待办' 改成 '## 已完成'。服务器 http://localhost:8080/webdav/，认证 admin:pass123",
+      "expected_output": "GET 文件，用 sed 替换标题，PUT 修改后的内容",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "通过 WebDAV 协议给 ideas.md 的 frontmatter tags 里加上 'brainstorm'。WebDAV URL: http://localhost:8080/webdav/, 用户名密码: admin/pass123",
+      "expected_output": "GET 文件，解析 frontmatter，更新 tags 数组，PUT 回去",
+      "files": []
+    }
+  ]
+}

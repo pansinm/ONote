@@ -3,10 +3,20 @@
   "inputPlaceholder": "输入消息...",
   "clearQuote": "清除引用",
   "thinking": "思考中",
+  "response": "回答",
   "toolCall": "工具调用",
   "summary": "总结",
   "generating": "生成中...",
   "arguments": "参数:",
   "result": "结果:",
-  "agentTitle": "智能助手"
+  "agentTitle": "智能助手",
+  "pendingChangesTitle": "Agent 修改了此文件 ({{count}}处)",
+  "acceptAll": "全部接受",
+  "rejectAll": "全部拒绝",
+  "accept": "接受",
+  "reject": "拒绝",
+  "insert": "新增 {{count}} 行",
+  "delete": "删除 {{count}} 行",
+  "change": "替换 {{count}} 行",
+  "conflicted": "内容已被手动修改，无法自动还原"
 }

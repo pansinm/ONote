@@ -13,6 +13,7 @@ import { buildMessageState } from './prompts';
 export class Assistant {
   private currentSteps: Map<string, ExecutionStep> = new Map();
   private currentToolCalls: Map<string, ToolCall> = new Map();
+  private currentTextStepId: string | null = null;
   private conversationStore = new AgentConversationStore();
 
   async chat(input: string, callback: (event: AgentStepEvent) => void) {
@@ -20,6 +21,7 @@ export class Assistant {
       const agent = getOrCreateAgent();
       this.currentSteps.clear();
       this.currentToolCalls.clear();
+      this.currentTextStepId = null;
 
       const fileUri = stores.activationStore.activeFileUri;
       const rootUri = stores.activationStore.rootUri;
@@ -98,6 +100,7 @@ export class Assistant {
     } finally {
       this.currentSteps.clear();
       this.currentToolCalls.clear();
+      this.currentTextStepId = null;
     }
   }
 
@@ -193,10 +196,35 @@ export class Assistant {
       }
 
       case 'text-delta': {
+        if (!this.currentTextStepId) {
+          const step: ExecutionStep = {
+            id: chunk.id || uuidv4(),
+            type: 'response',
+            content: '',
+            isCompleted: false,
+            timestamp: Date.now(),
+          };
+          this.currentTextStepId = step.id;
+          this.currentSteps.set(step.id, step);
+          callback({ type: 'step-start', step });
+        }
+        const step = this.currentSteps.get(this.currentTextStepId);
+        if (step) {
+          step.content += chunk.text || '';
+          callback({ type: 'step-delta', stepId: this.currentTextStepId, delta: chunk.text || '' });
+        }
         break;
       }
 
       case 'text-end': {
+        if (this.currentTextStepId) {
+          const step = this.currentSteps.get(this.currentTextStepId);
+          if (step) {
+            step.isCompleted = true;
+            callback({ type: 'step-complete', stepId: this.currentTextStepId });
+          }
+          this.currentTextStepId = null;
+        }
         break;
       }
 

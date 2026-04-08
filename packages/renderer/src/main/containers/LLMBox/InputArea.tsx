@@ -1,8 +1,8 @@
 /**
  * Agent输入区域组件
- * 1. 多行输入框 + 工具条
+ * 1. 多行输入框（自动增高）+ 工具条
  * 2. 输入框跟工具条上下布局
- * 3. 工具条当前仅包含发送按钮，在右侧
+ * 3. 工具条包含状态指示器和发送按钮
  * 4. 支持引用属性，引用的文本展示在输入框上方，绝对定位。
  * 5. 引用文本带x按钮，可关闭
  * 6. 组件为受控组件
@@ -11,7 +11,7 @@
 
 import classNames from 'classnames';
 import type { FC } from 'react';
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import { Button } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
 import {
@@ -20,6 +20,8 @@ import {
   ArrowClockwiseRegular,
 } from '@fluentui/react-icons';
 import styles from './InputArea.module.scss';
+
+const MAX_HEIGHT = 200;
 
 export interface Quote {
   id: string;
@@ -52,7 +54,7 @@ export interface InputAreaProps {
   // 是否正在发送（用于显示加载状态）
   loading?: boolean;
 
-  // 最小行数
+  // 最小行数（初始高度）
   minRows?: number;
 
   // 自定义容器类名（用于外部样式覆盖）
@@ -60,6 +62,9 @@ export interface InputAreaProps {
 
   // 自定义容器样式（用于外部样式定义）
   style?: React.CSSProperties;
+
+  // Agent 状态
+  agentState?: 'idle' | 'thinking' | 'executing';
 }
 
 const InputArea: FC<InputAreaProps> = (props) => {
@@ -72,12 +77,25 @@ const InputArea: FC<InputAreaProps> = (props) => {
     placeholder,
     disabled = false,
     loading = false,
-    minRows = 3,
+    minRows = 1,
     className,
     style,
+    agentState = 'idle',
   } = props;
 
   const { t } = useTranslation('llmbox');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-grow: 根据内容自动调整高度
+  const handleInput = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const el = e.target;
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, MAX_HEIGHT) + 'px';
+      onChange(el.value);
+    },
+    [onChange],
+  );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -121,9 +139,10 @@ const InputArea: FC<InputAreaProps> = (props) => {
 
       {/* 输入框 */}
       <textarea
+        ref={textareaRef}
         className={styles.textarea}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={handleInput}
         onKeyDown={handleKeyDown}
         placeholder={placeholder || t('inputPlaceholder')}
         disabled={disabled}
@@ -132,6 +151,12 @@ const InputArea: FC<InputAreaProps> = (props) => {
 
       {/* 工具条 */}
       <div className={styles.toolbar}>
+        {agentState !== 'idle' && (
+          <span
+            className={classNames(styles.statusDot, styles.statusDotActive)}
+          />
+        )}
+        <div style={{ flex: 1 }} />
         <Button
           className={styles.sendButton}
           appearance="primary"

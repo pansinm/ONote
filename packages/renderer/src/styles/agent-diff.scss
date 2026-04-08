@@ -1,0 +1,12 @@
+.agent-diff-insert {
+  background-color: rgba(16, 185, 129, 0.15);
+  border-left: 3px solid #10b981;
+}
+.agent-diff-delete {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-left: 3px solid #ef4444;
+}
+.agent-diff-change {
+  background-color: rgba(59, 130, 246, 0.12);
+  border-left: 3px solid #3b82f6;
+}

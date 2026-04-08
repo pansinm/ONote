@@ -1,18 +1,36 @@
 // 拖拽配置常量
 export const RESIZE_CONFIG = {
+  // 侧边栏配置
+  sidebar: {
+    min: 150,
+    max: 500,
+    default: 200,
+    cssVar: '--sidebar-width',
+    unit: 'px' as const,
+  },
+  // 文件列表配置
+  fileList: {
+    min: 150,
+    max: 500,
+    default: 230,
+    cssVar: '--file-list-width',
+    unit: 'px' as const,
+  },
   // 编辑器配置
   editor: {
-    min: 100,
-    max: 1200,
-    default: 500,
+    min: 10,
+    max: 90,
+    default: 50,
     cssVar: '--editor-width',
+    unit: '%' as const,
   },
   // LLMBox 配置
   llmbox: {
-    min: 200,
-    max: 800,
-    default: 400,
+    min: 10,
+    max: 80,
+    default: 30,
     cssVar: '--llmbox-width',
+    unit: '%' as const,
   },
   // 拖拽手柄配置
   dragHandle: {
@@ -36,42 +54,73 @@ export const RESIZE_CONFIG = {
 /**
  * 更新 CSS 变量宽度
  * @param cssVarName CSS 变量名
- * @param delta 拖拽增量
- * @param min 最小像素值
- * @param max 最大像素值
- * @param isReverse 是否反向（LLMBox 拖拽时需要反向）
+ * @param delta 拖拽增量（像素）
+ * @param min 最小值（px 为像素，% 为百分比）
+ * @param max 最大值（px 为像素，% 为百分比）
+ * @param unit 单位类型
+ * @param isReverse 是否反向（llmbox 手柄在左侧，向左拖 delta < 0，宽度应变大）
+ * @param referenceWidth % 单位的参考容器像素宽度（即 CSS 变量所在元素的 containing block 宽度）
  */
 export function updateWidth(
   cssVarName: string,
   delta: number,
   min: number,
   max: number,
+  unit: 'px' | '%',
   isReverse = false,
+  referenceWidth?: number,
 ): void {
-  const widthStr = getComputedStyle(document.documentElement)
-    .getPropertyValue(cssVarName)
-    .trim();
-  const currentPixels = parseFloat(widthStr) || min;
-  const newPixels = isReverse ? currentPixels - delta : currentPixels + delta;
-  const newWidth = Math.max(min, Math.min(max, newPixels));
+  const root = document.documentElement;
+  const widthStr = getComputedStyle(root).getPropertyValue(cssVarName).trim();
 
-  document.documentElement.style.setProperty(cssVarName, `${newWidth}px`);
+  if (unit === 'px') {
+    const currentPixels = parseFloat(widthStr) || min;
+    const newPixels = isReverse ? currentPixels - delta : currentPixels + delta;
+    const clampedWidth = Math.max(min, Math.min(max, newPixels));
+    root.style.setProperty(cssVarName, `${clampedWidth}px`);
+  } else {
+    // % 单位：参考容器宽度必须由调用方传入，否则降级到 window.innerWidth
+    const containerWidth = referenceWidth || window.innerWidth;
+    const currentPercent = parseFloat(widthStr) || min;
+    const currentPixels = (currentPercent / 100) * containerWidth;
+    const effectiveDelta = isReverse ? -delta : delta;
+    const newPixels = currentPixels + effectiveDelta;
+    const newPercent = (newPixels / containerWidth) * 100;
+    const clampedPercent = Math.max(min, Math.min(max, newPercent));
+    root.style.setProperty(cssVarName, `${clampedPercent}%`);
+  }
 }
 
 /**
  * 从本地存储加载面板宽度设置
+ * 会校验单位一致性，丢弃单位不匹配的旧值（旧 bug 可能将 % 变量写成了 px）
  */
 export function loadSavedWidths(): void {
   try {
     const saved = localStorage.getItem('onote-panel-widths');
-    if (saved) {
-      const widths = JSON.parse(saved);
-      if (widths.editor) {
-        document.documentElement.style.setProperty('--editor-width', widths.editor);
+    if (!saved) return;
+    const widths = JSON.parse(saved);
+    const root = document.documentElement;
+
+    type PanelKey = 'sidebar' | 'fileList' | 'editor' | 'llmbox';
+    const expectedUnits: Record<PanelKey, string> = {
+      sidebar: 'px',
+      fileList: 'px',
+      editor: '%',
+      llmbox: '%',
+    };
+
+    for (const [key, expectedSuffix] of Object.entries(expectedUnits) as [PanelKey, string][]) {
+      const value = widths[key];
+      if (typeof value !== 'string') continue;
+      const config = RESIZE_CONFIG[key];
+      // 单位校验：值必须以期望的后缀结尾
+      if (!value.endsWith(expectedSuffix)) {
+        console.warn(`[loadSavedWidths] Discarding stale ${key} value "${value}" (expected ${expectedSuffix}), using default`);
+        root.style.setProperty(config.cssVar, `${config.default}${expectedSuffix}`);
+        continue;
       }
-      if (widths.llmbox) {
-        document.documentElement.style.setProperty('--llmbox-width', widths.llmbox);
-      }
+      root.style.setProperty(config.cssVar, value);
     }
   } catch (error) {
     console.error('[loadSavedWidths] Failed to load widths:', error);
@@ -83,16 +132,14 @@ export function loadSavedWidths(): void {
  */
 export function saveWidths(): void {
   try {
-    const editorWidth = getComputedStyle(document.documentElement)
-      .getPropertyValue('--editor-width')
-      .trim();
-    const llmboxWidth = getComputedStyle(document.documentElement)
-      .getPropertyValue('--llmbox-width')
-      .trim();
-    localStorage.setItem(
-      'onote-panel-widths',
-      JSON.stringify({ editor: editorWidth, llmbox: llmboxWidth }),
-    );
+    const root = document.documentElement;
+    const widths = {
+      sidebar: getComputedStyle(root).getPropertyValue('--sidebar-width').trim(),
+      fileList: getComputedStyle(root).getPropertyValue('--file-list-width').trim(),
+      editor: getComputedStyle(root).getPropertyValue('--editor-width').trim(),
+      llmbox: getComputedStyle(root).getPropertyValue('--llmbox-width').trim(),
+    };
+    localStorage.setItem('onote-panel-widths', JSON.stringify(widths));
   } catch (error) {
     console.error('[saveWidths] Failed to save widths:', error);
   }
@@ -103,12 +150,20 @@ export function saveWidths(): void {
  */
 export function resetWidths(): void {
   document.documentElement.style.setProperty(
+    '--sidebar-width',
+    `${RESIZE_CONFIG.sidebar.default}px`,
+  );
+  document.documentElement.style.setProperty(
+    '--file-list-width',
+    `${RESIZE_CONFIG.fileList.default}px`,
+  );
+  document.documentElement.style.setProperty(
     '--editor-width',
-    `${RESIZE_CONFIG.editor.default}px`,
+    `${RESIZE_CONFIG.editor.default}%`,
   );
   document.documentElement.style.setProperty(
     '--llmbox-width',
-    `${RESIZE_CONFIG.llmbox.default}px`,
+    `${RESIZE_CONFIG.llmbox.default}%`,
   );
   saveWidths();
 }

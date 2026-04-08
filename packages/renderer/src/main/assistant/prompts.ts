@@ -180,6 +180,42 @@ ${stores.activationStore.openedFiles.map((file) => file).join('\n')}
 ${stores.activationStore.activeFileUri}
 </current_note>
 
+${buildCurrentNoteContent(editor)}
+
 ${selectionXml}
 </env>`.trim();
+}
+
+/** 文档注入阈值：超过此行数则截断 */
+const DOC_INJECT_MAX_LINES = 500;
+/** 截断时以选中行/中心行为基准，向上下各取这么多行 */
+const DOC_INJECT_WINDOW = 100;
+
+function buildCurrentNoteContent(editor: monaco.editor.ICodeEditor | undefined): string {
+  if (!editor) return '';
+  const model = editor.getModel();
+  if (!model) return '';
+
+  const content = model.getValue();
+  const lines = content.split('\n');
+
+  const editorSelection = editor.getSelection();
+
+  if (lines.length > DOC_INJECT_MAX_LINES) {
+    const centerLine = editorSelection
+      ? editorSelection.startLineNumber
+      : Math.floor(lines.length / 2);
+    const start = Math.max(1, centerLine - DOC_INJECT_WINDOW);
+    const end = Math.min(lines.length, centerLine + DOC_INJECT_WINDOW);
+    const truncatedLines: string[] = [];
+    if (start > 1) truncatedLines.push(`... (${start - 1} lines before) ...`);
+    for (let i = start - 1; i < end; i++) {
+      truncatedLines.push(`${i + 1}|${lines[i]}`);
+    }
+    if (end < lines.length) truncatedLines.push(`... (${lines.length - end} lines after) ...`);
+    return `<current_note_content>\n${truncatedLines.join('\n')}\n</current_note_content>`;
+  }
+
+  const numberedLines = lines.map((line, index) => `${index + 1}|${line}`);
+  return `<current_note_content>\n${numberedLines.join('\n')}\n</current_note_content>`;
 }

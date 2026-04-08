@@ -9,10 +9,12 @@ import type { FC } from 'react';
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
-import Header from './Header';
+import * as monaco from 'monaco-editor';
 import MessageList from './MessageList';
 import type { MessageListRef } from './MessageList';
 import InputArea from './InputArea';
+import type { Quote } from './InputArea';
+import PendingChangesBar from './PendingChangesBar';
 import type { Message, UserMessage, AgentMessage } from '/@/main/types/IMessage';
 import styles from './LLMBox.module.scss';
 import { assistant } from '../../assistant';
@@ -36,16 +38,44 @@ const LLMBox: FC<LLMBoxProps> = observer(({ className, style }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [quote, setQuote] = useState<Quote | null>(null);
 
   const { agentStore } = stores;
 
   // Refs
   const messageListRef = useRef<MessageListRef>(null);
+  // 用 ref 追踪最新 messages，避免 useCallback 闭包捕获陈旧值
+  const messagesRef = useRef<Message[]>(messages);
+  messagesRef.current = messages;
 
   // 初始滚动到底部
   useEffect(() => {
     messageListRef.current?.scrollToBottom('auto');
   }, []);
+
+  // ========== Selection Quote：监听 Monaco editor 选中文字 ==========
+  useEffect(() => {
+    const editors = monaco.editor.getEditors();
+    if (editors.length === 0) return;
+    const editor = editors[0];
+
+    const disposable = editor.onDidChangeCursorSelection(() => {
+      if (agentStore.agentState !== 'idle') return;
+
+      const selection = editor.getSelection();
+      if (!selection || selection.isEmpty()) return;
+
+      const model = editor.getModel();
+      if (!model) return;
+
+      const text = model.getValueInRange(selection);
+      if (text && text.trim()) {
+        setQuote({ id: `q-${Date.now()}`, content: text });
+      }
+    });
+
+    return () => disposable.dispose();
+  }, [agentStore.agentState]);
 
   // Handlers
   const handleSend = useCallback(() => {
@@ -62,16 +92,21 @@ const LLMBox: FC<LLMBoxProps> = observer(({ className, style }) => {
 
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
+    setQuote(null);
     messageListRef.current?.scrollToBottom('auto');
     setIsLoading(true);
 
-    assistant.chat(inputValue, async (event) => {
+    const capturedInput = inputValue;
+
+    assistant.chat(capturedInput, async (event) => {
       agentStore.handleEvent(event);
 
       if (event.type === 'step-start' || event.type === 'step-delta' || event.type === 'step-complete') {
-        const existingMessage = messages.find(
+        // 通过 ref 读取最新 messages，避免闭包陈旧值
+        const currentMessages = messagesRef.current;
+        const existingMessage = currentMessages.find(
           (msg) => msg.id === agentStore.currentMessageId && msg.role === 'assistant',
-        ) as AgentMessage;
+        ) as AgentMessage | undefined;
 
         if (event.type === 'step-start') {
           if (!existingMessage) {
@@ -117,15 +152,11 @@ const LLMBox: FC<LLMBoxProps> = observer(({ className, style }) => {
         );
       }
     });
-  }, [inputValue, isLoading, agentStore, messages]);
-
-  const handleClearQuote = useCallback(() => {
-    // 当前没有实现引用功能，预留接口
-  }, []);
+  }, [inputValue, isLoading, agentStore]);
 
   return (
     <div className={classNames(styles.container, className)} style={style}>
-      <Header title={t('agentTitle')} agentState={agentStore.agentState} className={styles.header} />
+      <PendingChangesBar />
       <MessageList
         ref={messageListRef}
         messages={messages}
@@ -135,12 +166,14 @@ const LLMBox: FC<LLMBoxProps> = observer(({ className, style }) => {
         value={inputValue}
         onChange={setInputValue}
         onSend={handleSend}
-        onClearQuote={handleClearQuote}
+        quote={quote ?? undefined}
+        onClearQuote={() => setQuote(null)}
         placeholder={t('inputMessagePlaceholder')}
         disabled={isLoading}
         loading={isLoading}
-        minRows={3}
+        minRows={1}
         className={styles.inputArea}
+        agentState={agentStore.agentState}
       />
     </div>
   );

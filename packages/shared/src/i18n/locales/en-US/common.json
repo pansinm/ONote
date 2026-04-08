@@ -67,5 +67,6 @@
   "agentIcon": "Agent icon",
   "completed": "Completed",
   "inProgress": "In progress",
-  "selectDirectory": "Select Directory"
+  "selectDirectory": "Select Directory",
+  "emptyStateHint": "Open a note to start writing"
 }

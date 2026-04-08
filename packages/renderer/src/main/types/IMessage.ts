@@ -9,7 +9,7 @@
 
 export type MessageRole = 'user' | 'assistant' | 'system' | 'session_divider';
 
-export type StepType = 'thinking' | 'tool_call' | 'summary' | 'error';
+export type StepType = 'thinking' | 'response' | 'tool_call' | 'summary' | 'error';
 
 export interface BaseMessage {
   id: string;

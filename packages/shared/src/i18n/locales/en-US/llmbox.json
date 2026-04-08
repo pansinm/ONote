@@ -3,10 +3,20 @@
   "inputPlaceholder": "Type a message...",
   "clearQuote": "Clear quote",
   "thinking": "Thinking",
+  "response": "Response",
   "toolCall": "Tool Call",
   "summary": "Summary",
   "generating": "Generating...",
   "arguments": "Arguments:",
   "result": "Result:",
-  "agentTitle": "Agent"
+  "agentTitle": "Agent",
+  "pendingChangesTitle": "Agent modified this file ({{count}} changes)",
+  "acceptAll": "Accept All",
+  "rejectAll": "Reject All",
+  "accept": "Accept",
+  "reject": "Reject",
+  "insert": "Added {{count}} lines",
+  "delete": "Deleted {{count}} lines",
+  "change": "Modified {{count}} lines",
+  "conflicted": "Content was modified manually, cannot auto-revert"
 }

@@ -2,7 +2,7 @@ import type { WorkStep, ToolCall as IMessageToolCall } from './IMessage';
 
 export interface ExecutionStep extends Omit<WorkStep, 'type'> {
   id: string;
-  type: 'thinking' | 'tool_call' | 'summary' | 'error';
+  type: 'thinking' | 'response' | 'tool_call' | 'summary' | 'error';
   isCompleted: boolean;
   timestamp: number;
 }

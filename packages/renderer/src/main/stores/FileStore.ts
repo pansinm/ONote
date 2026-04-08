@@ -4,6 +4,7 @@ import * as monaco from 'monaco-editor';
 import { stringify } from 'yaml';
 import { isMarkdown } from '../../common/utils/uri';
 import { filePanelManager } from '../frame';
+import stores from './index';
 
 type FileState =
   | 'loading'
@@ -60,6 +61,9 @@ class FileStateStore {
   }
 
   closeFile(uri: string) {
+    // 关闭前 revert 所有未审查的 Agent 修改
+    // ESM live binding 保证运行时 pendingChangeStore 已初始化（不存在构造时访问）
+    stores.pendingChangeStore?.revertAllForUri(uri);
     return this.getModel(uri)?.dispose();
   }
 

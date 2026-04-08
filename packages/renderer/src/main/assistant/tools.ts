@@ -1,8 +1,11 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import * as monaco from 'monaco-editor';
+import { v4 as uuidv4 } from 'uuid';
+
 import stores from '../stores';
 import fileService from '../services/fileService';
+import type { PendingChange } from '../types/PendingChange';
 
 export const readFile = tool({
   description:
@@ -131,46 +134,103 @@ export const applyPatch = tool({
   execute: async ({ uri, patches }) => {
     try {
       const model = await stores.fileStore.getOrCreateModel(uri);
+      const versionId = model.getVersionId();
+      const changes: PendingChange[] = [];
+      const lineCount = model.getLineCount();
 
-      // Convert to Monaco edit operations
-      const edits: monaco.editor.IIdentifiedSingleEditOperation[] = patches.map(
-        (patch) => {
-          const {
-            startLine,
-            startColumn = 1,
-            endLine,
-            endColumn,
-            newText,
-          } = patch;
+      // 预校验：所有 patch 的行号必须在合法范围内
+      for (const patch of patches) {
+        if (patch.startLine < 1 || patch.endLine < patch.startLine) {
+          throw new Error(`Invalid line range: startLine=${patch.startLine}, endLine=${patch.endLine}`);
+        }
+        if (patch.endLine > lineCount) {
+          throw new Error(`Line ${patch.endLine} out of bounds (file has ${lineCount} lines)`);
+        }
+      }
 
-          // Calculate end column if not provided
-          let actualEndColumn = endColumn;
-          if (actualEndColumn === undefined) {
-            const lineContent = model.getLineContent(endLine) || '';
-            actualEndColumn = lineContent.length + 1;
-          }
+      // 倒序排序：从最后一行往前 apply，避免位置偏移
+      const sortedPatches = [...patches].sort((a, b) => {
+        if (b.startLine !== a.startLine) return b.startLine - a.startLine;
+        return (b.startColumn ?? 1) - (a.startColumn ?? 1);
+      });
 
-          return {
-            range: new monaco.Range(
-              startLine,
-              startColumn,
-              endLine,
-              actualEndColumn,
-            ),
-            text: newText,
-            forceMoveMarkers: true,
-          };
-        },
-      );
+      // 所有 patch 包在同一个 undo group 里，用户 Ctrl+Z 一次即可撤销
+      model.pushStackElement();
 
-      // Apply all edits in one batch
-      const { applyModelEdits } = await import('../monaco/utils');
-      applyModelEdits(model, edits);
+      for (const patch of sortedPatches) {
+        const startCol = patch.startColumn ?? 1;
+        const endCol =
+          patch.endColumn ?? model.getLineContent(patch.endLine).length + 1;
+        const range = new monaco.Range(
+          patch.startLine,
+          startCol,
+          patch.endLine,
+          endCol,
+        );
+        const originalText = model.getValueInRange(range);
 
-      // Save file
-      await stores.fileStore.save(uri);
+        // Apply 单个 patch（不带额外的 undo boundary）
+        model.pushEditOperations([], [
+          { range, text: patch.newText, forceMoveMarkers: true },
+        ], () => []);
 
-      return `Successfully applied ${patches.length} edit operation(s)`;
+        // 计算新文本的精确 range
+        const newLines = patch.newText.split('\n');
+        const newEndLine = patch.startLine + newLines.length - 1;
+        const newEndCol =
+          newLines.length === 1
+            ? startCol + newLines[0].length
+            : newLines[newLines.length - 1].length;
+        const newRange = new monaco.Range(
+          patch.startLine,
+          startCol,
+          newEndLine,
+          newEndCol,
+        );
+
+        // 立即创建 decoration
+        const diffType =
+          originalText === ''
+            ? 'insert'
+            : patch.newText === ''
+              ? 'delete'
+              : 'change';
+
+        const [decorationId] = model.deltaDecorations([], [
+          {
+            range: newRange,
+            options: {
+              className: `agent-diff-${diffType}`,
+              stickiness:
+                monaco.editor.TrackedRangeStickiness
+                  .NeverGrowsWhenTypingAtEdges,
+              isWholeLine: true,
+              overviewRuler: {
+                color: '#3b82f6',
+                position: monaco.editor.OverviewRulerLane.Full,
+              },
+            },
+          },
+        ]);
+
+        changes.push({
+          id: uuidv4(),
+          uri,
+          originalText,
+          newText: patch.newText,
+          decorationId,
+          versionId,
+          status: 'pending',
+          label: `L${patch.startLine}${patch.endLine !== patch.startLine ? `-${patch.endLine}` : ''}`,
+        });
+      }
+
+      model.pushStackElement();
+
+      // 注册到 PendingChangeStore（不 save，等用户 review）
+      stores.pendingChangeStore.addGroup(uri, changes);
+
+      return `Applied ${patches.length} edit(s). Awaiting review.`;
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
