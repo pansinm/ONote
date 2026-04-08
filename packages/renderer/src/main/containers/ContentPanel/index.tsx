@@ -39,9 +39,12 @@ const ContentPanel = observer(() => {
         <div className={styles.empty}>
           <DocumentRegular className={styles.emptyIcon} style={{ fontSize: '48px' }} />
           <span className={styles.emptyText}>{t('emptyStateHint')}</span>
+          {!rootUri && (
+            <span className={styles.emptyText}>{t('menu:openFolderHint')}</span>
+          )}
           {rootUri && (
             <Button
-              appearance="primary"
+              appearance="subtle"
               onClick={() => createFile(rootUri, 'file').catch(() => {})}
             >
               {t('menu:createNote')}

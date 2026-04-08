@@ -85,7 +85,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
           flexDirection: 'column',
         }}
       >
-        {isMarkdown(props.uri) && <Toolbar />}
+        <Toolbar isMarkdown={isMarkdown(props.uri)} />
         <div
           style={{
             position: 'relative',
