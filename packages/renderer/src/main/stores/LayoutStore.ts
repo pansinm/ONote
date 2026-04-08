@@ -5,9 +5,10 @@ type Layout = 'split' | 'editor-only' | 'previewer-only';
 const layouts: Layout[] = ['split', 'editor-only', 'previewer-only'];
 class LayoutStore {
   layout: Layout = 'split';
-  sidebarShown: undefined | boolean = undefined;
+  /** undefined = 从未打开过 LLMBox; true = 可见; false = 已隐藏 */
+  llmBoxVisible: undefined | boolean = undefined;
 
-  sidebarUrl = '';
+  llmBoxUrl = '';
 
   constructor() {
     makeAutoObservable(this);
@@ -23,13 +24,13 @@ class LayoutStore {
     this.layout = layout;
   }
 
-  showSidebar(url: string) {
-    this.sidebarShown = true;
-    this.sidebarUrl = url;
+  showLLMBox(url: string) {
+    this.llmBoxVisible = true;
+    this.llmBoxUrl = url;
   }
 
-  hideSidebar() {
-    this.sidebarShown = false;
+  hideLLMBox() {
+    this.llmBoxVisible = false;
   }
 }
 

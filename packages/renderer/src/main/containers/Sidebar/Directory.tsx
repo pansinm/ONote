@@ -15,14 +15,15 @@ import NoDirectory from './NoDirectory';
 import '@sinm/react-file-tree/styles.css';
 import '@sinm/react-file-tree/icons.css';
 
-const MENU_ID = 'DIRECTORY_MENU';
+const DIRECTORY_MENU_ID = 'DIRECTORY_MENU';
+const FILE_MENU_ID = 'FILE_MENU';
 
 import orderBy from 'lodash/orderBy';
 import { when } from 'mobx';
 import { getParentUri, isEquals, pathanme } from '/@/common/utils/uri';
 import fileService from '../../services/fileService';
 
-// directory first and filename dict sort
+// directory first, then by name
 const sorter = (treeNodes: TreeNode[]) =>
   orderBy(
     treeNodes,
@@ -38,30 +39,26 @@ const Directory = observer(() => {
   const [tree, setTree] = useState<TreeNode | undefined>(undefined);
   const { t } = useTranslation('menu');
 
-  const baseMenus: MenuItem[] = useMemo(() => [
-    {
-      id: 'CREATE_FILE',
-      title: t('createNote'),
-    },
-    {
-      id: 'CREATE_DIRECTORY',
-      title: t('createDirectory'),
-    },
-    {
-      id: 'RENAME_DIRECTORY',
-      title: t('renameNote'),
-    },
-    {
-      id: 'DELETE_DIRECTORY',
-      title: t('deleteDirectory'),
-    },
-    {
-      id: 'COPY_PATH',
-      title: t('copyPath'),
-    },
+  const dirMenus: MenuItem[] = useMemo(() => [
+    { id: 'CREATE_FILE', title: t('createNote') },
+    { id: 'CREATE_DIRECTORY', title: t('createDirectory') },
+    { id: 'RENAME', title: t('renameNote') },
+    { id: 'DELETE', title: t('deleteDirectory') },
+    { id: 'COPY_PATH', title: t('copyPath') },
   ], [t]);
 
+  const fileMenus: MenuItem[] = useMemo(() => [
+    { id: 'RENAME_FILE', title: t('renameNote') },
+    { id: 'DELETE_FILE', title: t('deleteNote') },
+    { id: 'COPY_PATH', title: t('copyPath') },
+    { id: 'EXPORT_PDF', title: t('exportPdf') },
+  ], [t]);
+
+  const { show: showDirMenu } = useContextMenu({ id: DIRECTORY_MENU_ID });
+  const { show: showFileMenu } = useContextMenu({ id: FILE_MENU_ID });
+
   const toggleExpanded = (treeNode: TreeNode) => {
+    if (treeNode.type !== 'directory') return;
     const loading = !treeNode.children;
     setTree((t) =>
       utils.assignTreeNode(t, treeNode.uri, {
@@ -74,7 +71,7 @@ const Directory = observer(() => {
         setTree((t) =>
           utils.assignTreeNode(t, treeNode.uri, {
             loading: false,
-            children: children.filter((child) => child.type === 'directory'),
+            children,
           } as any),
         );
       });
@@ -96,9 +93,7 @@ const Directory = observer(() => {
   useEffect(() => {
     if (rootUri) {
       fileService.getTreeNode(rootUri).then((node) => {
-        node.children = node.children?.filter(
-          (item) => item.type === 'directory',
-        );
+        // 不再过滤：显示所有文件和文件夹
         setTree(node);
         toggleExpanded(node);
       });
@@ -107,13 +102,9 @@ const Directory = observer(() => {
     }
   }, [rootUri]);
 
-  const { show: showMenu } = useContextMenu({
-    id: MENU_ID,
-  });
-
   const { Modal, createFile, deleteFile, renameFile } = useFileOperation();
 
-  const handleMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
+  const handleDirMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
     const dirUri = (menuProps as unknown as TreeNode).uri;
     switch (menu.id) {
       case 'CREATE_DIRECTORY':
@@ -121,14 +112,17 @@ const Directory = observer(() => {
           treeNode && appendTreeNode(dirUri, treeNode);
         });
       case 'CREATE_FILE':
-        return createFile(dirUri, 'file').then(() =>
-          stores.activationStore.activeDir(dirUri),
-        );
-      case 'RENAME_DIRECTORY':
+        return createFile(dirUri, 'file').then((treeNode) => {
+          if (treeNode) {
+            appendTreeNode(dirUri, treeNode);
+            stores.activationStore.activeFile(treeNode.uri);
+          }
+        });
+      case 'RENAME':
         return renameFile(dirUri, 'directory').then((node) => {
           replaceTreeNode(dirUri, node);
         });
-      case 'DELETE_DIRECTORY':
+      case 'DELETE':
         return deleteFile(dirUri, 'directory').then(() => {
           removeTreeNode(dirUri);
         });
@@ -143,15 +137,52 @@ const Directory = observer(() => {
     }
   };
 
+  const handleFileMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
+    const uri = (menuProps as unknown as TreeNode).uri;
+    switch (menu.id) {
+      case 'RENAME_FILE':
+        return renameFile(uri, 'file').then((node) => {
+          replaceTreeNode(uri, node);
+        });
+      case 'DELETE_FILE':
+        return deleteFile(uri, 'file').then(() => {
+          removeTreeNode(uri);
+        });
+      case 'COPY_PATH':
+        return navigator.clipboard.writeText(decodeURIComponent(pathanme(uri)));
+      case 'EXPORT_PDF': {
+        const content = await fileService.readText(uri);
+        return window.onote.export.invoke('exportToPdf', uri, content);
+      }
+      case 'OPEN_FOLDER':
+        return window.simmer.openPath(getParentUri(uri));
+      default:
+        return;
+    }
+  };
+
   const treeItemRenderer: FileTreeProps['itemRenderer'] = useCallback(
-    (treeNode: TreeNode) => (
-      <FileTreeItem
-        onContextMenu={(event) => showMenu(event, { props: treeNode })}
-        active={isEquals(treeNode.uri, stores.activationStore.activeDirUri)}
-        treeNode={treeNode}
-      />
-    ),
-    [],
+    (treeNode: TreeNode) => {
+      const isDir = treeNode.type === 'directory';
+      return (
+        <FileTreeItem
+          onContextMenu={(event) => {
+            if (isDir) {
+              showDirMenu(event, { props: treeNode });
+            } else {
+              showFileMenu(event, { props: treeNode });
+            }
+          }}
+          active={
+            isDir
+              ? isEquals(treeNode.uri, stores.activationStore.activeDirUri)
+              : isEquals(treeNode.uri, stores.activationStore.activeFileUri)
+          }
+          treeNode={treeNode}
+        />
+      );
+    },
+    [showDirMenu, showFileMenu],
   );
 
   const handleDrop: FileTreeProps['onDrop'] = async (e, fromUri, toDirUri) => {
@@ -164,25 +195,32 @@ const Directory = observer(() => {
     const to = await fileService.move(fromUri, toDirUri);
     await removeTreeNode(fromUri);
     await appendTreeNode(toDirUri, to);
-    stores.fileListStore.refreshFiles();
   };
 
-  const menus = useMemo(() =>
+  const localDirMenus = useMemo(() =>
     stores.activationStore.dataSourceId === 'local'
-      ? [...baseMenus, { id: 'OPEN_FOLDER', title: t('openFolder') }]
-      : baseMenus,
-  [baseMenus, t]);
+      ? [...dirMenus, { id: 'OPEN_FOLDER', title: t('openFolder') }]
+      : dirMenus,
+  [dirMenus, t]);
+
+  const localFileMenus = useMemo(() =>
+    stores.activationStore.dataSourceId === 'local'
+      ? [...fileMenus, { id: 'OPEN_FOLDER', title: t('openFolder') }]
+      : fileMenus,
+  [fileMenus, t]);
 
   const handleItemClick = (treeNode: TreeNode) => {
-    if (
-      !treeNode.expanded ||
-      stores.activationStore.activeDirUri === treeNode.uri
-    ) {
-      toggleExpanded(treeNode);
+    if (treeNode.type === 'directory') {
+      if (!treeNode.expanded || stores.activationStore.activeDirUri === treeNode.uri) {
+        toggleExpanded(treeNode);
+      } else {
+        replaceTreeNode(treeNode.uri, { ...treeNode });
+      }
+      stores.activationStore.activeDir(treeNode.uri);
     } else {
-      replaceTreeNode(treeNode.uri, { ...treeNode });
+      // 文件：直接打开
+      stores.activationStore.activeFile(treeNode.uri);
     }
-    stores.activationStore.activeDir(treeNode.uri);
   };
 
   return (
@@ -197,7 +235,8 @@ const Directory = observer(() => {
         itemRenderer={treeItemRenderer}
         rowHeight={34}
       />
-      <Menu menuId={MENU_ID} menus={menus} onClick={handleMenuClick} />
+      <Menu menuId={DIRECTORY_MENU_ID} menus={localDirMenus} onClick={handleDirMenuClick} />
+      <Menu menuId={FILE_MENU_ID} menus={localFileMenus} onClick={handleFileMenuClick} />
       <Modal />
     </div>
   );

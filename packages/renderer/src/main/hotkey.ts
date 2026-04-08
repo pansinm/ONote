@@ -104,10 +104,10 @@ function handleToggleSidebar(): void {
 /** Ctrl/Cmd+J — 切换 LLMBox */
 function handleToggleLLMBox(): void {
   const { layoutStore } = stores;
-  if (layoutStore.sidebarShown) {
-    layoutStore.hideSidebar();
+  if (layoutStore.llmBoxVisible) {
+    layoutStore.hideLLMBox();
   } else {
-    layoutStore.showSidebar('llmbox');
+    layoutStore.showLLMBox('llmbox');
   }
 }
 
@@ -122,7 +122,7 @@ function handleCloseTab(): void {
 /** Ctrl/Cmd+P — 聚焦搜索框 */
 function handleFocusSearch(): void {
   const searchInput = document.querySelector<HTMLInputElement>(
-    '.file-list input[type="search"]',
+    'input[type="text"]',
   );
   if (searchInput) {
     searchInput.focus();
@@ -215,7 +215,7 @@ function globalKeydownHandler(e: KeyboardEvent) {
   // ── 无修饰键 ────────────────────────────────────────────────────────
   if (e.key === 'Escape') {
     const searchInput = document.querySelector<HTMLInputElement>(
-      '.file-list input[type="search"]',
+      'input[type="text"]',
     );
     if (searchInput && document.activeElement === searchInput) {
       // 通过 React 可识别的方式清空受控输入框

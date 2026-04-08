@@ -6,7 +6,7 @@ import styles from './App.module.scss';
 import { observer } from 'mobx-react-lite';
 import stores from './stores';
 import EventBus from './containers/EventBus';
-import Page from './containers/Page';
+import ContentPanel from './containers/ContentPanel';
 import { getLogger } from '/@/shared/logger';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { DragIndicator, DragHandle } from '/@/components/DragBarNew';
@@ -50,7 +50,18 @@ const App: FC = observer(() => {
             isDragging={dragState.isDragging && dragState.type === 'sidebar'}
           />
         </div>
-        <Page />
+        <div
+          style={{
+            display: 'flex',
+            flex: 1,
+            flexDirection: 'column',
+            maxWidth: stores.activationStore.hideSidebar
+              ? '100vw'
+              : 'calc(100vw - var(--sidebar-width))',
+          }}
+        >
+          <ContentPanel />
+        </div>
         <EventBus />
         <DragIndicator
           visible={dragState.isDragging}

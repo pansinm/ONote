@@ -57,7 +57,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
 
   const showEditorOnly = layout === 'editor-only' || !previewerUri;
   const showPreviewerOnly = layout === 'previewer-only';
-  const showSidebar = typeof stores.layoutStore.sidebarShown === 'boolean';
+  const showLLMBox = typeof stores.layoutStore.llmBoxVisible === 'boolean';
   const showBothEditorAndPreview = !showEditorOnly && !showPreviewerOnly;
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +67,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
     loadSavedWidths();
   }, []);
 
-  const containerWidth = showSidebar
+  const containerWidth = showLLMBox
     ? 'calc(100% - var(--llmbox-width))'
     : '100%';
 
@@ -154,19 +154,19 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               )}
               <Previewer previewerUri={previewerUri} />
             </div>
-            {showSidebar && (
+            {showLLMBox && (
               <div
                 className="llmbox-container"
                 style={{
-                  width: stores.layoutStore.sidebarShown
+                  width: stores.layoutStore.llmBoxVisible
                     ? 'var(--llmbox-width)'
                     : '0',
-                  minWidth: stores.layoutStore.sidebarShown
+                  minWidth: stores.layoutStore.llmBoxVisible
                     ? 'var(--llmbox-width)'
                     : '0',
                   maxWidth: 'var(--llmbox-width)',
                   position: 'relative',
-                  display: stores.layoutStore.sidebarShown ? 'block' : 'none',
+                  display: stores.layoutStore.llmBoxVisible ? 'block' : 'none',
                   overflow: 'hidden',
                   flexShrink: 0,
                 }}

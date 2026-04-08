@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from './index.module.scss';
-import useDimensions from '../../../hooks/useDimensions';
 import stores from '../../stores';
 import Flex from '/@/components/Flex';
 import Directory from './Directory';
@@ -10,9 +9,74 @@ import { useLocalStorage } from 'react-use';
 import fileService from '../../services/fileService';
 import ProjectSelector from './ProjectSelector';
 import SettingTrigger from '../Setting/SettingTrigger';
+import { useTranslation } from 'react-i18next';
+import { DismissRegular } from '@fluentui/react-icons';
+import { makeStyles, shorthands } from '@fluentui/react-components';
+import type FileListStore from '../../stores/FileListStore';
+import SearchList from '../FileList/SearchList';
+import type { TreeNode } from '@sinm/react-file-tree/lib/type';
+import { useLatest } from 'react-use';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('Sidebar');
+
+type SorterType = FileListStore['sorter'];
+
+const useStyles = makeStyles({
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: '10px',
+    gap: '4px',
+  },
+  inputWrap: {
+    position: 'relative',
+    ...shorthands.flex(1),
+    minWidth: '50px',
+  },
+  input: {
+    width: '100%',
+    height: '28px',
+    ...shorthands.padding('5px', '28px', '5px', '10px'),
+    ...shorthands.border('1px', 'solid', '#d3b17d'),
+    '::placeholder': {
+      fontFamily: 'bootstrap-icons, inherit',
+    },
+  },
+  clearBtn: {
+    position: 'absolute',
+    right: '4px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '20px',
+    height: '20px',
+    cursor: 'pointer',
+    color: '#8a8886',
+    borderRadius: '2px',
+    ':hover': {
+      backgroundColor: 'rgba(0,0,0,0.06)',
+      color: '#323130',
+    },
+  },
+  iconBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '28px',
+    height: '28px',
+    cursor: 'pointer',
+    borderRadius: '3px',
+    ':hover': {
+      backgroundColor: 'rgba(0,0,0,0.05)',
+    },
+  },
+});
 
 export default observer(function ActivityBar() {
-  const [ref] = useDimensions();
   const [open, setOpen] = useState(false);
   const [project, setProject] = useLocalStorage<
     | {
@@ -23,15 +87,59 @@ export default observer(function ActivityBar() {
     | undefined
   >('project');
 
+  const { t } = useTranslation('menu');
+  const headerStyles = useStyles();
+
+  // ===== 搜索功能 =====
+  const [searchText, setSearchText] = useState('');
+  const [searchFiles, setSearchFiles] = useState<TreeNode[]>([]);
+  const latestText = useLatest(searchText);
+
+  const search = async (keywords: string) => {
+    try {
+      const filterFiles = await fileService.searchFiles(
+        stores.activationStore.rootUri,
+        keywords,
+      );
+      if (keywords === latestText.current) {
+        setSearchFiles(filterFiles);
+      }
+    } catch (err) {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    if (!searchText) {
+      setSearchFiles([]);
+    } else {
+      search(searchText);
+    }
+  }, [searchText]);
+
+  // ESC 清空搜索
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape' && searchText) {
+      e.preventDefault();
+      setSearchText('');
+    }
+  }, [searchText]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, [handleKeyDown]);
+
+  const isSearching = searchText.length > 0;
+
   const handleSelect = async (project: Project) => {
     try {
       await fileService.connect(project.type, project.config);
       stores.activationStore.openNoteBook(project.type, project.rootUri);
       fileService.setRootDirUri(project.rootUri);
       setProject(project);
-      setOpen(false);
     } catch (err) {
-      //ignore {
+      //ignore
     }
   };
 
@@ -42,17 +150,71 @@ export default observer(function ActivityBar() {
   }, []);
 
   return (
-    <div className={styles.Sidebar} ref={ref}>
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <Directory />
+    <div className={styles.Sidebar}>
+      {/* 搜索头 */}
+      <div className={headerStyles.header}>
+        <div className={headerStyles.inputWrap}>
+          <input
+            className={headerStyles.input}
+            value={searchText}
+            type="text"
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder={`\uf52a ${t('searchFiles')}`}
+          />
+          {searchText && (
+            <span
+              className={headerStyles.clearBtn}
+              onClick={() => setSearchText('')}
+              title={t('clearSearch')}
+            >
+              <DismissRegular fontSize={12} />
+            </span>
+          )}
+        </div>
+        <span
+          className={headerStyles.iconBtn}
+          onClick={() => {
+            const dirUri = stores.activationStore.activeDirUri || stores.activationStore.rootUri;
+            if (dirUri) {
+              stores.activationStore.activeDir(dirUri);
+            }
+          }}
+          title={t('createNote')}
+          style={{ fontSize: '16px', color: '#5c5545' }}
+        >
+          +
+        </span>
       </div>
+
+      {/* 目录/文件树 或 搜索结果 */}
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'auto' }}>
+        {isSearching ? (
+          <>
+            <div className={styles.searchHeader}>
+              {t('searchResults')} ({searchFiles.length})
+            </div>
+            {searchFiles.length === 0 ? (
+              <div className={styles.noResults}>{t('noSearchResults')}</div>
+            ) : (
+              <SearchList
+                files={searchFiles}
+                activeUri={stores.activationStore.activeFileUri}
+                onItemClick={(treeNode: TreeNode) => {
+                  stores.activationStore.activeFile(treeNode.uri);
+                  setSearchText('');
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <Directory />
+        )}
+      </div>
+
+      {/* 底部按钮 */}
       <Flex justifyContent={'space-between'}>
         <SettingTrigger />
-        <ProjectSelector
-          open={open}
-          onOpenChange={setOpen}
-          onSelected={handleSelect}
-        />
+        <ProjectSelector open={open} onOpenChange={setOpen} onSelected={handleSelect} />
       </Flex>
     </div>
   );

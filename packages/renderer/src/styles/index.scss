@@ -42,20 +42,13 @@ body {
 
 :root {
   --editor-width: 50%;
-  --sidebar-width: 200px;
-  --file-list-width: 230px;
+  --sidebar-width: 230px;
   --llmbox-width: 30%;
-}
-
-.file-list {
-  width: var(--file-list-width);
-  min-width: 150px;
-  position: relative;
 }
 
 .sidebar {
   width: var(--sidebar-width);
-  min-width: 100px;
+  min-width: 150px;
   position: relative;
 }
 

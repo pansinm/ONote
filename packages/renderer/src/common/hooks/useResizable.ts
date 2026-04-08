@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { updateWidth, RESIZE_CONFIG, saveWidths } from '/@/common/constants/resize';
 
-export type DragType = 'editor-preview' | 'llmbox' | 'sidebar' | 'file-list';
+export type DragType = 'editor-preview' | 'llmbox' | 'sidebar';
 
 export interface DragState {
   isDragging: boolean;
@@ -70,7 +70,6 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
         'editor-preview': RESIZE_CONFIG.editor,
         'llmbox': RESIZE_CONFIG.llmbox,
         'sidebar': RESIZE_CONFIG.sidebar,
-        'file-list': RESIZE_CONFIG.fileList,
       }[dragState.type];
 
       if (config) {

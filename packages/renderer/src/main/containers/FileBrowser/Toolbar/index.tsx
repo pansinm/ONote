@@ -10,11 +10,11 @@ import { LLM_BASE_URL } from '/@/common/constants/SettingKey';
 function Toolbar() {
   const { t } = useTranslation('common');
   const toggleChatBox = () => {
-    const shown = stores.layoutStore.sidebarShown;
+    const shown = stores.layoutStore.llmBoxVisible;
     if (shown) {
-      stores.layoutStore.hideSidebar();
+      stores.layoutStore.hideLLMBox();
     } else {
-      stores.layoutStore.showSidebar('llmbox');
+      stores.layoutStore.showLLMBox('llmbox');
     }
   };
   return (

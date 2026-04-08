@@ -4,7 +4,7 @@ import LLMBox from './LLMBox';
 import stores from '../../stores';
 
 const LLMBoxContainer = observer(() => {
-  if (!stores.layoutStore.sidebarShown) {
+  if (!stores.layoutStore.llmBoxVisible) {
     return null;
   }
 

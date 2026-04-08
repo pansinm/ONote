@@ -1,19 +1,11 @@
 // 拖拽配置常量
 export const RESIZE_CONFIG = {
-  // 侧边栏配置
+  // 侧边栏配置（统一面板：目录树 + 文件列表）
   sidebar: {
     min: 150,
     max: 500,
-    default: 200,
-    cssVar: '--sidebar-width',
-    unit: 'px' as const,
-  },
-  // 文件列表配置
-  fileList: {
-    min: 150,
-    max: 500,
     default: 230,
-    cssVar: '--file-list-width',
+    cssVar: '--sidebar-width',
     unit: 'px' as const,
   },
   // 编辑器配置
@@ -109,10 +101,9 @@ export function loadSavedWidths(): void {
     const widths = JSON.parse(saved);
     const root = document.documentElement;
 
-    type PanelKey = 'sidebar' | 'fileList' | 'editor' | 'llmbox';
+    type PanelKey = 'sidebar' | 'editor' | 'llmbox';
     const expectedUnits: Record<PanelKey, string> = {
       sidebar: 'px',
-      fileList: 'px',
       editor: '%',
       llmbox: '%',
     };
@@ -142,7 +133,6 @@ export function saveWidths(): void {
     const root = document.documentElement;
     const widths = {
       sidebar: getComputedStyle(root).getPropertyValue('--sidebar-width').trim(),
-      fileList: getComputedStyle(root).getPropertyValue('--file-list-width').trim(),
       editor: getComputedStyle(root).getPropertyValue('--editor-width').trim(),
       llmbox: getComputedStyle(root).getPropertyValue('--llmbox-width').trim(),
     };
@@ -159,10 +149,6 @@ export function resetWidths(): void {
   document.documentElement.style.setProperty(
     '--sidebar-width',
     `${RESIZE_CONFIG.sidebar.default}px`,
-  );
-  document.documentElement.style.setProperty(
-    '--file-list-width',
-    `${RESIZE_CONFIG.fileList.default}px`,
   );
   document.documentElement.style.setProperty(
     '--editor-width',
