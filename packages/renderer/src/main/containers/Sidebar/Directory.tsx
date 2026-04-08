@@ -115,6 +115,7 @@ const Directory = observer(() => {
       case 'CREATE_FILE':
         return createFile(dirUri, 'file').then((treeNode) => {
           if (treeNode) {
+            setTree((t) => utils.assignTreeNode(t, dirUri, { expanded: true } as any));
             appendTreeNode(dirUri, treeNode);
             stores.activationStore.activeFile(treeNode.uri);
           }

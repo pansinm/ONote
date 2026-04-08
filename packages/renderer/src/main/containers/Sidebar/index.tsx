@@ -188,7 +188,7 @@ export default observer(function Sidebar() {
               stores.activationStore.activeDirUri ||
               stores.activationStore.rootUri;
             if (dirUri) {
-              createFile(dirUri, 'file');
+              createFile(dirUri, 'file').catch(() => {});
             }
           }}
           title={t('createNote')}
