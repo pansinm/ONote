@@ -132,6 +132,7 @@ export default observer(function Sidebar() {
       stores.activationStore.openNoteBook(project.type, project.rootUri);
       fileService.setRootDirUri(project.rootUri);
       setProject(project);
+      setOpen(false);
     } catch (err) {
       //ignore
     }
