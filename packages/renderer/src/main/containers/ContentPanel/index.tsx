@@ -62,11 +62,12 @@ const ContentPanel = observer(() => {
   const currentIsMarkdown = activeFileUri ? isMarkdown(activeFileUri) : true;
 
   return (
-    <div className="fullfill">
+    <div className="fullfill" style={{ display: 'flex', flexDirection: 'column' }}>
       <div
         style={{
           display: 'flex',
           alignItems: 'stretch',
+          background: 'var(--tab-bar-bg)',
         }}
       >
         <div style={{ flex: 1, overflow: 'hidden' }}>
