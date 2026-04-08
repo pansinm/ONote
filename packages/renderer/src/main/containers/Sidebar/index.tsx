@@ -10,17 +10,16 @@ import fileService from '../../services/fileService';
 import ProjectSelector from './ProjectSelector';
 import SettingTrigger from '../Setting/SettingTrigger';
 import { useTranslation } from 'react-i18next';
-import { DismissRegular } from '@fluentui/react-icons';
+import {
+  DismissRegular,
+  SearchRegular,
+  AddRegular,
+} from '@fluentui/react-icons';
 import { makeStyles, shorthands } from '@fluentui/react-components';
-import type FileListStore from '../../stores/FileListStore';
 import SearchList from '../FileList/SearchList';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { useLatest } from 'react-use';
-import { getLogger } from '/@/shared/logger';
-
-const logger = getLogger('Sidebar');
-
-type SorterType = FileListStore['sorter'];
+import useFileOperation from '/@/hooks/useFileOperation';
 
 const useStyles = makeStyles({
   header: {
@@ -35,14 +34,21 @@ const useStyles = makeStyles({
     ...shorthands.flex(1),
     minWidth: '50px',
   },
+  searchIcon: {
+    position: 'absolute',
+    left: '8px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: '#8a8886',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+  },
   input: {
     width: '100%',
     height: '28px',
-    ...shorthands.padding('5px', '28px', '5px', '10px'),
+    ...shorthands.padding('5px', '28px', '5px', '28px'),
     ...shorthands.border('1px', 'solid', '#d3b17d'),
-    '::placeholder': {
-      fontFamily: 'bootstrap-icons, inherit',
-    },
   },
   clearBtn: {
     position: 'absolute',
@@ -76,7 +82,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default observer(function ActivityBar() {
+export default observer(function Sidebar() {
   const [open, setOpen] = useState(false);
   const [project, setProject] = useLocalStorage<
     | {
@@ -89,6 +95,7 @@ export default observer(function ActivityBar() {
 
   const { t } = useTranslation('menu');
   const headerStyles = useStyles();
+  const { createFile, Modal } = useFileOperation();
 
   // ===== 搜索功能 =====
   const [searchText, setSearchText] = useState('');
@@ -154,12 +161,15 @@ export default observer(function ActivityBar() {
       {/* 搜索头 */}
       <div className={headerStyles.header}>
         <div className={headerStyles.inputWrap}>
+          <span className={headerStyles.searchIcon}>
+            <SearchRegular fontSize={12} />
+          </span>
           <input
             className={headerStyles.input}
             value={searchText}
             type="text"
             onChange={(e) => setSearchText(e.target.value)}
-            placeholder={`\uf52a ${t('searchFiles')}`}
+            placeholder={t('searchFiles')}
           />
           {searchText && (
             <span
@@ -174,15 +184,16 @@ export default observer(function ActivityBar() {
         <span
           className={headerStyles.iconBtn}
           onClick={() => {
-            const dirUri = stores.activationStore.activeDirUri || stores.activationStore.rootUri;
+            const dirUri =
+              stores.activationStore.activeDirUri ||
+              stores.activationStore.rootUri;
             if (dirUri) {
-              stores.activationStore.activeDir(dirUri);
+              createFile(dirUri, 'file');
             }
           }}
           title={t('createNote')}
-          style={{ fontSize: '16px', color: '#5c5545' }}
         >
-          +
+          <AddRegular fontSize={16} style={{ color: '#5c5545' }} />
         </span>
       </div>
 
@@ -216,6 +227,7 @@ export default observer(function ActivityBar() {
         <SettingTrigger />
         <ProjectSelector open={open} onOpenChange={setOpen} onSelected={handleSelect} />
       </Flex>
+      <Modal />
     </div>
   );
 });

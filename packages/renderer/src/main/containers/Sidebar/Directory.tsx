@@ -174,9 +174,8 @@ const Directory = observer(() => {
             }
           }}
           active={
-            isDir
-              ? isEquals(treeNode.uri, stores.activationStore.activeDirUri)
-              : isEquals(treeNode.uri, stores.activationStore.activeFileUri)
+            !isDir &&
+            isEquals(treeNode.uri, stores.activationStore.activeFileUri)
           }
           treeNode={treeNode}
         />
