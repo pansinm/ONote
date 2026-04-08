@@ -3,8 +3,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon from '/@/components/Icon';
 import {
-  TextHanging24Regular,
   TextHangingRegular,
+  DismissRegular,
 } from '@fluentui/react-icons';
 import { makeStyles, shorthands } from '@fluentui/react-components';
 import type FileListStore from '../../stores/FileListStore';
@@ -51,14 +51,36 @@ const useStyles = makeStyles({
       cursor: 'pointer',
     },
   },
-  input: {
-    height: '28px',
+  inputWrap: {
+    position: 'relative',
     ...shorthands.flex(1),
-    ...shorthands.padding('5px', '10px'),
-    ...shorthands.border('1px', 'solid', '#d3b17d'),
     minWidth: '50px',
+  },
+  input: {
+    width: '100%',
+    height: '28px',
+    ...shorthands.padding('5px', '28px', '5px', '10px'),
+    ...shorthands.border('1px', 'solid', '#d3b17d'),
     '::placeholder': {
       fontFamily: 'bootstrap-icons, inherit',
+    },
+  },
+  clearBtn: {
+    position: 'absolute',
+    right: '4px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '20px',
+    height: '20px',
+    cursor: 'pointer',
+    color: '#8a8886',
+    borderRadius: '2px',
+    ':hover': {
+      backgroundColor: 'rgba(0,0,0,0.06)',
+      color: '#323130',
     },
   },
   sortIndicator: {
@@ -100,13 +122,24 @@ const ListHeader: FC<ListHeaderProps> = ({
       <span className={styles.prefix}>
         <TextHangingRegular onClick={onPrefixIconClick} fontSize={22} />
       </span>
-      <input
-        className={styles.input}
-        value={searchText}
-        type="search"
-        onChange={(e) => onTextChange?.(e.target.value)}
-        placeholder={`${SEARCH_ICON} ${t('searchFiles')}`}
-      ></input>
+      <div className={styles.inputWrap}>
+        <input
+          className={styles.input}
+          value={searchText}
+          type="text"
+          onChange={(e) => onTextChange?.(e.target.value)}
+          placeholder={`${SEARCH_ICON} ${t('searchFiles')}`}
+        />
+        {searchText && (
+          <span
+            className={styles.clearBtn}
+            onClick={() => onTextChange?.('')}
+            title={t('clearSearch')}
+          >
+            <DismissRegular fontSize={12} />
+          </span>
+        )}
+      </div>
       <span className={styles.sortIndicator} title={t(SORTER_I18N_KEY[sorter])}>
         <Icon type={SORTER_ICON[sorter]} size={14} />
       </span>

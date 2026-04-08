@@ -22,5 +22,8 @@
   "searchFiles": "搜索文件",
   "createDirectory": "创建目录",
   "deleteDirectory": "删除目录",
-  "openFolderHint": "先打开目录..."
+  "openFolderHint": "先打开目录...",
+  "searchResults": "搜索结果",
+  "noSearchResults": "未找到匹配的文件",
+  "clearSearch": "清除搜索"
 }

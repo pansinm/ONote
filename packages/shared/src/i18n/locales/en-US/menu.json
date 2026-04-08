@@ -22,5 +22,8 @@
   "searchFiles": "Search files",
   "createDirectory": "Create Directory",
   "deleteDirectory": "Delete Directory",
-  "openFolderHint": "Open a directory first..."
+  "openFolderHint": "Open a directory first...",
+  "searchResults": "Search Results",
+  "noSearchResults": "No matching files found",
+  "clearSearch": "Clear search"
 }

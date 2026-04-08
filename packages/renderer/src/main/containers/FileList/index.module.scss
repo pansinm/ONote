@@ -1,7 +1,25 @@
 .NoteList {
-  background: #fffbf0;
+  background: #f7f3eb;
   height: 100%;
   width: 100%;
   padding: 10px 0;
   overflow: auto;
+}
+
+.searchHeader {
+  padding: 6px 14px;
+  font-size: 12px;
+  color: #8a8886;
+  font-weight: 500;
+  user-select: none;
+}
+
+.noResults {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 14px;
+  font-size: 13px;
+  color: #a19f9d;
+  user-select: none;
 }

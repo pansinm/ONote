@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import type { FC } from 'react';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useState } from 'react';
 import React from 'react';
 import { useContextMenu } from 'react-contexify';
@@ -230,6 +230,21 @@ const FileList: FC = observer(() => {
       : baseMenus,
   [baseMenus, t]);
 
+  // ESC 清空搜索
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape' && text) {
+      e.preventDefault();
+      setText('');
+    }
+  }, [text]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, [handleKeyDown]);
+
+  const isSearching = text.length > 0;
+
   return (
     <Flex flexDirection="column" className={styles.NoteList}>
       <ListHeader
@@ -252,56 +267,49 @@ const FileList: FC = observer(() => {
           onDragOver={handleDragover}
           onDrop={handleDrop}
         >
-          {stores.fileListStore.files.map((file) => (
-            <ListItem
-              key={file.uri}
-              active={isEquals(activationStore.activeFileUri, file.uri)}
-              onContextMenu={(e) => {
-                showMenu(e, { props: { uri: file.uri } });
-              }}
-              onClick={() => {
-                stores.activationStore.activeFile(file.uri);
-              }}
-              onClose={() => {
-                deleteFile(file.uri, 'file');
-              }}
-              onDragStart={(e) => {
-                e.dataTransfer.setData('text/plain', file.uri);
-              }}
-            >
-              <FileTreeItem treeNode={file} active={false} />
-            </ListItem>
-          ))}
+          {isSearching ? (
+            <>
+              <div className={styles.searchHeader}>
+                {t('searchResults')} ({files.length})
+              </div>
+              {files.length === 0 ? (
+                <div className={styles.noResults}>
+                  {t('noSearchResults')}
+                </div>
+              ) : (
+                <SearchList
+                  files={files}
+                  activeUri={stores.activationStore.activeFileUri}
+                  onItemClick={(treeNode: TreeNode) => {
+                    stores.activationStore.activeFile(treeNode.uri);
+                    setText('');
+                  }}
+                />
+              )}
+            </>
+          ) : (
+            stores.fileListStore.files.map((file) => (
+              <ListItem
+                key={file.uri}
+                active={isEquals(activationStore.activeFileUri, file.uri)}
+                onContextMenu={(e) => {
+                  showMenu(e, { props: { uri: file.uri } });
+                }}
+                onClick={() => {
+                  stores.activationStore.activeFile(file.uri);
+                }}
+                onClose={() => {
+                  deleteFile(file.uri, 'file');
+                }}
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('text/plain', file.uri);
+                }}
+              >
+                <FileTreeItem treeNode={file} active={false} />
+              </ListItem>
+            ))
+          )}
         </div>
-        {text && (
-          <Flex
-            background={'rgba(0,0,0,0.5)'}
-            position="absolute"
-            flexDirection="column"
-            left={0}
-            right={0}
-            height={'100%'}
-            className="search-container"
-            onClick={(e) => {
-              if (
-                (e.target as HTMLDivElement).classList.contains(
-                  'search-container',
-                )
-              ) {
-                setText('');
-              }
-            }}
-          >
-            <SearchList
-              style={{ maxHeight: '70%', overflow: 'auto' }}
-              files={files}
-              activeUri={stores.activationStore.activeFileUri}
-              onItemClick={(treeNode: TreeNode) => {
-                stores.activationStore.activeFile(treeNode.uri);
-              }}
-            ></SearchList>
-          </Flex>
-        )}
       </Flex>
 
       <Menu menuId={MENU_ID} menus={menus} onClick={handleMenuClick} />
