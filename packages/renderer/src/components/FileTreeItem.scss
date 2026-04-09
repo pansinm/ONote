@@ -11,9 +11,10 @@
 }
 
 .file-tree__tree-item.active {
-  background-color: #0f6cbd;
+  background-color: #d4c9b8;
 
   & .file-tree__filename {
-    color: #fff;
+    color: #4a3f35;
+    font-weight: 500;
   }
 }

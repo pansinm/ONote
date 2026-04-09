@@ -1,9 +1,7 @@
-import type { WorkStep, ToolCall as IMessageToolCall } from './IMessage';
+import type { ConversationStep, ToolCall as IMessageToolCall } from './IMessage';
 
-export interface ExecutionStep extends Omit<WorkStep, 'type'> {
+export interface ExecutionStep extends ConversationStep {
   id: string;
-  type: 'thinking' | 'response' | 'tool_call' | 'summary' | 'error';
-  isCompleted: boolean;
   timestamp: number;
 }
 
@@ -22,7 +20,7 @@ export interface AgentMessage {
   id: string;
   role: 'assistant';
   content: string;
-  steps: ExecutionStep[];
+  steps: ConversationStep[];
   isStreaming: boolean;
   timestamp: number;
 }

@@ -5,6 +5,7 @@ import type {
   UserMessage,
   AgentMessage,
   WorkStep,
+  ConversationStep,
   ToolCall,
 } from '/@/main/types/IMessage';
 
@@ -74,13 +75,13 @@ const createUserMessage = (overrides?: Partial<UserMessage>): UserMessage => ({
 
 // 创建测试用的 Agent 消息
 const createAgentMessage = (
-  overrides?: Partial<AgentMessage>,
+  overrides?: Partial<Omit<AgentMessage, 'steps'>> & { steps?: ConversationStep[] },
 ): AgentMessage => ({
   id: 'agent-1',
   role: 'assistant',
   content: '这是 Agent 消息',
   timestamp: Date.now(),
-  steps: [],
+  steps: [] as ConversationStep[],
   isStreaming: false,
   ...overrides,
 });
@@ -99,6 +100,7 @@ const createWorkStep = (overrides?: Partial<WorkStep>): WorkStep => ({
   type: 'thinking',
   content: 'Thinking content',
   isCompleted: false,
+  id: `step-${Math.random().toString(36).substring(2, 9)}`,
   ...overrides,
 });
 
@@ -236,7 +238,7 @@ describe('Message', () => {
         type: 'thinking',
         content: '正在思考问题...',
       });
-      const agentMessage = createAgentMessage({ steps: [thinkingStep] });
+      const agentMessage = createAgentMessage({ steps: [thinkingStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       expect(screen.getByText('Thinking')).toBeInTheDocument();
@@ -250,7 +252,7 @@ describe('Message', () => {
         content: 'Calling tool',
         toolCalls: [toolCall],
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       expect(screen.getByText('Tool Call')).toBeInTheDocument();
@@ -263,7 +265,7 @@ describe('Message', () => {
         content: '任务完成',
         isCompleted: true,
       });
-      const agentMessage = createAgentMessage({ steps: [summaryStep] });
+      const agentMessage = createAgentMessage({ steps: [summaryStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       expect(screen.getByText('Summary')).toBeInTheDocument();
@@ -277,7 +279,7 @@ describe('Message', () => {
         content: '生成中...',
         isCompleted: false,
       });
-      const agentMessage = createAgentMessage({ steps: [summaryStep] });
+      const agentMessage = createAgentMessage({ steps: [summaryStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       expect(screen.getByText('Generating...')).toBeInTheDocument();
@@ -298,7 +300,7 @@ describe('Message', () => {
           isCompleted: true,
         }),
       ];
-      const agentMessage = createAgentMessage({ steps });
+      const agentMessage = createAgentMessage({ steps: steps as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       expect(screen.getByText('Thinking')).toBeInTheDocument();
@@ -315,7 +317,7 @@ describe('Message', () => {
         type: 'tool_call',
         toolCalls: [toolCall],
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       // Use queryByText because the elements don't exist when collapsed
@@ -329,7 +331,7 @@ describe('Message', () => {
         type: 'tool_call',
         toolCalls: [toolCall],
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       const expandButton = screen.getByRole('button', {
@@ -349,7 +351,7 @@ describe('Message', () => {
         type: 'tool_call',
         toolCalls: [toolCall],
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       const expandButton = screen.getByRole('button', {
@@ -369,7 +371,7 @@ describe('Message', () => {
         type: 'tool_call',
         toolCalls: [toolCall],
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       const expandButton = screen.getByRole('button', {
@@ -386,7 +388,7 @@ describe('Message', () => {
         type: 'tool_call',
         toolCalls: [toolCall],
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       const expandButton = screen.getByRole('button', {
@@ -403,7 +405,7 @@ describe('Message', () => {
         type: 'tool_call',
         toolCalls: [toolCall],
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       const expandButton = screen.getByRole('button', {
@@ -420,7 +422,7 @@ describe('Message', () => {
         type: 'tool_call',
         toolCalls: [toolCall],
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       const expandButton = screen.getByRole('button', {
@@ -455,7 +457,7 @@ describe('Message', () => {
         type: 'tool_call',
         toolCalls,
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       expect(screen.getByText('search')).toBeInTheDocument();
@@ -485,7 +487,7 @@ describe('Message', () => {
         type: 'tool_call',
         toolCalls: [toolCall],
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       const expandButton = screen.getByRole('button', {
@@ -508,7 +510,7 @@ describe('Message', () => {
         type: 'tool_call',
         toolCalls: [toolCall],
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       const expandButton = screen.getByRole('button', {
@@ -529,7 +531,7 @@ describe('Message', () => {
         type: 'tool_call',
         toolCalls: [toolCall],
       });
-      const agentMessage = createAgentMessage({ steps: [toolCallStep] });
+      const agentMessage = createAgentMessage({ steps: [toolCallStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       const expandButton = screen.getByRole('button', {
@@ -563,7 +565,7 @@ describe('Message', () => {
         content: '完成',
         isCompleted: true,
       });
-      const agentMessage = createAgentMessage({ steps: [summaryStep] });
+      const agentMessage = createAgentMessage({ steps: [summaryStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       expect(screen.getByLabelText('Completed')).toBeInTheDocument();
@@ -575,7 +577,7 @@ describe('Message', () => {
         content: '生成中',
         isCompleted: false,
       });
-      const agentMessage = createAgentMessage({ steps: [summaryStep] });
+      const agentMessage = createAgentMessage({ steps: [summaryStep] as ConversationStep[] });
       render(<IMessage message={agentMessage} />);
 
       expect(screen.getByLabelText('In progress')).toBeInTheDocument();

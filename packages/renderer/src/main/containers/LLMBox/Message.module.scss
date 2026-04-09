@@ -263,6 +263,13 @@
   line-height: 1.5;
 }
 
+.toolCallDescription {
+  padding: 4px 0;
+  font-size: 13px;
+  color: var(--warm-text-muted);
+  font-style: italic;
+}
+
 // ========== Streaming 指示器 ==========
 .streamingIndicator {
   display: inline-flex;

@@ -1,7 +1,10 @@
 .inputArea {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
+  padding: 8px 12px 10px;
+  border-top: 1px solid var(--warm-border);
+  background-color: #ffffff;
   position: relative;
 }
 
@@ -10,17 +13,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 6px 10px;
   background-color: var(--warm-bg-hover);
   border-left: 3px solid var(--warm-accent);
   border-radius: 4px;
   font-size: 14px;
+  margin-bottom: 6px;
 }
 
 .quoteContent {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   flex: 1;
   overflow: hidden;
 }
@@ -68,10 +72,17 @@
   }
 }
 
-// 输入框 — 自动增高
+// 输入行：textarea + 工具条
+.inputRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+// 输入框
 .textarea {
-  width: 100%;
-  padding: 8px 12px;
+  flex: 1;
+  padding: 6px 10px;
   border: 1px solid var(--warm-border);
   border-radius: 4px;
   font-size: 14px;
@@ -79,8 +90,8 @@
   line-height: 1.5;
   resize: none;
   overflow-y: auto;
-  min-height: 36px;
-  max-height: 200px;
+  min-height: 32px;
+  max-height: 120px;
   outline-style: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 
@@ -103,15 +114,15 @@
 // 工具条
 .toolbar {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 // Agent 状态圆点
 .statusDot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background-color: #c8c6c4;
   flex-shrink: 0;
@@ -134,8 +145,8 @@
 }
 
 .sendButton {
-  min-width: 40px;
-  height: 36px;
+  min-width: 36px;
+  height: 32px;
 
   svg {
     width: 16px;

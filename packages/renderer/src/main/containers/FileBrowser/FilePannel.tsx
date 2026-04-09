@@ -56,7 +56,6 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
   const showEditorOnly = layout === 'editor-only' || !previewerUri;
   const showPreviewerOnly = layout === 'previewer-only';
   const showLLMBox = typeof stores.layoutStore.llmBoxVisible === 'boolean';
-  const showBothEditorAndPreview = !showEditorOnly && !showPreviewerOnly;
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -65,11 +64,6 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
     loadSavedWidths();
   }, []);
 
-  const containerWidth = showLLMBox
-    ? 'calc(100% - var(--llmbox-width))'
-    : '100%';
-
-  // 使用自定义 Hook 处理拖拽
   const { dragState, startDrag } = useResizable({ containerRef });
 
   const editorWidth = showEditorOnly ? '100%' : 'var(--editor-width)';
@@ -97,7 +91,6 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               position: 'relative',
               flex: 1,
               display: 'flex',
-              width: containerWidth,
             }}
           >
             <div
@@ -113,6 +106,8 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
                   panel?.editable && layout !== 'previewer-only'
                     ? 'flex'
                     : 'none',
+                // 右侧分隔线：编辑器和预览之间
+                borderRight: !showEditorOnly ? '1px solid var(--warm-border)' : 'none',
               }}
             >
               <MonacoEditor
@@ -134,6 +129,8 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
                 flex: 1,
                 position: 'relative',
                 display: showEditorOnly ? 'none' : 'flex',
+                // 预览和 LLMBox 之间的分隔线
+                borderRight: showLLMBox ? '1px solid var(--warm-border)' : 'none',
               }}
             >
               {dragState.isDragging && (

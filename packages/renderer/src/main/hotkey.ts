@@ -17,6 +17,7 @@
  *   对需要拦截的快捷键执行 preventDefault + stopPropagation，
  *   同时保留 Monaco 自身的 Ctrl+F（查找）、Ctrl+H（替换）等功能。
  */
+import i18next from 'i18next';
 import developToolsService from './services/developToolsService';
 import stores from './stores';
 import fileService from './services/fileService';
@@ -71,7 +72,10 @@ function handleNewNote(): void {
   const { activeDirUri } = stores.activationStore;
   if (!activeDirUri) return;
 
-  const name = window.prompt('文件名：', '');
+  const name = window.prompt(
+    i18next.t('menu:inputNoteName'),
+    '',
+  );
   if (!name) return;
 
   const fileName = name.includes('.') ? name : `${name}.md`;
@@ -233,7 +237,9 @@ function globalKeydownHandler(e: KeyboardEvent) {
 }
 
 // ---------------------------------------------------------------------------
-// 注册监听（capture 阶段优先于 Monaco）
+// 注册监听（capture 阶段优先于 Monaco，i18n 初始化后调用）
 // ---------------------------------------------------------------------------
 
-window.document.addEventListener('keydown', globalKeydownHandler, true);
+export function registerHotkeys(): void {
+  window.document.addEventListener('keydown', globalKeydownHandler, true);
+}

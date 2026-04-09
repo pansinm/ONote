@@ -58,15 +58,18 @@
   "moveDown": "Move down",
   "moveUp": "Move up",
   "remove": "Remove",
-  "agentTitle": "Agent",
+  "agentTitle": "ONote AI",
   "chatGPT": "AI Chat",
   "host": "Host",
   "port": "Port",
   "username": "Username",
   "password": "Password",
-  "agentIcon": "Agent icon",
+  "agentIcon": "ONote AI",
   "completed": "Completed",
   "inProgress": "In progress",
   "selectDirectory": "Select Directory",
-  "emptyStateHint": "Open a note to start writing"
+  "emptyStateHint": "Open a note to start writing",
+  "aiAssistantHint": "Once you open a note, select text and the AI will see it",
+  "openAiAssistant": "Open AI Assistant",
+  "hideAiAssistant": "Hide AI Assistant"
 }

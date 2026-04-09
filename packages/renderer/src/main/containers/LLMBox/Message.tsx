@@ -14,13 +14,76 @@ import React, { useState, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { Components } from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTranslation } from 'react-i18next';
 import {
   CheckmarkCircle12Regular,
   ArrowClockwise12Regular,
   ChevronDown12Regular,
+  Sparkle24Regular,
+  Chat20Regular,
+  Wrench16Regular,
 } from '@fluentui/react-icons';
+
+// 暖色代码高亮主题 — 与 ONote 书写氛围一致
+const warmLight: Record<string, React.CSSProperties> = {
+  'code[class*="language-"]': {
+    color: '#4a3f35',
+    background: 'none',
+    textShadow: 'none',
+    fontFamily: "'Droid Sans Mono', 'Consolas', monospace",
+    fontSize: '1em',
+    lineHeight: '1.5',
+    whiteSpace: 'pre-wrap',
+    wordWrap: 'normal',
+    wordBreak: 'normal',
+    tabSize: '2',
+    hyphens: 'none',
+  },
+  'pre[class*="language-"]': {
+    color: '#4a3f35',
+    background: '#f0ebe0',
+    borderRadius: '6px',
+    textShadow: 'none',
+    fontFamily: "'Droid Sans Mono', 'Consolas', monospace",
+    fontSize: '1em',
+    lineHeight: '1.5',
+    whiteSpace: 'pre-wrap',
+    wordWrap: 'normal',
+    wordBreak: 'normal',
+    tabSize: '2',
+    hyphens: 'none',
+    padding: '1em',
+    margin: '0.5em 0',
+    overflow: 'auto',
+  },
+  comment: { color: '#9a8f7a', fontStyle: 'italic' },
+  prolog: { color: '#9a8f7a', fontStyle: 'italic' },
+  doctype: { color: '#9a8f7a', fontStyle: 'italic' },
+  cdata: { color: '#9a8f7a', fontStyle: 'italic' },
+  punctuation: { color: '#6b5e50' },
+  property: { color: '#8b6914' },
+  tag: { color: '#8b6914' },
+  boolean: { color: '#a05050' },
+  number: { color: '#a05050' },
+  constant: { color: '#a05050' },
+  symbol: { color: '#a05050' },
+  selector: { color: '#5c7a5c' },
+  'attr-name': { color: '#5c7a5c' },
+  string: { color: '#7a6b52' },
+  char: { color: '#7a6b52' },
+  builtin: { color: '#5c7a5c' },
+  operator: { color: '#6b5e50' },
+  entity: { color: '#8b6914' },
+  url: { color: '#7a6b52' },
+  atrule: { color: '#8b6914' },
+  'attr-value': { color: '#7a6b52' },
+  keyword: { color: '#8b6914' },
+  regex: { color: '#a05050' },
+  important: { color: '#8b6914', fontWeight: 'bold' },
+  variable: { color: '#a05050' },
+  function: { color: '#5c7a5c' },
+  'class-name': { color: '#5c7a5c' },
+};
 import type {
   Message as IMessage,
   UserMessage,
@@ -71,7 +134,7 @@ const markdownComponents: Components = {
       const code = String(children.props.children).replace(/\n$/, '');
       return (
         <SyntaxHighlighter
-          style={oneDark}
+          style={warmLight}
           language={language}
           PreTag="div"
           className={styles.markdownCodeBlock}
@@ -90,7 +153,7 @@ const markdownComponents: Components = {
       const code = String(children.props.children).replace(/\n$/, '');
       return (
         <SyntaxHighlighter
-          style={oneDark}
+          style={warmLight}
           language="text"
           PreTag="div"
           className={styles.markdownCodeBlock}
@@ -132,6 +195,50 @@ const MarkdownStepContent: FC<{ content: string }> = React.memo(({ content }) =>
 MarkdownStepContent.displayName = 'MarkdownStepContent';
 
 // ========== 工具调用详情子组件 ==========
+
+/** 判断 result 是否为空或不可读 */
+const isEmptyOrUnreadable = (value: string | undefined): boolean => {
+  if (!value) return true;
+  if (value === '[object Object]') return true;
+  if (value === 'null') return true;
+  if (value.trim() === '') return true;
+  return false;
+};
+
+/** 从工具调用信息生成人类可读的操作描述 */
+const getHumanReadableDescription = (toolCall: ToolCall): string => {
+  const { name, arguments: args } = toolCall;
+
+  // 尝试提取常见参数中的文件路径或搜索关键词
+  const filePath = (args.file_path ?? args.filePath ?? args.path ?? args.filename) as string | undefined;
+  const query = (args.query ?? args.search ?? args.pattern) as string | undefined;
+
+  switch (name) {
+    case 'read_file':
+    case 'readFile':
+      return filePath ? `正在读取文件: ${filePath}` : '正在读取文件';
+    case 'write_file':
+    case 'writeFile':
+      return filePath ? `正在写入: ${filePath}` : '正在写入文件';
+    case 'edit_file':
+    case 'editFile':
+    case 'apply_diff':
+      return filePath ? `正在编辑: ${filePath}` : '正在编辑文件';
+    case 'search':
+    case 'grep':
+    case 'find':
+      return query ? `正在搜索: ${query}` : '正在搜索';
+    case 'list_directory':
+    case 'listFiles':
+      return filePath ? `正在列出目录: ${filePath}` : '正在列出目录';
+    default: {
+      // 通用描述：显示操作名 + 关键参数
+      const detail = filePath ?? query;
+      return detail ? `${name}: ${detail}` : name;
+    }
+  }
+};
+
 interface ToolCallDetailsProps {
   toolCall: ToolCall;
 }
@@ -154,14 +261,11 @@ const ToolCallDetails: FC<ToolCallDetailsProps> = React.memo(({ toolCall }) => {
     [toggleExpanded],
   );
 
-  // 格式化参数为 JSON 字符串
-  const formatArguments = (args: Record<string, unknown>): string => {
-    try {
-      return JSON.stringify(args, null, 2);
-    } catch {
-      return String(args);
-    }
-  };
+  // 生成人类可读的摘要描述
+  const description = getHumanReadableDescription(toolCall);
+
+  // 判断 result 是否可展示
+  const hasReadableResult = !isEmptyOrUnreadable(toolCall.result);
 
   return (
     <div className={styles.toolCall}>
@@ -171,11 +275,11 @@ const ToolCallDetails: FC<ToolCallDetailsProps> = React.memo(({ toolCall }) => {
         onClick={toggleExpanded}
         onKeyDown={handleKeyDown}
         aria-expanded={isExpanded}
-        aria-label={`Toggle tool call details for ${toolCall.name}`}
+        aria-label={`Toggle details for ${toolCall.name}`}
       >
         <div className={styles.toolCallHeader__left}>
-          <i className="bi bi-gear" aria-hidden="true" />
-          <span className={styles.toolCallHeader__name}>{toolCall.name}</span>
+          <Wrench16Regular style={{ fontSize: 14, color: 'var(--warm-text-muted)' }} aria-hidden="true" />
+          <span className={styles.toolCallHeader__name}>{description}</span>
         </div>
         <ChevronDown12Regular
           className={classNames(
@@ -187,17 +291,12 @@ const ToolCallDetails: FC<ToolCallDetailsProps> = React.memo(({ toolCall }) => {
 
       {isExpanded && (
         <div className={styles.toolCallBody}>
-          <div className={styles.toolCallSection}>
-            <span className={styles.toolCallSection__label}>{t('arguments')}</span>
-            <pre className={styles.toolCallArguments}>
-              {formatArguments(toolCall.arguments)}
-            </pre>
-          </div>
-
-          {toolCall.result && (
-            <div className={styles.toolCallSection}>
-              <span className={styles.toolCallSection__label}>{t('result')}</span>
-              <div className={styles.toolCallResult}>{toolCall.result}</div>
+          {hasReadableResult && (
+            <div className={styles.toolCallResult}>{toolCall.result}</div>
+          )}
+          {!hasReadableResult && (
+            <div className={styles.toolCallDescription}>
+              {t('toolCallDescription', { defaultValue: '已执行操作' })}
             </div>
           )}
         </div>
@@ -218,11 +317,11 @@ const WorkStepItem: FC<WorkStepItemProps> = React.memo(({ step }) => {
   const renderStepIcon = () => {
     switch (step.type) {
       case 'thinking':
-        return <i className="bi bi-lightbulb" aria-hidden="true" />;
+        return <Sparkle24Regular style={{ fontSize: 14 }} aria-hidden="true" />;
       case 'response':
-        return <i className="bi bi-chat-square-text" aria-hidden="true" />;
+        return <Chat20Regular style={{ fontSize: 14 }} aria-hidden="true" />;
       case 'tool_call':
-        return <i className="bi bi-gear" aria-hidden="true" />;
+        return <Wrench16Regular style={{ fontSize: 14 }} aria-hidden="true" />;
       case 'summary':
         if (step.isCompleted) {
           return (

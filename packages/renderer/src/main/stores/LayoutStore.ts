@@ -5,8 +5,8 @@ type Layout = 'split' | 'editor-only' | 'previewer-only';
 const layouts: Layout[] = ['split', 'editor-only', 'previewer-only'];
 class LayoutStore {
   layout: Layout = 'split';
-  /** undefined = 从未打开过 LLMBox; true = 可见; false = 已隐藏 */
-  llmBoxVisible: undefined | boolean = undefined;
+  /** AI 助手默认可见 — 新用户第一眼就看到 AI 伙伴 */
+  llmBoxVisible: undefined | boolean = true;
 
   llmBoxUrl = '';
 

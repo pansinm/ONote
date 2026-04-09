@@ -1,6 +1,6 @@
 /**
  * Header 组件样式
- * 显示 Agent 标题和图标，支持工作状态动画
+ * AI 助手标题和图标，工作时带呼吸脉冲动画
  */
 
 .header {
@@ -19,7 +19,7 @@
 }
 
 .icon {
-  font-size: 20px;
+  fontSize: 20px;
   color: var(--warm-accent);
   display: inline-flex;
   align-items: center;
@@ -27,7 +27,7 @@
   flex-shrink: 0;
 
   &.iconAnimating {
-    animation: rotate 1s linear infinite;
+    animation: aiPulse 2s ease-in-out infinite;
   }
 }
 
@@ -38,12 +38,15 @@
   user-select: none;
 }
 
-// 旋转动画关键帧
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
+// 书写感呼吸脉冲动画
+@keyframes aiPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    transform: scale(1.15);
+    opacity: 0.7;
   }
 }

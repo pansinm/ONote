@@ -12,10 +12,11 @@ import { warmLightTheme } from './theme/warmLightTheme';
 import { createRoot } from 'react-dom/client';
 import { initI18n } from './i18n';
 import App from './App';
-import './hotkey';
 import './integration';
+import { registerHotkeys } from './hotkey';
 
 initI18n().then(() => {
+  registerHotkeys();
   const root = createRoot(document.getElementById('app') as HTMLDivElement);
 
   root.render(

@@ -53,6 +53,7 @@ interface ToolbarActionsProps {
 
 function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
   const { t } = useTranslation('common');
+  const { t: tLlm } = useTranslation('llmbox');
   const toggleChatBox = () => {
     const shown = stores.layoutStore.llmBoxVisible;
     if (shown) {
@@ -61,6 +62,8 @@ function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
       stores.layoutStore.showLLMBox('llmbox');
     }
   };
+
+  const isAiOpen = stores.layoutStore.llmBoxVisible;
 
   return (
     <div
@@ -104,7 +107,7 @@ function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
       >
         <ChatRegular
           style={{ fontSize: 18, cursor: 'pointer' }}
-          title={t('chatGPT')}
+          title={isAiOpen ? t('hideAiAssistant') : t('openAiAssistant')}
           onClick={toggleChatBox}
         />
       </span>

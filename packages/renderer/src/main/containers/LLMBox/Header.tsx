@@ -1,16 +1,17 @@
 /**
- * Agent头部区域：
+ * AI 助手头部区域：
  * 1. 受控组件
  * 2. 包含 className和style属性
- * 3. 显示title及Agent图标(默认)
+ * 3. 显示 AI 助手名称及图标
  * 4. 样式美观、符合项目整体风格
- * 5. Agent工作时，Agent图标有动画效果
+ * 5. AI 助手工作时，图标有呼吸脉冲动画
  */
 
 import classNames from 'classnames';
 import type { FC } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { InkingTool20Regular } from '@fluentui/react-icons';
 import styles from './Header.module.scss';
 
 export type AgentState = 'idle' | 'thinking' | 'executing';
@@ -34,13 +35,13 @@ export interface HeaderProps {
 
 const Header: FC<HeaderProps> = (props) => {
   const {
-    title = 'Agent',
+    title,
     agentState = 'idle',
     className,
     style,
     icon,
   } = props;
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('llmbox');
 
   // 判断 Agent 是否在工作状态
   const isWorking = agentState === 'thinking' || agentState === 'executing';
@@ -52,17 +53,15 @@ const Header: FC<HeaderProps> = (props) => {
     >
       <div className={styles.titleContainer}>
         {icon || (
-          <i
+          <InkingTool20Regular
             className={classNames(
-              'bi',
-              'bi-robot',
               styles.icon,
               isWorking && styles.iconAnimating,
             )}
-            aria-label={t('agentIcon')}
+            aria-label={t('aiAssistantIcon')}
           />
         )}
-        <span className={styles.title}>{title}</span>
+        <span className={styles.title}>{title || t('aiAssistantTitle')}</span>
       </div>
     </div>
   );

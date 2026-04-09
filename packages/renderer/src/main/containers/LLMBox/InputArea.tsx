@@ -137,33 +137,35 @@ const InputArea: FC<InputAreaProps> = (props) => {
         </div>
       )}
 
-      {/* 输入框 */}
-      <textarea
-        ref={textareaRef}
-        className={styles.textarea}
-        value={value}
-        onChange={handleInput}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder || t('inputPlaceholder')}
-        disabled={disabled}
-        rows={minRows}
-      />
-
-      {/* 工具条 */}
-      <div className={styles.toolbar}>
-        {agentState !== 'idle' && (
-          <span
-            className={classNames(styles.statusDot, styles.statusDotActive)}
-          />
-        )}
-        <div style={{ flex: 1 }} />
-        <Button
-          className={styles.sendButton}
-          appearance="primary"
-          disabled={!canSend}
-          onClick={onSend}
-          icon={loading ? <ArrowClockwiseRegular /> : <SendRegular />}
+      {/* 输入行：textarea + 工具条 */}
+      <div className={styles.inputRow}>
+        {/* 输入框 */}
+        <textarea
+          ref={textareaRef}
+          className={styles.textarea}
+          value={value}
+          onChange={handleInput}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder || t('inputPlaceholder')}
+          disabled={disabled}
+          rows={minRows}
         />
+
+        {/* 工具条 */}
+        <div className={styles.toolbar}>
+          {agentState !== 'idle' && (
+            <span
+              className={classNames(styles.statusDot, styles.statusDotActive)}
+            />
+          )}
+          <Button
+            className={styles.sendButton}
+            appearance="primary"
+            disabled={!canSend}
+            onClick={onSend}
+            icon={loading ? <ArrowClockwiseRegular /> : <SendRegular />}
+          />
+        </div>
       </div>
     </div>
   );

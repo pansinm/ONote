@@ -1,7 +1,8 @@
 /**
- * 实现Agent组合，将相关组件进行合理布局
+ * AI 写作伙伴
  * 1. 支持 style 和 className 属性
  * 2. 样式美观，符合项目整体风格
+ * 3. 欢迎页展示 AI 助手的个性和核心能力
  */
 
 import classNames from 'classnames';
@@ -10,7 +11,6 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
 import * as monaco from 'monaco-editor';
-import { SparkleRegular } from '@fluentui/react-icons';
 import MessageList from './MessageList';
 import type { MessageListRef } from './MessageList';
 import InputArea from './InputArea';
@@ -160,12 +160,14 @@ const LLMBox: FC<LLMBoxProps> = observer(({ className, style }) => {
 
   return (
     <div className={classNames(styles.container, className)} style={style}>
-      <PendingChangesBar />
+      <div className={styles.pendingBar}>
+        <PendingChangesBar />
+      </div>
       {messages.length === 0 ? (
         <div className={styles.welcomePanel}>
-          <SparkleRegular className={styles.welcomeIcon} fontSize={28} />
-          <div className={styles.welcomeTitle}>{tLlm('welcomeTitle')}</div>
-          <div className={styles.welcomeHint}>{tLlm('welcomeHint')}</div>
+          <div className={styles.welcomeDroplet}>✦</div>
+          <div className={styles.welcomeGreeting}>{tLlm('welcomeGreeting')}</div>
+          <div className={styles.welcomeTagline}>{tLlm('welcomeTagline')}</div>
           <div className={styles.quickPrompts}>
             {[tLlm('quickPrompt1'), tLlm('quickPrompt2'), tLlm('quickPrompt3')].map((prompt) => (
               <button
@@ -178,6 +180,7 @@ const LLMBox: FC<LLMBoxProps> = observer(({ className, style }) => {
               </button>
             ))}
           </div>
+          <div className={styles.welcomeHint}>{tLlm('welcomeHint')}</div>
         </div>
       ) : (
         <MessageList

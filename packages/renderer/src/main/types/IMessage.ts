@@ -26,15 +26,29 @@ export interface ToolCall {
 }
 
 export interface WorkStep {
+  id?: string;
   type: StepType;
   content: string;
   toolCalls?: ToolCall[];
   isCompleted?: boolean;
 }
 
+/**
+ * 对话存储用的 Step 类型
+ * 与 WorkStep 同构，但字段更明确（isCompleted 必填）
+ */
+export interface ConversationStep {
+  id: string;
+  type: StepType;
+  content: string;
+  toolCalls?: ToolCall[];
+  isCompleted: boolean;
+  timestamp?: number;
+}
+
 export interface AgentMessage extends BaseMessage {
   role: 'assistant';
-  steps: WorkStep[];
+  steps: ConversationStep[];
   isStreaming?: boolean;
 }
 

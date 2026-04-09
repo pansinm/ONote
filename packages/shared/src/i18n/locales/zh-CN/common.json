@@ -58,15 +58,18 @@
   "moveDown": "下移",
   "moveUp": "上移",
   "remove": "移除",
-  "agentTitle": "智能助手",
+  "agentTitle": "ONote AI",
   "chatGPT": "AI 对话",
   "host": "主机",
   "port": "端口",
   "username": "用户名",
   "password": "密码",
-  "agentIcon": "智能助手图标",
+  "agentIcon": "ONote AI 图标",
   "completed": "已完成",
   "inProgress": "进行中",
   "selectDirectory": "选择目录",
-  "emptyStateHint": "打开笔记开始书写"
+  "emptyStateHint": "打开笔记开始书写",
+  "aiAssistantHint": "打开笔记后，选中文字，AI 会看到",
+  "openAiAssistant": "打开 AI 助手",
+  "hideAiAssistant": "隐藏 AI 助手"
 }

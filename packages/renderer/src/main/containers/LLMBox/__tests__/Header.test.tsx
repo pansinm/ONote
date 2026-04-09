@@ -11,6 +11,19 @@ jest.mock('../Header.module.scss', () => ({
   title: 'title',
 }));
 
+// Mock i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const map: Record<string, string> = {
+        aiAssistantTitle: 'ONote AI',
+        aiAssistantIcon: 'ONote AI 图标',
+      };
+      return map[key] ?? key;
+    },
+  }),
+}));
+
 const defaultProps: HeaderProps = {};
 
 describe('Header', () => {
@@ -22,12 +35,12 @@ describe('Header', () => {
   describe('基础渲染', () => {
     it('应该正常渲染组件', () => {
       render(<Header {...defaultProps} />);
-      expect(screen.getByText('Agent')).toBeInTheDocument();
+      expect(screen.getByText('ONote AI')).toBeInTheDocument();
     });
 
-    it('应该渲染默认的 Agent 图标', () => {
+    it('应该渲染默认的 AI 图标', () => {
       const { container } = render(<Header {...defaultProps} />);
-      const icon = container.querySelector('.bi-robot');
+      const icon = container.querySelector('[aria-label="ONote AI 图标"]');
       expect(icon).toBeInTheDocument();
     });
 
@@ -38,19 +51,19 @@ describe('Header', () => {
 
     it('应该有正确的 aria-label', () => {
       const { container } = render(<Header {...defaultProps} />);
-      const icon = container.querySelector('[aria-label="Agent icon"]');
+      const icon = container.querySelector('[aria-label="ONote AI 图标"]');
       expect(icon).toBeInTheDocument();
+    });
+
+    it('没有传 title 时应该使用 i18n 默认标题', () => {
+      render(<Header {...defaultProps} />);
+      expect(screen.getByText('ONote AI')).toBeInTheDocument();
     });
   });
 
   // 2. 属性测试
   describe('属性', () => {
-    it('应该使用默认标题 "Agent"', () => {
-      render(<Header {...defaultProps} />);
-      expect(screen.getByText('Agent')).toBeInTheDocument();
-    });
-
-    it('应该渲染自定义标题', () => {
+    it('应该渲染自定义标题覆盖默认', () => {
       render(<Header {...defaultProps} title="AI Assistant" />);
       expect(screen.getByText('AI Assistant')).toBeInTheDocument();
     });
@@ -72,7 +85,7 @@ describe('Header', () => {
     it('应该渲染自定义图标', () => {
       const customIcon = <i className="bi bi-star" data-testid="custom-icon" />;
       const { container } = render(<Header {...defaultProps} icon={customIcon} />);
-      expect(container.querySelector('.bi-robot')).not.toBeInTheDocument();
+      expect(container.querySelector('.bi-droplet')).not.toBeInTheDocument();
       expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
     });
 
@@ -139,10 +152,10 @@ describe('Header', () => {
       expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
     });
 
-    it('应该在无自定义图标时使用默认 Bootstrap Icons', () => {
+    it('应该在无自定义图标时使用默认 AI 图标', () => {
       const { container } = render(<Header {...defaultProps} />);
-      expect(container.querySelector('.bi')).toBeInTheDocument();
-      expect(container.querySelector('.bi-robot')).toBeInTheDocument();
+      const icon = container.querySelector('[aria-label="ONote AI 图标"]');
+      expect(icon).toBeInTheDocument();
     });
   });
 
@@ -152,13 +165,13 @@ describe('Header', () => {
       const customStyle = { border: '2px solid red' };
       const { container } = render(
         <Header
-          title="Working Agent"
+          title="Working AI"
           agentState="thinking"
           style={customStyle}
           className="working"
         />,
       );
-      expect(screen.getByText('Working Agent')).toBeInTheDocument();
+      expect(screen.getByText('Working AI')).toBeInTheDocument();
       const header = container.querySelector('.header');
       expect(header).toHaveClass('working');
       expect(header).toHaveStyle(customStyle);
@@ -178,13 +191,13 @@ describe('Header', () => {
     it('应该在 idle 状态下正确渲染所有自定义属性', () => {
       const { container } = render(
         <Header
-          title="Idle Agent"
+          title="Idle AI"
           agentState="idle"
           className="idle-class"
           style={{ opacity: 0.7 }}
         />,
       );
-      expect(screen.getByText('Idle Agent')).toBeInTheDocument();
+      expect(screen.getByText('Idle AI')).toBeInTheDocument();
       const header = container.querySelector('.header');
       expect(header).toHaveClass('idle-class');
       expect(header).toHaveStyle({ opacity: 0.7 });
@@ -202,10 +215,10 @@ describe('Header', () => {
     });
 
     it('应该在 titleContainer 中包含图标和标题', () => {
-      const { container } = render(<Header {...defaultProps} title="Test" />);
+      const { container } = render(<Header {...defaultProps} />);
       const titleContainer = container.querySelector('.title-container');
       expect(titleContainer).toContainElement(container.querySelector('.icon'));
-      expect(titleContainer).toContainElement(screen.getByText('Test'));
+      expect(titleContainer).toContainElement(screen.getByText('ONote AI'));
     });
   });
 });
