@@ -69,7 +69,7 @@ const AboutPanel: React.FC = () => {
   return (
     <div style={{ padding: '20px', maxWidth: '400px' }}>
       <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>ONote</h2>
-      <p style={{ color: '#605e5c', fontSize: '13px', marginBottom: '16px', lineHeight: 1.5 }}>
+      <p style={{ color: '#7a6e60', fontSize: '13px', marginBottom: '16px', lineHeight: 1.5 }}>
         {t('onoteDesc')}
       </p>
       <div style={{ fontSize: '13px', color: '#8a8886', marginBottom: '8px' }}>

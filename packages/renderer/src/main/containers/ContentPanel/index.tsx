@@ -21,11 +21,11 @@ const useStyles = makeStyles({
     userSelect: 'none',
   },
   emptyIcon: {
-    color: '#c8c6c4',
+    color: '#c4b9a8',
   },
   emptyText: {
     fontSize: '14px',
-    color: '#605e5c',
+    color: '#7a6e60',
   },
 });
 

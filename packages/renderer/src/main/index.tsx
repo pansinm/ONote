@@ -6,7 +6,8 @@ import React from 'react';
 import '../styles/utils.scss';
 import '../styles/index.scss';
 import '../styles/agent-diff.scss';
-import { FluentProvider, webLightTheme } from '@fluentui/react-components';
+import { FluentProvider } from '@fluentui/react-components';
+import { warmLightTheme } from './theme/warmLightTheme';
 
 import { createRoot } from 'react-dom/client';
 import { initI18n } from './i18n';
@@ -18,7 +19,7 @@ initI18n().then(() => {
   const root = createRoot(document.getElementById('app') as HTMLDivElement);
 
   root.render(
-    <FluentProvider theme={webLightTheme}>
+    <FluentProvider theme={warmLightTheme}>
       <App />
     </FluentProvider>,
   );

@@ -65,7 +65,7 @@ const useStyles = makeStyles({
     borderRadius: '2px',
     ':hover': {
       backgroundColor: 'rgba(0,0,0,0.06)',
-      color: '#323130',
+      color: '#4a3f35',
     },
   },
   iconBtn: {
