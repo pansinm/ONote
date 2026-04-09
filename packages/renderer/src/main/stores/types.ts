@@ -33,10 +33,4 @@ export type OnoteAPI = {
   typst: {
     invoke: <T = unknown>(method: string, ...args: unknown[]) => Promise<T>;
   };
-  llmConversation: {
-    invoke: <T = unknown>(method: string, ...args: unknown[]) => Promise<T>;
-  };
-  agentContext: {
-    invoke: <T = unknown>(method: string, ...args: unknown[]) => Promise<T>;
-  };
 };

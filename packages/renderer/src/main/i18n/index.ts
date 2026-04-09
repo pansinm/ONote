@@ -11,7 +11,7 @@ export function initI18n() {
       resources,
       fallbackLng: DEFAULT_LOCALE,
       supportedLngs: SUPPORTED_LOCALES,
-      ns: ['common', 'menu', 'setting', 'sidebar', 'llmbox'],
+      ns: ['common', 'menu', 'setting', 'sidebar'],
       defaultNS: 'common',
       interpolation: {
         escapeValue: false,

@@ -42,12 +42,6 @@ export enum ErrorCode {
   EDITOR_CONTENT_TOO_LARGE = 5002,
   EDITOR_SAVE_FAILED = 5003,
 
-  // LLM 错误 (6xxx)
-  LLM_API_ERROR = 6001,
-  LLM_AUTH_FAILED = 6002,
-  LLM_QUOTA_EXCEEDED = 6003,
-  LLM_TIMEOUT = 6004,
-
   // 配置错误 (7xxx)
   CONFIG_INVALID = 7001,
   CONFIG_MISSING = 7002,
@@ -201,26 +195,6 @@ export class NetworkError extends AppError {
       originalError,
     );
     this.name = 'NetworkError';
-  }
-}
-
-/**
- * LLM API 错误
- */
-export class LLMError extends AppError {
-  constructor(
-    message: string,
-    code: ErrorCode,
-    provider?: string,
-    originalError?: Error,
-  ) {
-    super(message, code, ErrorSeverity.MEDIUM, { provider }, originalError);
-    this.name = 'LLMError';
-  }
-
-  getUserMessage(): string {
-    const provider = this.context?.provider ? ` (${this.context.provider as string})` : '';
-    return i18next.t('common:llmError', { provider, message: this.message });
   }
 }
 

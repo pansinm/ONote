@@ -1,32 +1,20 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <!-- 背景渐变 -->
-  <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#357ABD;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="noteGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#F0F4F8;stop-opacity:1" />
-    </linearGradient>
-  </defs>
+  <!-- 暖米色背景 -->
+  <rect width="512" height="512" rx="115" fill="#F5EFE0"/>
 
-  <!-- 圆角矩形背景 -->
-  <rect width="512" height="512" rx="115" fill="url(#bgGradient)"/>
+  <!-- 墨滴阴影 -->
+  <ellipse cx="256" cy="340" rx="100" ry="22" fill="#8B6F4E" opacity="0.18"/>
+  <ellipse cx="256" cy="358" rx="65" ry="14" fill="#8B6F4E" opacity="0.10"/>
 
-  <!-- 笔记本主体 - O 形状 -->
-  <circle cx="256" cy="256" r="140" fill="url(#noteGradient)" stroke="#2C5F8D" stroke-width="8"/>
+  <!-- 墨滴主体 — O 的形状，顶部亮底部深 -->
+  <ellipse cx="256" cy="248" rx="118" ry="140" fill="#7A6040"/>
 
-  <!-- 内圈 -->
-  <circle cx="256" cy="256" r="100" fill="none" stroke="#4A90E2" stroke-width="6"/>
+  <!-- 墨滴中层 -->
+  <ellipse cx="256" cy="235" rx="95" ry="118" fill="#9B7D55"/>
 
-  <!-- 笔记线条 -->
-  <line x1="200" y1="230" x2="312" y2="230" stroke="#4A90E2" stroke-width="4" stroke-linecap="round"/>
-  <line x1="200" y1="256" x2="312" y2="256" stroke="#4A90E2" stroke-width="4" stroke-linecap="round"/>
-  <line x1="200" y1="282" x2="280" y2="282" stroke="#4A90E2" stroke-width="4" stroke-linecap="round"/>
+  <!-- 墨滴高光 -->
+  <ellipse cx="218" cy="185" rx="30" ry="42" fill="#C4A882" opacity="0.65"/>
 
-  <!-- 装饰点 -->
-  <circle cx="180" cy="230" r="4" fill="#E74C3C"/>
-  <circle cx="180" cy="256" r="4" fill="#F39C12"/>
-  <circle cx="180" cy="282" r="4" fill="#27AE60"/>
+  <!-- 墨滴顶光 -->
+  <ellipse cx="245" cy="155" rx="14" ry="20" fill="#D8C4A0" opacity="0.45"/>
 </svg>

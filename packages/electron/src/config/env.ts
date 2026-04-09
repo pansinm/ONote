@@ -27,11 +27,6 @@ export interface EnvConfig {
   LOG_LEVEL: 'debug' | 'info' | 'warn' | 'error';
   PORT: number;
 
-  // OpenAI API
-  OPENAI_API_KEY?: string;
-  OPENAI_API_BASE_URL?: string;
-  OPENAI_MODEL?: string;
-
   // 数据存储
   DEFAULT_NOTE_DIR: string;
   BACKUP_DIR: string;
@@ -156,11 +151,6 @@ export function loadConfig(): EnvConfig {
     ),
     PORT: getEnv('PORT', validators.number, 8080),
 
-    // OpenAI API
-    OPENAI_API_KEY: getEnv('OPENAI_API_KEY', validators.optional(validators.string), undefined),
-    OPENAI_API_BASE_URL: getEnv('OPENAI_API_BASE_URL', validators.optional(validators.url), undefined),
-    OPENAI_MODEL: getEnv('OPENAI_MODEL', validators.optional(validators.string), undefined),
-
     // 数据存储
     DEFAULT_NOTE_DIR: expandHomeDir(
       getEnv('DEFAULT_NOTE_DIR', validators.string, '~/Documents/ONote'),
@@ -227,15 +217,9 @@ export function validateRequiredConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
   const config = getConfig();
 
-  // 检查关键配置
+  // 检查 WebDAV 配置
   if (config.WEBDAV_ENABLED && (!config.WEBDAV_USERNAME || !config.WEBDAV_PASSWORD)) {
     errors.push('WebDAV is enabled but username or password is missing');
-  }
-
-  // 检查 OpenAI 配置（如果使用 LLM 功能）
-  // 注意：这里只是警告，不是错误，因为 LLM 功能是可选的
-  if (!config.OPENAI_API_KEY) {
-    logger.warn('Warning: OPENAI_API_KEY not set, LLM features will be disabled');
   }
 
   return {

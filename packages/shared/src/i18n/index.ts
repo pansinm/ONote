@@ -5,13 +5,11 @@ import zhCNCommon from './locales/zh-CN/common.json';
 import zhCNMenu from './locales/zh-CN/menu.json';
 import zhCNSetting from './locales/zh-CN/setting.json';
 import zhCINSidebar from './locales/zh-CN/sidebar.json';
-import zhCNLlmbox from './locales/zh-CN/llmbox.json';
 
 import enUSCommon from './locales/en-US/common.json';
 import enUSMenu from './locales/en-US/menu.json';
 import enUSSetting from './locales/en-US/setting.json';
 import enUSSidebar from './locales/en-US/sidebar.json';
-import enUSLlmbox from './locales/en-US/llmbox.json';
 
 export const resources: Record<SupportedLocale, Record<string, LocaleResource>> = {
   'zh-CN': {
@@ -19,14 +17,12 @@ export const resources: Record<SupportedLocale, Record<string, LocaleResource>> 
     menu: zhCNMenu,
     setting: zhCNSetting,
     sidebar: zhCINSidebar,
-    llmbox: zhCNLlmbox,
   },
   'en-US': {
     common: enUSCommon,
     menu: enUSMenu,
     setting: enUSSetting,
     sidebar: enUSSidebar,
-    llmbox: enUSLlmbox,
   },
 };
 

@@ -5,7 +5,6 @@ import { pluginManager as pluginManager } from '../plugin';
 import { sendToMain } from './ipc';
 import { findWindow, getPageUrl } from './utils';
 import { injectJs } from './frames';
-import { injectScript, isChatBox } from '../chatbox';
 import setting from '../setting';
 import { getLogger } from '/@/shared/logger';
 
@@ -102,9 +101,6 @@ async function createWindow(type: 'main' | 'previewer') {
       frame?.executeJavaScript(
         `window.__settings = ${JSON.stringify(setting.getAll())}`,
       );
-      if (isChatBox(frame)) {
-        injectScript(frame);
-      }
       frame?.executeJavaScript(
         `(()=>{
           const event = new Event('onote:ready');

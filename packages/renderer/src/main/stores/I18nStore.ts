@@ -18,7 +18,8 @@ class I18nStore {
 
   private async init() {
     try {
-      const savedLang = await settingService.get('app.language') as string | undefined;
+      const allSettings = await settingService.getAll() as Record<string, unknown>;
+      const savedLang = (allSettings['app.language'] as string | undefined) || '';
 
       let targetLang: SupportedLocale;
 

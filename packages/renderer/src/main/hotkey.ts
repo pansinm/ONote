@@ -5,7 +5,6 @@
  *   Ctrl/Cmd+N          新建笔记
  *   Ctrl/Cmd+S          保存当前文件
  *   Ctrl/Cmd+B          切换侧边栏
- *   Ctrl/Cmd+J          切换 LLMBox
  *   Ctrl/Cmd+W          关闭当前 tab
  *   Ctrl/Cmd+P          聚焦搜索框
  *   Ctrl/Cmd+Tab        下一个 tab
@@ -105,16 +104,6 @@ function handleToggleSidebar(): void {
   stores.activationStore.toggleSidebar();
 }
 
-/** Ctrl/Cmd+J — 切换 LLMBox */
-function handleToggleLLMBox(): void {
-  const { layoutStore } = stores;
-  if (layoutStore.llmBoxVisible) {
-    layoutStore.hideLLMBox();
-  } else {
-    layoutStore.showLLMBox('llmbox');
-  }
-}
-
 /** Ctrl/Cmd+W — 关闭当前 tab */
 function handleCloseTab(): void {
   const { activeFileUri } = stores.activationStore;
@@ -192,9 +181,6 @@ function globalKeydownHandler(e: KeyboardEvent) {
         return;
       case 'b':
         handleToggleSidebar();
-        return;
-      case 'j':
-        handleToggleLLMBox();
         return;
       case 'w':
         overrideIfMonaco(e);

@@ -1,20 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { updateWidth, RESIZE_CONFIG, saveWidths } from '/@/common/constants/resize';
 
-export type DragType = 'editor-preview' | 'llmbox' | 'sidebar';
+export type DragType = 'editor-preview' | 'sidebar';
 
 export interface DragState {
   isDragging: boolean;
   type: DragType | null;
   startX: number;
   currentX: number;
-}
-
-export interface ShrinkNeighborConfig {
-  cssVar: string;
-  min: number;
-  max: number;
-  unit: 'px' | '%';
 }
 
 interface UseResizableOptions {
@@ -33,18 +26,13 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
     currentX: 0,
   });
 
-  const [shrinkConfig, setShrinkConfig] = useState<ShrinkNeighborConfig | null>(null);
-
-  const startDrag = useCallback((type: DragType, startX: number, shrinkNeighbor?: ShrinkNeighborConfig) => {
+  const startDrag = useCallback((type: DragType, startX: number) => {
     setDragState({
       isDragging: true,
       type,
       startX,
       currentX: startX,
     });
-    if (shrinkNeighbor) {
-      setShrinkConfig(shrinkNeighbor);
-    }
   }, []);
 
   // 处理鼠标移动
@@ -68,7 +56,6 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
 
       const config = {
         'editor-preview': RESIZE_CONFIG.editor,
-        'llmbox': RESIZE_CONFIG.llmbox,
         'sidebar': RESIZE_CONFIG.sidebar,
       }[dragState.type];
 
@@ -81,22 +68,8 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
           config.min,
           config.max,
           config.unit,
-          dragState.type === 'llmbox',
           referenceWidth,
         );
-
-        if (dragState.type === 'llmbox' && shrinkConfig) {
-          // llmbox 变大 → neighbor 缩小，方向相同（不取反）
-          updateWidth(
-            shrinkConfig.cssVar,
-            delta,
-            shrinkConfig.min,
-            shrinkConfig.max,
-            shrinkConfig.unit,
-            false,
-            referenceWidth,
-          );
-        }
       }
 
       saveWidths();
@@ -108,7 +81,6 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
         startX: 0,
         currentX: 0,
       });
-      setShrinkConfig(null);
 
       // 回调
       onResizeEnd?.();
@@ -121,7 +93,7 @@ export function useResizable({ containerRef, onResizeEnd }: UseResizableOptions)
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [dragState.isDragging, dragState.startX, dragState.type, containerRef, onResizeEnd, shrinkConfig]);
+  }, [dragState.isDragging, dragState.startX, dragState.type, containerRef, onResizeEnd]);
 
   return { dragState, startDrag };
 }

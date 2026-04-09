@@ -16,14 +16,6 @@ export const RESIZE_CONFIG = {
     cssVar: '--editor-width',
     unit: '%' as const,
   },
-  // LLMBox 配置
-  llmbox: {
-    min: 10,
-    max: 80,
-    default: 30,
-    cssVar: '--llmbox-width',
-    unit: '%' as const,
-  },
   // 拖拽手柄配置
   dragHandle: {
     /** 可交互区域宽度（视觉线更细，居中显示） */
@@ -57,7 +49,6 @@ export const RESIZE_CONFIG = {
  * @param min 最小值（px 为像素，% 为百分比）
  * @param max 最大值（px 为像素，% 为百分比）
  * @param unit 单位类型
- * @param isReverse 是否反向（llmbox 手柄在左侧，向左拖 delta < 0，宽度应变大）
  * @param referenceWidth % 单位的参考容器像素宽度（即 CSS 变量所在元素的 containing block 宽度）
  */
 export function updateWidth(
@@ -66,7 +57,6 @@ export function updateWidth(
   min: number,
   max: number,
   unit: 'px' | '%',
-  isReverse = false,
   referenceWidth?: number,
 ): void {
   const root = document.documentElement;
@@ -74,7 +64,7 @@ export function updateWidth(
 
   if (unit === 'px') {
     const currentPixels = parseFloat(widthStr) || min;
-    const newPixels = isReverse ? currentPixels - delta : currentPixels + delta;
+    const newPixels = currentPixels + delta;
     const clampedWidth = Math.max(min, Math.min(max, newPixels));
     root.style.setProperty(cssVarName, `${clampedWidth}px`);
   } else {
@@ -82,8 +72,7 @@ export function updateWidth(
     const containerWidth = referenceWidth || window.innerWidth;
     const currentPercent = parseFloat(widthStr) || min;
     const currentPixels = (currentPercent / 100) * containerWidth;
-    const effectiveDelta = isReverse ? -delta : delta;
-    const newPixels = currentPixels + effectiveDelta;
+    const newPixels = currentPixels + delta;
     const newPercent = (newPixels / containerWidth) * 100;
     const clampedPercent = Math.max(min, Math.min(max, newPercent));
     root.style.setProperty(cssVarName, `${clampedPercent}%`);
@@ -101,11 +90,10 @@ export function loadSavedWidths(): void {
     const widths = JSON.parse(saved);
     const root = document.documentElement;
 
-    type PanelKey = 'sidebar' | 'editor' | 'llmbox';
+    type PanelKey = 'sidebar' | 'editor';
     const expectedUnits: Record<PanelKey, string> = {
       sidebar: 'px',
       editor: '%',
-      llmbox: '%',
     };
 
     for (const [key, expectedSuffix] of Object.entries(expectedUnits) as [PanelKey, string][]) {
@@ -134,7 +122,6 @@ export function saveWidths(): void {
     const widths = {
       sidebar: getComputedStyle(root).getPropertyValue('--sidebar-width').trim(),
       editor: getComputedStyle(root).getPropertyValue('--editor-width').trim(),
-      llmbox: getComputedStyle(root).getPropertyValue('--llmbox-width').trim(),
     };
     localStorage.setItem('onote-panel-widths', JSON.stringify(widths));
   } catch (error) {
@@ -153,10 +140,6 @@ export function resetWidths(): void {
   document.documentElement.style.setProperty(
     '--editor-width',
     `${RESIZE_CONFIG.editor.default}%`,
-  );
-  document.documentElement.style.setProperty(
-    '--llmbox-width',
-    `${RESIZE_CONFIG.llmbox.default}%`,
   );
   saveWidths();
 }

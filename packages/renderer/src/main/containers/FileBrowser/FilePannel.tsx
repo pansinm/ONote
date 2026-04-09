@@ -9,9 +9,8 @@ import UnSupport from './UnSupport';
 import { filePanelManager } from '../../frame';
 import { isEquals } from '/@/common/utils/uri';
 import stores from '../../stores';
-import LLMBoxContainer from '../LLMBox';
 import { DragIndicator, DragHandle } from '/@/components/DragBarNew';
-import { useResizable, DragType } from '/@/common/hooks/useResizable';
+import { useResizable } from '/@/common/hooks/useResizable';
 import { resetWidths, loadSavedWidths } from '/@/common/constants/resize';
 import { RESIZE_CONFIG } from '/@/common/constants/resize';
 
@@ -54,8 +53,6 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
   const layout = stores.layoutStore.layout;
 
   const showEditorOnly = layout === 'editor-only' || !previewerUri;
-  const showPreviewerOnly = layout === 'previewer-only';
-  const showLLMBox = typeof stores.layoutStore.llmBoxVisible === 'boolean';
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -129,8 +126,6 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
                 flex: 1,
                 position: 'relative',
                 display: showEditorOnly ? 'none' : 'flex',
-                // 预览和 LLMBox 之间的分隔线
-                borderRight: showLLMBox ? '1px solid var(--warm-border)' : 'none',
               }}
             >
               {dragState.isDragging && (
@@ -148,59 +143,6 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
               )}
               <Previewer previewerUri={previewerUri} />
             </div>
-            {showLLMBox && (
-              <div
-                className="llmbox-container"
-                style={{
-                  width: stores.layoutStore.llmBoxVisible
-                    ? 'var(--llmbox-width)'
-                    : '0',
-                  minWidth: stores.layoutStore.llmBoxVisible
-                    ? 'var(--llmbox-width)'
-                    : '0',
-                  maxWidth: 'var(--llmbox-width)',
-                  position: 'relative',
-                  display: stores.layoutStore.llmBoxVisible ? 'block' : 'none',
-                  overflow: 'hidden',
-                  flexShrink: 0,
-                }}
-              >
-                {dragState.isDragging && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      zIndex: 1,
-                      background: 'transparent',
-                    }}
-                  ></div>
-                )}
-                <DragHandle
-                  type="llmbox"
-                  left="-5px"
-                  onStartDrag={(type, startX) =>
-                    startDrag(
-                      type,
-                      startX,
-                      showEditorOnly
-                        ? {
-                            cssVar: RESIZE_CONFIG.editor.cssVar,
-                            min: RESIZE_CONFIG.editor.min,
-                            max: RESIZE_CONFIG.editor.max,
-                            unit: RESIZE_CONFIG.editor.unit,
-                          }
-                        : undefined,
-                    )
-                  }
-                  onDoubleClick={resetWidths}
-                  isDragging={dragState.isDragging && dragState.type === 'llmbox'}
-                />
-                <LLMBoxContainer />
-              </div>
-            )}
           </div>
         </div>
       </div>

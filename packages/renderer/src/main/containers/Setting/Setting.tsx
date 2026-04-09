@@ -11,7 +11,6 @@ import { observer } from 'mobx-react-lite';
 // import PluginManager from './PluginPanel/PluginManager';
 import EditorPanel from './EditorPanel';
 import PlantUMLPanel from './PlantUMLPanel';
-import ChatGPT from './ChatGPT';
 import GeneralPanel from './GeneralPanel';
 
 const useStyles = makeStyles({
@@ -45,7 +44,6 @@ const Setting: React.FC = observer(() => {
         <Tab value="editor">{t('editor')}</Tab>
         <Tab value="diagrams">{t('diagrams')}</Tab>
         {/* <Tab value="plugin">{t('plugin')}</Tab> */}
-        <Tab value="ai-assistant">{t('aiAssistant')}</Tab>
         <Tab value="about">{t('about')}</Tab>
       </TabList>
       <div className={styles.panel}>
@@ -53,7 +51,6 @@ const Setting: React.FC = observer(() => {
         {tab === 'editor' && <EditorPanel />}
         {tab === 'diagrams' && <PlantUMLPanel />}
         {/* {tab === 'plugin' && <PluginManager />} */}
-        {tab === 'ai-assistant' && <ChatGPT />}
         {tab === 'about' && <AboutPanel />}
       </div>
     </div>

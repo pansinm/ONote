@@ -5,7 +5,6 @@ import {
   QrCodeRegular,
   LayoutColumnTwoSplitLeftRegular,
   PlayRegular,
-  ChatRegular,
 } from '@fluentui/react-icons';
 import { Tooltip } from '@fluentui/react-components';
 import _QRCode from 'react-qr-code';
@@ -53,17 +52,6 @@ interface ToolbarActionsProps {
 
 function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
   const { t } = useTranslation('common');
-  const { t: tLlm } = useTranslation('llmbox');
-  const toggleChatBox = () => {
-    const shown = stores.layoutStore.llmBoxVisible;
-    if (shown) {
-      stores.layoutStore.hideLLMBox();
-    } else {
-      stores.layoutStore.showLLMBox('llmbox');
-    }
-  };
-
-  const isAiOpen = stores.layoutStore.llmBoxVisible;
 
   return (
     <div
@@ -90,27 +78,6 @@ function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
           onClick={() => window.simmer.showPreviewerWindow()}
         />
       )}
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          borderRadius: '4px',
-          cursor: 'pointer',
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLSpanElement).style.background =
-            'rgba(0,0,0,0.05)';
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLSpanElement).style.background = 'none';
-        }}
-      >
-        <ChatRegular
-          style={{ fontSize: 18, cursor: 'pointer' }}
-          title={isAiOpen ? t('hideAiAssistant') : t('openAiAssistant')}
-          onClick={toggleChatBox}
-        />
-      </span>
     </div>
   );
 }

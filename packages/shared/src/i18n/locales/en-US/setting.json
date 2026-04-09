@@ -2,7 +2,6 @@
   "editor": "Editor",
   "diagrams": "Diagrams",
   "plugin": "Plugins",
-  "aiAssistant": "AI Assistant",
   "general": "General",
   "about": "About",
   "language": "Language",
@@ -18,10 +17,7 @@
   "pluginMarket": "Plugin Market",
   "installed": "Installed",
   "uninstall": "Uninstall",
-  "llmBaseUrl": "LLM BASE URL",
-  "modelName": "MODEL NAME",
-  "apiKey": "API KEY",
   "version": "Version",
-  "onoteDesc": "An elegant Markdown note-taking app with built-in AI assistant.",
+  "onoteDesc": "An elegant Markdown note-taking app.",
   "checkUpdate": "Check for Updates"
 }

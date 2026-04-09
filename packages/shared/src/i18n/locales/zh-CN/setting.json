@@ -2,7 +2,6 @@
   "editor": "编辑器",
   "diagrams": "图表",
   "plugin": "插件管理",
-  "aiAssistant": "AI 助手",
   "general": "通用",
   "about": "关于",
   "language": "语言",
@@ -18,10 +17,7 @@
   "pluginMarket": "插件市场",
   "installed": "已安装",
   "uninstall": "卸载",
-  "llmBaseUrl": "LLM BASE URL",
-  "modelName": "MODEL NAME",
-  "apiKey": "API KEY",
   "version": "版本",
-  "onoteDesc": "一款简洁优雅的 Markdown 笔记应用，内置 AI 智能助手。",
+  "onoteDesc": "一款简洁优雅的 Markdown 笔记应用。",
   "checkUpdate": "检查更新"
 }
