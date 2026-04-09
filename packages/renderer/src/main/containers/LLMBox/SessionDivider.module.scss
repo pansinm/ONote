@@ -2,12 +2,12 @@
   display: flex;
   align-items: center;
   margin: 12px 0;
-  border-bottom: 1px solid #e1dfdd;
+  border-bottom: 1px solid var(--warm-border);
 }
 
 .label {
   font-size: 12px;
-  color: #605e5c;
+  color: var(--warm-text-muted);
   padding: 4px 8px;
-  background-color: #faf9f8;
+  background-color: #faf6ee;
 }

@@ -11,8 +11,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  background-color: #f3f2f1;
-  border-left: 3px solid #0078d4;
+  background-color: var(--warm-bg-hover);
+  border-left: 3px solid var(--warm-accent);
   border-radius: 4px;
   font-size: 14px;
 }
@@ -27,12 +27,12 @@
 
 .quoteSource {
   font-size: 12px;
-  color: #605e5c;
+  color: var(--warm-text-muted);
   font-weight: 600;
 }
 
 .quoteText {
-  color: #323130;
+  color: var(--warm-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -47,19 +47,19 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  color: #605e5c;
+  color: var(--warm-text-muted);
   padding: 0;
   margin-left: 8px;
   border-radius: 4px;
   flex-shrink: 0;
 
   &:hover {
-    background-color: #edebe9;
-    color: #323130;
+    background-color: #e8e0d0;
+    color: var(--warm-text);
   }
 
   &:active {
-    background-color: #e1dfdd;
+    background-color: var(--warm-border);
   }
 
   svg {
@@ -72,7 +72,7 @@
 .textarea {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--warm-border);
   border-radius: 4px;
   font-size: 14px;
   font-family: inherit;
@@ -85,12 +85,12 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 
   &:focus {
-    border-color: #0078d4;
-    box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+    border-color: var(--warm-accent);
+    box-shadow: 0 0 0 2px rgba(139, 126, 104, 0.2);
   }
 
   &:disabled {
-    background-color: #f3f2f1;
+    background-color: var(--warm-bg-hover);
     color: #a19f9d;
     cursor: not-allowed;
   }
@@ -118,7 +118,7 @@
 }
 
 .statusDotActive {
-  background-color: #0078d4;
+  background-color: var(--warm-accent);
   animation: statusPulse 1.5s ease-in-out infinite;
 }
 

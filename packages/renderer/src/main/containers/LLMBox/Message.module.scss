@@ -12,7 +12,7 @@
   padding: 8px 12px;
 
   &--user {
-    background-color: #0078d4;
+    background-color: var(--warm-accent-strong);
     border-radius: 12px 12px 2px 12px;
     align-self: flex-end;
     max-width: 85%;
@@ -25,7 +25,7 @@
       color: rgba(255, 255, 255, 0.7);
     }
 
-    // markdown 子元素蓝色背景下的颜色修正
+    // markdown 子元素暖色背景下的颜色修正
     .markdownCodeInline {
       background: rgba(255, 255, 255, 0.2);
       color: #ffffff;
@@ -49,9 +49,9 @@
   }
 
   &--agent {
-    background-color: #f5f5f5;
+    background-color: var(--warm-bg-subtle);
     border-radius: 12px 12px 12px 2px;
-    border-left: 3px solid #0078d4;
+    border-left: 3px solid var(--warm-accent);
     align-self: flex-start;
     max-width: 90%;
   }
@@ -64,7 +64,7 @@
   line-height: 1.5;
   word-break: break-word;
   white-space: pre-wrap;
-  color: #323130;
+  color: var(--warm-text);
 }
 
 .userTimestamp {
@@ -121,7 +121,7 @@
       border-radius: 4px;
       border-left: 3px solid #ffe066;
       font-style: italic;
-      color: #323130;
+      color: var(--warm-text);
     }
   }
 
@@ -135,37 +135,37 @@
   // 总结步骤
   &--summary {
     .workStep__header {
-      color: #323130;
+      color: var(--warm-text);
     }
 
     .workStep__content {
       background-color: #ffffff;
       padding: 8px 10px;
       border-radius: 4px;
-      border: 1px solid #e1dfdd;
-      color: #323130;
+      border: 1px solid var(--warm-border);
+      color: var(--warm-text);
     }
   }
 
   // Response 步骤
   &--response {
     .workStep__header {
-      color: #0078d4;
+      color: var(--warm-accent);
     }
 
     .workStep__content {
       background-color: transparent;
       padding: 8px 10px;
       border-radius: 4px;
-      border-left: 3px solid #0078d4;
-      color: #323130;
+      border-left: 3px solid var(--warm-accent);
+      color: var(--warm-text);
     }
   }
 }
 
 // ========== 工具调用详情（可展开） ==========
 .toolCall {
-  border: 1px solid #e1dfdd;
+  border: 1px solid var(--warm-border);
   border-radius: 6px;
   overflow: hidden;
   background-color: #ffffff;
@@ -177,17 +177,17 @@
   justify-content: space-between;
   gap: 8px;
   padding: 6px 10px;
-  background-color: #f3f2f1;
+  background-color: var(--warm-bg-hover);
   cursor: pointer;
   user-select: none;
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #edebe9;
+    background-color: #e8e0d0;
   }
 
   &:focus-visible {
-    outline: 2px solid #0078d4;
+    outline: 2px solid var(--warm-accent);
     outline-offset: -2px;
   }
 
@@ -199,18 +199,18 @@
   }
 
   &__icon {
-    color: #605e5c;
+    color: var(--warm-text-muted);
     font-size: 14px;
   }
 
   &__name {
     font-size: 13px;
     font-weight: 500;
-    color: #323130;
+    color: var(--warm-text);
   }
 
   &__expand {
-    color: #605e5c;
+    color: var(--warm-text-muted);
     font-size: 12px;
     transition: transform 0.2s ease;
 
@@ -222,7 +222,7 @@
 
 .toolCallBody {
   padding: 10px;
-  border-top: 1px solid #e1dfdd;
+  border-top: 1px solid var(--warm-border);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -236,27 +236,27 @@
   &__label {
     font-size: 12px;
     font-weight: 600;
-    color: #605e5c;
+    color: var(--warm-text-muted);
   }
 }
 
 .toolCallArguments {
-  background-color: #f8f8f8;
+  background-color: var(--warm-bg-subtle);
   padding: 8px;
   border-radius: 4px;
   font-family: 'Droid Sans Mono', 'Consolas', monospace;
   font-size: 12px;
   overflow-x: auto;
-  color: #323130;
+  color: var(--warm-text);
   line-height: 1.5;
 }
 
 .toolCallResult {
-  background-color: #f0f0f0;
+  background-color: var(--warm-bg-hover);
   padding: 8px;
   border-radius: 4px;
   font-size: 13px;
-  color: #323130;
+  color: var(--warm-text);
   word-break: break-word;
   max-height: 200px;
   overflow-y: auto;
@@ -279,7 +279,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background-color: #0078d4;
+    background-color: var(--warm-accent);
     animation: bounce 1.4s infinite ease-in-out both;
 
     &:nth-child(1) {
@@ -298,7 +298,7 @@
 
 .streamingText {
   font-size: 12px;
-  color: #605e5c;
+  color: var(--warm-text-muted);
   font-style: italic;
 }
 
@@ -340,7 +340,7 @@
   }
 
   &--inProgress {
-    color: #0078d4;
+    color: var(--warm-accent);
     animation: spin 1s linear infinite;
   }
 
@@ -365,7 +365,7 @@
 }
 
 .markdownCodeBlock {
-  background: #f5f5f5;
+  background: var(--warm-bg-subtle);
   padding: 10px;
   border-radius: 4px;
   overflow-x: auto;
@@ -389,14 +389,14 @@
 }
 
 .markdownBlockquote {
-  border-left: 3px solid #dfe2e5;
-  color: #6a737d;
+  border-left: 3px solid var(--warm-border);
+  color: var(--warm-text-muted);
   padding-left: 10px;
   margin: 6px 0;
 }
 
 .markdownLink {
-  color: #0078d4;
+  color: var(--warm-accent);
   text-decoration: none;
   cursor: pointer;
   &:hover {
