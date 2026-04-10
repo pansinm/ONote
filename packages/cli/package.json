@@ -1,0 +1,19 @@
+{
+  "name": "onote-cli",
+  "version": "0.1.0",
+  "description": "ONote command-line interface",
+  "bin": {
+    "onote": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^20.0.0"
+  }
+}

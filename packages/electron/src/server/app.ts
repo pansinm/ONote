@@ -9,6 +9,8 @@ import { sendToMain } from '../window/ipc';
 import * as dsWebDav from './webdav';
 import { dataSource } from '../dataSource';
 import { getLogger } from '/@/shared/logger';
+import apiRouter from './api';
+import { errorHandler } from './api/errors';
 
 const logger = getLogger('ServerApp');
 const upload = multer({ dest: os.tmpdir() });
@@ -69,6 +71,10 @@ app.post('/upload', upload.single('file'), async (req, res, next) => {
 app.use('/mobile', (req, res, next) => {
   res.sendFile(path.join(staticRoot, 'auxiliary.html'));
 });
+
+// ──── REST API：在 WebDAV 之前挂载，避免被 WebDAV 吞掉 ────
+app.use('/api/v1', apiRouter);
+app.use('/api', errorHandler); // API 错误处理中间件
 
 const useWebdav = webdav.extensions.express('/', webdavServer);
 app.use((req, res, next) => {
