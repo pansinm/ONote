@@ -14,4 +14,6 @@ export const EventNames = {
   SettingUpdated: 'setting.updated',
   FileCreated: 'file.created',
   FileDeleted: 'file.deleted',
+  FileRenamed: 'file.renamed',
+  FileMoved: 'file.moved',
 };

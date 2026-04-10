@@ -80,10 +80,28 @@ class DataSource extends EventEmitter implements IDataSourceProvider<unknown> {
     return this.provider.getTreeNode(uri);
   }
   rename(uri: string, name: string) {
-    return this.provider.rename(uri, name);
+    return this.provider.rename(uri, name).then((result) => {
+      this.emit(EventNames.FileRenamed, uri, result.uri, result.type);
+      if (result.type === 'directory') {
+        this.emit(EventNames.FileDeleted, uri);
+        this.emit(EventNames.FileCreated, result.uri);
+      } else {
+        this.emit(EventNames.FileContentChanged, result.uri);
+      }
+      return result;
+    });
   }
   move(sourceUri: string, targetDirUri: string) {
-    return this.provider.move(sourceUri, targetDirUri);
+    return this.provider.move(sourceUri, targetDirUri).then((result) => {
+      this.emit(EventNames.FileMoved, sourceUri, result.uri, result.type);
+      if (result.type === 'directory') {
+        this.emit(EventNames.FileDeleted, sourceUri);
+        this.emit(EventNames.FileCreated, result.uri);
+      } else {
+        this.emit(EventNames.FileContentChanged, result.uri);
+      }
+      return result;
+    });
   }
   listDir(uri: string) {
     return this.provider.listDir(uri);

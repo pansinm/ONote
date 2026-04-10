@@ -5,3 +5,5 @@ export const EDITOR_SELECTION_CHANGED = 'editor.selection.changed';
 export const EDITOR_CONTENT_CHANGED = 'editor.content.changed';
 export const FILE_CREATED = 'file.created';
 export const FILE_DELETED = 'file.deleted';
+export const FILE_RENAMED = 'file.renamed';
+export const FILE_MOVED = 'file.moved';

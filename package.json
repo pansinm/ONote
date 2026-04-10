@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@hpcc-js/wasm": "^2.15.3",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "cron": "^3.1.7",
     "default-gateway": "^6.0.3",
     "electron-log": "5.4.3",

@@ -476,8 +476,8 @@ Phase 1-3 都需要 ONote GUI running（因为 Express 在 Electron 主进程里
 **一句话**：CLI 人类用，MCP Agent 用，底层同一个 DataSource。三层夹一个核心。
 
 做三件事：
-1. **给 DataSource 加 HTTP 薄壳**（REST API）
-2. **给 HTTP 薄壳加人类界面**（CLI）
-3. **给 HTTP 薄壳加 Agent 界面**（MCP）
+1. **给 DataSource 加 HTTP 薄壳**（REST API）✅
+2. **给 HTTP 薄壳加人类界面**（CLI）✅
+3. **给 HTTP 薄壳加 Agent 界面**（MCP）✅
 
 之后砍掉 `.claude/skills/onote/SKILL.md`——那个 curl 杂耍可以退休了。

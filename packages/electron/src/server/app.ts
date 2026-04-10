@@ -11,6 +11,7 @@ import { dataSource } from '../dataSource';
 import { getLogger } from '/@/shared/logger';
 import apiRouter from './api';
 import { errorHandler } from './api/errors';
+import { handleMcpRequest } from './mcp';
 
 const logger = getLogger('ServerApp');
 const upload = multer({ dest: os.tmpdir() });
@@ -74,6 +75,15 @@ app.use('/mobile', (req, res, next) => {
 
 // ──── REST API：在 WebDAV 之前挂载，避免被 WebDAV 吞掉 ────
 app.use('/api/v1', apiRouter);
+
+// ──── MCP Server：Streamable HTTP transport（stateless 模式） ────
+const mcpHandler = async (req: express.Request, res: express.Response) => {
+  await handleMcpRequest(req, res);
+};
+app.post('/api/mcp', mcpHandler);
+app.get('/api/mcp', mcpHandler);
+app.delete('/api/mcp', mcpHandler);
+
 app.use('/api', errorHandler); // API 错误处理中间件
 
 const useWebdav = webdav.extensions.express('/', webdavServer);

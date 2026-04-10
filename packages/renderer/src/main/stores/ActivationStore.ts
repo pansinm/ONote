@@ -1,9 +1,11 @@
-import { makeAutoObservable, reaction } from 'mobx';
+import { makeAutoObservable, reaction, runInAction } from 'mobx';
 import _ from 'lodash';
 import type FileStateStore from './FileStore';
 import { isEquals } from '/@/common/utils/uri';
 import type SettingStore from './SettingStore';
 import { MAX_OPEN_TABS } from '/@/common/constants/SettingKey';
+import eventbus from '../eventbus/eventbus';
+import { FILE_RENAMED, FILE_MOVED, FILE_DELETED } from '../eventbus/EventName';
 
 class ActivationStore {
   openedFiles: string[] = [];
@@ -41,6 +43,41 @@ class ActivationStore {
         closedFiles.forEach((closedFile) => fileStore.closeFile(closedFile));
       },
     );
+
+    // 外部 rename/move/delete 同步（MCP、REST API 等）
+    eventbus.on(FILE_RENAMED, (oldUri: unknown, newUri: unknown, type: unknown) => {
+      if (typeof oldUri === 'string' && typeof newUri === 'string') {
+        runInAction(() => {
+          if (type === 'directory') {
+            this.renameDirUri(oldUri, newUri);
+          } else {
+            this.renameFileUri(oldUri, newUri);
+          }
+        });
+      }
+    });
+    eventbus.on(FILE_MOVED, (oldUri: unknown, newUri: unknown, type: unknown) => {
+      if (typeof oldUri === 'string' && typeof newUri === 'string') {
+        runInAction(() => {
+          if (type === 'directory') {
+            this.renameDirUri(oldUri, newUri);
+          } else {
+            this.renameFileUri(oldUri, newUri);
+          }
+        });
+      }
+    });
+    eventbus.on(FILE_DELETED, (uri: unknown) => {
+      if (typeof uri === 'string') {
+        runInAction(() => {
+          // 如果被删除的文件正在编辑器里打开，关闭对应 tab
+          const matching = this.openedFiles.filter((f) =>
+            isEquals(f, uri) || f.startsWith(uri + '/'),
+          );
+          matching.forEach((f) => this.closeFile(f));
+        });
+      }
+    });
   }
 
   openNoteBook(dataSourceId: string, rootUri: string) {

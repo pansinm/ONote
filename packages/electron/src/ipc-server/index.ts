@@ -43,6 +43,18 @@ function startDataSource() {
     IPCNamespaces.DataSource,
     () => webContents.fromFrame(getMainFrame()!)!,
   );
+  delegateEvent(
+    dataSource,
+    EventNames.FileRenamed,
+    IPCNamespaces.DataSource,
+    () => webContents.fromFrame(getMainFrame()!)!,
+  );
+  delegateEvent(
+    dataSource,
+    EventNames.FileMoved,
+    IPCNamespaces.DataSource,
+    () => webContents.fromFrame(getMainFrame()!)!,
+  );
 }
 
 function startSetting() {

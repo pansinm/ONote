@@ -4,6 +4,8 @@ import {
   FILE_CONTENT_CHANGED,
   FILE_CREATED,
   FILE_DELETED,
+  FILE_RENAMED,
+  FILE_MOVED,
 } from '../eventbus/EventName';
 import eventbus from '../eventbus/eventbus';
 import Pop from '/@/utils/Pop';
@@ -20,6 +22,12 @@ class FileService {
     });
     dataSource.addListener(FILE_DELETED, (...args: unknown[]) => {
       eventbus.emit(FILE_DELETED, ...args);
+    });
+    dataSource.addListener(FILE_RENAMED, (...args: unknown[]) => {
+      eventbus.emit(FILE_RENAMED, ...args);
+    });
+    dataSource.addListener(FILE_MOVED, (...args: unknown[]) => {
+      eventbus.emit(FILE_MOVED, ...args);
     });
   }
   async getProvider(): Promise<{
