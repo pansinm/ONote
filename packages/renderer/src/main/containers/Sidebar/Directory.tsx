@@ -14,6 +14,8 @@ import useFileOperation from '/@/hooks/useFileOperation';
 import NoDirectory from './NoDirectory';
 import '@sinm/react-file-tree/styles.css';
 import '@sinm/react-file-tree/icons.css';
+import eventbus from '/@/main/eventbus/eventbus';
+import { FILE_CREATED, FILE_DELETED, FILE_RENAMED, FILE_MOVED } from '/@/main/eventbus/EventName';
 
 const DIRECTORY_MENU_ID = 'DIRECTORY_MENU';
 const FILE_MENU_ID = 'FILE_MENU';
@@ -102,6 +104,39 @@ const Directory = observer(() => {
       setTree(undefined);
     }
   }, [rootUri]);
+
+  // 刷新所有已展开目录的 children
+  const refreshExpandedDirs = useCallback(() => {
+    setTree((prev) => {
+      if (!prev) return prev;
+      const expandedDirs: string[] = [];
+      const collectExpanded = (node: TreeNode) => {
+        if (node.type === 'directory' && node.expanded && node.children) {
+          expandedDirs.push(node.uri);
+          node.children.forEach(collectExpanded);
+        }
+      };
+      collectExpanded(prev);
+      // 异步刷新各个目录的 children
+      expandedDirs.forEach((dirUri) => {
+        fileService.listDir(dirUri).then((children) => {
+          setTree((t) =>
+            utils.assignTreeNode(t, dirUri, { children } as any),
+          );
+        });
+      });
+      return prev; // 不直接改 tree，异步回调里改
+    });
+  }, []);
+
+  // 外部变更事件（MCP / REST API）刷新文件树
+  useEffect(() => {
+    const events = [FILE_CREATED, FILE_DELETED, FILE_RENAMED, FILE_MOVED];
+    events.forEach((evt) => eventbus.on(evt, refreshExpandedDirs));
+    return () => {
+      events.forEach((evt) => eventbus.off(evt, refreshExpandedDirs));
+    };
+  }, [refreshExpandedDirs]);
 
   const { Modal, createFile, deleteFile, renameFile } = useFileOperation();
 

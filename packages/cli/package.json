@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "ONote command-line interface",
   "bin": {
-    "onote": "./dist/index.js"
+    "onote-cli": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
