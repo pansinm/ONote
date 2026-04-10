@@ -1,4 +1,6 @@
 import EventEmitter from 'events';
+import * as url from 'url';
+import * as path from 'path';
 import { dataSourceProviderManager } from './providers';
 import type { IDataSourceProvider } from './providers/IDataSourceProvider';
 import { EventNames } from '../constants';
@@ -92,6 +94,12 @@ class DataSource extends EventEmitter implements IDataSourceProvider<unknown> {
     });
   }
   move(sourceUri: string, targetDirUri: string) {
+    // 不能把目录移到自身或自身的子目录中
+    const source = url.fileURLToPath(sourceUri);
+    const target = url.fileURLToPath(targetDirUri);
+    if (target === source || target.startsWith(source + path.sep)) {
+      return Promise.reject(new Error('Cannot move a directory into itself or its subdirectory'));
+    }
     return this.provider.move(sourceUri, targetDirUri).then((result) => {
       this.emit(EventNames.FileMoved, sourceUri, result.uri, result.type);
       if (result.type === 'directory') {
