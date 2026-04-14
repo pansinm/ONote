@@ -1,2 +1,5 @@
 @echo off
-"%~dp0\..\ONote.exe" %*
+REM ONote CLI — calls the standalone binary
+REM No Node.js dependency required.
+
+"%~dp0\onote-cli.exe" %*

@@ -43,24 +43,31 @@ async function isCliInstalled(): Promise<boolean> {
 
 async function installCli() {
   const appPath = process.resourcesPath;
-  const cliSource = path.join(appPath, 'bin', 'onote');
+  const cliWrapper = path.join(appPath, 'bin', 'onote');
+  const cliBinary = path.join(appPath, 'bin', 'onote-cli');
 
-  if (!fs.existsSync(cliSource)) {
-    logger.error('CLI tool not found', { cliSource });
+  if (!fs.existsSync(cliBinary)) {
+    logger.error('CLI binary not found', { cliBinary });
     dialog.showErrorBox('错误', 'CLI 工具文件不存在');
     return;
   }
 
-  exec(`sudo ln -sf "${cliSource}" /usr/local/bin/onote`, (error) => {
+  // 确保 wrapper 脚本有执行权限
+  if (fs.existsSync(cliWrapper)) {
+    fs.chmodSync(cliWrapper, 0o755);
+  }
+
+  const linkTarget = fs.existsSync(cliWrapper) ? cliWrapper : cliBinary;
+  exec(`sudo ln -sf "${linkTarget}" /usr/local/bin/onote`, (error) => {
     if (error) {
       logger.error('Failed to install CLI', error);
-      dialog.showErrorBox('安装失败', `请手动执行:\nsudo ln -s "${cliSource}" /usr/local/bin/onote`);
+      dialog.showErrorBox('安装失败', `请手动执行:\nsudo ln -s "${linkTarget}" /usr/local/bin/onote`);
     } else {
       logger.info('CLI installed successfully');
       dialog.showMessageBox({
         type: 'info',
         title: '安装成功',
-        message: 'CLI 工具已安装，现在可以使用 onote 命令了！',
+        message: 'CLI 工具已安装，现在可以在终端使用 onote 命令了！',
       });
     }
   });

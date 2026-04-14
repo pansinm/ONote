@@ -1,12 +1,7 @@
 #!/bin/bash
-# ONote CLI tool
+# ONote CLI — 调用独立二进制，不启动 Electron
+#
+# 安装后无 Node.js 依赖，由 pkg 编译的原生可执行文件直接运行。
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  APP_PATH="$SCRIPT_DIR/../../MacOS/ONote"
-else
-  APP_PATH="$SCRIPT_DIR/../onote"
-fi
-
-exec "$APP_PATH" "$@"
+exec "$SCRIPT_DIR/onote-cli" "$@"

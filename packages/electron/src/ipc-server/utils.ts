@@ -35,9 +35,14 @@ export function delegateEvent(
   emitter: EventEmitter,
   eventName: string,
   ipcNamespace: string,
-  webContents: () => WebContents,
+  webContentsFetcher: () => WebContents,
 ) {
   emitter.addListener(eventName, (...args) => {
-    webContents().send(`${ipcNamespace}.${eventName}`, ...args);
+    try {
+      webContentsFetcher().send(`${ipcNamespace}.${eventName}`, ...args);
+    } catch {
+      // IPC 推送失败不应炸掉调用者（如 REST API / MCP 的写入操作）
+      // 典型场景：窗口关闭中、GUI 未加载完成、headless 模式
+    }
   });
 }

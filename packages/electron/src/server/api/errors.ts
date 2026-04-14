@@ -61,5 +61,5 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     return fail(res, err.statusCode, err.code, err.message);
   }
   console.error('[API] Unexpected error:', err);
-  return fail(res, 500, ApiErrorCode.INTERNAL_ERROR, 'Internal server error');
+  return fail(res, 500, ApiErrorCode.INTERNAL_ERROR, err.message || 'Internal server error');
 }

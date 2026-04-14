@@ -16,10 +16,17 @@ const config = {
   },
   files: [
     'packages/**/dist/**',
+    '!packages/cli/dist/**',
     {
       from: 'buildResources',
       to: 'buildResources',
       filter: ['icon.png', 'tray-icon.png'],
+    },
+  ],
+  extraResources: [
+    {
+      from: 'packages/cli/dist/onote-cli',
+      to: 'bin/onote-cli',
     },
   ],
   extraMetadata: {

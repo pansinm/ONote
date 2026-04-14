@@ -106,7 +106,7 @@ const Directory = observer(() => {
   }, [rootUri]);
 
   // 刷新所有已展开目录的 children
-  const refreshExpandedDirs = useCallback(() => {
+  const refreshExpandedDirs = useCallback((fileUri?: string) => {
     setTree((prev) => {
       if (!prev) return prev;
       const expandedDirs: string[] = [];
@@ -117,13 +117,35 @@ const Directory = observer(() => {
         }
       };
       collectExpanded(prev);
+
+      // 如果传入了 fileUri，找到其父目录并确保展开
+      let targetDirUri: string | undefined;
+      if (fileUri && typeof fileUri === 'string') {
+        const parentNode = utils.getParentNode(prev, fileUri);
+        if (parentNode && !parentNode.expanded) {
+          targetDirUri = parentNode.uri;
+        }
+      }
+
       // 异步刷新各个目录的 children
-      expandedDirs.forEach((dirUri) => {
+      const dirsToRefresh = targetDirUri && !expandedDirs.includes(targetDirUri)
+        ? [...expandedDirs, targetDirUri]
+        : expandedDirs;
+
+      dirsToRefresh.forEach((dirUri) => {
         fileService.listDir(dirUri).then((children) => {
-          setTree((t) =>
-            utils.assignTreeNode(t, dirUri, { children } as any),
-          );
+          setTree((t) => {
+            const updated = utils.assignTreeNode(t, dirUri, { children, expanded: true } as any);
+            return updated;
+          });
         });
+        // 如果该目录还没加载过 children，先设为 loading
+        const dirNode = utils.getTreeNodeByUri(prev, dirUri);
+        if (dirNode && !dirNode.children) {
+          setTree((t) =>
+            utils.assignTreeNode(t, dirUri, { loading: true } as any),
+          );
+        }
       });
       return prev; // 不直接改 tree，异步回调里改
     });
@@ -131,10 +153,15 @@ const Directory = observer(() => {
 
   // 外部变更事件（MCP / REST API）刷新文件树
   useEffect(() => {
+    const handleEvent = (...args: unknown[]) => {
+      // FILE_CREATED 事件第一个参数是 fileUri，用于定位父目录
+      const fileUri = args[0] as string | undefined;
+      refreshExpandedDirs(fileUri);
+    };
     const events = [FILE_CREATED, FILE_DELETED, FILE_RENAMED, FILE_MOVED];
-    events.forEach((evt) => eventbus.on(evt, refreshExpandedDirs));
+    events.forEach((evt) => eventbus.on(evt, handleEvent));
     return () => {
-      events.forEach((evt) => eventbus.off(evt, refreshExpandedDirs));
+      events.forEach((evt) => eventbus.off(evt, handleEvent));
     };
   }, [refreshExpandedDirs]);
 
@@ -145,13 +172,16 @@ const Directory = observer(() => {
     switch (menu.id) {
       case 'CREATE_DIRECTORY':
         return createFile(dirUri, 'directory').then((treeNode) => {
-          treeNode && appendTreeNode(dirUri, treeNode);
+          if (treeNode) {
+            // 确保父目录展开，children 由 refreshExpandedDirs 事件刷新
+            setTree((t) => utils.assignTreeNode(t, dirUri, { expanded: true } as any));
+          }
         });
       case 'CREATE_FILE':
         return createFile(dirUri, 'file').then((treeNode) => {
           if (treeNode) {
+            // 确保父目录展开，children 由 refreshExpandedDirs 事件刷新
             setTree((t) => utils.assignTreeNode(t, dirUri, { expanded: true } as any));
-            appendTreeNode(dirUri, treeNode);
             stores.activationStore.activeFile(treeNode.uri);
           }
         });

@@ -2,18 +2,19 @@
   "name": "onote-cli",
   "version": "0.1.0",
   "description": "ONote command-line interface",
-  "bin": {
-    "onote-cli": "./dist/index.js"
-  },
+  "private": true,
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch"
+    "build": "webpack",
+    "build:binary": "webpack && pkg dist/cli.cjs --target host --output dist/onote-cli"
   },
   "dependencies": {
     "commander": "^12.1.0"
   },
   "devDependencies": {
+    "@yao-pkg/pkg": "^6.1.0",
+    "swc-loader": "^0.2.6",
     "typescript": "^5.5.0",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "webpack": "^5.88.0"
   }
 }

@@ -1,4 +1,6 @@
 import http from 'http';
+import fs from 'fs';
+import osPath from 'path';
 
 /**
  * ONote REST API 客户端配置
@@ -30,16 +32,33 @@ const DEFAULT_CONFIG: ClientConfig = {
 };
 
 /**
- * 从以下位置加载配置（优先级从高到低）：
+ * 加载配置（优先级从高到低）：
  * 1. 环境变量 ONOTE_HOST / ONOTE_PORT / ONOTE_USER / ONOTE_PASS
- * 2. 默认值 localhost:21221 / webdav:webdav
+ * 2. ~/.onote/credentials 文件
+ * 3. 默认值 localhost:21221 / webdav:webdav
  */
 export function loadConfig(): ClientConfig {
+  let fileConfig: Partial<ClientConfig> = {};
+
+  const credPath = osPath.join(
+    process.env.HOME || process.env.USERPROFILE || '',
+    '.onote',
+    'credentials',
+  );
+
+  if (fs.existsSync(credPath)) {
+    try {
+      fileConfig = JSON.parse(fs.readFileSync(credPath, 'utf-8'));
+    } catch {
+      // 凭据文件损坏，忽略
+    }
+  }
+
   return {
-    host: process.env.ONOTE_HOST || DEFAULT_CONFIG.host,
-    port: parseInt(process.env.ONOTE_PORT || '', 10) || DEFAULT_CONFIG.port,
-    username: process.env.ONOTE_USER || DEFAULT_CONFIG.username,
-    password: process.env.ONOTE_PASS || DEFAULT_CONFIG.password,
+    host: process.env.ONOTE_HOST || fileConfig.host || DEFAULT_CONFIG.host,
+    port: parseInt(process.env.ONOTE_PORT || '', 10) || fileConfig.port || DEFAULT_CONFIG.port,
+    username: process.env.ONOTE_USER || fileConfig.username || DEFAULT_CONFIG.username,
+    password: process.env.ONOTE_PASS || fileConfig.password || DEFAULT_CONFIG.password,
   };
 }
 
