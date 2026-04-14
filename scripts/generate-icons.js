@@ -5,10 +5,12 @@ const { default: pngToIco } = require('png-to-ico');
 const png2icons = require('png2icons');
 
 const svgPath = path.join(__dirname, '../buildResources/icon.svg');
+const traySvgPath = path.join(__dirname, '../buildResources/tray-icon.svg');
 const outputDir = path.join(__dirname, '../buildResources');
 
 async function generateIcons() {
   const svgBuffer = fs.readFileSync(svgPath);
+  const traySvgBuffer = fs.existsSync(traySvgPath) ? fs.readFileSync(traySvgPath) : svgBuffer;
 
   // 生成主图标 512x512
   await sharp(svgBuffer)
@@ -17,12 +19,18 @@ async function generateIcons() {
     .toFile(path.join(outputDir, 'icon.png'));
   console.log('✓ Generated icon.png (512x512)');
 
-  // 生成托盘图标 16x16
-  await sharp(svgBuffer)
+  // 生成托盘图标
+  await sharp(traySvgBuffer)
     .resize(16, 16)
     .png()
     .toFile(path.join(outputDir, 'tray-icon.png'));
   console.log('✓ Generated tray-icon.png (16x16)');
+
+  await sharp(traySvgBuffer)
+    .resize(32, 32)
+    .png()
+    .toFile(path.join(outputDir, 'tray-icon@2x.png'));
+  console.log('✓ Generated tray-icon@2x.png (32x32)');
 
   // 生成其他尺寸
   const sizes = [16, 32, 48, 64, 128, 256];

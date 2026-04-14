@@ -1,20 +1,28 @@
-<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <!-- 暖米色背景 -->
-  <rect width="512" height="512" rx="115" fill="#F5EFE0"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="72" y1="60" x2="440" y2="452" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1F2B3A"/>
+      <stop offset="1" stop-color="#0E1620"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="158" y1="138" x2="360" y2="372" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF8EE"/>
+      <stop offset="1" stop-color="#E7D4B6"/>
+    </linearGradient>
+    <filter id="shadow" x="116" y="116" width="280" height="292" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="18"/>
+      <feGaussianBlur stdDeviation="18"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.03 0 0 0 0 0.04 0 0 0 0 0.07 0 0 0 0.26 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_1" result="shape"/>
+    </filter>
+  </defs>
 
-  <!-- 墨滴阴影 -->
-  <ellipse cx="256" cy="340" rx="100" ry="22" fill="#8B6F4E" opacity="0.18"/>
-  <ellipse cx="256" cy="358" rx="65" ry="14" fill="#8B6F4E" opacity="0.10"/>
+  <rect x="32" y="32" width="448" height="448" rx="108" fill="url(#bg)"/>
+  <rect x="44" y="44" width="424" height="424" rx="96" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="2"/>
 
-  <!-- 墨滴主体 — O 的形状，顶部亮底部深 -->
-  <ellipse cx="256" cy="248" rx="118" ry="140" fill="#7A6040"/>
-
-  <!-- 墨滴中层 -->
-  <ellipse cx="256" cy="235" rx="95" ry="118" fill="#9B7D55"/>
-
-  <!-- 墨滴高光 -->
-  <ellipse cx="218" cy="185" rx="30" ry="42" fill="#C4A882" opacity="0.65"/>
-
-  <!-- 墨滴顶光 -->
-  <ellipse cx="245" cy="155" rx="14" ry="20" fill="#D8C4A0" opacity="0.45"/>
+  <g filter="url(#shadow)">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M256 150C196.905 150 149 197.905 149 257C149 316.095 196.905 364 256 364C315.095 364 363 316.095 363 257C363 197.905 315.095 150 256 150ZM256 186C216.787 186 185 217.787 185 257C185 296.213 216.787 328 256 328C295.213 328 327 296.213 327 257C327 217.787 295.213 186 256 186Z" fill="url(#ring)"/>
+  </g>
 </svg>
