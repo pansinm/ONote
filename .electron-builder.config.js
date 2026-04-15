@@ -20,7 +20,7 @@ const config = {
     {
       from: 'buildResources',
       to: 'buildResources',
-      filter: ['icon.png', 'tray-icon.png'],
+      filter: ['icon.png', 'tray-icon.png', 'tray-icon@2x.png'],
     },
   ],
   extraResources: [

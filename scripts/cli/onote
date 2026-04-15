@@ -2,6 +2,21 @@
 # ONote CLI — 调用独立二进制，不启动 Electron
 #
 # 安装后无 Node.js 依赖，由 pkg 编译的原生可执行文件直接运行。
+#
+# 注意：该脚本可能会被软链接到 /usr/local/bin/onote，因此不能直接基于 $0
+# 计算目录；需要先解析软链接，再定位真实脚本所在目录，才能稳定找到同目录
+# 下的 onote-cli。
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SOURCE="${BASH_SOURCE[0]:-$0}"
+while [ -L "$SOURCE" ]; do
+  DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+  TARGET="$(readlink "$SOURCE")"
+  if [[ "$TARGET" = /* ]]; then
+    SOURCE="$TARGET"
+  else
+    SOURCE="$DIR/$TARGET"
+  fi
+done
+
+SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 exec "$SCRIPT_DIR/onote-cli" "$@"

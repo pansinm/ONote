@@ -57,13 +57,14 @@ async function installCli() {
     fs.chmodSync(cliWrapper, 0o755);
   }
 
+  // 优先链接 wrapper：它负责参数透传与相邻资源定位；同时 wrapper 本身必须支持解析软链接。
   const linkTarget = fs.existsSync(cliWrapper) ? cliWrapper : cliBinary;
   exec(`sudo ln -sf "${linkTarget}" /usr/local/bin/onote`, (error) => {
     if (error) {
       logger.error('Failed to install CLI', error);
       dialog.showErrorBox('安装失败', `请手动执行:\nsudo ln -s "${linkTarget}" /usr/local/bin/onote`);
     } else {
-      logger.info('CLI installed successfully');
+      logger.info('CLI installed successfully', { linkTarget });
       dialog.showMessageBox({
         type: 'info',
         title: '安装成功',
