@@ -5,9 +5,10 @@ import { basename } from './uri';
 export function sortTreeNodes(treeNodes: TreeNode[]) {
     return orderBy(
         treeNodes,
-        (treeNode) => {
-            return basename(treeNode.uri);
-        },
-        'asc',
+        [
+            (treeNode) => (treeNode.type === 'directory' ? 0 : 1),
+            (treeNode) => basename(treeNode.uri),
+        ],
+        ['asc', 'asc'],
     );
 }

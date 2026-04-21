@@ -64,7 +64,7 @@ class FileService {
     if (node.type === 'directory') {
       await dataSource.invoke('mkdir', node.uri);
     } else {
-      await dataSource.invoke('writeText', node.uri, '');
+      await dataSource.invoke('createFile', node.uri, '');
     }
     return dataSource.invoke('getTreeNode', node.uri);
   }

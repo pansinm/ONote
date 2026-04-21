@@ -1,20 +1,21 @@
 .file-tree__tree-item {
   display: flex;
   align-items: center;
-&:hover,
+
+  &:hover,
   &.file-tree__tree-item--dragover {
     background-color: rgba($color: (
         #000),
       $alpha: 0.05
     );
-}
-}
+  }
 
-.file-tree__tree-item.active {
-  background-color: #d4c9b8;
+  &.activated {
+    background-color: #d4c9b8;
 
-  & .file-tree__filename {
-    color: #4a3f35;
-    font-weight: 500;
+    & .file-tree__filename {
+      color: #4a3f35;
+      font-weight: 500;
+    }
   }
 }

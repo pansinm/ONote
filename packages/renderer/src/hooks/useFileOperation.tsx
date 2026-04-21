@@ -55,7 +55,8 @@ function useFileOperation() {
           .readText(resolveUri(dirUri + '/', 'template.md'))
           .catch(() => '');
         await fileService.writeText(fileUri, template);
-        await stores.fileListStore.refreshFiles();
+        // 注意：不需要手动 refreshFiles — create 触发 FILE_CREATED 事件，
+        // FileListStore 和 Directory 组件各自监听事件自动刷新
         stores.activationStore.activeFile(node.uri);
       }
       return node;
@@ -93,7 +94,7 @@ function useFileOperation() {
         stores.activationStore.closeFilesInDir(uri);
       } else {
         stores.activationStore.closeFile(uri);
-        await stores.fileListStore.refreshFiles();
+        // FILE_DELETED 事件会自动触发 FileListStore 和 Directory 刷新
       }
     } else {
       throw new Error('not delete');
@@ -115,7 +116,7 @@ function useFileOperation() {
         stores.activationStore.renameDirUri(uri, newNode.uri);
       } else {
         stores.activationStore.renameFileUri(uri, newNode.uri);
-        await stores.fileListStore.refreshFiles();
+        // FILE_RENAMED 事件会自动触发 FileListStore 和 Directory 刷新
       }
       return newNode;
     }

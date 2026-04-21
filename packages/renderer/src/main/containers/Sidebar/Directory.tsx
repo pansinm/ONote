@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FileTreeProps } from '@sinm/react-file-tree';
 import { utils } from '@sinm/react-file-tree';
 import { FileTree } from '@sinm/react-file-tree';
@@ -81,14 +81,6 @@ const Directory = observer(() => {
     }
   };
 
-  const appendTreeNode = (uri: string, treeNode: TreeNode) => {
-    setTree((t) => utils.appendTreeNode(t, uri, treeNode));
-  };
-
-  const replaceTreeNode = (uri: string, treeNode: TreeNode) => {
-    setTree((t) => utils.replaceTreeNode(t, uri, treeNode));
-  };
-
   const removeTreeNode = (uri: string) => {
     setTree((t) => utils.removeTreeNode(t, uri));
   };
@@ -105,56 +97,77 @@ const Directory = observer(() => {
     }
   }, [rootUri]);
 
-  // 刷新所有已展开目录的 children
+  // 用于防抖的 pending fileUri（在一次事件风暴中只保留最后一个）
+  const pendingRefreshUriRef = useRef<string | undefined>(undefined);
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 刷新所有已展开目录的 children（带防抖：100ms 内的多次事件合并为一次刷新）
   const refreshExpandedDirs = useCallback((fileUri?: string) => {
-    setTree((prev) => {
-      if (!prev) return prev;
-      const expandedDirs: string[] = [];
-      const collectExpanded = (node: TreeNode) => {
-        if (node.type === 'directory' && node.expanded && node.children) {
-          expandedDirs.push(node.uri);
-          node.children.forEach(collectExpanded);
+    // 记录最新的 fileUri
+    pendingRefreshUriRef.current = fileUri;
+
+    // 清除之前的定时器，合并短时间内的多次事件
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current);
+    }
+
+    refreshTimerRef.current = setTimeout(() => {
+      const targetFileUri = pendingRefreshUriRef.current;
+      pendingRefreshUriRef.current = undefined;
+      refreshTimerRef.current = null;
+
+      setTree((prev) => {
+        if (!prev) return prev;
+        const expandedDirs: string[] = [];
+        const collectExpanded = (node: TreeNode) => {
+          if (node.type === 'directory' && node.expanded && node.children) {
+            expandedDirs.push(node.uri);
+            node.children.forEach(collectExpanded);
+          }
+        };
+        collectExpanded(prev);
+
+        // 如果传入了 fileUri，找到其父目录并确保展开
+        let targetDirUri: string | undefined;
+        if (targetFileUri && typeof targetFileUri === 'string') {
+          const parentNode = utils.getParentNode(prev, targetFileUri);
+          if (parentNode && !parentNode.expanded) {
+            targetDirUri = parentNode.uri;
+          }
         }
-      };
-      collectExpanded(prev);
 
-      // 如果传入了 fileUri，找到其父目录并确保展开
-      let targetDirUri: string | undefined;
-      if (fileUri && typeof fileUri === 'string') {
-        const parentNode = utils.getParentNode(prev, fileUri);
-        if (parentNode && !parentNode.expanded) {
-          targetDirUri = parentNode.uri;
-        }
-      }
+        const dirsToRefresh = targetDirUri && !expandedDirs.includes(targetDirUri)
+          ? [...expandedDirs, targetDirUri]
+          : expandedDirs;
 
-      // 异步刷新各个目录的 children
-      const dirsToRefresh = targetDirUri && !expandedDirs.includes(targetDirUri)
-        ? [...expandedDirs, targetDirUri]
-        : expandedDirs;
+        if (dirsToRefresh.length === 0) return prev;
 
-      dirsToRefresh.forEach((dirUri) => {
-        fileService.listDir(dirUri).then((children) => {
-          setTree((t) => {
-            const updated = utils.assignTreeNode(t, dirUri, { children, expanded: true } as any);
-            return updated;
+        // 异步刷新各个目录的 children
+        dirsToRefresh.forEach((dirUri) => {
+          fileService.listDir(dirUri).then((children) => {
+            setTree((t) => {
+              if (!t) return t;
+              return utils.assignTreeNode(t, dirUri, { children, expanded: true } as any);
+            });
           });
         });
-        // 如果该目录还没加载过 children，先设为 loading
-        const dirNode = utils.getTreeNodeByUri(prev, dirUri);
-        if (dirNode && !dirNode.children) {
-          setTree((t) =>
-            utils.assignTreeNode(t, dirUri, { loading: true } as any),
-          );
-        }
+        return prev; // 不直接改 tree，异步回调里改
       });
-      return prev; // 不直接改 tree，异步回调里改
-    });
+    }, 100);
+  }, []);
+
+  // 组件卸载时清理定时器
+  useEffect(() => {
+    return () => {
+      if (refreshTimerRef.current) {
+        clearTimeout(refreshTimerRef.current);
+      }
+    };
   }, []);
 
   // 外部变更事件（MCP / REST API）刷新文件树
   useEffect(() => {
     const handleEvent = (...args: unknown[]) => {
-      // FILE_CREATED 事件第一个参数是 fileUri，用于定位父目录
       const fileUri = args[0] as string | undefined;
       refreshExpandedDirs(fileUri);
     };
@@ -173,22 +186,21 @@ const Directory = observer(() => {
       case 'CREATE_DIRECTORY':
         return createFile(dirUri, 'directory').then((treeNode) => {
           if (treeNode) {
-            // 确保父目录展开，children 由 refreshExpandedDirs 事件刷新
+            // 确保父目录展开，children 由事件驱动的 refreshExpandedDirs 刷新
             setTree((t) => utils.assignTreeNode(t, dirUri, { expanded: true } as any));
           }
         });
       case 'CREATE_FILE':
         return createFile(dirUri, 'file').then((treeNode) => {
           if (treeNode) {
-            // 确保父目录展开，children 由 refreshExpandedDirs 事件刷新
+            // 确保父目录展开，children 由事件驱动的 refreshExpandedDirs 刷新
             setTree((t) => utils.assignTreeNode(t, dirUri, { expanded: true } as any));
             stores.activationStore.activeFile(treeNode.uri);
           }
         });
       case 'RENAME':
-        return renameFile(dirUri, 'directory').then((node) => {
-          replaceTreeNode(dirUri, node);
-        });
+        // renameFile 内部调用 fileService.rename，后端发出事件后由 refreshExpandedDirs 自动刷新树
+        return renameFile(dirUri, 'directory');
       case 'DELETE':
         return deleteFile(dirUri, 'directory').then(() => {
           removeTreeNode(dirUri);
@@ -208,9 +220,8 @@ const Directory = observer(() => {
     const uri = (menuProps as unknown as TreeNode).uri;
     switch (menu.id) {
       case 'RENAME_FILE':
-        return renameFile(uri, 'file').then((node) => {
-          replaceTreeNode(uri, node);
-        });
+        // renameFile 内部调用 fileService.rename，后端发出事件后由 refreshExpandedDirs 自动刷新树
+        return renameFile(uri, 'file');
       case 'DELETE_FILE':
         return deleteFile(uri, 'file').then(() => {
           removeTreeNode(uri);
@@ -240,27 +251,25 @@ const Directory = observer(() => {
               showFileMenu(event, { props: treeNode });
             }
           }}
-          active={
-            !isDir &&
-            isEquals(treeNode.uri, activeFileUri)
-          }
+          active={false}
           treeNode={treeNode}
         />
       );
     },
-    [showDirMenu, showFileMenu, activeFileUri],
+    [showDirMenu, showFileMenu],
   );
 
   const handleDrop: FileTreeProps['onDrop'] = async (e, fromUri, toDirUri) => {
     e.preventDefault();
-    stores.activationStore.closeFile(fromUri);
-    stores.activationStore.closeFilesInDir(fromUri);
+    // 等待文件保存完成
     if (stores.fileStore.states[fromUri] === 'changed') {
       await when(() => stores.fileStore.states[fromUri] !== 'changed');
     }
+    // 关闭源文件/目录下的所有打开标签
+    stores.activationStore.closeFile(fromUri);
+    stores.activationStore.closeFilesInDir(fromUri);
     const to = await fileService.move(fromUri, toDirUri);
-    await removeTreeNode(fromUri);
-    await appendTreeNode(toDirUri, to);
+    // 移动完成后通过事件自动刷新树，不需要手动操作节点
   };
 
   const localDirMenus = useMemo(() =>
@@ -277,10 +286,10 @@ const Directory = observer(() => {
 
   const handleItemClick = (treeNode: TreeNode) => {
     if (treeNode.type === 'directory') {
+      // 点击已展开的当前活跃目录 → 折叠
+      // 点击未展开目录或非活跃目录 → 展开
       if (!treeNode.expanded || stores.activationStore.activeDirUri === treeNode.uri) {
         toggleExpanded(treeNode);
-      } else {
-        replaceTreeNode(treeNode.uri, { ...treeNode });
       }
       stores.activationStore.activeDir(treeNode.uri);
     } else {
@@ -295,6 +304,7 @@ const Directory = observer(() => {
         draggable
         sorter={sorter}
         tree={tree}
+        activatedUri={activeFileUri}
         onDrop={handleDrop}
         emptyRenderer={() => <NoDirectory>{t('openFolderHint')}</NoDirectory>}
         onItemClick={handleItemClick}

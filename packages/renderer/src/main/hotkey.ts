@@ -83,7 +83,7 @@ function handleNewNote(): void {
   fileService
     .create(activeDirUri, { type: 'file', uri: fileUri })
     .then((node) => {
-      stores.fileListStore.refreshFiles();
+      // FILE_CREATED 事件会自动触发 FileListStore 和 Directory 刷新
       stores.activationStore.activeFile(node.uri);
     })
     .catch(() => {

@@ -17,6 +17,9 @@ class FileListStore {
 
   sorter: 'name-asc' | 'name-desc' | 'time-asc' | 'time-desc' = 'name-asc';
 
+  /** 防抖定时器 */
+  private _refreshTimer: ReturnType<typeof setTimeout> | null = null;
+
   get files(): TreeNode[] {
     switch (this.sorter) {
       case 'name-asc':
@@ -43,10 +46,19 @@ class FileListStore {
       },
     );
 
-    eventbus.on(FILE_CREATED, () => this.refreshFiles());
-    eventbus.on(FILE_DELETED, () => this.refreshFiles());
-    eventbus.on(FILE_RENAMED, () => this.refreshFiles());
-    eventbus.on(FILE_MOVED, () => this.refreshFiles());
+    // 事件驱动的刷新，带 100ms 防抖
+    const debouncedRefresh = () => {
+      if (this._refreshTimer) clearTimeout(this._refreshTimer);
+      this._refreshTimer = setTimeout(() => {
+        this._refreshTimer = null;
+        this.refreshFiles();
+      }, 100);
+    };
+
+    eventbus.on(FILE_CREATED, debouncedRefresh);
+    eventbus.on(FILE_DELETED, debouncedRefresh);
+    eventbus.on(FILE_RENAMED, debouncedRefresh);
+    eventbus.on(FILE_MOVED, debouncedRefresh);
   }
 
   setSorter(sorter: typeof this.sorter) {

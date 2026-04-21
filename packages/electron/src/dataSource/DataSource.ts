@@ -61,6 +61,12 @@ class DataSource extends EventEmitter implements IDataSourceProvider<unknown> {
   async writeText(uri: string, text: string) {
     await this.provider.write(uri, Buffer.from(text, 'utf-8'));
     this.emit(EventNames.FileContentChanged, uri);
+  }
+
+  /** 创建新文件（写入内容并触发 FILE_CREATED） */
+  async createFile(uri: string, text: string) {
+    await this.provider.write(uri, Buffer.from(text, 'utf-8'));
+    this.emit(EventNames.FileContentChanged, uri);
     this.emit(EventNames.FileCreated, uri);
   }
 
