@@ -11,6 +11,7 @@ import {
   Button,
   makeStyles,
   tokens,
+  Divider,
 } from '@fluentui/react-components';
 import _QRCode from 'react-qr-code';
 import stores from '/@/main/stores';
@@ -23,6 +24,20 @@ const useStyles = makeStyles({
     gap: '8px',
     paddingRight: '10px',
     flexShrink: 0,
+  },
+  primaryGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  secondaryGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    opacity: 0.82,
+  },
+  divider: {
+    height: '20px',
   },
   statusButton: {
     minWidth: 'unset',
@@ -146,34 +161,40 @@ function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
 
   return (
     <div className={styles.toolbar}>
-      <Tooltip
-        withArrow
-        content={`${t('layoutCurrent', { layout: currentLayout })} · ${t('layoutNext', {
-          layout: nextLayout,
-        })}`}
-        relationship="description"
-      >
-        <Button
-          appearance="secondary"
-          className={styles.statusButton}
-          icon={<LayoutColumnTwoSplitLeftRegular />}
-          onClick={() => stores.layoutStore.switchLayout()}
+      <div className={styles.primaryGroup}>
+        <Tooltip
+          withArrow
+          content={`${t('layoutCurrent', { layout: currentLayout })} · ${t('layoutNext', {
+            layout: nextLayout,
+          })}`}
+          relationship="description"
         >
-          {currentLayout}
-        </Button>
-      </Tooltip>
+          <Button
+            appearance="secondary"
+            className={styles.statusButton}
+            icon={<LayoutColumnTwoSplitLeftRegular />}
+            onClick={() => stores.layoutStore.switchLayout()}
+          >
+            {currentLayout}
+          </Button>
+        </Tooltip>
 
-      <Tooltip withArrow content={t('openInNewPreview')} relationship="description">
-        <Button
-          appearance="subtle"
-          icon={<PlayRegular />}
-          className={styles.iconButton}
-          aria-label={t('openInNewPreview')}
-          onClick={() => window.simmer.showPreviewerWindow()}
-        />
-      </Tooltip>
+        <Tooltip withArrow content={t('openInNewPreview')} relationship="description">
+          <Button
+            appearance="subtle"
+            icon={<PlayRegular />}
+            className={styles.iconButton}
+            aria-label={t('openInNewPreview')}
+            onClick={() => window.simmer.showPreviewerWindow()}
+          />
+        </Tooltip>
+      </div>
 
-      <ObserverQRCodePopover />
+      <Divider vertical className={styles.divider} />
+
+      <div className={styles.secondaryGroup}>
+        <ObserverQRCodePopover />
+      </div>
     </div>
   );
 }

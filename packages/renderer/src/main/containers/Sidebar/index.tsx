@@ -216,6 +216,8 @@ export default observer(function Sidebar() {
               <div className={styles.searchResultsList}>
                 <SearchList
                   files={searchFiles}
+                  keyword={searchText}
+                  rootUri={stores.activationStore.rootUri}
                   activeUri={stores.activationStore.activeFileUri}
                   onItemClick={(treeNode: TreeNode) => {
                     stores.activationStore.activeFile(treeNode.uri);

@@ -98,7 +98,7 @@ const ContentPanel = observer(() => {
                   });
                 }}
               >
-                {t('openDirectory')}
+                {t('emptyStateOpenDirectoryNow')}
               </Button>
             ) : (
               <>
@@ -110,10 +110,10 @@ const ContentPanel = observer(() => {
                     });
                   }}
                 >
-                  {t('createNote', { ns: 'menu' })}
+                  {t('emptyStateCreateFirstNote')}
                 </Button>
                 <Button appearance="subtle" onClick={() => stores.activationStore.activeDir(rootUri)}>
-                  {t('openFolderHint', { ns: 'menu' })}
+                  {t('emptyStatePickFromSidebar')}
                 </Button>
               </>
             )}
