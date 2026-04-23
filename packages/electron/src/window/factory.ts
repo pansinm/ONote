@@ -136,7 +136,7 @@ async function createWindow(type: 'main' | 'previewer') {
 
   /**
    * URL for main window.
-   * Vite dev server for development.
+   * Webpack dev server for development.
    * `file://../renderer/index.html` for production and test
    */
   const pageUrl = getPageUrl(type);

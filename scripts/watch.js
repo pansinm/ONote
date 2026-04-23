@@ -10,7 +10,7 @@ const path = require('path');
 /** @type 'production' | 'development'' */
 const mode = (process.env.MODE = process.env.MODE || 'development');
 
-/** @type {import('vite').LogLevel} */
+/** @type {'info' | 'warn' | 'error' | 'silent'} */
 const LOG_LEVEL = 'info';
 
 const logger = console;
@@ -18,13 +18,12 @@ const logger = console;
 /** Messages on stderr that match any of the contained patterns will be stripped from output */
 const stderrFilterPatterns = [
   // warning about devtools extension
-  // https://github.com/cawa-93/vite-electron-builder/issues/492
   // https://github.com/MarshallOfSound/electron-devtools-installer/issues/143
   /ExtensionLoadWarning/,
 ];
 
 /**
- * @param {{name: string; configFile: string; writeBundle: import('rollup').OutputPlugin['writeBundle'] }} param0
+ * @param {{name: string; configFile: string; writeBundle: () => void }} param0
  */
 const getWatcher = ({ name, configFile, writeBundle }) => {
   const configuration = require(path.resolve(process.cwd(), configFile));
@@ -38,11 +37,11 @@ const getWatcher = ({ name, configFile, writeBundle }) => {
 };
 
 const setupElectronPackageWatcher = ({ server }) => {
-  // Create VITE_DEV_SERVER_URL environment variable to pass it to the main process.
+  // Create DEV_SERVER_URL environment variable to pass it to the main process.
   {
     const protocol = server.https ? 'https:' : 'http:';
     const host = server.host || 'localhost';
-    const port = server.port || server.address().port; // Vite searches for and occupies the first free port: 3000, 3001, 3002 and so on
+    const port = server.port || server.address().port;
     const path = '/';
     process.env.DEV_SERVER_URL = `${protocol}//${host}:${port}${path}`;
   }

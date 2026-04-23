@@ -8,7 +8,7 @@ const logger = getLogger('SecurityRestrictions');
 /**
  * List of origins that you allow open INSIDE the application and permissions for each of them.
  *
- * In development mode you need allow open `VITE_DEV_SERVER_URL`
+ * In development mode you need allow open `DEV_SERVER_URL`
  */
 const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<
   string,
