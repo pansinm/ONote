@@ -7,7 +7,10 @@ import {
   DialogTitle,
   DialogContent,
 } from '@fluentui/react-components';
-import { Dismiss24Regular } from '@fluentui/react-icons';
+import {
+  Dismiss24Regular,
+  FolderOpenRegular,
+} from '@fluentui/react-icons';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Project } from './components/ProjectSelect';
@@ -22,13 +25,12 @@ export default function ProjectSelector(props: {
   if (!props.open) {
     return (
       <Button
-        style={{ flex: 1 }}
+        icon={<FolderOpenRegular />}
         onClick={() => props.onOpenChange(true)}
-        appearance="primary"
+        appearance="subtle"
         shape="square"
-      >
-        {t('openDirectory')}
-      </Button>
+        title={t('openDirectory')}
+      />
     );
   }
   return (
@@ -37,9 +39,12 @@ export default function ProjectSelector(props: {
       onOpenChange={(e, { open: needOpen }) => props.onOpenChange(needOpen)}
     >
       <DialogTrigger>
-        <Button style={{ flex: 1 }} appearance="primary" shape="square">
-          {t('openDirectory')}
-        </Button>
+        <Button
+          icon={<FolderOpenRegular />}
+          appearance="subtle"
+          shape="square"
+          title={t('openDirectory')}
+        />
       </DialogTrigger>
       <DialogSurface>
         <DialogBody>

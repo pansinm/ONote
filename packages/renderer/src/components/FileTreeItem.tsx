@@ -19,6 +19,7 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
     <div
       title={decodeURIComponent(treeNode.uri)}
       onContextMenu={onContextMenu}
+      className={active ? 'activated' : undefined}
       style={{
         display: 'flex',
         paddingLeft: 10,

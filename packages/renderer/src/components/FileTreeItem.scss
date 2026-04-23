@@ -1,3 +1,12 @@
+.activated {
+  background-color: #d4c9b8;
+
+  .file-tree__filename {
+    color: #4a3f35;
+    font-weight: 500;
+  }
+}
+
 .file-tree__tree-item {
   display: flex;
   align-items: center;

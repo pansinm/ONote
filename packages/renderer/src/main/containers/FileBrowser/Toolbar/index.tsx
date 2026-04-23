@@ -65,18 +65,28 @@ function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
     >
       {isMarkdown && <ObserverQRCodePopover />}
       {isMarkdown && (
-        <LayoutColumnTwoSplitLeftRegular
-          style={{ fontSize: 18, cursor: 'pointer' }}
-          title={t('switchLayout')}
-          onClick={() => stores.layoutStore.switchLayout()}
-        />
+        <Tooltip
+          withArrow
+          content={t('switchLayout')}
+          relationship="description"
+        >
+          <LayoutColumnTwoSplitLeftRegular
+            style={{ fontSize: 18, cursor: 'pointer' }}
+            onClick={() => stores.layoutStore.switchLayout()}
+          />
+        </Tooltip>
       )}
       {isMarkdown && (
-        <PlayRegular
-          style={{ fontSize: 18, cursor: 'pointer' }}
-          title={t('demo')}
-          onClick={() => window.simmer.showPreviewerWindow()}
-        />
+        <Tooltip
+          withArrow
+          content={t('demo')}
+          relationship="description"
+        >
+          <PlayRegular
+            style={{ fontSize: 18, cursor: 'pointer' }}
+            onClick={() => window.simmer.showPreviewerWindow()}
+          />
+        </Tooltip>
       )}
     </div>
   );

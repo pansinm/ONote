@@ -244,6 +244,7 @@ const Directory = observer(() => {
       const isDir = treeNode.type === 'directory';
       return (
         <FileTreeItem
+          active={!isDir && isEquals(treeNode.uri, activeFileUri)}
           onContextMenu={(event) => {
             if (isDir) {
               showDirMenu(event, { props: treeNode });
@@ -256,7 +257,7 @@ const Directory = observer(() => {
         />
       );
     },
-    [showDirMenu, showFileMenu],
+    [showDirMenu, showFileMenu, activeFileUri],
   );
 
   const handleDrop: FileTreeProps['onDrop'] = async (e, fromUri, toDirUri) => {
