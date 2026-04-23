@@ -162,6 +162,15 @@ export default observer(function Sidebar() {
               if (e.key === 'Escape' && searchText) {
                 e.stopPropagation();
                 setSearchText('');
+                return;
+              }
+
+              if (e.key === 'ArrowDown' && searchFiles.length > 0) {
+                e.preventDefault();
+                const firstSearchResult = document.querySelector<HTMLElement>(
+                  '[data-search-result-item="first"]',
+                );
+                firstSearchResult?.focus();
               }
             }}
             placeholder={t('searchShortcutHint', { ns: 'common' })}

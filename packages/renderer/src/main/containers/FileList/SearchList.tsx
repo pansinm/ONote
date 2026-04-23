@@ -29,8 +29,16 @@ const useStyles = makeStyles({
     borderRadius: '8px',
     cursor: 'pointer',
     backgroundColor: 'transparent',
+    border: '1px solid transparent',
+    textAlign: 'left',
     ':hover': {
       backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    },
+    ':focus-visible': {
+      outline: 'none',
+      borderColor: '#a67c38',
+      boxShadow: '0 0 0 2px rgba(166, 124, 56, 0.18)',
+      backgroundColor: 'rgba(212, 201, 184, 0.36)',
     },
   },
   itemActive: {
@@ -72,27 +80,42 @@ const useStyles = makeStyles({
 });
 
 function highlightText(text: string, keyword: string, highlightClassName: string): ReactNode {
-  if (!keyword.trim()) {
+  const normalizedKeyword = keyword.trim().toLowerCase();
+
+  if (!normalizedKeyword) {
     return text;
   }
 
-  const normalizedKeyword = keyword.trim().toLowerCase();
   const normalizedText = text.toLowerCase();
-  const matchIndex = normalizedText.indexOf(normalizedKeyword);
+  const segments: ReactNode[] = [];
+  let cursor = 0;
+  let matchIndex = normalizedText.indexOf(normalizedKeyword, cursor);
 
   if (matchIndex === -1) {
     return text;
   }
 
-  const matchEnd = matchIndex + normalizedKeyword.length;
+  while (matchIndex !== -1) {
+    if (matchIndex > cursor) {
+      segments.push(text.slice(cursor, matchIndex));
+    }
 
-  return (
-    <>
-      {text.slice(0, matchIndex)}
-      <mark className={highlightClassName}>{text.slice(matchIndex, matchEnd)}</mark>
-      {text.slice(matchEnd)}
-    </>
-  );
+    const matchEnd = matchIndex + normalizedKeyword.length;
+    segments.push(
+      <mark key={`${matchIndex}-${matchEnd}`} className={highlightClassName}>
+        {text.slice(matchIndex, matchEnd)}
+      </mark>,
+    );
+
+    cursor = matchEnd;
+    matchIndex = normalizedText.indexOf(normalizedKeyword, cursor);
+  }
+
+  if (cursor < text.length) {
+    segments.push(text.slice(cursor));
+  }
+
+  return <>{segments}</>;
 }
 
 const SearchList: FC<SearchListProps> = ({
@@ -106,18 +129,22 @@ const SearchList: FC<SearchListProps> = ({
 
   return (
     <div className={styles.list}>
-      {files.map((node) => {
+      {files.map((node, index) => {
         const fileName = basename(node.uri);
-        const filePath = rootUri ? relative(rootUri, node.uri) : decodeURIComponent(node.uri);
+        const relativePath = rootUri ? relative(rootUri, node.uri) : decodeURIComponent(node.uri);
+        const filePath = relativePath || fileName;
         const active = isEquals(activeUri, node.uri);
 
         return (
           <button
             key={node.uri}
             type="button"
+            data-search-result-item={index === 0 ? 'first' : 'item'}
             className={`${styles.item} ${active ? styles.itemActive : ''}`.trim()}
             onClick={() => onItemClick(node)}
             title={decodeURIComponent(node.uri)}
+            aria-current={active ? 'true' : undefined}
+            aria-label={`${fileName} · ${filePath}`}
           >
             <DocumentRegular className={styles.icon} fontSize={16} />
             <div className={styles.textWrap}>
