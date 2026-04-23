@@ -252,7 +252,6 @@ const Directory = observer(() => {
               showFileMenu(event, { props: treeNode });
             }
           }}
-          active={false}
           treeNode={treeNode}
         />
       );

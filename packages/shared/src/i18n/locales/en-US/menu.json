@@ -25,5 +25,7 @@
   "openFolderHint": "Open a directory first...",
   "searchResults": "Search Results",
   "noSearchResults": "No matching files found",
-  "clearSearch": "Clear search"
+  "clearSearch": "Clear search",
+  "searchKeepsTreeVisible": "Search results stay above the file tree",
+  "searchOpenToEdit": "Click a result to open it and keep editing"
 }

@@ -1,14 +1,16 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
+import { Uri } from 'monaco-editor';
 import ResourcePanel from '../FileBrowser';
 import ResourceTabs from '../ResourceTabs';
 import ToolbarActions from '../FileBrowser/Toolbar';
 import stores from '../../stores';
 import { isMarkdown } from '/@/common/utils/uri';
-import { DocumentRegular } from '@fluentui/react-icons';
+import { DocumentRegular, FolderOpenRegular } from '@fluentui/react-icons';
 import { makeStyles, Button } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
 import useFileOperation from '../../../hooks/useFileOperation';
+import fileService from '../../services/fileService';
 
 const useStyles = makeStyles({
   root: {
@@ -25,46 +27,97 @@ const useStyles = makeStyles({
     justifyContent: 'center',
     gap: '16px',
     userSelect: 'none',
+    padding: '24px',
   },
   emptyIcon: {
     color: '#c4b9a8',
   },
-  emptyText: {
-    fontSize: '14px',
-    color: '#7a6e60',
+  emptyTitle: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: '#5c5545',
+    textAlign: 'center',
   },
   emptySubtext: {
     fontSize: '13px',
-    color: '#b0aaa0',
+    color: '#8c8275',
     textAlign: 'center',
-    maxWidth: '260px',
-    lineHeight: 1.5,
+    maxWidth: '360px',
+    lineHeight: 1.6,
+  },
+  emptyActions: {
+    display: 'flex',
+    gap: '10px',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
 });
 
 const ContentPanel = observer(() => {
   const styles = useStyles();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation(['common', 'menu']);
   const { createFile, Modal } = useFileOperation();
+
+  const handleOpenDirectory = async () => {
+    const ret = await window.simmer.openDirectory();
+    const dir = ret.filePaths?.[0];
+    if (!dir) return;
+
+    const rootUri = Uri.file(dir).toString();
+    await fileService.connect('local', null);
+    stores.activationStore.openNoteBook('local', rootUri);
+    fileService.setRootDirUri(rootUri);
+  };
 
   if (!stores.activationStore.openedFiles.length) {
     const rootUri = stores.activationStore.rootUri;
+    const hasDirectory = Boolean(rootUri);
+
     return (
       <>
         <div className={styles.empty}>
           <DocumentRegular className={styles.emptyIcon} style={{ fontSize: '48px' }} />
-          <span className={styles.emptyText}>{t('emptyStateHint')}</span>
-          {!rootUri && (
-            <span className={styles.emptyText}>{t('menu:openFolderHint')}</span>
-          )}
-          {rootUri && (
-            <Button
-              appearance="subtle"
-              onClick={() => createFile(rootUri, 'file').catch(() => {})}
-            >
-              {t('menu:createNote')}
-            </Button>
-          )}
+          <div className={styles.emptyTitle}>
+            {hasDirectory
+              ? t('emptyStateTitleNoFile')
+              : t('emptyStateTitleNoDirectory')}
+          </div>
+          <div className={styles.emptySubtext}>
+            {hasDirectory
+              ? t('emptyStateDescNoFile')
+              : t('emptyStateDescNoDirectory')}
+          </div>
+          <div className={styles.emptyActions}>
+            {!hasDirectory ? (
+              <Button
+                appearance="primary"
+                icon={<FolderOpenRegular />}
+                onClick={() => {
+                  void handleOpenDirectory().catch((error) => {
+                    console.error('Failed to open directory from empty state', error);
+                  });
+                }}
+              >
+                {t('openDirectory')}
+              </Button>
+            ) : (
+              <>
+                <Button
+                  appearance="primary"
+                  onClick={() => {
+                    void createFile(rootUri, 'file').catch((error) => {
+                      console.error('Failed to create note from empty state', error);
+                    });
+                  }}
+                >
+                  {t('createNote', { ns: 'menu' })}
+                </Button>
+                <Button appearance="subtle" onClick={() => stores.activationStore.activeDir(rootUri)}>
+                  {t('openFolderHint', { ns: 'menu' })}
+                </Button>
+              </>
+            )}
+          </div>
         </div>
         <Modal />
       </>

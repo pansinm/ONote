@@ -62,5 +62,18 @@
   "completed": "已完成",
   "inProgress": "进行中",
   "selectDirectory": "选择目录",
-  "emptyStateHint": "打开笔记开始书写"
+  "emptyStateHint": "打开笔记开始书写",
+  "emptyStateTitleNoDirectory": "先打开一个目录",
+  "emptyStateDescNoDirectory": "选择本地目录、SSH 或 Gitee 项目后，就可以开始整理和编辑笔记。",
+  "emptyStateTitleNoFile": "从左侧打开一个文件，或先创建一篇笔记",
+  "emptyStateDescNoFile": "文件树负责找文件，内容区负责编辑。先选一个文件，界面才会继续往下走。",
+  "layoutSplit": "双栏",
+  "layoutEditorOnly": "仅编辑",
+  "layoutPreviewOnly": "仅预览",
+  "layoutCurrent": "当前布局：{{layout}}",
+  "layoutNext": "切换到：{{layout}}",
+  "moreActions": "更多操作",
+  "openInNewPreview": "独立预览窗口",
+  "searchShortcutHint": "搜索文件 (Ctrl/Cmd+P)",
+  "searchResultsHint": "找到 {{count}} 个匹配文件"
 }

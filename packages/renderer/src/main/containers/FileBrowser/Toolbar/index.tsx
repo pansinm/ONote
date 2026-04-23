@@ -6,13 +6,72 @@ import {
   LayoutColumnTwoSplitLeftRegular,
   PlayRegular,
 } from '@fluentui/react-icons';
-import { Tooltip } from '@fluentui/react-components';
+import {
+  Tooltip,
+  Button,
+  makeStyles,
+  tokens,
+} from '@fluentui/react-components';
 import _QRCode from 'react-qr-code';
 import stores from '/@/main/stores';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+const useStyles = makeStyles({
+  toolbar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    paddingRight: '10px',
+    flexShrink: 0,
+  },
+  statusButton: {
+    minWidth: 'unset',
+    paddingLeft: '10px',
+    paddingRight: '10px',
+    color: '#4a3f35',
+  },
+  iconButton: {
+    minWidth: '32px',
+    width: '32px',
+    height: '32px',
+  },
+  qrWrap: {
+    maxWidth: '220px',
+  },
+  qrHint: {
+    fontSize: '12px',
+    color: tokens.colorNeutralForeground3,
+    wordBreak: 'break-all',
+    marginTop: '8px',
+  },
+});
+
+function getLayoutLabel(t: (key: string, options?: any) => string, layout: string) {
+  switch (layout) {
+    case 'editor-only':
+      return t('layoutEditorOnly');
+    case 'previewer-only':
+      return t('layoutPreviewOnly');
+    case 'split':
+    default:
+      return t('layoutSplit');
+  }
+}
+
+function getNextLayout(layout: string) {
+  switch (layout) {
+    case 'split':
+      return 'editor-only';
+    case 'editor-only':
+      return 'previewer-only';
+    default:
+      return 'split';
+  }
+}
 
 function QRCodePopover() {
   const { t } = useTranslation('common');
+  const styles = useStyles();
   const [url, setUrl] = useState('');
   const [visible, setVisible] = useState(false);
 
@@ -29,17 +88,26 @@ function QRCodePopover() {
     <Tooltip
       withArrow
       onVisibleChange={(_e, data) => setVisible(data.visible)}
-      positioning="below-start"
-      content={visible ? (
-        <div>
-          <p style={{ fontSize: 13, marginBottom: 4 }}>{t('insertFileFromPhone')}</p>
-          {url ? <_QRCode style={{ width: '100%' }} value={url} /> : <p>...</p>}
-          <p style={{ fontSize: 12, color: '#888' }}>{url}</p>
-        </div>
-      ) : ''}
+      positioning="below-end"
+      content={
+        visible ? (
+          <div className={styles.qrWrap}>
+            <p style={{ fontSize: 13, marginBottom: 6 }}>{t('insertFileFromPhone')}</p>
+            {url ? <_QRCode style={{ width: '100%' }} value={url} /> : <p>...</p>}
+            <p className={styles.qrHint}>{url}</p>
+          </div>
+        ) : (
+          ''
+        )
+      }
       relationship="description"
     >
-      <QrCodeRegular style={{ fontSize: 18, cursor: 'pointer' }} title={t('insertFile')} />
+      <Button
+        appearance="subtle"
+        icon={<QrCodeRegular />}
+        className={styles.iconButton}
+        aria-label={t('insertFile')}
+      />
     </Tooltip>
   );
 }
@@ -52,42 +120,60 @@ interface ToolbarActionsProps {
 
 function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
   const { t } = useTranslation('common');
+  const styles = useStyles();
+  const layout = stores.layoutStore.layout;
+  const currentLayout = useMemo(() => getLayoutLabel(t, layout), [t, layout]);
+  const nextLayout = useMemo(
+    () => getLayoutLabel(t, getNextLayout(layout)),
+    [t, layout],
+  );
 
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px',
-        paddingRight: '10px',
-        flexShrink: 0,
-      }}
-    >
-      {isMarkdown && <ObserverQRCodePopover />}
-      {isMarkdown && (
-        <Tooltip
-          withArrow
-          content={t('switchLayout')}
-          relationship="description"
-        >
-          <LayoutColumnTwoSplitLeftRegular
-            style={{ fontSize: 18, cursor: 'pointer' }}
-            onClick={() => stores.layoutStore.switchLayout()}
-          />
-        </Tooltip>
-      )}
-      {isMarkdown && (
-        <Tooltip
-          withArrow
-          content={t('demo')}
-          relationship="description"
-        >
-          <PlayRegular
-            style={{ fontSize: 18, cursor: 'pointer' }}
+  if (!isMarkdown) {
+    return (
+      <div className={styles.toolbar}>
+        <Tooltip withArrow content={t('openInNewPreview')} relationship="description">
+          <Button
+            appearance="subtle"
+            icon={<PlayRegular />}
+            className={styles.iconButton}
+            aria-label={t('openInNewPreview')}
             onClick={() => window.simmer.showPreviewerWindow()}
           />
         </Tooltip>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.toolbar}>
+      <Tooltip
+        withArrow
+        content={`${t('layoutCurrent', { layout: currentLayout })} · ${t('layoutNext', {
+          layout: nextLayout,
+        })}`}
+        relationship="description"
+      >
+        <Button
+          appearance="secondary"
+          className={styles.statusButton}
+          icon={<LayoutColumnTwoSplitLeftRegular />}
+          onClick={() => stores.layoutStore.switchLayout()}
+        >
+          {currentLayout}
+        </Button>
+      </Tooltip>
+
+      <Tooltip withArrow content={t('openInNewPreview')} relationship="description">
+        <Button
+          appearance="subtle"
+          icon={<PlayRegular />}
+          className={styles.iconButton}
+          aria-label={t('openInNewPreview')}
+          onClick={() => window.simmer.showPreviewerWindow()}
+        />
+      </Tooltip>
+
+      <ObserverQRCodePopover />
     </div>
   );
 }

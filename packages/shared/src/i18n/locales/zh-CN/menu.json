@@ -25,5 +25,7 @@
   "openFolderHint": "先打开目录...",
   "searchResults": "搜索结果",
   "noSearchResults": "未找到匹配的文件",
-  "clearSearch": "清除搜索"
+  "clearSearch": "清除搜索",
+  "searchKeepsTreeVisible": "搜索结果会显示在文件树上方",
+  "searchOpenToEdit": "点击结果即可打开并开始编辑"
 }

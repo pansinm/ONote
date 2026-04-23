@@ -115,7 +115,7 @@ function handleCloseTab(): void {
 /** Ctrl/Cmd+P — 聚焦搜索框 */
 function handleFocusSearch(): void {
   const searchInput = document.querySelector<HTMLInputElement>(
-    'input[type="text"]',
+    '#sidebar-search-input',
   );
   if (searchInput) {
     searchInput.focus();

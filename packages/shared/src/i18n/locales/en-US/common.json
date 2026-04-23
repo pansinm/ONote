@@ -62,5 +62,18 @@
   "completed": "Completed",
   "inProgress": "In progress",
   "selectDirectory": "Select Directory",
-  "emptyStateHint": "Open a note to start writing"
+  "emptyStateHint": "Open a note to start writing",
+  "emptyStateTitleNoDirectory": "Open a directory first",
+  "emptyStateDescNoDirectory": "Choose a local directory, SSH source, or Gitee project to start organizing and editing notes.",
+  "emptyStateTitleNoFile": "Open a file from the sidebar, or create a new note first",
+  "emptyStateDescNoFile": "The file tree is for finding files; the content area is for editing. Pick a file to continue.",
+  "layoutSplit": "Split",
+  "layoutEditorOnly": "Editor only",
+  "layoutPreviewOnly": "Preview only",
+  "layoutCurrent": "Current layout: {{layout}}",
+  "layoutNext": "Switch to: {{layout}}",
+  "moreActions": "More actions",
+  "openInNewPreview": "Open in separate preview window",
+  "searchShortcutHint": "Search files (Ctrl/Cmd+P)",
+  "searchResultsHint": "{{count}} matching files"
 }

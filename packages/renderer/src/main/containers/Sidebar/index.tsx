@@ -15,7 +15,7 @@ import {
   SearchRegular,
   AddRegular,
 } from '@fluentui/react-icons';
-import { makeStyles, shorthands } from '@fluentui/react-components';
+import { makeStyles, shorthands, Tooltip } from '@fluentui/react-components';
 import SearchList from '../FileList/SearchList';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { useLatest } from 'react-use';
@@ -93,11 +93,10 @@ export default observer(function Sidebar() {
     | undefined
   >('project');
 
-  const { t } = useTranslation('menu');
+  const { t } = useTranslation(['menu', 'common']);
   const headerStyles = useStyles();
   const { createFile, Modal } = useFileOperation();
 
-  // ===== 搜索功能 =====
   const [searchText, setSearchText] = useState('');
   const [searchFiles, setSearchFiles] = useState<TreeNode[]>([]);
   const latestText = useLatest(searchText);
@@ -133,6 +132,8 @@ export default observer(function Sidebar() {
       fileService.setRootDirUri(project.rootUri);
       setProject(project);
       setOpen(false);
+      setSearchText('');
+      setSearchFiles([]);
     } catch (err) {
       //ignore
     }
@@ -146,13 +147,13 @@ export default observer(function Sidebar() {
 
   return (
     <div className={styles.Sidebar}>
-      {/* 搜索头 */}
       <div className={headerStyles.header}>
         <div className={headerStyles.inputWrap}>
           <span className={headerStyles.searchIcon}>
             <SearchRegular fontSize={12} />
           </span>
           <input
+            id="sidebar-search-input"
             className={headerStyles.input}
             value={searchText}
             type="text"
@@ -163,7 +164,7 @@ export default observer(function Sidebar() {
                 setSearchText('');
               }
             }}
-            placeholder={t('searchFiles')}
+            placeholder={t('searchShortcutHint', { ns: 'common' })}
           />
           {searchText && (
             <span
@@ -175,48 +176,62 @@ export default observer(function Sidebar() {
             </span>
           )}
         </div>
-        <span
-          className={headerStyles.iconBtn}
-          onClick={() => {
-            const dirUri =
-              stores.activationStore.activeDirUri ||
-              stores.activationStore.rootUri;
-            if (dirUri) {
-              createFile(dirUri, 'file').catch(() => {});
-            }
-          }}
-          title={t('createNote')}
-        >
-          <AddRegular fontSize={16} style={{ color: '#5c5545' }} />
-        </span>
+        <Tooltip content={t('createNote')} relationship="description" withArrow>
+          <span
+            className={headerStyles.iconBtn}
+            onClick={() => {
+              const dirUri =
+                stores.activationStore.activeDirUri ||
+                stores.activationStore.rootUri;
+              if (dirUri) {
+                void createFile(dirUri, 'file').catch((error) => {
+                  console.error('Failed to create note from sidebar', error);
+                });
+              }
+            }}
+            title={t('createNote')}
+          >
+            <AddRegular fontSize={16} style={{ color: '#5c5545' }} />
+          </span>
+        </Tooltip>
       </div>
 
-      {/* 目录/文件树 或 搜索结果 */}
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'auto' }}>
-        {isSearching ? (
-          <>
-            <div className={styles.searchHeader}>
-              {t('searchResults')} ({searchFiles.length})
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+        {isSearching && (
+          <div className={styles.searchPanel}>
+            <div className={styles.searchHeaderRow}>
+              <div>
+                <div className={styles.searchHeader}>{t('searchResults')}</div>
+                <div className={styles.searchHint}>
+                  {searchFiles.length > 0
+                    ? t('searchResultsHint', { ns: 'common', count: searchFiles.length })
+                    : t('searchOpenToEdit')}
+                </div>
+              </div>
+              <span className={styles.searchHint}>{t('searchKeepsTreeVisible')}</span>
             </div>
             {searchFiles.length === 0 ? (
               <div className={styles.noResults}>{t('noSearchResults')}</div>
             ) : (
-              <SearchList
-                files={searchFiles}
-                activeUri={stores.activationStore.activeFileUri}
-                onItemClick={(treeNode: TreeNode) => {
-                  stores.activationStore.activeFile(treeNode.uri);
-                  setSearchText('');
-                }}
-              />
+              <div className={styles.searchResultsList}>
+                <SearchList
+                  files={searchFiles}
+                  activeUri={stores.activationStore.activeFileUri}
+                  onItemClick={(treeNode: TreeNode) => {
+                    stores.activationStore.activeFile(treeNode.uri);
+                    setSearchText('');
+                  }}
+                />
+              </div>
             )}
-          </>
-        ) : (
-          <Directory />
+          </div>
         )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'auto' }}>
+          <Directory />
+        </div>
       </div>
 
-      {/* 底部按钮 */}
       <Flex gap="4px">
         <ProjectSelector open={open} onOpenChange={setOpen} onSelected={handleSelect} />
         <SettingTrigger />
