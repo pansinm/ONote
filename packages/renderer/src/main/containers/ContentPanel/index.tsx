@@ -7,54 +7,12 @@ import ToolbarActions from '../FileBrowser/Toolbar';
 import stores from '../../stores';
 import { isMarkdown } from '/@/common/utils/uri';
 import { DocumentRegular, FolderOpenRegular } from '@fluentui/react-icons';
-import { makeStyles, Button } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
 import useFileOperation from '../../../hooks/useFileOperation';
 import fileService from '../../services/fileService';
-
-const useStyles = makeStyles({
-  root: {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    flex: 1,
-  },
-  empty: {
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    gap: '16px',
-    userSelect: 'none',
-    padding: '24px',
-  },
-  emptyIcon: {
-    color: '#c4b9a8',
-  },
-  emptyTitle: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#5c5545',
-    textAlign: 'center',
-  },
-  emptySubtext: {
-    fontSize: '13px',
-    color: '#8c8275',
-    textAlign: 'center',
-    maxWidth: '360px',
-    lineHeight: 1.6,
-  },
-  emptyActions: {
-    display: 'flex',
-    gap: '10px',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-});
+import styles from './index.module.scss';
 
 const ContentPanel = observer(() => {
-  const styles = useStyles();
   const { t } = useTranslation(['common', 'menu']);
   const { createFile, Modal } = useFileOperation();
 
@@ -89,21 +47,23 @@ const ContentPanel = observer(() => {
           </div>
           <div className={styles.emptyActions}>
             {!hasDirectory ? (
-              <Button
-                appearance="primary"
-                icon={<FolderOpenRegular />}
+              <button
+                type="button"
+                className={styles.primaryButton}
                 onClick={() => {
                   void handleOpenDirectory().catch((error) => {
                     console.error('Failed to open directory from empty state', error);
                   });
                 }}
               >
+                <FolderOpenRegular />
                 {t('emptyStateOpenDirectoryNow')}
-              </Button>
+              </button>
             ) : (
               <>
-                <Button
-                  appearance="primary"
+                <button
+                  type="button"
+                  className={styles.primaryButton}
                   onClick={() => {
                     void createFile(rootUri, 'file').catch((error) => {
                       console.error('Failed to create note from empty state', error);
@@ -111,10 +71,14 @@ const ContentPanel = observer(() => {
                   }}
                 >
                   {t('emptyStateCreateFirstNote')}
-                </Button>
-                <Button appearance="subtle" onClick={() => stores.activationStore.activeDir(rootUri)}>
+                </button>
+                <button
+                  type="button"
+                  className={styles.subtleButton}
+                  onClick={() => stores.activationStore.activeDir(rootUri)}
+                >
                   {t('emptyStatePickFromSidebar')}
-                </Button>
+                </button>
               </>
             )}
           </div>

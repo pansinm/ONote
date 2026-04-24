@@ -1,0 +1,115 @@
+@use '../../../styles/mixins' as *;
+
+// ── ContentPanel / 空状态 ──
+// 所有样式均使用 CSS 变量 + 共享 mixin，不依赖 Fluent tokens / makeStyles。
+
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+// ── 空状态容器 ──
+.empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  user-select: none;
+  padding: 24px;
+}
+
+.emptyIcon {
+  color: var(--warm-empty-icon);
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--warm-text);
+  text-align: center;
+}
+
+.emptySubtext {
+  font-size: 13px;
+  color: var(--warm-text-muted);
+  text-align: center;
+  max-width: 360px;
+  line-height: 1.6;
+}
+
+.emptyActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+// ── Primary button ──
+// 当前区域唯一最推荐动作
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 16px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  background: var(--warm-accent-strong);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  line-height: 1;
+
+  &:hover {
+    background: var(--warm-accent-hover);
+  }
+
+  &:active {
+    background: var(--warm-accent-active);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Subtle button ──
+// 次要动作
+.subtleButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 16px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--warm-text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  line-height: 1;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--warm-text);
+  }
+
+  &:active {
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

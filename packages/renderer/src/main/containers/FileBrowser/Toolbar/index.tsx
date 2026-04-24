@@ -6,60 +6,10 @@ import {
   LayoutColumnTwoSplitLeftRegular,
   PlayRegular,
 } from '@fluentui/react-icons';
-import {
-  Tooltip,
-  Button,
-  makeStyles,
-  tokens,
-  Divider,
-} from '@fluentui/react-components';
 import _QRCode from 'react-qr-code';
 import stores from '/@/main/stores';
-import { useEffect, useMemo, useState } from 'react';
-
-const useStyles = makeStyles({
-  toolbar: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    paddingRight: '10px',
-    flexShrink: 0,
-  },
-  primaryGroup: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  secondaryGroup: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    opacity: 0.82,
-  },
-  divider: {
-    height: '20px',
-  },
-  statusButton: {
-    minWidth: 'unset',
-    paddingLeft: '10px',
-    paddingRight: '10px',
-    color: '#4a3f35',
-  },
-  iconButton: {
-    minWidth: '32px',
-    width: '32px',
-    height: '32px',
-  },
-  qrWrap: {
-    maxWidth: '220px',
-  },
-  qrHint: {
-    fontSize: '12px',
-    color: tokens.colorNeutralForeground3,
-    wordBreak: 'break-all',
-    marginTop: '8px',
-  },
-});
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import styles from './index.module.scss';
 
 function getLayoutLabel(t: (key: string, options?: any) => string, layout: string) {
   switch (layout) {
@@ -86,9 +36,9 @@ function getNextLayout(layout: string) {
 
 function QRCodePopover() {
   const { t } = useTranslation('common');
-  const styles = useStyles();
   const [url, setUrl] = useState('');
   const [visible, setVisible] = useState(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!visible) return;
@@ -99,31 +49,46 @@ function QRCodePopover() {
     });
   }, [visible, stores.activationStore.activeFileUri]);
 
+  const handleMouseEnter = useCallback(() => setVisible(true), []);
+  const handleMouseLeave = useCallback(() => setVisible(false), []);
+
+  // 键盘 Escape 关闭弹层
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Escape' && visible) {
+        e.stopPropagation();
+        setVisible(false);
+      }
+    },
+    [visible],
+  );
+
   return (
-    <Tooltip
-      withArrow
-      onVisibleChange={(_e, data) => setVisible(data.visible)}
-      positioning="below-end"
-      content={
-        visible ? (
+    <div
+      ref={popoverRef}
+      className={styles.qrTrigger}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onKeyDown={handleKeyDown}
+    >
+      <button
+        type="button"
+        className={styles.iconButton}
+        aria-label={t('insertFile')}
+      >
+        <QrCodeRegular />
+      </button>
+
+      {visible && (
+        <div className={styles.qrPopover}>
           <div className={styles.qrWrap}>
-            <p style={{ fontSize: 13, marginBottom: 6 }}>{t('insertFileFromPhone')}</p>
+            <p className={styles.qrTitle}>{t('insertFileFromPhone')}</p>
             {url ? <_QRCode style={{ width: '100%' }} value={url} /> : <p>...</p>}
             <p className={styles.qrHint}>{url}</p>
           </div>
-        ) : (
-          ''
-        )
-      }
-      relationship="description"
-    >
-      <Button
-        appearance="subtle"
-        icon={<QrCodeRegular />}
-        className={styles.iconButton}
-        aria-label={t('insertFile')}
-      />
-    </Tooltip>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -135,7 +100,6 @@ interface ToolbarActionsProps {
 
 function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
   const { t } = useTranslation('common');
-  const styles = useStyles();
   const layout = stores.layoutStore.layout;
   const currentLayout = useMemo(() => getLayoutLabel(t, layout), [t, layout]);
   const nextLayout = useMemo(
@@ -146,15 +110,15 @@ function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
   if (!isMarkdown) {
     return (
       <div className={styles.toolbar}>
-        <Tooltip withArrow content={t('openInNewPreview')} relationship="description">
-          <Button
-            appearance="subtle"
-            icon={<PlayRegular />}
-            className={styles.iconButton}
-            aria-label={t('openInNewPreview')}
-            onClick={() => window.simmer.showPreviewerWindow()}
-          />
-        </Tooltip>
+        <button
+          type="button"
+          className={styles.iconButton}
+          title={t('openInNewPreview')}
+          aria-label={t('openInNewPreview')}
+          onClick={() => window.simmer.showPreviewerWindow()}
+        >
+          <PlayRegular />
+        </button>
       </div>
     );
   }
@@ -162,35 +126,30 @@ function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
   return (
     <div className={styles.toolbar}>
       <div className={styles.primaryGroup}>
-        <Tooltip
-          withArrow
-          content={`${t('layoutCurrent', { layout: currentLayout })} · ${t('layoutNext', {
+        <button
+          type="button"
+          className={styles.statusButton}
+          title={`${t('layoutCurrent', { layout: currentLayout })} · ${t('layoutNext', {
             layout: nextLayout,
           })}`}
-          relationship="description"
+          onClick={() => stores.layoutStore.switchLayout()}
         >
-          <Button
-            appearance="secondary"
-            className={styles.statusButton}
-            icon={<LayoutColumnTwoSplitLeftRegular />}
-            onClick={() => stores.layoutStore.switchLayout()}
-          >
-            {currentLayout}
-          </Button>
-        </Tooltip>
+          <LayoutColumnTwoSplitLeftRegular />
+          {currentLayout}
+        </button>
 
-        <Tooltip withArrow content={t('openInNewPreview')} relationship="description">
-          <Button
-            appearance="subtle"
-            icon={<PlayRegular />}
-            className={styles.iconButton}
-            aria-label={t('openInNewPreview')}
-            onClick={() => window.simmer.showPreviewerWindow()}
-          />
-        </Tooltip>
+        <button
+          type="button"
+          className={styles.iconButton}
+          title={t('openInNewPreview')}
+          aria-label={t('openInNewPreview')}
+          onClick={() => window.simmer.showPreviewerWindow()}
+        >
+          <PlayRegular />
+        </button>
       </div>
 
-      <Divider vertical className={styles.divider} />
+      <div className={styles.divider} />
 
       <div className={styles.secondaryGroup}>
         <ObserverQRCodePopover />

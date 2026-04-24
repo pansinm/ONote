@@ -1,0 +1,73 @@
+@use '../../../../styles/mixins' as *;
+
+// ── UnSupport / 不支持文件格式提示态 ──
+// 复用 ContentPanel 空状态已建立的视觉语言。
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  user-select: none;
+  padding: 24px;
+  padding-bottom: 30%;
+}
+
+.icon {
+  color: var(--warm-empty-icon);
+}
+
+.fileName {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--warm-text);
+  text-align: center;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--warm-text-muted);
+  text-align: center;
+}
+
+// ── Primary button ──
+// 与 ContentPanel .primaryButton 完全同源。
+// 出现第二处重复时再抽 mixin，现在保留局部 class。
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 16px;
+  margin-top: 16px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  background: var(--warm-accent-strong);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  line-height: 1;
+
+  &:hover {
+    background: var(--warm-accent-hover);
+  }
+
+  &:active {
+    background: var(--warm-accent-active);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

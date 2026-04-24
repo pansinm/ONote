@@ -15,72 +15,10 @@ import {
   SearchRegular,
   AddRegular,
 } from '@fluentui/react-icons';
-import { makeStyles, shorthands, Tooltip } from '@fluentui/react-components';
 import SearchList from '../FileList/SearchList';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { useLatest } from 'react-use';
 import useFileOperation from '/@/hooks/useFileOperation';
-
-const useStyles = makeStyles({
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: '10px',
-    gap: '4px',
-  },
-  inputWrap: {
-    position: 'relative',
-    ...shorthands.flex(1),
-    minWidth: '50px',
-  },
-  searchIcon: {
-    position: 'absolute',
-    left: '8px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    color: '#8a8886',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    height: '28px',
-    ...shorthands.padding('5px', '28px', '5px', '28px'),
-    ...shorthands.border('1px', 'solid', '#d3b17d'),
-  },
-  clearBtn: {
-    position: 'absolute',
-    right: '4px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '20px',
-    height: '20px',
-    cursor: 'pointer',
-    color: '#8a8886',
-    borderRadius: '2px',
-    ':hover': {
-      backgroundColor: 'rgba(0,0,0,0.06)',
-      color: '#4a3f35',
-    },
-  },
-  iconBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '28px',
-    height: '28px',
-    cursor: 'pointer',
-    borderRadius: '3px',
-    ':hover': {
-      backgroundColor: 'rgba(0,0,0,0.05)',
-    },
-  },
-});
 
 export default observer(function Sidebar() {
   const [open, setOpen] = useState(false);
@@ -94,7 +32,6 @@ export default observer(function Sidebar() {
   >('project');
 
   const { t } = useTranslation(['menu', 'common']);
-  const headerStyles = useStyles();
   const { createFile, Modal } = useFileOperation();
 
   const [searchText, setSearchText] = useState('');
@@ -147,14 +84,14 @@ export default observer(function Sidebar() {
 
   return (
     <div className={styles.Sidebar}>
-      <div className={headerStyles.header}>
-        <div className={headerStyles.inputWrap}>
-          <span className={headerStyles.searchIcon}>
+      <div className={styles.header}>
+        <div className={styles.inputWrap}>
+          <span className={styles.searchIcon}>
             <SearchRegular fontSize={12} />
           </span>
           <input
             id="sidebar-search-input"
-            className={headerStyles.input}
+            className={styles.searchInput}
             value={searchText}
             type="text"
             onChange={(e) => setSearchText(e.target.value)}
@@ -176,33 +113,35 @@ export default observer(function Sidebar() {
             placeholder={t('searchShortcutHint', { ns: 'common' })}
           />
           {searchText && (
-            <span
-              className={headerStyles.clearBtn}
+            <button
+              type="button"
+              className={styles.clearBtn}
               onClick={() => setSearchText('')}
               title={t('clearSearch')}
+              aria-label={t('clearSearch')}
             >
               <DismissRegular fontSize={12} />
-            </span>
+            </button>
           )}
         </div>
-        <Tooltip content={t('createNote')} relationship="description" withArrow>
-          <span
-            className={headerStyles.iconBtn}
-            onClick={() => {
-              const dirUri =
-                stores.activationStore.activeDirUri ||
-                stores.activationStore.rootUri;
-              if (dirUri) {
-                void createFile(dirUri, 'file').catch((error) => {
-                  console.error('Failed to create note from sidebar', error);
-                });
-              }
-            }}
-            title={t('createNote')}
-          >
-            <AddRegular fontSize={16} style={{ color: '#5c5545' }} />
-          </span>
-        </Tooltip>
+        <button
+          type="button"
+          className={styles.iconBtn}
+          onClick={() => {
+            const dirUri =
+              stores.activationStore.activeDirUri ||
+              stores.activationStore.rootUri;
+            if (dirUri) {
+              void createFile(dirUri, 'file').catch((error) => {
+                console.error('Failed to create note from sidebar', error);
+              });
+            }
+          }}
+          title={t('createNote')}
+          aria-label={t('createNote')}
+        >
+          <AddRegular fontSize={16} />
+        </button>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>

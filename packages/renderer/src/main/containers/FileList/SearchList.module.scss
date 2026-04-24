@@ -1,0 +1,75 @@
+@use '../../../styles/mixins' as *;
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 8px 8px;
+}
+
+.item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: transparent;
+  border: 1px solid transparent;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  &:focus-visible {
+    @include focus-ring($alpha: 0.18);
+    background-color: rgba(212, 201, 184, 0.36);
+  }
+}
+
+.itemActive {
+  background-color: var(--warm-bg-active);
+}
+
+.icon {
+  color: var(--warm-icon-muted);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.textWrap {
+  min-width: 0;
+  flex: 1;
+}
+
+.fileName {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #3b342b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.filePath {
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--warm-text-hint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.highlight {
+  background-color: var(--warm-highlight-bg);
+  color: var(--warm-highlight-text);
+  border-radius: 3px;
+  padding: 0 2px;
+  font-weight: 600;
+}

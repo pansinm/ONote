@@ -2,10 +2,9 @@ import type { FC } from 'react';
 import { useState } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@fluentui/react-components';
 import FileIcon from '/@/components/FileIcon';
-import View from '/@/components/View';
 import { basename } from '../../../../common/utils/uri';
+import styles from './index.module.scss';
 
 interface UnSupportProps {
   uri: string;
@@ -23,23 +22,19 @@ const UnSupport: FC<UnSupportProps> = (props) => {
     }
   };
   return (
-    <View
-      flexDirection="column"
-      flex={1}
-      alignContent={'center'}
-      justifyContent="center"
-      className="fullfill"
-      paddingBottom={'30%'}
-    >
-      <View flexDirection="column" alignItems={'center'}>
-        <FileIcon size={40} uri={props.uri}></FileIcon>
-        <p style={{ marginTop: 10 }}>{basename(props.uri)}</p>
-        <p>{t('unsupportedFileFormat')}</p>
-        <Button appearance="primary" disabled={opening} onClick={handleClick}>
-          {t('openWithSystemApp')}
-        </Button>
-      </View>
-    </View>
+    <div className={styles.root}>
+      <FileIcon size={40} uri={props.uri} className={styles.icon} />
+      <p className={styles.fileName}>{basename(props.uri)}</p>
+      <p className={styles.hint}>{t('unsupportedFileFormat')}</p>
+      <button
+        type="button"
+        className={styles.primaryButton}
+        disabled={opening}
+        onClick={handleClick}
+      >
+        {t('openWithSystemApp')}
+      </button>
+    </div>
   );
 };
 

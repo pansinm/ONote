@@ -1,0 +1,25 @@
+.NoDirectory {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  color: var(--warm-text-empty);
+}
+
+.text {
+  color: var(--warm-text-empty);
+  font-size: 13px;
+  max-width: 140px;
+  text-align: center;
+  line-height: 1.4;
+}

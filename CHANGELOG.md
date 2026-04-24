@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.16.0 (2026-04-24)
+
+### 改进
+- Fluent UI 去耦进入 Phase 2：收束基础样式层，统一 focus ring、icon button 和暖色 CSS 变量
+- 修正全局焦点策略，不再使用会吞掉键盘焦点可见性的 `outline: 0`
+- Sidebar / Search results / Toolbar / ContentPanel 统一复用 SCSS Modules + CSS variables + SCSS mixins
+- Toolbar 二维码弹层补齐 `Escape` 关闭，并将样式从 inline style 抽离
+- `UnSupport` 提示态去除 Fluent Button / View，改为 ONote 自有按钮表达，和空状态视觉语言统一
+- 迁移评估文档补齐 Phase 2 边界、验收标准和后续禁区说明
+
+### 修复
+- 键盘导航下焦点态可能丢失的问题
+- 不支持文件格式提示态像临时拼装页的问题
+
+---
+
 ## v0.15.0 (2025-04-23)
 
 ### 新功能

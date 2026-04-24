@@ -2,10 +2,12 @@
 * {
   border: 0;
   margin: 0;
-  outline: 0;
+  // 不再用 outline: 0 — 那会吞掉键盘焦点可见性。
+  // 改为透明 outline，不显示默认蓝框但保留可访问性覆盖点。
+  outline: 2px solid transparent;
+  outline-offset: 2px;
   padding: 0;
   box-sizing: border-box;
-  // color: #392f41;
 }
 
 p {
@@ -54,9 +56,19 @@ body {
   --warm-accent-strong: #7a6b52;
   --warm-text: #4a3f35;
   --warm-text-muted: #7a6e60;
+  --warm-text-hint: #8a8886;
+  --warm-text-placeholder: #a19f9d;
+  --warm-text-empty: #8a7e6b;
   --warm-border: #d4c9b8;
   --warm-bg-subtle: #f5f0e6;
   --warm-bg-hover: #f0ebe0;
+  --warm-bg-active: #d4c9b8;
+  --warm-highlight-bg: #f6d98d;
+  --warm-highlight-text: #2f261d;
+  --warm-icon-muted: #8a8886;
+  --warm-accent-hover: #6b5c44;
+  --warm-accent-active: #5c4d38;
+  --warm-empty-icon: #c4b9a8;
 }
 
 .sidebar {

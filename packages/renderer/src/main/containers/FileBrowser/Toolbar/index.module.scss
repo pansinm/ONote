@@ -1,0 +1,108 @@
+@use '../../../../styles/mixins' as *;
+
+// ── Toolbar ──
+// 所有样式均使用 CSS 变量 + 共享 mixin，不依赖 Fluent tokens / makeStyles。
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 10px;
+  flex-shrink: 0;
+}
+
+.primaryGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.secondaryGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.82;
+}
+
+// ── Divider ──
+.divider {
+  width: 1px;
+  height: 20px;
+  background: var(--warm-border);
+  flex-shrink: 0;
+}
+
+// ── Status button (secondary) ──
+// 布局切换 — 主要控制，视觉层级高于 icon button
+.statusButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  min-width: unset;
+  height: 28px;
+  border: 1px solid var(--warm-border);
+  border-radius: 4px;
+  background: var(--warm-bg-subtle);
+  color: var(--warm-text);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+
+  &:hover {
+    background: var(--warm-bg-hover);
+    border-color: var(--warm-accent);
+  }
+
+  &:active {
+    background: var(--warm-bg-active);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Icon button (subtle) ──
+// 独立预览 / 二维码 — 次要控制
+.iconButton {
+  @include icon-button;
+}
+
+// ── QR Code popover container ──
+.qrTrigger {
+  position: relative;
+  display: inline-flex;
+}
+
+.qrPopover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  z-index: 10000;
+  background: #fff;
+  border: 1px solid var(--warm-border);
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.qrWrap {
+  max-width: 220px;
+}
+
+.qrTitle {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--warm-text);
+}
+
+.qrHint {
+  font-size: 12px;
+  color: var(--warm-text-muted);
+  word-break: break-all;
+  margin-top: 8px;
+}
