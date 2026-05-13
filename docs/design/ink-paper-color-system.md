@@ -240,9 +240,23 @@
 | `Input.module.scss` | `#ccc`/`#66afe9`→语义变量 |
 | `ListItem.module.scss` | `#ddd`/`#fff`→语义变量 |
 | `agent-diff.scss` | 颜色→语义变量 |
-| `previewer/index.scss` | 接入色彩体系 |
-| `blockquote.scss` | 硬编码→CSS 变量 |
-| `Block.scss` | `rgba(255,255,255,0.6)`→语义变量 |
+| `previewer/index.scss` | 保持不变（iframe 隔离，不共享主应用变量） |
+| `blockquote.scss` | 保持不变（内容语义色，非 UI 色） |
+| `Block.scss` | 保持不变（iframe 隔离） |
+
+### 额外优化文件
+
+| 文件 | 改动 |
+|------|------|
+| `ListItem.tsx` | 删除 `activeBackground`/`hoverBackground` props，CSS 自定义属性传递已不需要 |
+| `ErrorBoundary.tsx` | 内联错误色→`--error`、`--bg-card`、`--border`、`--accent` |
+| `TitleFieldTemplate.tsx` | `#555`→`--text-heading`，`#ddd`→`--border` |
+| `MarkdownPanel/index.tsx` | `#dddddd`→`--border`，`#5c5545`→`--text-secondary` |
+| `PlainTextPanel/index.tsx` | 同 MarkdownPanel |
+| `resize.ts` | 拖拽手柄色→`--border-light`、`--text-secondary`、`--text-hint` |
+| `Confirm.tsx` | `--warm-error`→`--error` |
+| `useFileOperation.tsx` | `--warm-error`→`--error` |
+| `auxiliary/index.tsx` | `webLightTheme`→`onoteLightTheme` |
 
 ### 删除
 
