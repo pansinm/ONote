@@ -10,7 +10,7 @@ import { PendingChangeStore } from './PendingChangeStore';
 const fileStore = new FileStateStore();
 const settingStore = new SettingStore();
 const activationStore = new ActivationStore(fileStore, settingStore);
-export default {
+const stores = {
   activationStore,
   fileStore,
   i18nStore: new I18nStore(),
@@ -20,3 +20,4 @@ export default {
   agentStore: new AgentStore(),
   pendingChangeStore: new PendingChangeStore(),
 };
+export default stores;

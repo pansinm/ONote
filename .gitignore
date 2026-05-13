@@ -65,3 +65,7 @@ coverage
 # Editor-based Rest Client
 .idea/httpRequests
 /.idea/csv-plugin.xml
+
+# Playwright QA screenshots
+screenshot-theme.js
+screenshots/
