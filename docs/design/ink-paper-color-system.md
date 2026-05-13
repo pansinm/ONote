@@ -264,11 +264,32 @@
 |------|------|
 | `packages/renderer/src/main/theme/warmLightTheme.ts` | 被 onoteLightTheme.ts 替代 |
 
-## 7. 实施顺序
+## 7. 实施状态
 
-1. **定义变量体系** — `index.scss` 中 `:root` + `[data-theme="dark"]`
-2. **更新 mixins** — `_mixins.scss` 用语义变量
-3. **Fluent UI 主题** — 新建 onoteLightTheme / onoteDarkTheme
-4. **接入主题切换** — `main/index.tsx` + `GeneralPanel`
-5. **逐组件替换** — 按上面的文件列表，硬编码→语义变量
-6. **验证** — 亮色/暗色分别截图对比，确认层级、对比度、一致性
+**✅ 已完成** — 5 commits, 32 files changed (+672/-284)
+
+| Commit | 说明 |
+|--------|------|
+| `00c8668` | feat: 实现墨与纸色彩体系，亮色/暗色双主题 |
+| `8d0d06f` | fix: 替换所有组件硬编码色值为语义变量 |
+| `48b979a` | chore: 删除 warmLightTheme，auxiliary 改用 onoteLightTheme |
+| `0722e20` | docs: 更新设计文档 |
+| `9b417c2` | fix: ResourceTabs 残留硬编码色值→语义变量 |
+
+### 审计结论
+
+- **裸 hex 色值**：仅存在于 token 定义层（`index.scss`）和 Fluent UI 主题覆盖（`onote*Theme.ts`），组件层零残留
+- **旧变量 `--warm-*`**：零残留
+- **`warmLightTheme` 引用**：零残留
+- **合理保留的硬编码**：
+  - `agent-diff.scss` — diff 视图的通用绿/红色（非 UI 语义色）
+  - `FileIcon.tsx` — 文件类型品牌色（不在迁移范围）
+  - `previewer/` — iframe 隔离的预览器（不共享主应用变量）
+
+### 用户验证清单
+
+1. 设置 → 通用 → 外观：切换 System/Light/Dark
+2. Tab 栏层级：paper-300 → paper-200 → paper-50 梯度是否清晰
+3. 暗色模式：`#E7D4B6` accent 在 `#0E1620` 背景上的对比度
+4. 各面板颜色一致性（Sidebar、ContentPanel、FileBrowser）
+5. Fluent UI 组件（按钮、下拉框、输入框）在双主题下的表现
