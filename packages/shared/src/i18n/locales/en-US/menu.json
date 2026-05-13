@@ -13,6 +13,7 @@
   "selectNotebook": "Please select a notebook",
   "selectDirectory": "No directory selected",
   "inputNoteName": "Please enter note name:",
+  "inputNoteNameHint": "Please enter note name (.md suffix will be added automatically):",
   "inputName": "Please enter name",
   "fileExists": "File already exists: {{name}}",
   "directoryExists": "Directory already exists: {{name}}",

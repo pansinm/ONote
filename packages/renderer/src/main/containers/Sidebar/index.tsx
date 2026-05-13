@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './index.module.scss';
 import stores from '../../stores';
 import Flex from '/@/components/Flex';
@@ -21,6 +21,7 @@ import { useLatest } from 'react-use';
 import useFileOperation from '/@/hooks/useFileOperation';
 import { eventbus } from '../../eventbus';
 import { NOTE_CREATE_REQUEST } from '../../eventbus/EventName';
+import Pop from '/@/utils/Pop';
 
 export default observer(function Sidebar() {
   const [open, setOpen] = useState(false);
@@ -55,6 +56,7 @@ export default observer(function Sidebar() {
   const [searchText, setSearchText] = useState('');
   const [searchFiles, setSearchFiles] = useState<TreeNode[]>([]);
   const latestText = useLatest(searchText);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const search = async (keywords: string) => {
     try {
@@ -66,16 +68,21 @@ export default observer(function Sidebar() {
         setSearchFiles(filterFiles);
       }
     } catch (err) {
-      // ignore
+      // search failure is non-critical
     }
   };
 
   useEffect(() => {
     if (!searchText) {
       setSearchFiles([]);
-    } else {
-      search(searchText);
+      return;
     }
+    // 300ms debounce to avoid excessive searches while typing
+    clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      search(searchText);
+    }, 300);
+    return () => clearTimeout(searchTimerRef.current);
   }, [searchText]);
 
   const isSearching = searchText.length > 0;
@@ -90,7 +97,11 @@ export default observer(function Sidebar() {
       setSearchText('');
       setSearchFiles([]);
     } catch (err) {
-      //ignore
+      Pop.showToast({
+        message: t('projectConnectFailed', { ns: 'common' }),
+        type: 'error',
+      });
+      console.error('Failed to connect project', err);
     }
   };
 

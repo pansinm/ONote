@@ -13,6 +13,7 @@
   "selectNotebook": "请选中笔记本",
   "selectDirectory": "未选中目录",
   "inputNoteName": "请输入笔记名称:",
+  "inputNoteNameHint": "请输入笔记名称（自动添加 .md 后缀）:",
   "inputName": "请输入名称",
   "fileExists": "文件已存在：{{name}}",
   "directoryExists": "目录已存在：{{name}}",

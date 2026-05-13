@@ -78,5 +78,10 @@
   "searchResultsHint": "找到 {{count}} 个匹配文件",
   "emptyStateOpenDirectoryNow": "现在打开目录",
   "emptyStateCreateFirstNote": "新建第一篇笔记",
-  "emptyStatePickFromSidebar": "去左侧选文件"
+  "emptyStatePickFromSidebar": "去左侧选文件",
+  "unsavedChanges": "未保存的更改",
+  "unsavedCloseConfirm": "\"{{name}}\" 有未保存的更改，关闭前将自动保存。确定继续？",
+  "projectConnectFailed": "项目连接失败，请检查配置后重试",
+  "layoutEditorShort": "编",
+  "layoutPreviewShort": "预"
 }

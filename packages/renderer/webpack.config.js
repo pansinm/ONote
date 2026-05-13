@@ -108,6 +108,7 @@ module.exports = {
       'process.env.NODE': JSON.stringify(process.env.NODE_ENV),
       'process.env.DEBUG': JSON.stringify(process.env.DEBUG || false),
       'process.env.NODE_DEBUG': JSON.stringify(process.env.NODE_DEBUG || false),
+      'process.env.APP_VERSION': JSON.stringify(require('../../package.json').version),
     }),
     // new MonacoWebpackPlugin(),
     ...Object.keys(entry).map(

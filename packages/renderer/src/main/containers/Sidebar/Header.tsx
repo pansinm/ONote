@@ -11,10 +11,10 @@ interface HeaderProps {
 const Header: FC<HeaderProps> = (props) => {
   return (
     <div className={styles.Header}>
-      <a href="#" className={styles.Title} onClick={props.onClick}>
+      <button type="button" className={styles.Title} onClick={props.onClick}>
         {props.prefix}
         {props.title}
-      </a>
+      </button>
       {props.suffix}
     </div>
   );

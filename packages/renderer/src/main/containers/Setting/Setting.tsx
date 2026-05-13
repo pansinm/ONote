@@ -61,7 +61,7 @@ const Setting: React.FC = observer(() => {
 });
 
 // ========== 关于面板 ==========
-const APP_VERSION = '0.16.0';
+const APP_VERSION = process.env.APP_VERSION || 'dev';
 
 const AboutPanel: React.FC = () => {
   const { t } = useTranslation('setting');

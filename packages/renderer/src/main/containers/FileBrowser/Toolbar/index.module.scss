@@ -32,36 +32,51 @@
   flex-shrink: 0;
 }
 
-// ── Status button (secondary) ──
-// 布局切换 — 主要控制，视觉层级高于 icon button
-.statusButton {
+// ── Layout segmented control ──
+.layoutGroup {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  min-width: unset;
-  height: 28px;
   border: 1px solid var(--warm-border);
   border-radius: 4px;
+  overflow: hidden;
+  height: 28px;
+}
+
+.layoutOption {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 8px;
+  height: 100%;
+  border: none;
+  border-radius: 0;
   background: var(--warm-bg-subtle);
-  color: var(--warm-text);
-  font-size: 12px;
+  color: var(--warm-text-muted);
+  font-size: 11px;
   line-height: 1;
   cursor: pointer;
   white-space: nowrap;
   font-family: inherit;
+  transition: background 0.12s, color 0.12s;
 
   &:hover {
     background: var(--warm-bg-hover);
-    border-color: var(--warm-accent);
-  }
-
-  &:active {
-    background: var(--warm-bg-active);
+    color: var(--warm-text);
   }
 
   &:focus-visible {
     @include focus-ring;
+  }
+}
+
+.layoutOptionActive {
+  background: var(--warm-accent);
+  color: #fff;
+
+  &:hover {
+    background: var(--warm-accent-hover);
+    color: #fff;
   }
 }
 

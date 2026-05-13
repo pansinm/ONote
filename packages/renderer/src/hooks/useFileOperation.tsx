@@ -17,7 +17,7 @@ function useFileOperation() {
     let name = await openPrompt({
       title: t('createNote'),
       defaultValue: '',
-      description: t('inputNoteName'),
+      description: t('inputNoteNameHint'),
     });
     if (!name) {
       throw new Error('cancel create');
@@ -77,8 +77,8 @@ function useFileOperation() {
     const tips = (
       <>
         {t('confirmDelete', { type: type === 'directory' ? t('directoryAndSubdirs') : t('file') })}
-        <span style={{ color: 'red' }}>
-          {decodeURIComponent(uri.split('/').pop()!)}
+        <span style={{ color: 'var(--warm-error, #c0392b)' }}>
+          {basename(uri)}
         </span>
       </>
     );
@@ -102,10 +102,10 @@ function useFileOperation() {
   };
 
   const renameFile = async (uri: string, type: 'directory' | 'file') => {
-    const title = decodeURIComponent(uri.split('/').pop()!);
+    const currentName = basename(uri);
     const newName = await openPrompt({
       title: t('renameNote'),
-      defaultValue: title,
+      defaultValue: currentName,
       description: t('inputName'),
     });
     if (newName) {

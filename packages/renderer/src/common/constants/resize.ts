@@ -22,8 +22,8 @@ export const RESIZE_CONFIG = {
     hitAreaWidth: '10px',
     /** 可见拖拽指示线宽度 */
     lineWidth: '2px',
-    /** 默认状态（透明 — 暖色系，hover 才出现） */
-    defaultColor: 'rgba(139, 126, 104, 0)',
+    /** 默认状态（微弱暖色线，提示可拖拽） */
+    defaultColor: 'rgba(139, 126, 104, 0.15)',
     /** hover 状态（暖灰半透明） */
     hoverColor: 'rgba(139, 126, 104, 0.6)',
     /** 拖拽中状态（暖灰实心） */

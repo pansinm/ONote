@@ -1,6 +1,7 @@
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import type { FC } from 'react';
 import React from 'react';
+import { pathanme } from '../common/utils/uri';
 import './FileTreeItem.scss';
 import FileItemWithFileIcon from '@sinm/react-file-tree/lib/FileItemWithFileIcon';
 
@@ -17,7 +18,7 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
 }) => {
   return (
     <div
-      title={decodeURIComponent(treeNode.uri)}
+      title={decodeURIComponent(pathanme(treeNode.uri))}
       onContextMenu={onContextMenu}
       className={active ? 'activated' : undefined}
       style={{

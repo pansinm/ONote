@@ -8,37 +8,13 @@ import {
 } from '@fluentui/react-icons';
 import _QRCode from 'react-qr-code';
 import stores from '/@/main/stores';
-import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import styles from './index.module.scss';
-
-function getLayoutLabel(t: (key: string, options?: any) => string, layout: string) {
-  switch (layout) {
-    case 'editor-only':
-      return t('layoutEditorOnly');
-    case 'previewer-only':
-      return t('layoutPreviewOnly');
-    case 'split':
-    default:
-      return t('layoutSplit');
-  }
-}
-
-function getNextLayout(layout: string) {
-  switch (layout) {
-    case 'split':
-      return 'editor-only';
-    case 'editor-only':
-      return 'previewer-only';
-    default:
-      return 'split';
-  }
-}
 
 function QRCodePopover() {
   const { t } = useTranslation('common');
   const [url, setUrl] = useState('');
   const [visible, setVisible] = useState(false);
-  const popoverRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!visible) return;
@@ -48,9 +24,6 @@ function QRCodePopover() {
       );
     });
   }, [visible, stores.activationStore.activeFileUri]);
-
-  const handleMouseEnter = useCallback(() => setVisible(true), []);
-  const handleMouseLeave = useCallback(() => setVisible(false), []);
 
   // 键盘 Escape 关闭弹层
   const handleKeyDown = useCallback(
@@ -63,12 +36,22 @@ function QRCodePopover() {
     [visible],
   );
 
+  // 点击弹层外部关闭
+  useEffect(() => {
+    if (!visible) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(`.${styles.qrTrigger}`)) {
+        setVisible(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [visible]);
+
   return (
     <div
-      ref={popoverRef}
       className={styles.qrTrigger}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       onKeyDown={handleKeyDown}
     >
       <button
@@ -103,11 +86,6 @@ interface ToolbarActionsProps {
 function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
   const { t } = useTranslation('common');
   const layout = stores.layoutStore.layout;
-  const currentLayout = useMemo(() => getLayoutLabel(t, layout), [t, layout]);
-  const nextLayout = useMemo(
-    () => getLayoutLabel(t, getNextLayout(layout)),
-    [t, layout],
-  );
 
   if (!isMarkdown) {
     return (
@@ -128,17 +106,21 @@ function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
   return (
     <div className={styles.toolbar}>
       <div className={styles.primaryGroup}>
-        <button
-          type="button"
-          className={styles.statusButton}
-          title={`${t('layoutCurrent', { layout: currentLayout })} · ${t('layoutNext', {
-            layout: nextLayout,
-          })}`}
-          onClick={() => stores.layoutStore.switchLayout()}
-        >
-          <LayoutColumnTwoSplitLeftRegular />
-          {currentLayout}
-        </button>
+        <div className={styles.layoutGroup}>
+          {(['split', 'editor-only', 'previewer-only'] as const).map((l) => (
+            <button
+              key={l}
+              type="button"
+              className={`${styles.layoutOption} ${layout === l ? styles.layoutOptionActive : ''}`}
+              title={t('switchLayout')}
+              onClick={() => stores.layoutStore.setLayout(l)}
+            >
+              {l === 'split' && <LayoutColumnTwoSplitLeftRegular />}
+              {l === 'editor-only' && t('layoutEditorShort')}
+              {l === 'previewer-only' && t('layoutPreviewShort')}
+            </button>
+          ))}
+        </div>
 
         <button
           type="button"

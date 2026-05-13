@@ -78,5 +78,10 @@
   "searchResultsHint": "{{count}} matching files",
   "emptyStateOpenDirectoryNow": "Open a directory now",
   "emptyStateCreateFirstNote": "Create your first note",
-  "emptyStatePickFromSidebar": "Pick a file from the sidebar"
+  "emptyStatePickFromSidebar": "Pick a file from the sidebar",
+  "unsavedChanges": "Unsaved Changes",
+  "unsavedCloseConfirm": "\"{{name}}\" has unsaved changes. It will be saved before closing. Continue?",
+  "projectConnectFailed": "Failed to connect to project. Please check your configuration and try again.",
+  "layoutEditorShort": "E",
+  "layoutPreviewShort": "P"
 }
