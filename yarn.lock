@@ -6897,6 +6897,13 @@ domhandler@^4.0.0, domhandler@^4.2.0, domhandler@^4.3.1:
   dependencies:
     domelementtype "^2.2.0"
 
+dompurify@3.2.7:
+  version "3.2.7"
+  resolved "https://registry.npmmirror.com/dompurify/-/dompurify-3.2.7.tgz#721d63913db5111dd6dfda8d3a748cfd7982d44a"
+  integrity sha512-WhL/YuveyGXJaerVlMYGWhvQswa7myDG17P7Vu65EWC05o8vfeNbvNf4d/BOvH99+ZW+LlQsc1GDKMa1vNK6dw==
+  optionalDependencies:
+    "@types/trusted-types" "^2.0.7"
+
 dompurify@^3.2.5:
   version "3.3.1"
   resolved "https://registry.npmmirror.com/dompurify/-/dompurify-3.3.1.tgz#c7e1ddebfe3301eacd6c0c12a4af284936dbbb86"
@@ -10143,6 +10150,11 @@ markdown-to-jsx@^7.4.1:
   resolved "https://registry.npmmirror.com/markdown-to-jsx/-/markdown-to-jsx-7.7.17.tgz#6e997d6aa4dbe2e69c423c65745541846777483c"
   integrity sha512-7mG/1feQ0TX5I7YyMZVDgCC/y2I3CiEhIRQIhyov9nGBP5eoVrOXXHuL5ZP8GRfxVZKRiXWJgwXkb9It+nQZfQ==
 
+marked@14.0.0:
+  version "14.0.0"
+  resolved "https://registry.npmmirror.com/marked/-/marked-14.0.0.tgz#79a1477358a59e0660276f8fec76de2c33f35d83"
+  integrity sha512-uIj4+faQ+MgHgwUW1l2PsPglZLOLOT1uErt06dAPtx2kjteLAkbsd/0FiYg/MGS+i7ZKLb7w2WClxHkzOOuryQ==
+
 marked@^16.2.1:
   version "16.4.2"
   resolved "https://registry.npmmirror.com/marked/-/marked-16.4.2.tgz#4959a64be6c486f0db7467ead7ce288de54290a3"
@@ -11149,10 +11161,13 @@ monaco-editor-nls@^3.0.0:
   resolved "https://registry.npmmirror.com/monaco-editor-nls/-/monaco-editor-nls-3.1.0.tgz#64086be3b0ee6791ac6bd99c9b1b45ad819c26ee"
   integrity sha512-GdzgKRAiwXlGI/ude/HbzP8ukml28yUoZ7rx/xsSsmYf9W13jTyWjXjoMK/+pjL6JorAThH2WkCYaDoCnIX7Jg==
 
-monaco-editor@*, monaco-editor@0.30.1, monaco-editor@0.45.0, monaco-editor@^0.45.0:
-  version "0.45.0"
-  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.45.0.tgz#6939123a6254aea9fea2d647697f846306dd4448"
-  integrity sha512-mjv1G1ZzfEE3k9HZN0dQ2olMdwIfaeAAjFiwNprLfYNRSz7ctv9XuCT7gPtBGrMUeV1/iZzYKj17Khu1hxoHOA==
+monaco-editor@*, monaco-editor@0.30.1, monaco-editor@0.55.1:
+  version "0.55.1"
+  resolved "https://registry.npmmirror.com/monaco-editor/-/monaco-editor-0.55.1.tgz#e74c6fe5a6bf985b817d2de3eb88d56afc494a1b"
+  integrity sha512-jz4x+TJNFHwHtwuV9vA9rMujcZRb0CEilTEwG2rRSpe/A7Jdkuj8xPKttCgOh+v/lkHy7HsZ64oj+q3xoAFl9A==
+  dependencies:
+    dompurify "3.2.7"
+    marked "14.0.0"
 
 monaco-markdown@^0.0.12:
   version "0.0.12"

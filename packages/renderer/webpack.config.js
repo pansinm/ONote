@@ -89,6 +89,9 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {
       '/@': path.resolve(__dirname, 'src'),
+      // monaco-markdown UMD uses require("monaco-editor") which resolves to AMD build via exports["require"].
+      // Force ESM to avoid AMD loader plugin issues (vs/nls.messages-loader!)
+      'monaco-editor$': path.resolve(__dirname, '../../node_modules/monaco-editor/esm/vs/editor/editor.main.js'),
     },
     fallback: {
       stream: require.resolve('stream-browserify'),

@@ -36,7 +36,7 @@
     "webdav-server": "^2.6.2"
   },
   "resolutions": {
-    "monaco-editor": "0.45.0",
+    "monaco-editor": "0.55.1",
     "webpack": "5.88.2",
     "@types/mdast": "4.0.3",
     "vfile-message": "4.0.0",
