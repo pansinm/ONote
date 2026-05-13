@@ -11,6 +11,7 @@ import {
   SettingsRegular,
 } from '@fluentui/react-icons';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Setting from './Setting';
 
 const useStyles = makeStyles({
@@ -22,6 +23,7 @@ const useStyles = makeStyles({
 });
 export default function SettingTrigger() {
   const styles = useStyles();
+  const { t } = useTranslation('setting');
   const [open, setOpen] = React.useState(false);
   if (!open) {
     return (
@@ -30,6 +32,8 @@ export default function SettingTrigger() {
         onClick={() => setOpen(!open)}
         appearance="subtle"
         shape="square"
+        title={t('settings')}
+        aria-label={t('settings')}
       ></Button>
     );
   }
@@ -39,9 +43,9 @@ export default function SettingTrigger() {
       onOpenChange={(_e, { open: needOpen }) => setOpen(needOpen)}
     >
       <DialogTrigger>
-        <Button icon={<SettingsRegular />} shape="square"></Button>
+        <Button icon={<SettingsRegular />} shape="square" title={t('settings')} aria-label={t('settings')}></Button>
       </DialogTrigger>
-      <DialogSurface style={{ height: '70%', minWidth: '70%' }}>
+      <DialogSurface style={{ height: '80%', maxWidth: '640px', minWidth: '480px' }}>
         <DialogTrigger>
           <Button
             className={styles.dismissIcon}

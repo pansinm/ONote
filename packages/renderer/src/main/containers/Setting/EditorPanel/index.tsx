@@ -66,7 +66,7 @@ const EditorPanel = observer(function EditorPanel() {
     }
   };
   return (
-    <div>
+    <div style={{ padding: '20px', maxWidth: '400px' }}>
       <Field>
         <Checkbox
           label={t('wordWrap')}
@@ -74,30 +74,30 @@ const EditorPanel = observer(function EditorPanel() {
           onChange={toggleWordWrap}
         />
       </Field>
-      <Field>
+      <Field style={{ marginTop: '12px' }}>
         <Checkbox
           label={t('vimMode')}
           checked={mode === 'VIM_MODE'}
           onChange={toggleVIMMode}
         />
       </Field>
-      <Field className={styles.input} label={t('fontSize')}>
+      <Field className={styles.input} label={t('fontSize')} style={{ marginTop: '16px' }}>
         <Input
-          defaultValue={(fontSize as string) || '14'}
+          value={String(fontSize || '14')}
           onChange={(e) => setFontSize(e.target.value)}
         />
       </Field>
-      <Field className={styles.input} label={t('fontFamily')}>
+      <Field className={styles.input} label={t('fontFamily')} style={{ marginTop: '16px' }}>
         <Input
-          defaultValue={family}
+          value={family}
           onChange={(e) => setFamily(e.target.value)}
         />
       </Field>
-      <Field className={styles.input} label={t('maxOpenTabs')}>
+      <Field className={styles.input} label={t('maxOpenTabs')} style={{ marginTop: '16px' }}>
         <Input
           type="number"
           min="1"
-          defaultValue={(maxOpenTabs as string) || '10'}
+          value={String(maxOpenTabs || '10')}
           onChange={(e) => setMaxOpenTabs(e.target.value)}
         />
       </Field>

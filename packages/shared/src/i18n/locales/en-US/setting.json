@@ -35,5 +35,10 @@
   "closeSearch": "Close Search",
   "devTools": "Developer Tools",
   "toggleBold": "Toggle Bold (in editor)",
-  "toggleTaskItem": "Toggle Task Item"
+  "toggleTaskItem": "Toggle Task Item",
+  "settings": "Settings",
+  "plantumlServer": "PlantUML Server",
+  "shortcutsApp": "Application",
+  "shortcutsEditor": "Editor",
+  "shortcutsOther": "Other"
 }

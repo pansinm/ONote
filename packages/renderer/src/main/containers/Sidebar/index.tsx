@@ -19,6 +19,8 @@ import SearchList from '../FileList/SearchList';
 import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import { useLatest } from 'react-use';
 import useFileOperation from '/@/hooks/useFileOperation';
+import { eventbus } from '../../eventbus';
+import { NOTE_CREATE_REQUEST } from '../../eventbus/EventName';
 
 export default observer(function Sidebar() {
   const [open, setOpen] = useState(false);
@@ -33,6 +35,22 @@ export default observer(function Sidebar() {
 
   const { t } = useTranslation(['menu', 'common']);
   const { createFile, Modal } = useFileOperation();
+
+  // Cmd/Ctrl+N → eventbus → 触发新建笔记弹窗
+  useEffect(() => {
+    const handler = () => {
+      const dirUri =
+        stores.activationStore.activeDirUri ||
+        stores.activationStore.rootUri;
+      if (dirUri) {
+        void createFile(dirUri, 'file').catch((error) => {
+          console.error('Failed to create note from hotkey', error);
+        });
+      }
+    };
+    eventbus.on(NOTE_CREATE_REQUEST, handler);
+    return () => { eventbus.off(NOTE_CREATE_REQUEST, handler); };
+  }, [createFile]);
 
   const [searchText, setSearchText] = useState('');
   const [searchFiles, setSearchFiles] = useState<TreeNode[]>([]);

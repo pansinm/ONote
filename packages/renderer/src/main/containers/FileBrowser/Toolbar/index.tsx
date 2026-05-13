@@ -75,6 +75,8 @@ function QRCodePopover() {
         type="button"
         className={styles.iconButton}
         aria-label={t('insertFile')}
+        title={t('insertFileFromPhone')}
+        onClick={() => setVisible((v) => !v)}
       >
         <QrCodeRegular />
       </button>

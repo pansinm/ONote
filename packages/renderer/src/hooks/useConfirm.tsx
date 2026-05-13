@@ -15,15 +15,16 @@ function useConfirm() {
   const ref = useRef<{ resolve?(isOk: boolean): void; reject?(): void }>({});
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        ref.current.resolve?.(true);
-        setIsOpen(false);
-        return;
-      }
+      // Escape：关闭对话框，返回 false（取消）
       if (e.key === 'Escape') {
+        e.stopPropagation();
         ref.current.resolve?.(false);
         setIsOpen(false);
       }
+      // 注意：不再全局监听 Enter。
+      // Enter 确认由 OK 按钮的 autoFocus + 浏览器原生行为完成。
+      // 当 Confirm 内容包含输入框（Prompt）时，输入框拿到焦点，
+      // Enter 由输入框消费，不会误触 Confirm。
     };
     if (isOpen) {
       document.addEventListener('keydown', handleKeydown);

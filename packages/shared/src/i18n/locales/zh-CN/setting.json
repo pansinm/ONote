@@ -35,5 +35,10 @@
   "closeSearch": "关闭搜索框",
   "devTools": "开发者工具",
   "toggleBold": "加粗（编辑器内）",
-  "toggleTaskItem": "切换任务项"
+  "toggleTaskItem": "切换任务项",
+  "settings": "设置",
+  "plantumlServer": "PlantUML 服务器",
+  "shortcutsApp": "应用快捷键",
+  "shortcutsEditor": "编辑器快捷键",
+  "shortcutsOther": "其他快捷键"
 }

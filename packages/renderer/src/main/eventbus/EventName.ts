@@ -7,3 +7,4 @@ export const FILE_CREATED = 'file.created';
 export const FILE_DELETED = 'file.deleted';
 export const FILE_RENAMED = 'file.renamed';
 export const FILE_MOVED = 'file.moved';
+export const NOTE_CREATE_REQUEST = 'note.create.request';

@@ -19,8 +19,8 @@ function PlantUMLPanel() {
     (stores.settingStore.settings[PLANTUML_USECACHE] as boolean) || false;
 
   return (
-    <div>
-      <Field label={'PlantUML Server'}>
+    <div style={{ padding: '20px', maxWidth: '400px' }}>
+      <Field label={t('plantumlServer')} style={{ marginBottom: '16px' }}>
         <Input
           value={server || ''}
           onChange={(e, data) =>

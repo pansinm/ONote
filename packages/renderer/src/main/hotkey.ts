@@ -18,12 +18,11 @@
  *   对需要拦截的快捷键执行 preventDefault + stopPropagation，
  *   同时保留 Monaco 自身的 Ctrl+F（查找）、Ctrl+H（替换）等功能。
  */
-import i18next from 'i18next';
 import developToolsService from './services/developToolsService';
 import stores from './stores';
-import fileService from './services/fileService';
-import { resolveUri } from '../common/utils/uri';
 import { getLogger } from '/@/shared/logger';
+import { eventbus } from './eventbus';
+import { NOTE_CREATE_REQUEST } from './eventbus/EventName';
 
 const logger = getLogger('Hotkeys');
 
@@ -71,29 +70,9 @@ function overrideIfMonaco(e: KeyboardEvent): void {
 // 快捷键动作
 // ---------------------------------------------------------------------------
 
-/** Ctrl/Cmd+N — 新建笔记 */
+/** Ctrl/Cmd+N — 新建笔记（通过 eventbus 触发自定义弹窗） */
 function handleNewNote(): void {
-  const { activeDirUri } = stores.activationStore;
-  if (!activeDirUri) return;
-
-  const name = window.prompt(
-    i18next.t('menu:inputNoteName'),
-    '',
-  );
-  if (!name) return;
-
-  const fileName = name.includes('.') ? name : `${name}.md`;
-  const fileUri = resolveUri(`${activeDirUri}/`, fileName);
-
-  fileService
-    .create(activeDirUri, { type: 'file', uri: fileUri })
-    .then((node) => {
-      // FILE_CREATED 事件会自动触发 FileListStore 和 Directory 刷新
-      stores.activationStore.activeFile(node.uri);
-    })
-    .catch(() => {
-      /* 用户取消或文件已存在 */
-    });
+  eventbus.emit(NOTE_CREATE_REQUEST);
 }
 
 /** Ctrl/Cmd+S — 保存当前文件 */
@@ -232,23 +211,8 @@ function globalKeydownHandler(e: KeyboardEvent) {
   }
 
   // ── 无修饰键 ────────────────────────────────────────────────────────
-  if (e.key === 'Escape') {
-    const searchInput = document.querySelector<HTMLInputElement>(
-      'input[type="text"]',
-    );
-    if (searchInput && document.activeElement === searchInput) {
-      // 通过 React 可识别的方式清空受控输入框
-      const nativeSetter = Object.getOwnPropertyDescriptor(
-        HTMLInputElement.prototype,
-        'value',
-      )?.set;
-      if (nativeSetter) {
-        nativeSetter.call(searchInput, '');
-      }
-      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-      searchInput.blur();
-    }
-  }
+  // Escape 由各组件自行处理（Sidebar 搜索框已有 onKeyDown 监听 Escape 清空）。
+  // 不再全局 hack React 受控输入框。
 }
 
 // ---------------------------------------------------------------------------
