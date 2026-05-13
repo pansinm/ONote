@@ -6,7 +6,9 @@
  *   Ctrl/Cmd+S          保存当前文件
  *   Ctrl/Cmd+B          切换侧边栏
  *   Ctrl/Cmd+W          关闭当前 tab
+ *   Ctrl/Cmd+Shift+W    关闭所有 tab
  *   Ctrl/Cmd+P          聚焦搜索框
+ *   Ctrl/Cmd+\          切换布局（split → editor-only → preview-only）
  *   Ctrl/Cmd+Tab        下一个 tab
  *   Ctrl/Cmd+Shift+Tab  上一个 tab
  *   Escape              关闭搜索/对话框
@@ -21,6 +23,9 @@ import developToolsService from './services/developToolsService';
 import stores from './stores';
 import fileService from './services/fileService';
 import { resolveUri } from '../common/utils/uri';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('Hotkeys');
 
 // ---------------------------------------------------------------------------
 // 平台检测
@@ -112,6 +117,16 @@ function handleCloseTab(): void {
   }
 }
 
+/** Ctrl/Cmd+Shift+W — 关闭所有 tab */
+function handleCloseAllTabs(): void {
+  stores.activationStore.closeAllFiles();
+}
+
+/** Ctrl/Cmd+\ — 切换布局 */
+function handleSwitchLayout(): void {
+  stores.layoutStore.switchLayout();
+}
+
 /** Ctrl/Cmd+P — 聚焦搜索框 */
 function handleFocusSearch(): void {
   const searchInput = document.querySelector<HTMLInputElement>(
@@ -120,6 +135,8 @@ function handleFocusSearch(): void {
   if (searchInput) {
     searchInput.focus();
     searchInput.select();
+  } else {
+    logger.warn('Search input #sidebar-search-input not found in DOM');
   }
 }
 
@@ -153,6 +170,13 @@ function globalKeydownHandler(e: KeyboardEvent) {
       return;
     }
 
+    // Ctrl/Cmd+Shift+W → 关闭所有 tab
+    if (key === 'W' && e.shiftKey) {
+      overrideIfMonaco(e);
+      handleCloseAllTabs();
+      return;
+    }
+
     // Ctrl/Cmd+Shift+Tab → 上一个 tab
     if (key === 'Tab' && e.shiftKey) {
       overrideIfMonaco(e);
@@ -180,6 +204,7 @@ function globalKeydownHandler(e: KeyboardEvent) {
         handleSave();
         return;
       case 'b':
+        overrideIfMonaco(e);
         handleToggleSidebar();
         return;
       case 'w':
@@ -189,6 +214,10 @@ function globalKeydownHandler(e: KeyboardEvent) {
       case 'p':
         overrideIfMonaco(e);
         handleFocusSearch();
+        return;
+      case '\\':
+        overrideIfMonaco(e);
+        handleSwitchLayout();
         return;
       case 'r':
         // 保留原有的重载功能，仅在非 Monaco 焦点时生效

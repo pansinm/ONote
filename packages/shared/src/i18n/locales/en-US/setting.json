@@ -19,5 +19,21 @@
   "uninstall": "Uninstall",
   "version": "Version",
   "onoteDesc": "An elegant Markdown note-taking app.",
-  "checkUpdate": "Check for Updates"
+  "checkUpdate": "Check for Updates",
+  "shortcuts": "Shortcuts",
+  "shortcut": "Shortcut",
+  "action": "Action",
+  "newNote": "New Note",
+  "saveFile": "Save File",
+  "toggleSidebar": "Toggle Sidebar",
+  "closeTab": "Close Tab",
+  "closeAllTabs": "Close All Tabs",
+  "focusSearch": "Focus Search",
+  "switchLayout": "Switch Layout",
+  "nextTab": "Next Tab",
+  "prevTab": "Previous Tab",
+  "closeSearch": "Close Search",
+  "devTools": "Developer Tools",
+  "toggleBold": "Toggle Bold (in editor)",
+  "toggleTaskItem": "Toggle Task Item"
 }

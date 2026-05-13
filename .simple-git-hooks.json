@@ -1,3 +1,4 @@
 {
-  "pre-commit": "npx nano-staged"
+  "pre-commit": "npx nano-staged",
+  "commit-msg": "node scripts/commit-msg-check.js"
 }

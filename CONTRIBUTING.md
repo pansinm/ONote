@@ -344,6 +344,14 @@ git rebase upstream/main
 
 我们使用 [Conventional Commits](https://www.conventionalcommits.org/) 规范。
 
+**要求：提交标题必须使用中文描述变更内容。**
+
+- ✅ `feat(editor): 添加代码折叠功能`
+- ✅ `fix(previewer): 修复滚动同步问题`
+- ✅ `docs: 更新开发环境说明`
+- ❌ `feat(editor): add code folding`
+- ❌ `fix: resolve preview sync bug`
+
 ### 提交格式
 
 ```
@@ -430,19 +438,25 @@ After:  1000 items - 20ms
    ❌ "feat: 添加了暗色模式" 或 "feat: 暗色模式"
    ```
 
-2. **首字母小写**
+2. **标题使用中文描述**
+   ```
+   ✅ "fix: 修复内存泄漏"
+   ❌ "fix: fix memory leak"
+   ```
+
+3. **type 保持小写**
    ```
    ✅ "fix: 修复内存泄漏"
    ❌ "Fix: 修复内存泄漏"
    ```
 
-3. **不要以句号结尾**
+4. **不要以句号结尾**
    ```
    ✅ "docs: 更新 README"
    ❌ "docs: 更新 README."
    ```
 
-4. **简洁明了**
+5. **简洁明了**
    ```
    ✅ "feat: 添加用户头像上传"
    ❌ "feat: 添加一个功能让用户可以上传他们的个人头像图片"
@@ -662,6 +676,11 @@ git config --global init.defaultBranch main
 ## 最后的话
 
 再次感谢你对 ONote 的关注和贡献！每一个贡献，无论大小，都让项目变得更好。
+
+如果你是第一次贡献，不要担心，我们都会帮助你。最重要的是开始行动！
+
+欢迎加入 ONote 社区！🎉
+�，都让项目变得更好。
 
 如果你是第一次贡献，不要担心，我们都会帮助你。最重要的是开始行动！
 

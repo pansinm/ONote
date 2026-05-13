@@ -12,6 +12,7 @@ import { observer } from 'mobx-react-lite';
 import EditorPanel from './EditorPanel';
 import PlantUMLPanel from './PlantUMLPanel';
 import GeneralPanel from './GeneralPanel';
+import ShortcutsPanel from './ShortcutsPanel';
 
 const useStyles = makeStyles({
   root: {
@@ -43,6 +44,7 @@ const Setting: React.FC = observer(() => {
         <Tab value="general">{t('general')}</Tab>
         <Tab value="editor">{t('editor')}</Tab>
         <Tab value="diagrams">{t('diagrams')}</Tab>
+        <Tab value="shortcuts">{t('shortcuts')}</Tab>
         {/* <Tab value="plugin">{t('plugin')}</Tab> */}
         <Tab value="about">{t('about')}</Tab>
       </TabList>
@@ -50,6 +52,7 @@ const Setting: React.FC = observer(() => {
         {tab === 'general' && <GeneralPanel />}
         {tab === 'editor' && <EditorPanel />}
         {tab === 'diagrams' && <PlantUMLPanel />}
+        {tab === 'shortcuts' && <ShortcutsPanel />}
         {/* {tab === 'plugin' && <PluginManager />} */}
         {tab === 'about' && <AboutPanel />}
       </div>

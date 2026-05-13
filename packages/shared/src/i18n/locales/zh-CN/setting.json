@@ -19,5 +19,21 @@
   "uninstall": "卸载",
   "version": "版本",
   "onoteDesc": "一款简洁优雅的 Markdown 笔记应用。",
-  "checkUpdate": "检查更新"
+  "checkUpdate": "检查更新",
+  "shortcuts": "快捷键",
+  "shortcut": "快捷键",
+  "action": "操作",
+  "newNote": "新建笔记",
+  "saveFile": "保存当前文件",
+  "toggleSidebar": "切换侧边栏",
+  "closeTab": "关闭当前标签",
+  "closeAllTabs": "关闭所有标签",
+  "focusSearch": "聚焦搜索框",
+  "switchLayout": "切换布局",
+  "nextTab": "下一个标签",
+  "prevTab": "上一个标签",
+  "closeSearch": "关闭搜索框",
+  "devTools": "开发者工具",
+  "toggleBold": "加粗（编辑器内）",
+  "toggleTaskItem": "切换任务项"
 }

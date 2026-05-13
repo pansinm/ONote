@@ -1,6 +1,4 @@
 import * as monaco from 'monaco-editor';
-import { EDITOR_FILE_SAVE } from '../../eventbus/EventName';
-import emitter from '../../eventbus/eventbus';
 import { getFenceContent, isInFence } from '../utils';
 import { getLogger } from '/@/shared/logger';
 
@@ -78,12 +76,7 @@ function onKeyPressed(
 }
 
 export function bindingKeys(editor: monaco.editor.IStandaloneCodeEditor) {
-  editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function () {
-    const model = editor.getModel();
-    if (model) {
-      emitter.emit(EDITOR_FILE_SAVE, model.uri.toString());
-    }
-  });
+  // Cmd+S 保存由 hotkey.ts 在 capture 阶段统一处理，此处不再重复绑定。
 
   editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyV, function () {
     if (editor.hasTextFocus()) {
@@ -91,9 +84,8 @@ export function bindingKeys(editor: monaco.editor.IStandaloneCodeEditor) {
         'editor.action.clipboardPasteAction',
         editor.getModel()?.uri,
       );
-    } else {
-      document.execCommand('paste');
     }
+    // Monaco 无焦点时不拦截粘贴，交给浏览器原生行为
   });
 
   (window as any).editor = editor;
