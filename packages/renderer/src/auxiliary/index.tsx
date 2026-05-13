@@ -1,5 +1,6 @@
 import React from 'react';
-import { FluentProvider, webLightTheme } from '@fluentui/react-components';
+import { FluentProvider } from '@fluentui/react-components';
+import { onoteLightTheme } from '../main/theme/onoteLightTheme';
 
 import { createRoot } from 'react-dom/client';
 import App from './App';
@@ -7,7 +8,7 @@ import App from './App';
 const root = createRoot(document.getElementById('app') as HTMLDivElement);
 
 root.render(
-  <FluentProvider theme={webLightTheme}>
+  <FluentProvider theme={onoteLightTheme}>
     <App></App>
   </FluentProvider>,
 );
