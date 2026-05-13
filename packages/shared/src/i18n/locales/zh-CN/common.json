@@ -74,6 +74,7 @@
   "layoutNext": "切换到：{{layout}}",
   "moreActions": "更多操作",
   "openInNewPreview": "独立预览窗口",
+  "searchPlaceholder": "搜索文件...",
   "searchShortcutHint": "搜索文件 (Ctrl/Cmd+P)",
   "searchResultsHint": "找到 {{count}} 个匹配文件",
   "emptyStateOpenDirectoryNow": "现在打开目录",
@@ -81,6 +82,7 @@
   "emptyStatePickFromSidebar": "去左侧选文件",
   "unsavedChanges": "未保存的更改",
   "unsavedCloseConfirm": "\"{{name}}\" 有未保存的更改，关闭前将自动保存。确定继续？",
+  "unsavedBatchCloseConfirm": "{{count}} 个文件有未保存的更改，关闭前将自动保存。确定继续？",
   "projectConnectFailed": "项目连接失败，请检查配置后重试",
   "layoutEditorShort": "编",
   "layoutPreviewShort": "预"

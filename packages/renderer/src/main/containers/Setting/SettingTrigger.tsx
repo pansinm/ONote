@@ -17,8 +17,9 @@ import Setting from './Setting';
 const useStyles = makeStyles({
   dismissIcon: {
     position: 'absolute',
-    top: '5px',
-    right: '5px',
+    top: '12px',
+    right: '12px',
+    zIndex: 1,
   },
 });
 export default function SettingTrigger() {
@@ -54,6 +55,7 @@ export default function SettingTrigger() {
           ></Button>
         </DialogTrigger>
         <DialogBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <h2 style={{ fontSize: '16px', fontWeight: 600, margin: '0 0 8px 0', color: 'var(--warm-text)' }}>{t('settings')}</h2>
           <Setting />
         </DialogBody>
       </DialogSurface>

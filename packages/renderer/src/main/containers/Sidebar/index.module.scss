@@ -90,6 +90,11 @@
   border-bottom: 1px solid rgba(122, 110, 96, 0.12);
   background: rgba(255, 252, 245, 0.72);
   padding: 8px 0 6px;
+  max-height: 45%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
 }
 
 .searchHeaderRow {

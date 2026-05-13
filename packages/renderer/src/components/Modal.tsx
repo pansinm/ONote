@@ -4,6 +4,7 @@ import ReactModal from 'react-modal';
 export interface ModalProps {
   onRequestClose?(): void;
   shouldCloseOnEsc?: boolean;
+  shouldCloseOnOverlayClick?: boolean;
   style?: React.CSSProperties;
   title?: string;
   isOpen: boolean;
@@ -14,6 +15,7 @@ const Modal: React.FC<ModalProps> = (props) => {
   return (
     <ReactModal
       shouldCloseOnEsc={props.shouldCloseOnEsc}
+      shouldCloseOnOverlayClick={props.shouldCloseOnOverlayClick}
       isOpen={props.isOpen}
       style={{
         content: {

@@ -7,6 +7,7 @@ type ShowParam = {
   content?: React.ReactNode;
   showCancelButton?: boolean;
   shouldCloseOnEsc?: boolean;
+  danger?: boolean;
 };
 
 function useConfirm() {
@@ -39,6 +40,7 @@ function useConfirm() {
         title={param.title}
         isOpen={isOpen}
         shouldCloseOnEsc={param.shouldCloseOnEsc}
+        danger={param.danger}
         onOk={function (): void {
           ref.current.resolve?.(true);
           setIsOpen(false);

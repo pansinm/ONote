@@ -10,6 +10,7 @@ type ConfirmProps = {
   title?: string;
   shouldCloseOnEsc?: boolean;
   showCancelButton?: boolean;
+  danger?: boolean;
   onOk(): void;
   onCancel(): void;
   children?: React.ReactNode;
@@ -22,6 +23,7 @@ const Confirm: FC<ConfirmProps> = ({
   children,
   shouldCloseOnEsc = false,
   showCancelButton = true,
+  danger = false,
   title,
 }) => {
   const { t } = useTranslation('common');
@@ -30,6 +32,8 @@ const Confirm: FC<ConfirmProps> = ({
       isOpen={isOpen}
       title={title || t('tip')}
       shouldCloseOnEsc={shouldCloseOnEsc}
+      shouldCloseOnOverlayClick
+      onRequestClose={onCancel}
     >
       <FluentProvider>
         <Flex
@@ -43,6 +47,7 @@ const Confirm: FC<ConfirmProps> = ({
               style={{ marginRight: 10 }}
               appearance="primary"
               onClick={() => onOk?.()}
+              {...(danger ? { style: { marginRight: 10, background: 'var(--warm-error, #c0392b)', borderColor: 'var(--warm-error, #c0392b)' } } : {})}
             >
               {t('confirm')}
             </Button>

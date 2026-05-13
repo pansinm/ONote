@@ -29,16 +29,25 @@ const useStyles = makeStyles({
   },
 });
 
+const SETTINGS_TAB_KEY = 'onote-settings-tab';
+
 const Setting: React.FC = observer(() => {
   const styles = useStyles();
   const { t } = useTranslation('setting');
-  const [tab, setTab] = useState('general');
+  const [tab, setTab] = useState(
+    () => localStorage.getItem(SETTINGS_TAB_KEY) || 'general',
+  );
+  const handleTabSelect = (e: unknown, data: { value: string | number }) => {
+    const value = String(data.value);
+    setTab(value);
+    localStorage.setItem(SETTINGS_TAB_KEY, value);
+  };
   return (
     <div className={styles.root}>
       <TabList
         className={styles.tabList}
         selectedValue={tab}
-        onTabSelect={(e, data) => setTab(data.value as string)}
+        onTabSelect={handleTabSelect}
         vertical
       >
         <Tab value="general">{t('general')}</Tab>

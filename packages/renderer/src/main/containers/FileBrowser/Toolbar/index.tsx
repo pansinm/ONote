@@ -128,7 +128,7 @@ function ToolbarActions({ isMarkdown = true }: ToolbarActionsProps) {
               key={l}
               type="button"
               className={`${styles.layoutOption} ${layout === l ? styles.layoutOptionActive : ''}`}
-              title={t('switchLayout')}
+              title={layout === l ? t('layoutCurrent', { layout: t(`layout${l === 'split' ? 'Split' : l === 'editor-only' ? 'EditorOnly' : 'PreviewOnly'}`) }) : t('layoutNext', { layout: t(`layout${l === 'split' ? 'Split' : l === 'editor-only' ? 'EditorOnly' : 'PreviewOnly'}`) })}
               onClick={() => stores.layoutStore.setLayout(l)}
             >
               {l === 'split' && <LayoutColumnTwoSplitLeftRegular />}

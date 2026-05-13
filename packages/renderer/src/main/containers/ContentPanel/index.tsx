@@ -75,7 +75,12 @@ const ContentPanel = observer(() => {
                 <button
                   type="button"
                   className={styles.subtleButton}
-                  onClick={() => stores.activationStore.activeDir(rootUri)}
+                  onClick={() => {
+                    stores.activationStore.activeDir(rootUri);
+                    if (stores.activationStore.hideSidebar) {
+                      stores.activationStore.toggleSidebar();
+                    }
+                  }}
                 >
                   {t('emptyStatePickFromSidebar')}
                 </button>

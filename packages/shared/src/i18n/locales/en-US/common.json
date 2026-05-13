@@ -74,6 +74,7 @@
   "layoutNext": "Switch to: {{layout}}",
   "moreActions": "More actions",
   "openInNewPreview": "Open in separate preview window",
+  "searchPlaceholder": "Search files...",
   "searchShortcutHint": "Search files (Ctrl/Cmd+P)",
   "searchResultsHint": "{{count}} matching files",
   "emptyStateOpenDirectoryNow": "Open a directory now",
@@ -81,6 +82,7 @@
   "emptyStatePickFromSidebar": "Pick a file from the sidebar",
   "unsavedChanges": "Unsaved Changes",
   "unsavedCloseConfirm": "\"{{name}}\" has unsaved changes. It will be saved before closing. Continue?",
+  "unsavedBatchCloseConfirm": "{{count}} files have unsaved changes. They will be saved before closing. Continue?",
   "projectConnectFailed": "Failed to connect to project. Please check your configuration and try again.",
   "layoutEditorShort": "E",
   "layoutPreviewShort": "P"

@@ -3,7 +3,7 @@ import { Tabs } from '@sinm/react-chrome-tabs';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 import type { ItemParams } from 'react-contexify';
-import { Menu, Item, useContextMenu } from 'react-contexify';
+import { Menu, Item, useContextMenu, Separator } from 'react-contexify';
 import type { TabProperties } from '@sinm/react-chrome-tabs/dist/chrome-tabs';
 import useConfirm from '../../../hooks/useConfirm';
 import stores from '../../stores';
@@ -65,27 +65,60 @@ export default observer(function EditorTabs({ pinnedRight }: { pinnedRight?: Rea
     show(event, { props: { tabId } });
   };
 
+  const saveAllUnsaved = async (uris: string[]) => {
+    const unsaved = uris.filter((u) => fileStore.states[u] === 'changed');
+    if (unsaved.length === 0) return;
+    const confirmed = await openConfirm({
+      title: t('unsavedChanges'),
+      content: t('unsavedBatchCloseConfirm', { count: unsaved.length }),
+    });
+    if (!confirmed) return false;
+    await Promise.all(unsaved.map((u) => fileStore.save(u)));
+    return true;
+  };
+
   const handleItemClick = ({ props, data }: ItemParams) => {
     const uri = props.tabId;
     switch (data.action) {
       case 'CLOSE':
         void handleCloseFile(uri);
         break;
-      case 'CLOSE_OTHERS':
-        activationStore.closeOtherFiles(uri);
+      case 'CLOSE_OTHERS': {
+        const others = openedFiles.filter((f) => !isEquals(f, uri));
+        void saveAllUnsaved(others).then((ok) => {
+          if (ok !== false) activationStore.closeOtherFiles(uri);
+        });
         break;
-      case 'CLOSE_RIGHT':
-        activationStore.closeRightFiles(uri);
+      }
+      case 'CLOSE_RIGHT': {
+        const idx = openedFiles.findIndex((f) => isEquals(f, uri));
+        const rightFiles = idx >= 0 ? openedFiles.slice(idx + 1) : [];
+        void saveAllUnsaved(rightFiles).then((ok) => {
+          if (ok !== false) activationStore.closeRightFiles(uri);
+        });
         break;
-      case 'CLOSE_LEFT':
-        activationStore.closeLeftFiles(uri);
+      }
+      case 'CLOSE_LEFT': {
+        const idx = openedFiles.findIndex((f) => isEquals(f, uri));
+        const leftFiles = idx > 0 ? openedFiles.slice(0, idx) : [];
+        void saveAllUnsaved(leftFiles).then((ok) => {
+          if (ok !== false) activationStore.closeLeftFiles(uri);
+        });
         break;
-      case 'CLOSE_SAVED':
-        activationStore.closeSavedFiles();
+      }
+      case 'CLOSE_SAVED': {
+        const saved = openedFiles.filter(
+          (f) => fileStore.states[f] !== 'changed',
+        );
+        void Promise.resolve().then(() => activationStore.closeSavedFiles());
         break;
-      case 'CLOSE_ALL':
-        activationStore.closeAllFiles();
+      }
+      case 'CLOSE_ALL': {
+        void saveAllUnsaved([...openedFiles]).then((ok) => {
+          if (ok !== false) activationStore.closeAllFiles();
+        });
         break;
+      }
       default:
         break;
     }
@@ -116,6 +149,7 @@ export default observer(function EditorTabs({ pinnedRight }: { pinnedRight?: Rea
         <Item data={{ action: 'CLOSE' }} onClick={handleItemClick}>
           {t('close')}
         </Item>
+        <Separator />
         <Item data={{ action: 'CLOSE_OTHERS' }} onClick={handleItemClick}>
           {t('closeOther')}
         </Item>
@@ -125,6 +159,7 @@ export default observer(function EditorTabs({ pinnedRight }: { pinnedRight?: Rea
         <Item data={{ action: 'CLOSE_LEFT' }} onClick={handleItemClick} disabled={isCloseLeftDisabled}>
           {t('closeLeft')}
         </Item>
+        <Separator />
         <Item data={{ action: 'CLOSE_SAVED' }} onClick={handleItemClick}>
           {t('closeSaved')}
         </Item>

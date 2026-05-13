@@ -139,7 +139,7 @@ export default observer(function Sidebar() {
                 firstSearchResult?.focus();
               }
             }}
-            placeholder={t('searchShortcutHint', { ns: 'common' })}
+            placeholder={t('searchPlaceholder', { ns: 'common' })}
           />
           {searchText && (
             <button

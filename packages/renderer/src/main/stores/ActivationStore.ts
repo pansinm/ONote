@@ -115,6 +115,10 @@ class ActivationStore {
         }
 
         if (oldestUri) {
+          // 逐出前保存未保存的文件，防止静默丢数据
+          if (this.fileStore.states[oldestUri] === 'changed') {
+            this.fileStore.save(oldestUri).catch(() => {});
+          }
           this.openedFiles = this.openedFiles.filter((f) => f !== oldestUri);
           this.fileActivationTimes.delete(oldestUri);
         }

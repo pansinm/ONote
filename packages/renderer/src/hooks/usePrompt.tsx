@@ -18,7 +18,7 @@ const PromptContent: FC<{
 }> = ({ description, defaultValue, onChange }) => {
   const [value, setValue] = useState(defaultValue);
   useEffect(() => {
-    setValue(value);
+    setValue(defaultValue);
   }, [defaultValue]);
   return (
     <Flex

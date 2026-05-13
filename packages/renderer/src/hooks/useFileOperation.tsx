@@ -87,6 +87,7 @@ function useFileOperation() {
         title: t('deleteNote'),
         content: tips,
         shouldCloseOnEsc: true,
+        danger: true,
       })
     ) {
       await fileService.remove(uri).catch(alertAndThrow);

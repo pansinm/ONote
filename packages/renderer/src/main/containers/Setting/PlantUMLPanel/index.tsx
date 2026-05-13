@@ -4,7 +4,7 @@ import {
   Input,
 } from '@fluentui/react-components';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   PLANTUML_ENDPOINT,
@@ -18,14 +18,27 @@ function PlantUMLPanel() {
   const useCache =
     (stores.settingStore.settings[PLANTUML_USECACHE] as boolean) || false;
 
+  const [localServer, setLocalServer] = useState(server || '');
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    setLocalServer(server || '');
+  }, [server]);
+
+  const handleServerChange = (value: string) => {
+    setLocalServer(value);
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      stores.settingStore.update(PLANTUML_ENDPOINT, value);
+    }, 400);
+  };
+
   return (
     <div style={{ padding: '20px', maxWidth: '400px' }}>
       <Field label={t('plantumlServer')} style={{ marginBottom: '16px' }}>
         <Input
-          value={server || ''}
-          onChange={(e, data) =>
-            stores.settingStore.update(PLANTUML_ENDPOINT, data.value)
-          }
+          value={localServer}
+          onChange={(_e, data) => handleServerChange(data.value)}
         />
       </Field>
       <CheckboxField
