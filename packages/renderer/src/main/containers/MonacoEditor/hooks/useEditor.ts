@@ -12,6 +12,7 @@ import {
   EDITOR_CONTENT_CHANGED,
   EDITOR_SELECTION_CHANGED,
 } from '/@/main/eventbus/EventName';
+import { getMonacoThemeName } from '/@/main/monaco/theme';
 
 /**
  * 创建editor实例
@@ -37,10 +38,10 @@ function useEditor() {
     const editor = monaco.editor.create(containerRef.current!, {
       value: '',
       language: 'markdown',
+      theme: getMonacoThemeName(),
       fixedOverflowWidgets: true,
       wordWrap: wordWrap,
       lineHeight: fontSize * 1.5,
-      // theme: '',
       padding: {
         top: 10,
       },
@@ -54,7 +55,7 @@ function useEditor() {
       },
       minimap: {
         enabled: true,
-        autohide: true,
+        autohide: true as const,
       },
       autoClosingBrackets: 'always',
       autoClosingQuotes: 'always',
@@ -78,7 +79,18 @@ function useEditor() {
       });
     });
     setEditor(editor);
+
+    // 监听 data-theme 属性变化，切换 Monaco 主题
+    const observer = new MutationObserver(() => {
+      monaco.editor.setTheme(getMonacoThemeName());
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
     return () => {
+      observer.disconnect();
       selectionDisposer.dispose();
       modelChangeDisposer.dispose();
       editor.dispose();

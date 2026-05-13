@@ -11,6 +11,10 @@
   display: flex;
   align-items: center;
 
+  .file-tree__filename {
+    color: var(--text-body);
+  }
+
   &:hover,
   &.file-tree__tree-item--dragover {
     background-color: var(--bg-hover);
