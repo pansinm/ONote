@@ -64,14 +64,14 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
       >
         <Flex
           justifyContent={'space-between'}
-          boxShadow="#dddddd 0 6px 6px -6px"
+          boxShadow="var(--border) 0 6px 6px -6px"
           padding={'5px 10px'}
         >
           <div></div>
           <Flex paddingRight={10}>
             <PlayRegular
               title={t('demo')}
-              style={{ fontSize: 18, cursor: 'pointer', color: '#5c5545' }}
+              style={{ fontSize: 18, cursor: 'pointer', color: 'var(--text-secondary)' }}
               onClick={() => window.simmer.showPreviewerWindow()}
             />
           </Flex>

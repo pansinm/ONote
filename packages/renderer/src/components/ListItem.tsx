@@ -14,8 +14,6 @@ export interface ListItemProps {
   className?: string;
   style?: CSSProperties;
   active?: boolean;
-  hoverBackground?: string;
-  activeBackground?: string;
   children?: React.ReactNode;
   onClose?: () => void;
   onClick?: () => void;
@@ -27,8 +25,6 @@ const Listitem: FC<ListItemProps> = ({
   children,
   style,
   active,
-  activeBackground = '#0f6cbd',
-  hoverBackground = 'rgba(0,0,0,0.05)',
   onClose,
   onClick,
   onDragStart,
@@ -37,13 +33,7 @@ const Listitem: FC<ListItemProps> = ({
   return (
     <div
       className={classNames(styles.ListItem, className, { active })}
-      style={
-        {
-          '--list-item-active-background': activeBackground,
-          '--list-item-hover-background': hoverBackground,
-          ...style,
-        } as CSSProperties
-      }
+      style={style}
       draggable={!!onDragStart}
       onDragStart={onDragStart}
       onContextMenu={onContextMenu}

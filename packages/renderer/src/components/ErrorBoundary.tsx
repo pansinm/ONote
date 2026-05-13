@@ -102,10 +102,10 @@ const DefaultErrorUI: React.FC<DefaultErrorUIProps> = ({ error, retry }) => {
       style={{
         padding: '20px',
         margin: '20px',
-        border: '1px solid #f5c6cb',
+        border: '1px solid var(--error)',
         borderRadius: '4px',
-        backgroundColor: '#f8d7da',
-        color: '#721c24',
+        backgroundColor: 'var(--bg-card)',
+        color: 'var(--error)',
       }}
     >
       <h3>⚠️ {t('error')}</h3>
@@ -123,8 +123,8 @@ const DefaultErrorUI: React.FC<DefaultErrorUIProps> = ({ error, retry }) => {
             style={{
               marginTop: '10px',
               padding: '10px',
-              backgroundColor: '#fff',
-              border: '1px solid #dee2e6',
+              backgroundColor: 'var(--bg-content)',
+              border: '1px solid var(--border)',
               borderRadius: '4px',
               fontSize: '12px',
               fontFamily: 'monospace',
@@ -168,18 +168,12 @@ const DefaultErrorUI: React.FC<DefaultErrorUIProps> = ({ error, retry }) => {
           onClick={retry}
           style={{
             padding: '8px 16px',
-            backgroundColor: '#007bff',
-            color: '#fff',
+            backgroundColor: 'var(--accent)',
+            color: 'var(--accent-text)',
             border: 'none',
             borderRadius: '4px',
             cursor: 'pointer',
             fontSize: '14px',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#0056b3';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#007bff';
           }}
         >
           {t('retry')}

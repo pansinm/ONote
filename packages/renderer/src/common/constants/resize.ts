@@ -22,18 +22,18 @@ export const RESIZE_CONFIG = {
     hitAreaWidth: '10px',
     /** 可见拖拽指示线宽度 */
     lineWidth: '2px',
-    /** 默认状态（微弱暖色线，提示可拖拽） */
-    defaultColor: 'rgba(139, 126, 104, 0.15)',
-    /** hover 状态（暖灰半透明） */
-    hoverColor: 'rgba(139, 126, 104, 0.6)',
-    /** 拖拽中状态（暖灰实心） */
-    draggingColor: '#8b7e68',
+    /** 默认状态（微弱线，提示可拖拽） */
+    defaultColor: 'var(--border-light)',
+    /** hover 状态 */
+    hoverColor: 'var(--text-secondary)',
+    /** 拖拽中状态 */
+    draggingColor: 'var(--text-hint)',
     zIndex: 1000,
   },
   // 拖拽指示线配置
   dragIndicator: {
     width: '2px',
-    color: 'rgba(180, 160, 130, 0.6)',
+    color: 'var(--text-secondary)',
     zIndex: 10000,
   },
   // 遮罩层配置

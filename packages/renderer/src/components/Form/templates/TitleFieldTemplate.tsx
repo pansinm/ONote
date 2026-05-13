@@ -11,8 +11,8 @@ function TitleFieldTemplate({ id, title, uiSchema }: TitleFieldProps) {
       id={id}
       as="h6"
       style={{
-        color: '#555',
-        borderBottom: '1px solid #ddd',
+        color: 'var(--text-heading)',
+        borderBottom: '1px solid var(--border)',
       }}
     >
       {title}
