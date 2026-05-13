@@ -104,7 +104,7 @@ const FilePanel: FC<MarkdownResourcePanelProps> = observer((props) => {
                     ? 'flex'
                     : 'none',
                 // 右侧分隔线：编辑器和预览之间
-                borderRight: !showEditorOnly ? '1px solid var(--warm-border)' : 'none',
+                borderRight: !showEditorOnly ? '1px solid var(--border)' : 'none',
               }}
             >
               <MonacoEditor

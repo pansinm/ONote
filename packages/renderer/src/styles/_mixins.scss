@@ -1,4 +1,4 @@
-// ── ONote Phase 2 基础样式 Mixins ──
+// ── ONote Mixins ──
 // 仅供 SCSS Modules @include 使用，不直接作为 class。
 //
 // 路径说明：
@@ -8,13 +8,13 @@
 // 如果未来要恢复 alias 引入，必须先确认构建链对 Sass `@use` 的解析已显式打通。
 
 // ── Focus ring ──
-// 统一焦点态：透明 outline + 暖色 border + ring。
+// 统一焦点态：透明 outline + accent border + ring。
 // $alpha: ring 透明度，默认 0.2
 @mixin focus-ring($alpha: 0.2) {
   outline: 2px solid transparent;
   outline-offset: 2px;
-  border-color: var(--warm-accent-strong);
-  box-shadow: 0 0 0 2px rgba(122, 107, 82, $alpha);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(31, 43, 58, $alpha);
 }
 
 // ── Icon button ──
@@ -29,18 +29,18 @@
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: var(--warm-text-muted);
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 0;
   font-family: inherit;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--warm-text);
+    background: var(--bg-hover);
+    color: var(--text-body);
   }
 
   &:active {
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--bg-pressed);
   }
 
   &:focus-visible {

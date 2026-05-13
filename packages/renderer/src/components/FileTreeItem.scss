@@ -1,8 +1,8 @@
 .activated {
-  background-color: #d4c9b8;
+  background-color: var(--bg-active);
 
   .file-tree__filename {
-    color: #4a3f35;
+    color: var(--text-heading);
     font-weight: 500;
   }
 }
@@ -13,17 +13,14 @@
 
   &:hover,
   &.file-tree__tree-item--dragover {
-    background-color: rgba($color: (
-        #000),
-      $alpha: 0.05
-    );
+    background-color: var(--bg-hover);
   }
 
   &.activated {
-    background-color: #d4c9b8;
+    background-color: var(--bg-active);
 
     & .file-tree__filename {
-      color: #4a3f35;
+      color: var(--text-heading);
       font-weight: 500;
     }
   }

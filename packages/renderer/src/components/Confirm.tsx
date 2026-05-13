@@ -44,10 +44,9 @@ const Confirm: FC<ConfirmProps> = ({
           <div>{children}</div>
           <Flex justifyContent={'center'} marginTop={10} alignItems="center">
             <Button
-              style={{ marginRight: 10 }}
+              style={{ marginRight: 10, ...(danger ? { background: 'var(--error)', borderColor: 'var(--error)' } : {}) }}
               appearance="primary"
               onClick={() => onOk?.()}
-              {...(danger ? { style: { marginRight: 10, background: 'var(--warm-error, #c0392b)', borderColor: 'var(--warm-error, #c0392b)' } } : {})}
             >
               {t('confirm')}
             </Button>

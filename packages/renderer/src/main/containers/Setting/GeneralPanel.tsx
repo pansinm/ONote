@@ -4,11 +4,13 @@ import {
   Option,
   Field,
   makeStyles,
+  type OptionOnSelectData,
 } from '@fluentui/react-components';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 import stores from '../../stores';
 import type { SupportedLocale } from '/@/shared/i18n';
+import { useOnoteTheme, type Appearance } from '../../theme';
 
 const useStyles = makeStyles({
   container: {
@@ -24,13 +26,23 @@ const GeneralPanel: React.FC = observer(() => {
   const styles = useStyles();
   const { t } = useTranslation('setting');
   const { i18nStore } = stores;
+  const { appearance, setAppearance } = useOnoteTheme();
 
   const handleLanguageChange = (
-    _event: React.MouseEvent | React.KeyboardEvent,
-    data: { optionValue?: string },
+    _event: unknown,
+    data: OptionOnSelectData,
   ) => {
     if (data.optionValue) {
       i18nStore.setLanguage(data.optionValue as SupportedLocale);
+    }
+  };
+
+  const handleAppearanceChange = (
+    _event: unknown,
+    data: OptionOnSelectData,
+  ) => {
+    if (data.optionValue) {
+      setAppearance(data.optionValue as Appearance);
     }
   };
 
@@ -47,6 +59,19 @@ const GeneralPanel: React.FC = observer(() => {
         >
           <Option value="zh-CN">{t('zhCN')}</Option>
           <Option value="en-US">{t('enUS')}</Option>
+        </Dropdown>
+      </Field>
+      <Field
+        label={t('appearance')}
+        className={styles.field}
+      >
+        <Dropdown
+          value={appearance}
+          onOptionSelect={handleAppearanceChange}
+        >
+          <Option value="system">{t('appearanceSystem')}</Option>
+          <Option value="light">{t('appearanceLight')}</Option>
+          <Option value="dark">{t('appearanceDark')}</Option>
         </Dropdown>
       </Field>
     </div>

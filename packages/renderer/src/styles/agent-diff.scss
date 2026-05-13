@@ -7,6 +7,6 @@
   border-left: 3px solid #ef4444;
 }
 .agent-diff-change {
-  background-color: rgba(139, 126, 104, 0.12);
-  border-left: 3px solid #8b7e68;
+  background-color: var(--bg-hover);
+  border-left: 3px solid var(--accent);
 }

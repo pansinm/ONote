@@ -42,35 +42,213 @@ body {
   align-items: center;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// 墨与纸色彩体系 — 亮色主题 (默认)
+// ═══════════════════════════════════════════════════════════════
 :root {
   --editor-width: 50%;
   --sidebar-width: 230px;
-  /* 纸与墨 色板 */
-  --tab-bar-bg: #e8e0d0;
-  --tab-inactive-bg: #ede6d6;
-  --tab-active-bg: #fffcf5;
-  --content-bg: #fffcf5;
-  --tool-bg: #ffffff;
-  /* 纸与墨 暖色系统 */
-  --warm-accent: #8b7e68;
-  --warm-accent-strong: #7a6b52;
-  --warm-text: #4a3f35;
-  --warm-text-muted: #7a6e60;
-  --warm-text-hint: #8a8886;
-  --warm-text-placeholder: #a19f9d;
-  --warm-text-empty: #8a7e6b;
-  --warm-border: #d4c9b8;
-  --warm-bg-subtle: #f5f0e6;
-  --warm-bg-hover: #f0ebe0;
-  --warm-bg-active: #d4c9b8;
-  --warm-highlight-bg: #f6d98d;
-  --warm-highlight-text: #2f261d;
-  --warm-icon-muted: #8a8886;
-  --warm-accent-hover: #6b5c44;
-  --warm-accent-active: #5c4d38;
-  --warm-empty-icon: #c4b9a8;
+  color-scheme: light;
+
+  // ── 纸色阶 (Surface) ──
+  --paper-50:  #FFFCF5;
+  --paper-100: #FFF8EE;
+  --paper-200: #F5EDE0;
+  --paper-300: #EDE3D4;
+  --paper-400: #E7D4B6;
+  --paper-500: #D4C4A6;
+
+  // ── 墨色阶 (Text / Brand) ──
+  --ink-900: #0E1620;
+  --ink-800: #1F2B3A;
+  --ink-700: #2C3E52;
+  --ink-600: #3D5168;
+  --ink-500: #556B7E;
+  --ink-400: #7A8E9F;
+  --ink-300: #9FB0BD;
+  --ink-200: #C2CDD6;
+  --ink-100: #E0E7ED;
+
+  // ── 强调色 ──
+  --accent:         #1F2B3A;
+  --accent-hover:   #2C3E52;
+  --accent-pressed: #0E1620;
+  --accent-text:    #FFFFFF;
+
+  // ── 语义变量：背景 ──
+  --bg-content:  var(--paper-50);
+  --bg-card:     var(--paper-100);
+  --bg-sidebar:  var(--paper-200);
+  --bg-tabbar:   var(--paper-300);
+  --bg-active:   var(--paper-400);
+  --bg-hover:    rgba(31, 43, 58, 0.05);
+  --bg-pressed:  rgba(31, 43, 58, 0.08);
+
+  // ── 语义变量：文字 ──
+  --text-heading:    var(--ink-700);
+  --text-body:       var(--ink-600);
+  --text-secondary:  var(--ink-500);
+  --text-hint:       var(--ink-400);
+  --text-disabled:   var(--ink-300);
+  --text-on-accent:  #FFFFFF;
+
+  // ── 语义变量：边框 ──
+  --border:       var(--ink-200);
+  --border-light: var(--ink-100);
+
+  // ── 搜索高亮 ──
+  --highlight-bg:   #F6D98D;
+  --highlight-text: var(--ink-900);
+
+  // ── 功能色 ──
+  --success: #3A7D44;
+  --warning: #B8860B;
+  --error:   #A83232;
+  --info:    #2C6B8A;
+
+  // ── 图标 ──
+  --icon-empty: #C2CDD6;
+  --icon-muted: var(--ink-400);
+
+  // ── Tab 栏（结构变量） ──
+  --tab-bar-bg: var(--paper-300);
+  --tab-inactive-bg: var(--paper-200);
+  --tab-active-bg: var(--paper-50);
+  --content-bg: var(--paper-50);
+  --tool-bg: var(--paper-100);
 }
 
+// ═══════════════════════════════════════════════════════════════
+// 墨与纸色彩体系 — 暗色主题
+// ═══════════════════════════════════════════════════════════════
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper-50:  #0E1620;
+  --paper-100: #141E2C;
+  --paper-200: #1A2535;
+  --paper-300: #1F2B3A;
+  --paper-400: #2C3E52;
+  --paper-500: #3D5168;
+
+  --ink-900: #FFFCF5;
+  --ink-800: #FFF8EE;
+  --ink-700: #F0E6D6;
+  --ink-600: #D4C4A6;
+  --ink-500: #B0A08F;
+  --ink-400: #8A8886;
+  --ink-300: #5C5545;
+  --ink-200: #3A3228;
+  --ink-100: #2A2420;
+
+  --accent:         #E7D4B6;
+  --accent-hover:   #F0E6D6;
+  --accent-pressed: #D4C4A6;
+  --accent-text:    #0E1620;
+
+  --bg-content:  var(--paper-50);
+  --bg-card:     var(--paper-100);
+  --bg-sidebar:  var(--paper-200);
+  --bg-tabbar:   var(--paper-300);
+  --bg-active:   var(--paper-400);
+  --bg-hover:    rgba(231, 212, 182, 0.06);
+  --bg-pressed:  rgba(231, 212, 182, 0.10);
+
+  --text-heading:    var(--ink-700);
+  --text-body:       var(--ink-600);
+  --text-secondary:  var(--ink-500);
+  --text-hint:       var(--ink-400);
+  --text-disabled:   var(--ink-300);
+  --text-on-accent:  #0E1620;
+
+  --border:       var(--ink-200);
+  --border-light: var(--ink-100);
+
+  --highlight-bg:   rgba(246, 217, 141, 0.20);
+  --highlight-text: #F6D98D;
+
+  --success: #52B765;
+  --warning: #D4A017;
+  --error:   #E05555;
+  --info:    #5BA3C9;
+
+  --icon-empty: #3D5168;
+  --icon-muted: var(--ink-400);
+
+  --tab-bar-bg: var(--paper-300);
+  --tab-inactive-bg: var(--paper-200);
+  --tab-active-bg: var(--paper-50);
+  --content-bg: var(--paper-50);
+  --tool-bg: var(--paper-100);
+}
+
+// ── 未手动设置时，跟随系统偏好 ──
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+
+    --paper-50:  #0E1620;
+    --paper-100: #141E2C;
+    --paper-200: #1A2535;
+    --paper-300: #1F2B3A;
+    --paper-400: #2C3E52;
+    --paper-500: #3D5168;
+
+    --ink-900: #FFFCF5;
+    --ink-800: #FFF8EE;
+    --ink-700: #F0E6D6;
+    --ink-600: #D4C4A6;
+    --ink-500: #B0A08F;
+    --ink-400: #8A8886;
+    --ink-300: #5C5545;
+    --ink-200: #3A3228;
+    --ink-100: #2A2420;
+
+    --accent:         #E7D4B6;
+    --accent-hover:   #F0E6D6;
+    --accent-pressed: #D4C4A6;
+    --accent-text:    #0E1620;
+
+    --bg-content:  var(--paper-50);
+    --bg-card:     var(--paper-100);
+    --bg-sidebar:  var(--paper-200);
+    --bg-tabbar:   var(--paper-300);
+    --bg-active:   var(--paper-400);
+    --bg-hover:    rgba(231, 212, 182, 0.06);
+    --bg-pressed:  rgba(231, 212, 182, 0.10);
+
+    --text-heading:    var(--ink-700);
+    --text-body:       var(--ink-600);
+    --text-secondary:  var(--ink-500);
+    --text-hint:       var(--ink-400);
+    --text-disabled:   var(--ink-300);
+    --text-on-accent:  #0E1620;
+
+    --border:       var(--ink-200);
+    --border-light: var(--ink-100);
+
+    --highlight-bg:   rgba(246, 217, 141, 0.20);
+    --highlight-text: #F6D98D;
+
+    --success: #52B765;
+    --warning: #D4A017;
+    --error:   #E05555;
+    --info:    #5BA3C9;
+
+    --icon-empty: #3D5168;
+    --icon-muted: var(--ink-400);
+
+    --tab-bar-bg: var(--paper-300);
+    --tab-inactive-bg: var(--paper-200);
+    --tab-active-bg: var(--paper-50);
+    --content-bg: var(--paper-50);
+    --tool-bg: var(--paper-100);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 布局
+// ═══════════════════════════════════════════════════════════════
 .sidebar {
   width: var(--sidebar-width);
   min-width: 150px;
@@ -105,34 +283,34 @@ body {
   fill: var(--tab-inactive-bg);
 }
 
-/* Tab 分隔线 — 暖色 */
+// Tab 分隔线
 .chrome-tabs .chrome-tab .chrome-tab-dividers::before,
 .chrome-tabs .chrome-tab .chrome-tab-dividers::after {
-  background: rgba(139, 126, 104, 0.25) !important;
+  background: rgba(31, 43, 58, 0.12) !important;
 }
 
-/* 底栏 — 跟内容区色无缝衔接 */
+// 底栏
 .chrome-tabs .chrome-tabs-bottom-bar {
   background: var(--content-bg);
 }
 
-/* Tab 标题色 — 暖黑 */
+// Tab 标题色
 .chrome-tabs .chrome-tab .chrome-tab-title {
-  color: #4a3f35;
+  color: var(--text-body);
 }
 .chrome-tabs .chrome-tab[active] .chrome-tab-title {
-  color: #2b2118;
+  color: var(--text-heading);
 }
 
-/* Tab close 按钮 hover — 暖灰 */
+// Tab close 按钮 hover
 .chrome-tabs .chrome-tab .chrome-tab-close:hover {
-  background-color: rgba(0, 0, 0, 0.06) !important;
+  background-color: var(--bg-hover) !important;
 }
 .chrome-tabs .chrome-tab .chrome-tab-close:hover:active {
-  background-color: rgba(0, 0, 0, 0.1) !important;
+  background-color: var(--bg-pressed) !important;
 }
 
-/* 内容区背景 — 微暖白 */
+// 内容区背景
 .editor-container {
   background: var(--content-bg);
 }

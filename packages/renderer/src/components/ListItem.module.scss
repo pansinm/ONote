@@ -14,21 +14,21 @@
   }
   i:last-child {
     display: none !important;
-    color: #ddd !important;
+    color: var(--text-disabled) !important;
   }
   &:hover {
-    background: var(--list-item-hover-background);
+    background: var(--bg-hover);
     i {
       display: inline-block !important;
       &:hover {
-        color: rgba($color: #000000, $alpha: 0.9) !important;
+        color: var(--text-body) !important;
       }
     }
   }
   &:global.active {
-    background: var(--list-item-active-background);
+    background: var(--bg-active);
     & span {
-      color: #fff;
+      color: var(--text-on-accent);
     }
   }
 }

@@ -77,7 +77,7 @@ function useFileOperation() {
     const tips = (
       <>
         {t('confirmDelete', { type: type === 'directory' ? t('directoryAndSubdirs') : t('file') })}
-        <span style={{ color: 'var(--warm-error, #c0392b)' }}>
+        <span style={{ color: 'var(--error)' }}>
           {basename(uri)}
         </span>
       </>

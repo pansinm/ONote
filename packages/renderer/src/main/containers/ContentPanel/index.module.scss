@@ -23,19 +23,19 @@
 }
 
 .emptyIcon {
-  color: var(--warm-empty-icon);
+  color: var(--icon-empty);
 }
 
 .emptyTitle {
   font-size: 16px;
   font-weight: 600;
-  color: var(--warm-text);
+  color: var(--text-heading);
   text-align: center;
 }
 
 .emptySubtext {
   font-size: 13px;
-  color: var(--warm-text-muted);
+  color: var(--text-secondary);
   text-align: center;
   max-width: 360px;
   line-height: 1.6;
@@ -59,8 +59,8 @@
   height: 32px;
   border: none;
   border-radius: 4px;
-  background: var(--warm-accent-strong);
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--accent-text);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -69,11 +69,11 @@
   line-height: 1;
 
   &:hover {
-    background: var(--warm-accent-hover);
+    background: var(--accent-hover);
   }
 
   &:active {
-    background: var(--warm-accent-active);
+    background: var(--accent-pressed);
   }
 
   &:focus-visible {
@@ -93,7 +93,7 @@
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: var(--warm-text-muted);
+  color: var(--text-secondary);
   font-size: 13px;
   cursor: pointer;
   white-space: nowrap;
@@ -101,12 +101,12 @@
   line-height: 1;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--warm-text);
+    background: var(--bg-hover);
+    color: var(--text-body);
   }
 
   &:active {
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--bg-pressed);
   }
 
   &:focus-visible {

@@ -28,7 +28,7 @@
 .divider {
   width: 1px;
   height: 20px;
-  background: var(--warm-border);
+  background: var(--border);
   flex-shrink: 0;
 }
 
@@ -36,7 +36,7 @@
 .layoutGroup {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--warm-border);
+  border: 1px solid var(--border);
   border-radius: 4px;
   overflow: hidden;
   height: 28px;
@@ -51,8 +51,8 @@
   height: 100%;
   border: none;
   border-radius: 0;
-  background: var(--warm-bg-subtle);
-  color: var(--warm-text-muted);
+  background: var(--bg-card);
+  color: var(--text-secondary);
   font-size: 11px;
   line-height: 1;
   cursor: pointer;
@@ -61,8 +61,8 @@
   transition: background 0.12s, color 0.12s;
 
   &:hover {
-    background: var(--warm-bg-hover);
-    color: var(--warm-text);
+    background: var(--bg-hover);
+    color: var(--text-body);
   }
 
   &:focus-visible {
@@ -71,12 +71,12 @@
 }
 
 .layoutOptionActive {
-  background: var(--warm-accent);
-  color: #fff;
+  background: var(--accent);
+  color: var(--accent-text);
 
   &:hover {
-    background: var(--warm-accent-hover);
-    color: #fff;
+    background: var(--accent-hover);
+    color: var(--accent-text);
   }
 }
 
@@ -95,8 +95,8 @@
 .qrPopover {
   position: fixed;
   z-index: 10000;
-  background: #fff;
-  border: 1px solid var(--warm-border);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -109,12 +109,12 @@
 .qrTitle {
   font-size: 13px;
   margin-bottom: 6px;
-  color: var(--warm-text);
+  color: var(--text-body);
 }
 
 .qrHint {
   font-size: 12px;
-  color: var(--warm-text-muted);
+  color: var(--text-secondary);
   word-break: break-all;
   margin-top: 8px;
 }
