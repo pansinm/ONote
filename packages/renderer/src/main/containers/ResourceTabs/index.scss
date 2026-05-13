@@ -4,7 +4,7 @@
 }
 
 .react-tabs-tab {
-  color: #4a3f35 !important;
+  color: var(--text-secondary) !important;
 }
 
 .react-tabs-tab-content {
@@ -26,7 +26,7 @@
 
 .react-tabs-tab-close:hover {
   border: 0 !important;
-  background: rgba(0, 0, 0, 0.06) !important;
+  background: var(--bg-hover) !important;
 }
 
 .chrome-tabs {
