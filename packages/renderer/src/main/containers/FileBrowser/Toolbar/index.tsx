@@ -8,13 +8,15 @@ import {
 } from '@fluentui/react-icons';
 import _QRCode from 'react-qr-code';
 import stores from '/@/main/stores';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import styles from './index.module.scss';
 
 function QRCodePopover() {
   const { t } = useTranslation('common');
   const [url, setUrl] = useState('');
   const [visible, setVisible] = useState(false);
+  const [popoverPos, setPopoverPos] = useState({ top: 0, right: 0 });
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!visible) return;
@@ -41,7 +43,7 @@ function QRCodePopover() {
     if (!visible) return;
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (!target.closest(`.${styles.qrTrigger}`)) {
+      if (!target.closest(`.${styles.qrPopover}`) && !target.closest(`.${styles.qrTrigger}`)) {
         setVisible(false);
       }
     };
@@ -49,23 +51,37 @@ function QRCodePopover() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [visible]);
 
+  const togglePopover = useCallback(() => {
+    setVisible((v) => {
+      if (!v && btnRef.current) {
+        const rect = btnRef.current.getBoundingClientRect();
+        setPopoverPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
+      }
+      return !v;
+    });
+  }, []);
+
   return (
     <div
       className={styles.qrTrigger}
       onKeyDown={handleKeyDown}
     >
       <button
+        ref={btnRef}
         type="button"
         className={styles.iconButton}
         aria-label={t('insertFile')}
         title={t('insertFileFromPhone')}
-        onClick={() => setVisible((v) => !v)}
+        onClick={togglePopover}
       >
         <QrCodeRegular />
       </button>
 
       {visible && (
-        <div className={styles.qrPopover}>
+        <div
+          className={styles.qrPopover}
+          style={{ top: popoverPos.top, right: popoverPos.right }}
+        >
           <div className={styles.qrWrap}>
             <p className={styles.qrTitle}>{t('insertFileFromPhone')}</p>
             {url ? <_QRCode style={{ width: '100%' }} value={url} /> : <p>...</p>}

@@ -93,10 +93,7 @@
 }
 
 .qrPopover {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 6px;
+  position: fixed;
   z-index: 10000;
   background: #fff;
   border: 1px solid var(--warm-border);
