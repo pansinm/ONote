@@ -101,13 +101,13 @@ const ShortcutsPanel: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.title}>{t('shortcuts')}</div>
 
-      <div className={styles.section}>{t('shortcuts')} — Application</div>
+      <div className={styles.section}>{t('shortcutsApp')}</div>
       {APPLICATION_SHORTCUTS.map((entry) => renderEntry(entry, mod))}
 
-      <div className={styles.section}>{t('shortcuts')} — Editor</div>
+      <div className={styles.section}>{t('shortcutsEditor')}</div>
       {EDITOR_SHORTCUTS.map((entry) => renderEntry(entry, mod))}
 
-      <div className={styles.section}>{t('shortcuts')} — Other</div>
+      <div className={styles.section}>{t('shortcutsOther')}</div>
       {EXTRA_SHORTCUTS.map((entry) => renderEntry(entry, mod))}
     </div>
   );
