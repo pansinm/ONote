@@ -31,7 +31,7 @@ class FileStateStore {
 
   private async createModel(uri: string, value: string) {
     const aUri = monaco.Uri.parse(uri);
-    const lang = isMarkdown(uri) ? 'markdown' : undefined;
+    const lang = isMarkdown(uri) ? 'markdown-math' : undefined;
     const model = monaco.editor.createModel(value, lang, aUri);
     // 关闭时，保存文件
     model.onWillDispose(() => {

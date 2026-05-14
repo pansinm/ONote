@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.16.1 (2026-05-14)
+
+### 修复
+- Markdown 编辑器语法高亮失效：`monaco-markdown` 的 monarch tokenizer 注册在 `markdown-math` 语言 ID 上，但编辑器和 model 绑定使用的是 Monaco 内置的 `markdown`，导致 tokenizer 从未生效。统一所有入口使用 `markdown-math`。
+
+### 改进
+- 编辑器与预览区字体统一：编辑器默认字体大小从 14px 调整为 16px，预览区 `.markdown-body` 的 font-family 和 font-size 改为从 body 继承，line-height 从 1.7 调整为 1.5，两侧排版参数一致。
+
+---
+
 ## v0.16.0 (2026-04-24)
 
 ### 改进

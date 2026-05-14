@@ -61,7 +61,7 @@ monaco.editor.registerCommand(
   async (accessor, uri) => {
     const editor = monaco.editor.getEditors()[0];
     const model = monaco.editor.getModel(uri);
-    if (editor && model?.getLanguageId() === 'markdown') {
+    if (editor && model?.getLanguageId() === 'markdown-math') {
       try {
         const files = await window.simmer.readBlobsFromClipboard();
         for (const file of files) {

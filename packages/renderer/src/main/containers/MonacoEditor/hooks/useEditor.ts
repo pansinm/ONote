@@ -28,7 +28,7 @@ function useEditor() {
     stores.settingStore.settings[EDITOR_WORD_WRAP] || 'off';
   const wordWrap = wordWrapConfig as 'on' | 'off';
   const fontSize =
-    (stores.settingStore.settings[EDITOR_FONT_SIZE] as number) || 14;
+    (stores.settingStore.settings[EDITOR_FONT_SIZE] as number) || 16;
 
   useEffect(() => {
     editor?.updateOptions({ fontFamily: family, fontSize, wordWrap });
@@ -37,7 +37,7 @@ function useEditor() {
   useEffect(() => {
     const editor = monaco.editor.create(containerRef.current!, {
       value: '',
-      language: 'markdown',
+      language: 'markdown-math',
       theme: getMonacoThemeName(),
       fixedOverflowWidgets: true,
       wordWrap: wordWrap,
