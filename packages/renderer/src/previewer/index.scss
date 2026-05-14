@@ -34,6 +34,12 @@ body {
   color: #2C2C2C;
 }
 
+// 暗色时覆盖上面的默认值
+[data-theme="dark"] body {
+  background: #0E1620;
+  color: #D4C4A6;
+}
+
 body {
   font-family:
     Source Han Sans,
@@ -122,19 +128,60 @@ blockquote {
 // ═══════════════════════════════════════════════════════════════
 // 暗色主题
 // ═══════════════════════════════════════════════════════════════
-[data-theme="dark"] body {
-  background: #0E1620;
-  color: #D4C4A6;
+
+// .markdown-body 由 github-markdown-css 控制，背景色由 body 统管
+.markdown-body {
+  background: transparent !important;
 }
 
+// 将 github-markdown-css 的暗色变量注入到 data-theme="dark" 下
+// 库原本用 @media(prefers-color-scheme:dark) 控制，我们走 data-theme
+[data-theme="dark"] .markdown-body {
+  color-scheme: dark;
+  --fgColor-accent: #4493f8;
+  --bgColor-default: #0E1620;
+  --bgColor-muted: #141E2C;
+  --bgColor-neutral-muted: #656c7633;
+  --borderColor-default: #3D5168;
+  --borderColor-muted: #3D5168b3;
+  --fgColor-default: #D4C4A6;
+  --fgColor-muted: #9198a1;
+  --fgColor-attention: #d29922;
+  --fgColor-danger: #f85149;
+  --fgColor-success: #3fb950;
+  --fgColor-done: #ab7df8;
+  --bgColor-attention-muted: #bb800926;
+  --borderColor-accent-emphasis: #1f6feb;
+  --borderColor-attention-emphasis: #9e6a03;
+  --borderColor-danger-emphasis: #da3633;
+  --borderColor-done-emphasis: #8957e5;
+  --borderColor-success-emphasis: #238636;
+  --focus-outlineColor: var(--borderColor-accent-emphasis);
+  --borderColor-neutral-muted: var(--borderColor-muted);
+
+  // 代码高亮色
+  --color-prettylights-syntax-comment: #9198a1;
+  --color-prettylights-syntax-constant: #79c0ff;
+  --color-prettylights-syntax-entity: #d2a8ff;
+  --color-prettylights-syntax-keyword: #ff7b72;
+  --color-prettylights-syntax-string: #a5d6ff;
+  --color-prettylights-syntax-variable: #ffa657;
+  --color-prettylights-syntax-string-regexp: #7ee787;
+  --color-prettylights-syntax-entity-tag: #7ee787;
+  --color-prettylights-syntax-markup-heading: #1f6feb;
+  --color-prettylights-syntax-markup-bold: #f0f6fc;
+  --color-prettylights-syntax-markup-italic: #f0f6fc;
+  --color-prettylights-syntax-markup-list: #f2cc60;
+  --color-prettylights-syntax-storage-modifier-import: #f0f6fc;
+  --color-prettylights-syntax-brackethighlighter-angle: #9198a1;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #f85149;
+  --color-prettylights-syntax-constant-other-reference-link: #a5d6ff;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #3d444d;
+}
+
+// ONote 自定义暗色配色（覆盖 GitHub 默认暗色值）
 [data-theme="dark"] a {
   color: #5BA3C9;
-}
-
-[data-theme="dark"] code,
-[data-theme="dark"] pre {
-  background: #141E2C;
-  color: #D4C4A6;
 }
 
 [data-theme="dark"] blockquote {
@@ -144,7 +191,6 @@ blockquote {
 
 [data-theme="dark"] table th {
   background: #141E2C;
-  color: #D4C4A6;
   border-color: #2C3E52;
 }
 
