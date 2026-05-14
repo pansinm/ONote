@@ -22,3 +22,8 @@
     }
   }
 }
+
+// 暗色主题
+[data-theme="dark"] .wemark-block .wemark-toolbar {
+  background: rgba(14, 22, 32, 0.6);
+}

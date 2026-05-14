@@ -14,6 +14,15 @@ window.React = React;
 const root = createRoot(document.getElementById('app') as HTMLDivElement);
 root.render(<App />);
 
-window.addEventListener('message', (e) =>
-  logger.debug('Window message', e.data),
-);
+// ── 接收主窗口主题同步 ──
+window.addEventListener('message', (e) => {
+  if (e.data?.type === 'theme-change') {
+    document.documentElement.setAttribute('data-theme', e.data.theme);
+    logger.debug('Theme synced', e.data.theme);
+  }
+});
+
+// 请求初始主题
+window.addEventListener('load', () => {
+  window.parent.postMessage({ type: 'theme-request' }, '*');
+});

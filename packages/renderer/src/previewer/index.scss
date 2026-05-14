@@ -30,6 +30,8 @@ body {
   zoom: 1;
   max-zoom: 5;
   min-zoom: 0.1;
+  background: #FFFCF5;
+  color: #2C2C2C;
 }
 
 body {
@@ -115,4 +117,41 @@ blockquote {
     flex: 1;
     max-width: 1200px;
   }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 暗色主题
+// ═══════════════════════════════════════════════════════════════
+[data-theme="dark"] body {
+  background: #0E1620;
+  color: #D4C4A6;
+}
+
+[data-theme="dark"] a {
+  color: #5BA3C9;
+}
+
+[data-theme="dark"] code,
+[data-theme="dark"] pre {
+  background: #141E2C;
+  color: #D4C4A6;
+}
+
+[data-theme="dark"] blockquote {
+  border-left-color: #3D5168;
+  color: #B0A08F;
+}
+
+[data-theme="dark"] table th {
+  background: #141E2C;
+  color: #D4C4A6;
+  border-color: #2C3E52;
+}
+
+[data-theme="dark"] table td {
+  border-color: #2C3E52;
+}
+
+[data-theme="dark"] hr {
+  background: #2C3E52;
 }

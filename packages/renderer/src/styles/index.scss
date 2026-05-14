@@ -273,7 +273,7 @@ body {
   .chrome-tab-background
   > svg
   .chrome-tab-geometry {
-  fill: var(--tab-active-bg);
+  fill: var(--tab-active-bg) !important;
 }
 
 .chrome-tabs
@@ -281,26 +281,26 @@ body {
   .chrome-tab-background
   > svg
   .chrome-tab-geometry {
-  fill: var(--tab-inactive-bg);
+  fill: var(--tab-inactive-bg) !important;
 }
 
 // Tab 分隔线
 .chrome-tabs .chrome-tab .chrome-tab-dividers::before,
 .chrome-tabs .chrome-tab .chrome-tab-dividers::after {
-  background: rgba(31, 43, 58, 0.12) !important;
+  background: var(--border-light) !important;
 }
 
 // 底栏
 .chrome-tabs .chrome-tabs-bottom-bar {
-  background: var(--content-bg);
+  background: var(--content-bg) !important;
 }
 
 // Tab 标题色
 .chrome-tabs .chrome-tab .chrome-tab-title {
-  color: var(--text-body);
+  color: var(--text-body) !important;
 }
 .chrome-tabs .chrome-tab[active] .chrome-tab-title {
-  color: var(--text-heading);
+  color: var(--text-heading) !important;
 }
 
 // Tab close 按钮 hover
@@ -313,6 +313,11 @@ body {
 
 // 内容区背景
 .editor-container {
+  background: var(--content-bg);
+}
+
+// 预览区 iframe 背景（跟随内容区）
+.preview-iframe {
   background: var(--content-bg);
 }
 

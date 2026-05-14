@@ -14,11 +14,13 @@ import 'react-contexify/dist/ReactContexify.css';
 import './index.scss';
 import { getFileIconClass } from '@sinm/react-file-tree/lib/FileItemWithFileIcon';
 import { getFileName } from '@sinm/react-file-tree/lib/utils';
+import { useOnoteTheme } from '../../theme';
 
 const MENU_ID = 'TABS_MENU';
 export default observer(function EditorTabs({ pinnedRight }: { pinnedRight?: React.ReactNode }) {
   const { t } = useTranslation('common');
   const { open: openConfirm, Confirm } = useConfirm();
+  const { isDark } = useOnoteTheme();
   const { fileStore, activationStore } = stores;
   const openedFiles = activationStore.openedFiles;
   const tabs: TabProperties[] = openedFiles.map((fileUri) => {
@@ -144,6 +146,7 @@ export default observer(function EditorTabs({ pinnedRight }: { pinnedRight?: Rea
         onContextMenu={handleContextMenu}
         tabs={tabs}
         pinnedRight={pinnedRight}
+        darkMode={isDark}
       ></Tabs>
       <Menu style={{ zIndex: 10001 }} id={MENU_ID}>
         <Item data={{ action: 'CLOSE' }} onClick={handleItemClick}>
