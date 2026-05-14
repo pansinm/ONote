@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
 import {
@@ -77,7 +78,7 @@ function QRCodePopover() {
         <QrCodeRegular />
       </button>
 
-      {visible && (
+      {visible && createPortal(
         <div
           className={styles.qrPopover}
           style={{ top: popoverPos.top, right: popoverPos.right }}
@@ -87,7 +88,8 @@ function QRCodePopover() {
             {url ? <_QRCode style={{ width: '100%' }} value={url} /> : <p>...</p>}
             <p className={styles.qrHint}>{url}</p>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );
