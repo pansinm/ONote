@@ -24,6 +24,23 @@ import orderBy from 'lodash/orderBy';
 import { when } from 'mobx';
 import { getParentUri, isEquals, pathanme } from '/@/common/utils/uri';
 import fileService from '../../services/fileService';
+import Pop from '/@/utils/Pop';
+
+interface DirectoryMenuProps {
+  uri: string;
+}
+
+interface ContextMenuItemParams {
+  props?: DirectoryMenuProps;
+}
+
+function getMenuNodeUri(menuProps: unknown): string {
+  const contextMenuProps = menuProps as ContextMenuItemParams;
+  if (!contextMenuProps.props) {
+    throw new Error('Missing file tree node for context menu');
+  }
+  return contextMenuProps.props.uri;
+}
 
 // directory first, then by name
 const sorter = (treeNodes: TreeNode[]) =>
@@ -179,8 +196,37 @@ const Directory = observer(() => {
 
   const { Modal, createFile, deleteFile, renameFile } = useFileOperation();
 
+  const pasteFilesToDir = useCallback(async (targetDirUri: string) => {
+    if (stores.activationStore.dataSourceId !== 'local') {
+      Pop.showToast({ message: t('pasteLocalOnly'), type: 'warning' });
+      return;
+    }
+
+    const sourcePaths: string[] = window.simmer.readFilePathsFromClipboard();
+    if (sourcePaths.length === 0) {
+      Pop.showToast({ message: t('pasteNoFiles'), type: 'warning' });
+      return;
+    }
+
+    try {
+      const copiedNodes = await fileService.copyLocalFilesToDir(sourcePaths, targetDirUri);
+      await refreshDir(targetDirUri);
+      Pop.showToast({
+        message: t('pasteSuccess', { count: copiedNodes.length }),
+        type: 'success',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      Pop.showToast({
+        message: t('pasteFailed', { message }),
+        type: 'error',
+      });
+      throw error;
+    }
+  }, [refreshDir, t]);
+
   const handleDirMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
-    const dirUri = (menuProps as unknown as TreeNode).uri;
+    const dirUri = getMenuNodeUri(menuProps);
     switch (menu.id) {
       case 'CREATE_DIRECTORY':
         return createFile(dirUri, 'directory').then((treeNode) => {
@@ -210,13 +256,15 @@ const Directory = observer(() => {
         return navigator.clipboard.writeText(
           decodeURIComponent(pathanme(dirUri)),
         );
+      case 'PASTE':
+        return pasteFilesToDir(dirUri);
       default:
         return;
     }
   };
 
   const handleFileMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
-    const uri = (menuProps as unknown as TreeNode).uri;
+    const uri = getMenuNodeUri(menuProps);
     switch (menu.id) {
       case 'RENAME_FILE':
         // renameFile 内部调用 fileService.rename，后端发出事件后由 refreshExpandedDirs 自动刷新树
@@ -233,6 +281,8 @@ const Directory = observer(() => {
       }
       case 'OPEN_FOLDER':
         return window.simmer.openPath(getParentUri(uri));
+      case 'PASTE_TO_CONTAINING_FOLDER':
+        return pasteFilesToDir(getParentUri(uri));
       default:
         return;
     }
@@ -273,13 +323,21 @@ const Directory = observer(() => {
 
   const localDirMenus = useMemo(() =>
     stores.activationStore.dataSourceId === 'local'
-      ? [...dirMenus, { id: 'OPEN_FOLDER', title: t('openFolder') }]
+      ? [
+          ...dirMenus,
+          { id: 'PASTE', title: t('paste') },
+          { id: 'OPEN_FOLDER', title: t('openFolder') },
+        ]
       : dirMenus,
   [dirMenus, t]);
 
   const localFileMenus = useMemo(() =>
     stores.activationStore.dataSourceId === 'local'
-      ? [...fileMenus, { id: 'OPEN_FOLDER', title: t('openFolder') }]
+      ? [
+          ...fileMenus,
+          { id: 'PASTE_TO_CONTAINING_FOLDER', title: t('pasteToContainingFolder') },
+          { id: 'OPEN_FOLDER', title: t('openFolder') },
+        ]
       : fileMenus,
   [fileMenus, t]);
 

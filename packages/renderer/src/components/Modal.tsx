@@ -12,30 +12,31 @@ export interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = (props) => {
-  return (
-    <ReactModal
-      shouldCloseOnEsc={props.shouldCloseOnEsc}
-      shouldCloseOnOverlayClick={props.shouldCloseOnOverlayClick}
-      isOpen={props.isOpen}
-      style={{
-        content: {
-          width: '600px',
-          maxWidth: '80%',
-          display: 'flex',
-          // position: 'initial',
-          position: 'relative',
-          ...props.style,
+  return React.createElement(
+    ReactModal,
+    {
+      shouldCloseOnEsc: props.shouldCloseOnEsc,
+      shouldCloseOnOverlayClick: props.shouldCloseOnOverlayClick,
+      isOpen: props.isOpen,
+      style: {
+          content: {
+            width: '600px',
+            maxWidth: '80%',
+            display: 'flex',
+            // position: 'initial',
+            position: 'relative',
+            ...props.style,
+          },
+          overlay: {
+            background: 'rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          },
         },
-        overlay: {
-          background: 'rgba(0, 0, 0, 0.1)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        },
-      }}
-      onRequestClose={props.onRequestClose}
-      appElement={document.getElementById('app')!}
-    >
+      onRequestClose: props.onRequestClose,
+      appElement: document.getElementById('app')!,
+    },
       <div
         style={{
           height: '100%',
@@ -44,8 +45,7 @@ const Modal: React.FC<ModalProps> = (props) => {
       >
         <h3>{props.title}</h3>
         {props.children}
-      </div>
-    </ReactModal>
+      </div>,
   );
 };
 

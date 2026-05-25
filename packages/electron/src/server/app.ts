@@ -1,7 +1,6 @@
 import express from 'express';
 import { app as electronApp } from 'electron';
 import path from 'path';
-import multer from 'multer';
 import { v2 as webdav } from 'webdav-server';
 import os from 'os';
 import fs from 'fs/promises';
@@ -13,8 +12,9 @@ import apiRouter from './api';
 import { errorHandler } from './api/errors';
 import { handleMcpRequest } from './mcp';
 
+const multer = require('multer') as typeof import('multer');
+
 const logger = getLogger('ServerApp');
-const upload = multer({ dest: os.tmpdir() });
 
 const app = express();
 
@@ -48,8 +48,20 @@ const staticRoot = path.join(
 
 app.use(express.static(staticRoot));
 
-app.post('/upload', upload.single('file'), async (req, res, next) => {
+const uploadSingleFile = multer({ dest: os.tmpdir() }).single('file');
+
+app.post('/upload', async (req, res, next) => {
   try {
+    await new Promise<void>((resolve, reject) => {
+      uploadSingleFile(req, res, (error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve();
+      });
+    });
+
     if (req.file) {
       const { originalname, path } = req.file;
       const { toFile } = req.body;

@@ -86,6 +86,7 @@ const MarkdownResourcePanel: FC<MarkdownResourcePanelProps> = observer(
               uri={props.uri}
             />
             <DragHandle
+              type="editor-preview"
               right="0"
               onStartDrag={handleStartDrag}
               isDragging={isDragging}

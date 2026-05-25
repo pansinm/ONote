@@ -114,7 +114,7 @@ class ErrorHandler {
   /**
    * 处理子进程崩溃
    */
-  private handleChildProcessGone(details: Electron.ChildProcessGoneDetails): void {
+  private handleChildProcessGone(details: Electron.Details): void {
     const appError = new AppError(
       '子进程崩溃',
       ErrorCode.OPERATION_FAILED,

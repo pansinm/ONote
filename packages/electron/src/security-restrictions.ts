@@ -27,6 +27,13 @@ const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<
     | 'fullscreen'
     | 'openExternal'
     | 'unknown'
+    | 'idle-detection'
+    | 'keyboardLock'
+    | 'speaker-selection'
+    | 'storage-access'
+    | 'top-level-storage-access'
+    | 'window-management'
+    | 'fileSystem'
   >
 >(
   process.env.NODE_ENV === 'development'
@@ -107,8 +114,10 @@ app.on('web-contents-created', (_, contents) => {
   contents.session.setPermissionRequestHandler(
     (webContents, permission, callback) => {
       const { origin } = new URL(webContents.getURL());
-      const permissionGranted =
-        !!ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin)?.has(permission);
+      const allowedPermissions = ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin);
+      const permissionGranted = allowedPermissions
+        ? Array.from(allowedPermissions).includes(permission)
+        : false;
 
       callback(permissionGranted);
 

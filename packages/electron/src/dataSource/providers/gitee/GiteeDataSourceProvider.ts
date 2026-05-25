@@ -175,6 +175,10 @@ class GiteeDataSourceProvider implements IDataSourceProvider<AuthForm> {
     // return this.readFileAsTreeNode(finalPath);
   }
 
+  async copyLocalFilesToDir(): Promise<TreeNode[]> {
+    throw new Error('Pasting local files is only supported for local notebooks');
+  }
+
   async listDir(uri: string): Promise<TreeNode[]> {
     const { namespace, pathname, repo } = parseGiteeUri(uri);
     const dirUri = repo && !pathname ? uri + '/' : uri;

@@ -19,6 +19,7 @@ export interface IDataSourceProvider<T> {
   mkdir(uri: string): Promise<void>;
 
   // 树
+  copyLocalFilesToDir(sourcePaths: string[], targetDirUri: string): Promise<TreeNode[]>;
   rename(uri: string, name: string): Promise<TreeNode>;
   move(sourceUri: string, targetDirUri: string): Promise<TreeNode>;
   listDir(uri: string): Promise<TreeNode[]>;

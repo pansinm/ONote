@@ -1,5 +1,9 @@
 import {contextBridge} from 'electron';
 
+interface Exposed {
+  [key: string]: unknown;
+}
+
 /**
  * Typesafe wrapper for `electron.contextBridge.exposeInMainWorld`.
  * Guarantees that all exposed APIs will comply with contracts.

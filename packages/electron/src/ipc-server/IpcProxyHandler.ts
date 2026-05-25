@@ -145,7 +145,7 @@ export function createIpcProxyHandlerClass<T extends Record<string, any>>(
   target: T,
   targetName: string,
   options?: IpcProxyHandlerOptions,
-): IpcHandlerClass<typeof IpcProxyHandler<T>> {
+): IpcHandlerClass<typeof IpcHandler> {
   return class extends IpcProxyHandler<T> {
     constructor(sender: WebContents, namespace: string) {
       super(target, targetName, sender, namespace, options);

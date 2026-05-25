@@ -57,6 +57,9 @@ class FileService {
   move(uri: string, targetDirUri: string): Promise<TreeNode> {
     return dataSource.invoke('move', uri, targetDirUri);
   }
+  copyLocalFilesToDir(sourcePaths: string[], targetDirUri: string): Promise<TreeNode[]> {
+    return dataSource.invoke('copyLocalFilesToDir', sourcePaths, targetDirUri);
+  }
   rename(uri: string, name: string): Promise<TreeNode> {
     return dataSource.invoke('rename', uri, name);
   }

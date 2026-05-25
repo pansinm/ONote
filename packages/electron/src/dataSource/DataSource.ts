@@ -117,6 +117,16 @@ class DataSource extends EventEmitter implements IDataSourceProvider<unknown> {
       return result;
     });
   }
+  async copyLocalFilesToDir(sourcePaths: string[], targetDirUri: string) {
+    const results = await this.provider.copyLocalFilesToDir(sourcePaths, targetDirUri);
+    results.forEach((node) => {
+      this.emit(EventNames.FileCreated, node.uri);
+      if (node.type === 'file') {
+        this.emit(EventNames.FileContentChanged, node.uri);
+      }
+    });
+    return results;
+  }
   listDir(uri: string) {
     return this.provider.listDir(uri);
   }

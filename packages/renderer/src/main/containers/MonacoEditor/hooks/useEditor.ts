@@ -55,7 +55,7 @@ function useEditor() {
       },
       minimap: {
         enabled: true,
-        autohide: true as const,
+        autohide: 'mouseover',
       },
       autoClosingBrackets: 'always',
       autoClosingQuotes: 'always',

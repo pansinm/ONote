@@ -21,7 +21,8 @@ function QRCodePopover() {
 
   useEffect(() => {
     if (!visible) return;
-    window.simmer.localIpV4().then((ip: string) => {
+    window.simmer.localIpV4().then((ip) => {
+      if (!ip) return;
       setUrl(
         `http://${ip}:${stores.settingStore.settings['server.port']}/mobile?file=${stores.activationStore.activeFileUri}`,
       );

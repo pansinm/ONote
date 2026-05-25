@@ -115,16 +115,17 @@ function ImagePreviewModalComponent({
     return null;
   };
 
-  return (
-    <ReactModal
-      isOpen={isOpen}
-      onRequestClose={handleClose}
-      shouldCloseOnEsc={false}
-      className={styles.PreviewModal}
-      overlayClassName={styles.Overlay}
-      style={{ overlay: overlayStyle }}
-      appElement={document.getElementById('app')!}
-    >
+  return React.createElement(
+    ReactModal,
+    {
+      isOpen,
+      onRequestClose: handleClose,
+      shouldCloseOnEsc: false,
+      className: styles.PreviewModal,
+      overlayClassName: styles.Overlay,
+      style: { overlay: overlayStyle },
+      appElement: document.getElementById('app')!,
+    },
       <div className={styles.Content}>
         <Draggable
           nodeRef={containerRef as React.RefObject<HTMLDivElement>}
@@ -159,7 +160,6 @@ function ImagePreviewModalComponent({
           </div>
         </Draggable>
       </div>
-    </ReactModal>
   );
 }
 

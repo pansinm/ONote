@@ -14,7 +14,6 @@ import { clipboard, nativeImage } from 'electron';
 import { exposeInMainWorld } from './exposeInMainWorld';
 import { nodeCrypto } from '../common/nodeCrypto';
 import * as defaultGateway from 'default-gateway';
-import { onote } from './onote';
 
 // Preload 脚本使用简化的日志实现，避免依赖主进程模块
 const debugLog = (...args: unknown[]) => {
@@ -65,12 +64,23 @@ export const simmer = {
         ),
     );
   },
+  readFilePathsFromClipboard() {
+    const uriList = clipboard.read('text/uri-list');
+    const uris = uriList
+      .split(/\r?\n/)
+      .map((uri) => uri.trim())
+      .filter((uri) => uri.length > 0 && !uri.startsWith('#'));
+
+    return uris
+      .filter((uri) => uri.startsWith('file://'))
+      .map((uri) => fileURLToPath(uri));
+  },
   async readImageFromClipboard() {
     const img = clipboard.readImage();
     if (img.isEmpty()) {
       return false;
     }
-    return new Blob([img.toPNG()], { type: 'image/png' });
+    return new Blob([new Uint8Array(img.toPNG())], { type: 'image/png' });
   },
   async renderPlantUML(
     plantuml: string,
@@ -115,8 +125,8 @@ export const simmer = {
     clipboard.writeBuffer('text/uri-list', Buffer.from(url, 'utf-8'));
   },
   async openExternal(uri: string) {
-    const localPath = await onote.dataSource.invoke('cache', uri);
-    shell.openExternal(pathToFileURL(localPath).toString());
+    const localPath = fileURLToPath(uri);
+    await shell.openExternal(pathToFileURL(localPath).toString());
   },
 };
 

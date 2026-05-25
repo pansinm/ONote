@@ -21,6 +21,35 @@ async function readFileAsTreeNode(filePath: string): Promise<TreeNode> {
   return statsToTreeNode(filePath, stats);
 }
 
+async function pathExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function resolveAvailablePath(targetPath: string): Promise<string> {
+  if (!(await pathExists(targetPath))) {
+    return targetPath;
+  }
+
+  const dirPath = path.dirname(targetPath);
+  const ext = path.extname(targetPath);
+  const baseName = path.basename(targetPath, ext);
+  let index = 1;
+
+  while (true) {
+    const suffix = index === 1 ? ' copy' : ` copy ${index}`;
+    const candidate = path.join(dirPath, `${baseName}${suffix}${ext}`);
+    if (!(await pathExists(candidate))) {
+      return candidate;
+    }
+    index += 1;
+  }
+}
+
 class LocalDataSourceProvider implements IDataSourceProvider<null> {
   rootUri?: string;
 
@@ -89,6 +118,29 @@ class LocalDataSourceProvider implements IDataSourceProvider<null> {
     const finalPath = path.join(target, filename);
     await fs.rename(source, finalPath);
     return readFileAsTreeNode(finalPath);
+  }
+  async copyLocalFilesToDir(sourcePaths: string[], targetDirUri: string) {
+    const targetDirPath = url.fileURLToPath(targetDirUri);
+    const copiedNodes: TreeNode[] = [];
+
+    for (const sourcePath of sourcePaths) {
+      const stats = await fs.stat(sourcePath);
+      const targetPath = await resolveAvailablePath(
+        path.join(targetDirPath, path.basename(sourcePath)),
+      );
+
+      if (stats.isDirectory()) {
+        await fs.cp(sourcePath, targetPath, { recursive: true });
+      } else if (stats.isFile()) {
+        await fs.copyFile(sourcePath, targetPath);
+      } else {
+        continue;
+      }
+
+      copiedNodes.push(await readFileAsTreeNode(targetPath));
+    }
+
+    return copiedNodes;
   }
   async listDir(uri: string) {
     const localPath = url.fileURLToPath(uri);

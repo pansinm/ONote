@@ -4,6 +4,8 @@ import {
   Tab,
   makeStyles,
   shorthands,
+  type SelectTabData,
+  type SelectTabEvent,
 } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
@@ -37,7 +39,7 @@ const Setting: React.FC = observer(() => {
   const [tab, setTab] = useState(
     () => localStorage.getItem(SETTINGS_TAB_KEY) || 'general',
   );
-  const handleTabSelect = (e: unknown, data: { value: string | number }) => {
+  const handleTabSelect = (_event: SelectTabEvent, data: SelectTabData) => {
     const value = String(data.value);
     setTab(value);
     localStorage.setItem(SETTINGS_TAB_KEY, value);

@@ -110,6 +110,10 @@ class SSHDataSourceProvider implements IDataSourceProvider<AuthForm> {
     return this.readFileAsTreeNode(finalPath);
   }
 
+  async copyLocalFilesToDir(): Promise<TreeNode[]> {
+    throw new Error('Pasting local files is only supported for local notebooks');
+  }
+
   async listDir(uri: string) {
     assert(this.sftp);
     const remotePath = uriToPath(uri);
