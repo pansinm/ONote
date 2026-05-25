@@ -60,24 +60,28 @@ const Directory = observer(() => {
   const { show: showDirMenu } = useContextMenu({ id: DIRECTORY_MENU_ID });
   const { show: showFileMenu } = useContextMenu({ id: FILE_MENU_ID });
 
+  const refreshDir = useCallback((dirUri: string) => {
+    return fileService.listDir(dirUri).then((children) => {
+      setTree((t) => {
+        if (!t) return t;
+        return utils.assignTreeNode(t, dirUri, {
+          children,
+          expanded: true,
+        });
+      });
+    });
+  }, []);
+
   const toggleExpanded = (treeNode: TreeNode) => {
     if (treeNode.type !== 'directory') return;
-    const loading = !treeNode.children;
+    const shouldLoadChildren = !treeNode.children;
     setTree((t) =>
       utils.assignTreeNode(t, treeNode.uri, {
         expanded: !treeNode.expanded,
-        loading,
-      } as any),
+      }),
     );
-    if (loading) {
-      fileService.listDir(treeNode.uri).then((children) => {
-        setTree((t) =>
-          utils.assignTreeNode(t, treeNode.uri, {
-            loading: false,
-            children,
-          } as any),
-        );
-      });
+    if (shouldLoadChildren) {
+      refreshDir(treeNode.uri);
     }
   };
 
@@ -144,17 +148,12 @@ const Directory = observer(() => {
 
         // 异步刷新各个目录的 children
         dirsToRefresh.forEach((dirUri) => {
-          fileService.listDir(dirUri).then((children) => {
-            setTree((t) => {
-              if (!t) return t;
-              return utils.assignTreeNode(t, dirUri, { children, expanded: true } as any);
-            });
-          });
+          refreshDir(dirUri);
         });
         return prev; // 不直接改 tree，异步回调里改
       });
     }, 100);
-  }, []);
+  }, [refreshDir]);
 
   // 组件卸载时清理定时器
   useEffect(() => {
@@ -186,15 +185,15 @@ const Directory = observer(() => {
       case 'CREATE_DIRECTORY':
         return createFile(dirUri, 'directory').then((treeNode) => {
           if (treeNode) {
-            // 确保父目录展开，children 由事件驱动的 refreshExpandedDirs 刷新
-            setTree((t) => utils.assignTreeNode(t, dirUri, { expanded: true } as any));
+            // 右键目录创建后立刻刷新父目录，避免只有 expanded 状态变化导致目录反而被折叠
+            refreshDir(dirUri);
           }
         });
       case 'CREATE_FILE':
         return createFile(dirUri, 'file').then((treeNode) => {
           if (treeNode) {
-            // 确保父目录展开，children 由事件驱动的 refreshExpandedDirs 刷新
-            setTree((t) => utils.assignTreeNode(t, dirUri, { expanded: true } as any));
+            // 右键目录创建后立刻刷新父目录，保持展开并展示新笔记
+            refreshDir(dirUri);
             stores.activationStore.activeFile(treeNode.uri);
           }
         });
