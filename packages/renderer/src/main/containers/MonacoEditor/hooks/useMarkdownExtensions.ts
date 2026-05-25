@@ -2,14 +2,10 @@ import * as monaco from 'monaco-editor';
 import { useEffect } from 'react';
 import { activate } from '/@/main/monaco';
 import { MonacoMarkdownExtension } from 'monaco-markdown';
-import quickInsertCompletionProvider from '/@/main/monaco/completions';
 
 function useMarkdownExtensions(editor?: monaco.editor.IStandaloneCodeEditor) {
   useEffect(() => {
     if (editor) {
-      quickInsertCompletionProvider.registerTriggerSuggest(() => {
-        editor.trigger('quickInsertCompletionProvider', 'editor.action.triggerSuggest', {});
-      });
       new MonacoMarkdownExtension().activate(editor);
       activate(editor);
       editor.onKeyDown((e) => {
