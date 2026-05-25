@@ -6,6 +6,28 @@ class QuickInsertCompletionItemProvider
 {
   triggerCharacters = ['@'];
 
+  private triggerSuggest?: () => void;
+  private refreshTimer: ReturnType<typeof setTimeout> | undefined;
+
+  registerTriggerSuggest(triggerSuggest: () => void) {
+    this.triggerSuggest = triggerSuggest;
+  }
+
+  refreshTriggerSuggest() {
+    if (!this.triggerSuggest) {
+      return;
+    }
+
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+    }
+
+    this.refreshTimer = setTimeout(() => {
+      this.triggerSuggest?.();
+      this.refreshTimer = undefined;
+    }, 0);
+  }
+
   provideCompletionItems(
     model: monaco.editor.ITextModel,
     position: monaco.Position,
