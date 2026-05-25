@@ -9,6 +9,7 @@ import type { TreeNode } from '@sinm/react-file-tree/lib/type';
 import FileTreeItem from '/@/components/FileTreeItem';
 import Menu from '/@/components/Menu';
 import type { MenuItem, MenuProps } from '/@/components/Menu';
+import type { ItemParams } from 'react-contexify';
 import { useContextMenu } from 'react-contexify';
 import useFileOperation from '/@/hooks/useFileOperation';
 import NoDirectory from './NoDirectory';
@@ -30,16 +31,11 @@ interface DirectoryMenuProps {
   uri: string;
 }
 
-interface ContextMenuItemParams {
-  props?: DirectoryMenuProps;
-}
-
-function getMenuNodeUri(menuProps: unknown): string {
-  const contextMenuProps = menuProps as ContextMenuItemParams;
-  if (!contextMenuProps.props) {
+function getMenuNodeUri(itemParams: ItemParams<DirectoryMenuProps>): string {
+  if (!itemParams.props) {
     throw new Error('Missing file tree node for context menu');
   }
-  return contextMenuProps.props.uri;
+  return itemParams.props.uri;
 }
 
 // directory first, then by name

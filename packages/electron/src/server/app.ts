@@ -17,6 +17,7 @@ const multer = require('multer') as typeof import('multer');
 const logger = getLogger('ServerApp');
 
 const app = express();
+const API_JSON_BODY_LIMIT = '512mb';
 
 const userManager = new webdav.SimpleUserManager();
 const user = userManager.addUser('webdav', 'webdav', false);
@@ -39,7 +40,7 @@ const webdavServer = new webdav.WebDAVServer({
   },
 });
 
-app.use(express.json({ limit: '100m' }));
+app.use(express.json({ limit: API_JSON_BODY_LIMIT }));
 
 const staticRoot = path.join(
   electronApp.getAppPath(),

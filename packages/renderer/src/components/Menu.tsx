@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import React from 'react';
-import type { MenuProps as RMenuProps } from 'react-contexify';
+import type { ItemParams } from 'react-contexify';
 import { Item, Menu as RMenu, Submenu } from 'react-contexify';
 
 export interface MenuItem {
@@ -12,7 +12,7 @@ export interface MenuItem {
 
 export interface MenuProps {
   menuId: string;
-  onClick(menu: MenuItem, props: RMenuProps): void;
+  onClick(menu: MenuItem, itemParams: ItemParams): void;
   menus: MenuItem[];
 }
 
@@ -30,8 +30,8 @@ const Menu: FC<MenuProps> = ({ menuId, menus, onClick }) => {
         <Item
           key={menu.id}
           data={menu}
-          onClick={({ data, props }) => {
-            onClick(data, props);
+          onClick={(itemParams) => {
+            onClick(itemParams.data, itemParams);
           }}
         >
           {menu.title}
