@@ -99,7 +99,32 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 12px;
+  padding-top: 28px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.qrCloseButton {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 20px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-body);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
 }
 
 .qrWrap {

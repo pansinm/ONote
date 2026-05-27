@@ -12,6 +12,25 @@ import stores from '/@/main/stores';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import styles from './index.module.scss';
 
+const DEFAULT_SERVER_PORT = '21221';
+
+function getServerPort() {
+  const port = stores.settingStore.settings['server.port'];
+  if (typeof port === 'string' && port.trim()) {
+    return port.trim();
+  }
+  if (typeof port === 'number' && Number.isFinite(port)) {
+    return String(port);
+  }
+  return DEFAULT_SERVER_PORT;
+}
+
+function buildMobileInsertUrl(ip: string, fileUri: string) {
+  const url = new URL(`http://${ip}:${getServerPort()}/mobile`);
+  url.searchParams.set('file', fileUri);
+  return url.toString();
+}
+
 function QRCodePopover() {
   const { t } = useTranslation('common');
   const [url, setUrl] = useState('');
@@ -23,21 +42,23 @@ function QRCodePopover() {
     if (!visible) return;
     window.simmer.localIpV4().then((ip) => {
       if (!ip) return;
-      setUrl(
-        `http://${ip}:${stores.settingStore.settings['server.port']}/mobile?file=${stores.activationStore.activeFileUri}`,
-      );
+      setUrl(buildMobileInsertUrl(ip, stores.activationStore.activeFileUri));
     });
   }, [visible, stores.activationStore.activeFileUri]);
+
+  const closePopover = useCallback(() => {
+    setVisible(false);
+  }, []);
 
   // 键盘 Escape 关闭弹层
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Escape' && visible) {
         e.stopPropagation();
-        setVisible(false);
+        closePopover();
       }
     },
-    [visible],
+    [closePopover, visible],
   );
 
   // 点击弹层外部关闭
@@ -46,12 +67,12 @@ function QRCodePopover() {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!target.closest(`.${styles.qrPopover}`) && !target.closest(`.${styles.qrTrigger}`)) {
-        setVisible(false);
+        closePopover();
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [visible]);
+  }, [closePopover, visible]);
 
   const togglePopover = useCallback(() => {
     setVisible((v) => {
@@ -84,6 +105,15 @@ function QRCodePopover() {
           className={styles.qrPopover}
           style={{ top: popoverPos.top, right: popoverPos.right }}
         >
+          <button
+            type="button"
+            className={styles.qrCloseButton}
+            aria-label={t('close')}
+            title={t('close')}
+            onClick={closePopover}
+          >
+            ×
+          </button>
           <div className={styles.qrWrap}>
             <p className={styles.qrTitle}>{t('insertFileFromPhone')}</p>
             {url ? <_QRCode style={{ width: '100%' }} value={url} /> : <p>...</p>}
