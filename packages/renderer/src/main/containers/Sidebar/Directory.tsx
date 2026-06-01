@@ -339,10 +339,11 @@ const Directory = observer(() => {
 
   const handleItemClick = (treeNode: TreeNode) => {
     if (treeNode.type === 'directory') {
-      // 点击已展开的当前活跃目录 → 折叠
-      // 点击未展开目录或非活跃目录 → 展开
-      if (!treeNode.expanded || stores.activationStore.activeDirUri === treeNode.uri) {
-        toggleExpanded(treeNode);
+      // 目录每次点击都切换展开/收缩；当前活跃目录再次点击则同时取消激活
+      toggleExpanded(treeNode);
+      if (stores.activationStore.activeDirUri === treeNode.uri) {
+        stores.activationStore.activeDir('');
+        return;
       }
       stores.activationStore.activeDir(treeNode.uri);
     } else {

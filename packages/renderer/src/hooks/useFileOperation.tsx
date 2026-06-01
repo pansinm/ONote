@@ -126,14 +126,12 @@ function useFileOperation() {
 
   const Modal = useCallback(
     () => {
-      const Component = () => (
+      return (
         <>
           <Prompt />
           <Confirm />
         </>
       );
-      Component.displayName = 'Modal';
-      return <Component />;
     },
     [Prompt, Confirm],
   );
