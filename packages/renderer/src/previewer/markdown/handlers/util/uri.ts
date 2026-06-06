@@ -1,4 +1,4 @@
-import { resolveUri, toONoteUri } from '/@/common/utils/uri';
+import { resolveMarkdownLinkUri, toONoteUri } from '/@/common/utils/uri';
 
 export const resolveAssetUri = (path: string, ctx: any) => {
   // uri
@@ -7,9 +7,7 @@ export const resolveAssetUri = (path: string, ctx: any) => {
   }
 
   try {
-    const uri = /^\//.test(path)
-      ? resolveUri(ctx.rootDirUri + '/', './' + path)
-      : resolveUri(ctx.fileUri, path);
+    const uri = resolveMarkdownLinkUri(path, ctx.fileUri, ctx.rootDirUri);
     return toONoteUri(uri);
   } catch (err) {
     return path;

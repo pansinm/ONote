@@ -117,6 +117,22 @@ export const resolveUri = (uri: string, relative: string) => {
   return new URL(relative, uri).toString();
 };
 
+export const resolveMarkdownLinkUri = (
+  link: string,
+  fileUri: string,
+  rootDirUri: string,
+) => {
+  if (/^(.*?):\/\//.test(link)) {
+    return link;
+  }
+
+  if (link.startsWith('/')) {
+    return resolveUri(rootDirUri + '/', '.' + link);
+  }
+
+  return resolveUri(fileUri, link);
+};
+
 export const toONoteUri = (uri: string) => {
   return uri.replace(/^file:/, 'onote:');
 };

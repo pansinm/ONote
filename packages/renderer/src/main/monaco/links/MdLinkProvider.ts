@@ -1,5 +1,6 @@
 import * as monaco from 'monaco-editor';
 import stores from '../../stores';
+import { resolveMarkdownLinkUri } from '/@/common/utils/uri';
 
 class MDLinkProvider implements monaco.languages.LinkProvider {
   provideLinks(
@@ -17,10 +18,11 @@ class MDLinkProvider implements monaco.languages.LinkProvider {
       )
       .map((match) => {
         const [_, link] = match.matches || [];
-        let url = new URL(link, model.uri.toString()).toString();
-        if (link.startsWith('/')) {
-          url = stores.activationStore.rootUri + link;
-        }
+        const url = resolveMarkdownLinkUri(
+          link,
+          model.uri.toString(),
+          stores.activationStore.rootUri,
+        );
         return {
           url,
           range: new monaco.Range(

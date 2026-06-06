@@ -2,26 +2,11 @@ import * as monaco from 'monaco-editor';
 import i18next from '../../i18n';
 import fileService from '/@/main/services/fileService';
 import type { TreeNode } from '@sinm/react-file-tree';
+import stores from '/@/main/stores';
+import { resolveMarkdownLinkUri } from '/@/common/utils/uri';
 
 interface FileNode extends TreeNode {
   name: string;
-}
-
-function joinPath(...paths: string[]): string {
-  const result = paths
-    .join('/')
-    .split('/')
-    .filter((part) => part !== '' && part !== '.')
-    .reduce((acc, part) => {
-      if (part === '..') {
-        acc.pop();
-      } else {
-        acc.push(part);
-      }
-      return acc;
-    }, [] as string[])
-    .join('/');
-  return result || '.';
 }
 
 interface LinkContext {
@@ -99,16 +84,10 @@ function parseLinkContext(
   };
 }
 
-function resolvePath(baseFileUri: string, inputPath: string): string | null {
+function resolvePath(baseFileUri: string, rootDirUri: string, inputPath: string): string | null {
   try {
-    const url = new URL(baseFileUri);
-
-    if (inputPath.startsWith('/')) {
-      return inputPath;
-    }
-
-    const dirPath = url.pathname.substring(0, url.pathname.lastIndexOf('/'));
-    const resolved = joinPath(dirPath, inputPath);
+    const resolvedUri = resolveMarkdownLinkUri(inputPath, baseFileUri, rootDirUri);
+    const resolved = new URL(resolvedUri).pathname;
 
     if (resolved === '.' || resolved === '..' || resolved.includes('/../')) {
       return null;
@@ -120,34 +99,51 @@ function resolvePath(baseFileUri: string, inputPath: string): string | null {
   }
 }
 
+function buildUriWithPath(baseUri: string, pathname: string) {
+  const url = new URL(baseUri);
+  return `${url.protocol}//${url.host}${pathname}`;
+}
+
+function getCompletionLabel(inputPath: string, fileName: string) {
+  if (!inputPath.startsWith('/')) {
+    return fileName;
+  }
+  const lastSlashIndex = inputPath.lastIndexOf('/');
+  const prefix = inputPath.substring(0, lastSlashIndex + 1) || '/';
+  return `${prefix}${fileName}`;
+}
+
 async function getCompletionFiles(
   baseFileUri: string,
+  rootDirUri: string,
   inputPath: string,
 ): Promise<
   Array<{ name: string; uri: string; type: 'file' | 'directory' }>
 > {
   try {
-    const resolvedPath = resolvePath(baseFileUri, inputPath);
+    const resolvedPath = resolvePath(baseFileUri, rootDirUri, inputPath);
     if (!resolvedPath) {
       return [];
     }
 
-    const url = new URL(baseFileUri);
-    const origin = url.origin;
+    const url = new URL(inputPath.startsWith('/') ? rootDirUri : baseFileUri);
 
     let targetUri: string;
     let filter = '';
 
     if (inputPath.endsWith('/') || inputPath === '') {
-      targetUri = origin + resolvedPath;
+      targetUri = buildUriWithPath(url.toString(), resolvedPath);
       filter = '';
     } else {
       const lastSlashIndex = resolvedPath.lastIndexOf('/');
       if (lastSlashIndex === -1) {
-        targetUri = origin + '/';
+        targetUri = buildUriWithPath(url.toString(), '/');
         filter = inputPath;
       } else {
-        targetUri = origin + resolvedPath.substring(0, lastSlashIndex + 1);
+        targetUri = buildUriWithPath(
+          url.toString(),
+          resolvedPath.substring(0, lastSlashIndex + 1),
+        );
         filter = resolvedPath.substring(lastSlashIndex + 1);
       }
     }
@@ -186,7 +182,11 @@ class PathCompletionProvider implements monaco.languages.CompletionItemProvider 
     }
 
     const currentFileUri = model.uri.toString();
-    const files = await getCompletionFiles(currentFileUri, linkContext.basePath);
+    const files = await getCompletionFiles(
+      currentFileUri,
+      stores.activationStore.rootUri,
+      linkContext.basePath,
+    );
 
     if (files.length === 0) {
       return { suggestions: [] };
@@ -229,11 +229,12 @@ class PathCompletionProvider implements monaco.languages.CompletionItemProvider 
             : `1${file.name.toLowerCase()}`;
 
         return {
-          label: file.name,
+          label: getCompletionLabel(linkContext.basePath, file.name),
           kind:
             file.type === 'directory'
               ? monaco.languages.CompletionItemKind.Folder
               : monaco.languages.CompletionItemKind.File,
+          filterText: file.name,
           insertText,
           range,
           sortText,

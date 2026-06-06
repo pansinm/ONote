@@ -7,6 +7,7 @@ import {
   toONoteUri,
   isEquals,
   getParentUri,
+  resolveMarkdownLinkUri,
 } from '../uri';
 
 test('fileType', () => {
@@ -24,6 +25,18 @@ test('isMarkdown', () => {
 
 test('resolveUri', () => {
   expect(resolveUri('file:///a/b/', 'c.txt')).toBe('file:///a/b/c.txt');
+});
+
+test('resolveMarkdownLinkUri', () => {
+  expect(
+    resolveMarkdownLinkUri('/test.md', 'file:///data/docs/current.md', 'file:///data/docs'),
+  ).toBe('file:///data/docs/test.md');
+  expect(
+    resolveMarkdownLinkUri('test.md', 'file:///data/docs/current.md', 'file:///data/docs'),
+  ).toBe('file:///data/docs/test.md');
+  expect(
+    resolveMarkdownLinkUri('https://example.com/a.md', 'file:///data/docs/current.md', 'file:///data/docs'),
+  ).toBe('https://example.com/a.md');
 });
 
 test('toONoteUri', () => {
