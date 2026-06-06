@@ -51,7 +51,6 @@ const sorter = (treeNodes: TreeNode[]) =>
 
 const Directory = observer(() => {
   const rootUri = stores.activationStore.rootUri;
-  const activeFileUri = stores.activationStore.activeFileUri;
   const [tree, setTree] = useState<TreeNode | undefined>(undefined);
   const { t } = useTranslation('menu');
 
@@ -78,7 +77,7 @@ const Directory = observer(() => {
       setTree((t) => {
         if (!t) return t;
         return utils.assignTreeNode(t, dirUri, {
-          children,
+          children: children.filter((child) => child.type === 'directory'),
           expanded: true,
         });
       });
@@ -105,7 +104,9 @@ const Directory = observer(() => {
   useEffect(() => {
     if (rootUri) {
       fileService.getTreeNode(rootUri).then((node) => {
-        // 不再过滤：显示所有文件和文件夹
+        node.children = node.children?.filter(
+          (item) => item.type === 'directory',
+        );
         setTree(node);
         toggleExpanded(node);
       });
@@ -285,23 +286,14 @@ const Directory = observer(() => {
   };
 
   const treeItemRenderer: FileTreeProps['itemRenderer'] = useCallback(
-    (treeNode: TreeNode) => {
-      const isDir = treeNode.type === 'directory';
-      return (
-        <FileTreeItem
-          active={!isDir && isEquals(treeNode.uri, activeFileUri)}
-          onContextMenu={(event) => {
-            if (isDir) {
-              showDirMenu(event, { props: treeNode });
-            } else {
-              showFileMenu(event, { props: treeNode });
-            }
-          }}
-          treeNode={treeNode}
-        />
-      );
-    },
-    [showDirMenu, showFileMenu, activeFileUri],
+    (treeNode: TreeNode) => (
+      <FileTreeItem
+        active={isEquals(treeNode.uri, stores.activationStore.activeDirUri)}
+        onContextMenu={(event) => showDirMenu(event, { props: treeNode })}
+        treeNode={treeNode}
+      />
+    ),
+    [showDirMenu],
   );
 
   const handleDrop: FileTreeProps['onDrop'] = async (e, fromUri, toDirUri) => {
@@ -338,18 +330,15 @@ const Directory = observer(() => {
   [fileMenus, t]);
 
   const handleItemClick = (treeNode: TreeNode) => {
-    if (treeNode.type === 'directory') {
-      // 目录每次点击都切换展开/收缩；当前活跃目录再次点击则同时取消激活
+    if (
+      !treeNode.expanded ||
+      stores.activationStore.activeDirUri === treeNode.uri
+    ) {
       toggleExpanded(treeNode);
-      if (stores.activationStore.activeDirUri === treeNode.uri) {
-        stores.activationStore.activeDir('');
-        return;
-      }
-      stores.activationStore.activeDir(treeNode.uri);
     } else {
-      // 文件：直接打开
-      stores.activationStore.activeFile(treeNode.uri);
+      setTree((tree) => utils.replaceTreeNode(tree, treeNode.uri, { ...treeNode }));
     }
+    stores.activationStore.activeDir(treeNode.uri);
   };
 
   return (
@@ -358,7 +347,6 @@ const Directory = observer(() => {
         draggable
         sorter={sorter}
         tree={tree}
-        activatedUri={activeFileUri}
         onDrop={handleDrop}
         emptyRenderer={() => <NoDirectory>{t('openFolderHint')}</NoDirectory>}
         onItemClick={handleItemClick}

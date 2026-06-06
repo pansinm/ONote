@@ -48,7 +48,8 @@ body {
 // ═══════════════════════════════════════════════════════════════
 :root {
   --editor-width: 50%;
-  --sidebar-width: 230px;
+  --sidebar-width: 200px;
+  --file-list-width: 230px;
   color-scheme: light;
 
   // ── 纸色阶 (Surface) ──
@@ -252,6 +253,12 @@ body {
 // ═══════════════════════════════════════════════════════════════
 .sidebar {
   width: var(--sidebar-width);
+  min-width: 150px;
+  position: relative;
+}
+
+.file-list {
+  width: var(--file-list-width);
   min-width: 150px;
   position: relative;
 }
