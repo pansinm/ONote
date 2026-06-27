@@ -11,6 +11,7 @@ interface SearchListProps {
   keyword: string;
   rootUri?: string;
   onItemClick(treeNode: TreeNode): void;
+  onContextMenu?(event: React.MouseEvent, treeNode: TreeNode): void;
 }
 
 function highlightText(text: string, keyword: string, highlightClassName: string): ReactNode {
@@ -58,6 +59,7 @@ const SearchList: FC<SearchListProps> = ({
   keyword,
   rootUri,
   onItemClick,
+  onContextMenu,
 }) => {
   return (
     <div className={styles.list}>
@@ -74,6 +76,11 @@ const SearchList: FC<SearchListProps> = ({
             data-search-result-item={index === 0 ? 'first' : 'item'}
             className={`${styles.item} ${active ? styles.itemActive : ''}`.trim()}
             onClick={() => onItemClick(node)}
+            onContextMenu={
+              onContextMenu
+                ? (e) => onContextMenu(e, node)
+                : undefined
+            }
             title={decodeURIComponent(node.uri)}
             aria-current={active ? 'true' : undefined}
             aria-label={`${fileName} · ${filePath}`}

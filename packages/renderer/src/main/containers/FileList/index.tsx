@@ -126,7 +126,7 @@ const FileList: FC = observer(() => {
   }, [activationStore.activeDirUri, createFile, t]);
 
   const handleMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
-    const uri = (menuProps as any).uri;
+    const uri = (menuProps as any).props?.uri;
     const SORTER_PREFIX = 'SORTER_';
     if (menu.id.startsWith(SORTER_PREFIX)) {
       stores.fileListStore.setSorter(
@@ -292,6 +292,9 @@ const FileList: FC = observer(() => {
                   onItemClick={(treeNode: TreeNode) => {
                     stores.activationStore.activeFile(treeNode.uri);
                     setText('');
+                  }}
+                  onContextMenu={(e, treeNode) => {
+                    showMenu(e, { props: { uri: treeNode.uri } });
                   }}
                 />
               )}
