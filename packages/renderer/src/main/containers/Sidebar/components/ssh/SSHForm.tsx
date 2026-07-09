@@ -7,6 +7,9 @@ import { useTranslation } from 'react-i18next';
 import Input from '../../../../../components/Input';
 import styles from './SSHForm.module.scss';
 import { Button } from '@fluentui/react-components';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('SSHForm');
 
 interface SSHFormData {
   host: string;
@@ -37,7 +40,8 @@ const SSHForm: FC<SSHFormProps> = (props) => {
     }
   };
   useEffect(() => {
-    const prevForm = localStorage.getItem('ssh_form') || '';
+    const prevForm = localStorage.getItem('ssh_form');
+    if (!prevForm) return;
     try {
       const data = JSON.parse(prevForm);
       Object.keys(data).forEach((key) => {
@@ -47,7 +51,7 @@ const SSHForm: FC<SSHFormProps> = (props) => {
         }
       });
     } catch (err) {
-      // ignore
+      logger.debug('Failed to parse saved ssh form data', err);
     }
   }, []);
   return (

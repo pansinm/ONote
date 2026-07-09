@@ -10,7 +10,6 @@ import stores from '../../stores';
 import { basename, isEquals } from '../../../common/utils/uri';
 
 import '@sinm/react-chrome-tabs/css/chrome-tabs.css';
-import 'react-contexify/dist/ReactContexify.css';
 import './index.scss';
 import { getFileIconClass } from '@sinm/react-file-tree/lib/FileItemWithFileIcon';
 import { getFileName } from '@sinm/react-file-tree/lib/utils';

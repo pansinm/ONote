@@ -96,7 +96,7 @@ const FileList: FC = observer(() => {
         setFiles(filterFiles);
       }
     } catch (err) {
-      // ignore
+      logger.debug('Search failed', err);
     }
   };
 
@@ -269,7 +269,6 @@ const FileList: FC = observer(() => {
             flex: 1,
             background,
           }}
-          draggable
           onDragLeave={() => setBackground('transparent')}
           onDragOver={handleDragover}
           onDrop={handleDrop}

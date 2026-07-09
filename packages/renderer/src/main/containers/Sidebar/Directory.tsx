@@ -19,7 +19,6 @@ import eventbus from '/@/main/eventbus/eventbus';
 import { FILE_CREATED, FILE_DELETED, FILE_RENAMED, FILE_MOVED } from '/@/main/eventbus/EventName';
 
 const DIRECTORY_MENU_ID = 'DIRECTORY_MENU';
-const FILE_MENU_ID = 'FILE_MENU';
 
 import orderBy from 'lodash/orderBy';
 import { when } from 'mobx';
@@ -62,15 +61,7 @@ const Directory = observer(() => {
     { id: 'COPY_PATH', title: t('copyPath') },
   ], [t]);
 
-  const fileMenus: MenuItem[] = useMemo(() => [
-    { id: 'RENAME_FILE', title: t('renameNote') },
-    { id: 'DELETE_FILE', title: t('deleteNote') },
-    { id: 'COPY_PATH', title: t('copyPath') },
-    { id: 'EXPORT_PDF', title: t('exportPdf') },
-  ], [t]);
-
   const { show: showDirMenu } = useContextMenu({ id: DIRECTORY_MENU_ID });
-  const { show: showFileMenu } = useContextMenu({ id: FILE_MENU_ID });
 
   const refreshDir = useCallback((dirUri: string) => {
     return fileService.listDir(dirUri).then((children) => {
@@ -260,31 +251,6 @@ const Directory = observer(() => {
     }
   };
 
-  const handleFileMenuClick: MenuProps['onClick'] = async (menu, menuProps) => {
-    const uri = getMenuNodeUri(menuProps);
-    switch (menu.id) {
-      case 'RENAME_FILE':
-        // renameFile 内部调用 fileService.rename，后端发出事件后由 refreshExpandedDirs 自动刷新树
-        return renameFile(uri, 'file');
-      case 'DELETE_FILE':
-        return deleteFile(uri, 'file').then(() => {
-          removeTreeNode(uri);
-        });
-      case 'COPY_PATH':
-        return navigator.clipboard.writeText(decodeURIComponent(pathanme(uri)));
-      case 'EXPORT_PDF': {
-        const content = await fileService.readText(uri);
-        return window.onote.export.invoke('exportToPdf', uri, content);
-      }
-      case 'OPEN_FOLDER':
-        return window.simmer.openPath(getParentUri(uri));
-      case 'PASTE_TO_CONTAINING_FOLDER':
-        return pasteFilesToDir(getParentUri(uri));
-      default:
-        return;
-    }
-  };
-
   const treeItemRenderer: FileTreeProps['itemRenderer'] = useCallback(
     (treeNode: TreeNode) => (
       <FileTreeItem
@@ -319,16 +285,6 @@ const Directory = observer(() => {
       : dirMenus,
   [dirMenus, t]);
 
-  const localFileMenus = useMemo(() =>
-    stores.activationStore.dataSourceId === 'local'
-      ? [
-          ...fileMenus,
-          { id: 'PASTE_TO_CONTAINING_FOLDER', title: t('pasteToContainingFolder') },
-          { id: 'OPEN_FOLDER', title: t('openFolder') },
-        ]
-      : fileMenus,
-  [fileMenus, t]);
-
   const handleItemClick = (treeNode: TreeNode) => {
     if (
       !treeNode.expanded ||
@@ -354,7 +310,6 @@ const Directory = observer(() => {
         rowHeight={34}
       />
       <Menu menuId={DIRECTORY_MENU_ID} menus={localDirMenus} onClick={handleDirMenuClick} />
-      <Menu menuId={FILE_MENU_ID} menus={localFileMenus} onClick={handleFileMenuClick} />
       <Modal />
     </div>
   );

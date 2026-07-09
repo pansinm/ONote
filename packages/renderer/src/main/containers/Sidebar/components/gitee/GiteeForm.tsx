@@ -6,6 +6,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Input from '/@/components/Input';
 import { Button } from '@fluentui/react-components';
+import { getLogger } from '/@/shared/logger';
+
+const logger = getLogger('GiteeForm');
 
 interface GiteeFormData {
   access_token: string;
@@ -32,7 +35,8 @@ const GiteeForm: FC<GiteeFormProps> = (props) => {
     }
   };
   useEffect(() => {
-    const prevForm = localStorage.getItem('gitee_form') || '';
+    const prevForm = localStorage.getItem('gitee_form');
+    if (!prevForm) return;
     try {
       const data = JSON.parse(prevForm);
       Object.keys(data).forEach((key) => {
@@ -42,7 +46,7 @@ const GiteeForm: FC<GiteeFormProps> = (props) => {
         }
       });
     } catch (err) {
-      // ignore
+      logger.debug('Failed to parse saved gitee form data', err);
     }
   }, []);
   return (

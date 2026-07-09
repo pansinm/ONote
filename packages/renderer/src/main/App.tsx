@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import React, { useRef, useEffect } from 'react';
 import '/@/common/emoji/emoji.scss';
+import 'react-contexify/dist/ReactContexify.css';
 import Sidebar from './containers/Sidebar';
 import styles from './App.module.scss';
 import { observer } from 'mobx-react-lite';
